@@ -23,8 +23,14 @@ Alliance workgroups will not apply to this Workgroup.
    the goals indicated in the “README” file within the Workgroup’s code
    repository.
 
-2. The scope of the Workgroup includes [add additional details about intended
-   focus of Workgroup, 2-3 sentences.]
+2. The scope of the Workgroup includes the IP and firmware for an integrated
+   Root of Trust silicon block. The Caliptra RoT block targets datacenter-class
+   SoCs like CPUs, GPUs, DPUs, TPUs. The repositories within this Workgroup
+   provide the documentation, silicon logic, ROM and firmware for implementing a
+   Root of Trust for Measurement (RTM) block inside an SoC. A Caliptra
+   integration provides the SoC with Identity, Measured Boot and Attestation
+   capabilities.
+
 
 ## Participants
 
@@ -58,23 +64,43 @@ The responsibilities of these TAC roles within the Workgroup include:
 - Determining whether any Workgroup open source collaborations should be wound
   down and archived on GitHub.
 
+### Classes of TAC members
+
+Due to the specific nature of the Caliptra project, there are three classes of
+TAC members. All members are expected to fulfill the responsibilities
+outlined above. However, the subject matter of different classes of maintainers
+is scoped to an area of the Caliptra project:
+
+- *RTL* Maintainers: these maintainers provide oversight over all contributions
+  to digital logic and silicon design.
+- *Firmware* Maintainers: these maintainers provide oversight over all
+  contributions to immutable ROM (Read Only Memory) code, First Mutable Code
+  (FMC) and runtime firmware (FW).
+- *Voting* Members: Only the Voting Members cast the votes for all decisions
+  below that require a TAC vote. Where TAC quorum may be needed, only a quorum
+  of Voting Members is required. Voting Members are responsible for membership
+  decisions in the TAC.
+
+All members of the TAC share oversight responsibilities for miscellaneous code
+that does not fall in any of the categories above, and for documentation files.
+
 ## Eligibility
 
-`[The initial TAC members of the Workgroup will be representatives appointed by
-[WORKGROUP FOUNDING ORGANIZATIONS], with one representative per organization.]`
+The initial TAC members of the Caliptra workgroup are listed in the
+[MAINTAINERS](MAINTAINERS.md) file committed in the same commit as this line.
 
 Organizations who have joined the CHIPS Alliance and signed the CHIPS Alliance
 Participation Agreement and CHIPS Alliance Contributor License Agreement are
 eligible to nominate developer representatives to join the Workgroup TAC.
 
-Developer representatives may join the TAC subject to a simple majority approval
-vote by the existing TAC members in attendance of a TAC meeting, provided quorum
-is met, or by electronic vote without a meeting, with a majority vote of all
-voting members of the TAC.
+At all times, a CHIPS Alliance member organization that meets the CLA
+requirement, and has had at least one employee accepted as a TAC member, should
+have one employee included in the TAC for each of the three classes of TAC
+members: RTL, Firmware, Voting.
 
 Additionally, Volunteer Developers may join the TAC in their individual capacity
 based on active contribution to the Workgroup open source repositories, subject
-to a 2/3 approval vote by the existing TAC members, with all existing TAC
+to a 2/3 approval vote by the existing Voting TAC members, with 2/3 Voting TAC
 members participating in the vote. Such TAC membership decisions will be based
 only on the technical quality of contributions made to the Workgroup open source
 project.
@@ -86,20 +112,20 @@ lists, or on calls that may be joined by any member of the public.
 Any member of the Workgroup TAC may resign by submitting a pull request to
 remove their name from the membership list document; the resignation will be
 considered effectively immediately upon submitting the pull request. The TAC may
-vote to remove a TAC member by a 2/3 vote with a majority of TAC members
-participating. A CHIPS Alliance member may remove its TAC member representative
-or replace its TAC member representative with an alternative employee
-representative at any time.
+vote to remove a TAC member by a 2/3 vote of the Voting TAC members, with 2/3
+Voting TAC members participating. A CHIPS Alliance member organization may
+remove its TAC member representative or replace its TAC member representative
+with an alternative employee representative at any time.
 
 The Workgroup TAC members will be listed by name or pseudonym and GitHub
-username in a document within the Workgroup open source repository. Membership
-changes are reflected by pull requests against the Workgroup TAC membership list
-document.
+username in the [MAINTAINERS](MAINTAINERS.md) document within the Workgroup open
+source repository. Membership changes are reflected by pull requests against the
+Workgroup TAC membership list document.
 
 ### TAC Chair
 
-The TAC may elect a Chair on an annual basis based on a majority vote by the TAC
-members.
+The TAC may elect a Chair on an annual basis based on a majority vote by the
+Voting TAC members.
 
 The TAC may determine the date of its annual Chair elections, with additional
 elections as needed if a Chair resigns or otherwise needs to be replaced.  The
@@ -112,8 +138,8 @@ TAC Chair will:
 - Escalate any Code of Conduct concerns to the CHIPS Alliance TSC.
 
 A TAC Chair may resign at any time. A TAC Chair may be removed from the position
-of Chair by a 2/3 vote of the TAC members, with a majority of the TAC members
-participating in the vote.
+of Chair by a 2/3 vote of the Voting TAC members, with a 2/3 majority of the
+Voting TAC members participating in the vote.
 
 A former TAC Chair may continue to be a Participant in the Workgroup if there is
 no other reason against it, e.g., if no adverse Code of Conduct determination
@@ -140,10 +166,10 @@ Workgroup open source project.
 
 The Workgroup will recognize Volunteer Developers if individuals request to be
 added to a list of Workgroup Volunteer Developers, to be maintained in a
-document in the Workgroup open source repository alongside, or in the same
-document as, the list of official TAC members. It is not necessary to be
-included in the listed individual Volunteer Developers in Workgroup
-documentation to be considered a Volunteer Developer.
+document in the Workgroup open source repository alongside the list of official
+TAC members. It is not necessary to be included in the listed individual
+Volunteer Developers in Workgroup documentation to be considered a Volunteer
+Developer.
 
 Volunteer Developers are welcome to join all meetings, mailing lists, and
 discussions on GitHub. Volunteer Developers do not have any required
@@ -154,10 +180,11 @@ regarding the addition of new members to the TAC.
 
 ## Amendments
 
-This Charter may be amended by a 2/3 vote of the TAC with a participating
-majority of listed TAC members. The vote may be conducted (1) in a meeting with
-meeting minutes noting which TAC members were present and how they voted; (2)
-over email, or (3) via participation in a pull request discussion on GitHub.
+This Charter may be amended by a 2/3 vote of the Voting TAC members with a 2/3
+participating majority of listed Voting TAC members. The upcoming vote will be
+announced ahead of time with no less than one week notive. The vote may be
+conducted in a meeting with meeting minutes noting which TAC members were
+present and how they voted. The minutes will be recorded in this github repo.
 
 Workgroup TAC votes to amend the Workgroup Charter will be subject to a veto by
 the CHIPS Alliance Board, to be exercised when a Charter amendment may
