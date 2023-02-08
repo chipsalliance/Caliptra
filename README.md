@@ -1,6 +1,8 @@
 # Caliptra
 Caliptra IP and firmware for an integrated Root of Trust block.
 
+![Caliptra Logo](doc/Caliptra_Logo_large.png)
+
 Caliptra targets datacenter-class SoCs like CPUs, GPUs, DPUs, TPUs. It is the
 specification, silicon logic, ROM and firmware for implementing a Root of Trust
 for Measurement (RTM) block inside an SoC. A Caliptra integration provides the
