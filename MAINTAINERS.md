@@ -11,7 +11,7 @@ Caliptra Technical Advisory Committee (TAC) Members.
 | Prabhu Jayanna | `Jhprabhu` | AMD | Voting |
 | Piotr Kwidzinski | `pkwidzin-amd` | AMD | RTL |
 | John Traver | `JohnTraverAmd` | AMD | Firmware |
-| Paul Chou | FILLME | Nvidia | Voting |
+| Paul Chou | `nvpachou` | Nvidia | Voting |
 | Rahul Jain | `rahuljainNV` | Nvidia | RTL |
 | James Zhang | `jameszhang-nvidia` | Nvidia | Firmware |
 
