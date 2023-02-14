@@ -20,3 +20,20 @@ Project](https://chipsalliance.org/), a Series of LF Projects, LLC.
 
 The [Caliptra WorkGroup Technical Charter](Caliptra_WG_Technical_Charter.md)
 sets out the charter governing the Caliptra project.
+
+## Repositories
+
+The Caliptra code base and documentation are split across five repositories:
+
+| Repo | Where |
+| -- | -- |
+| [Caliptra RTL](https://github.com/chipsalliance/caliptra-rtl) | The primary repository with immutable RTL |
+| [Caliptra SW](https://github.com/chipsalliance/caliptra-sw) | Caliptra firmware (ROM, FMC, Runtime), and libraries/tools needed to build and test firmware. |
+| [Caliptra U-Reg](https://github.com/chipsalliance/caliptra-ureg) | General-purpose libraries and tools for manipulating MMIO registers from Rust|
+| [Caliptra DPE](https://github.com/chipsalliance/caliptra-dpe) | Implementation of TCG DICE Protection Environment |
+| [Primary Repo](https://github.com/chipsalliance/caliptra) | This repo, with admin boilerplate and docs |
+
+## License
+
+All Code written for Caliptra and found in these repositories is licensed under
+the [Apache Source License 2.0](LICENSE).
