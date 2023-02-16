@@ -33,6 +33,9 @@ The Caliptra code base and documentation are split across five repositories:
 | [Caliptra DPE](https://github.com/chipsalliance/caliptra-dpe) | Implementation of TCG DICE Protection Environment |
 | [Primary Repo](https://github.com/chipsalliance/caliptra) | This repo, with admin boilerplate and docs |
 
+The github config parameters for all the branches are documented in a [local
+file](github_rules.md)
+
 ## License
 
 All Code written for Caliptra and found in these repositories is licensed under
