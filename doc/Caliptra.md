@@ -10,7 +10,7 @@
 
 # Foreword
 
-Caliptra is a project originally incepted at the Open Compute Project ([OCP](https://www.opencompute.org/)). The major revisions of the Caliptra specifications are published at OCP. The evolving source code and documentation for Caliptra live in this repository within the [CHIPS Alliance Project](https://chipsalliance.org/), a Series of LF Projects, LLC.
+Caliptra[^1] is a project originally incepted at the Open Compute Project ([OCP](https://www.opencompute.org/)). The major revisions of the Caliptra specifications are published at OCP. The evolving source code and documentation for Caliptra live in this repository within the [CHIPS Alliance Project](https://chipsalliance.org/), a Series of LF Projects, LLC.
 
 ## Acknowledgments
 
@@ -18,52 +18,37 @@ The Caliptra Workgroup acknowledges the following individuals for their contribu
 
 **CONTRIBUTORS:**
 
-Bryan Kelly (Microsoft)
-
-Andrés Lagar-Cavilla (Google) Jeff Andersen (Google)
-
-Prabhu Jayana (AMD)
-
-Rob Strong (AMD)
-
-John Traver (AMD)
-
-Louis Ferraro (AMD)
-
-Ishwar Agarwal (Microsoft) 
-
-Anjana Parthasarathy (Microsoft) 
-
-Bharat Pillilli (Microsoft)
-
-Vishal Soni (Microsoft)
-
-Marius Schilder (Google)
-
-Sudhir Mathane (AMD)
-
-Nathan Nadarajah (AMD)
-
-Kor Nielsen (Google)
-
-Varun Sampath (NVIDIA)
-
-James Zhang (NVIDIA)
-
-Paul Chou (NVIDIA)
+* Andrés Lagar-Cavilla (Google)
+* Anjana Parthasarathy (Microsoft)
+* Bharat Pillilli (Microsoft)
+* Bryan Kelly (Microsoft)
+* Ishwar Agarwal (Microsoft)
+* James Zhang (NVIDIA)
+* Jeff Andersen (Google)
+* John Traver (AMD)
+* Jordan Hand (Google)
+* Kor Nielsen (Google)
+* Louis Ferraro (AMD)
+* Marius Schilder (Google)
+* Nathan Nadarajah (AMD)
+* Paul Chou (NVIDIA)
+* Piotr Kwidzinski (AMD)
+* Prabhu Jayana (AMD)
+* Rob Strong (AMD)
+* Sudhir Mathane (AMD)
+* Varun Sampath (NVIDIA)
+* Vishal Soni (Microsoft)
 
 <div style="page-break-after: always"></div>
 
 **Revision Table**
-
-
 
 |**Date**|**Revision #**|**Author**|**Description**|
 | - | - | - | - |
 |February 2022|0.2|Prabhu Jayana (AMD)</p> Bryan Kelly (Microsoft)</p> Andrés Lagar-Cavilla (Google)</p> Jeff Andersen (Google)</p> | Initial proposal draft |
 |March 2022|0.4| Rob Strong (AMD)</p> Prabhu Jayana (AMD)</p>| Migrated to OCP template</p>Edits to clarify language use and added sections related LifeCycle support, fuse, crypto requirements, Kat support, etc.</p> |
 |April 12, 2022|0.5|Rob Strong (AMD)|Various edits and formatting modifications to get to v.5|
-|June 2022|0.51|Rob Strong (AMD)|Updated the FW Signing/Verification Algorithms section - added references to OCP Secure Boot specification.</p>Updated Physical Attack Countermeasures - updated the section to reference NiST paper ([14]) that discusses SCA as well as their countermeasures.|
+|June 2022|0.51|Rob Strong (AMD)|Updated the FW Signing/Verification Algorithms section - added references to OCP Secure Boot specification.</p>Updated Physical Attack Countermeasures - updated the section to reference NiST paper ([[7](#ref-7)]) that discusses SCA as well as their countermeasures.|
 |June 2022|0.52|Nathan Nadarajah (AMD) Sudhir Mathane (AMD)|Added Threat Model section and initial content |
 |July 2022|0.53|Louis Ferraro (AMD)|Added Device Resilience chapter and updated related text.|
 |August 2022|0.54|Rob Strong (AMD)|Updated with OCP template and feedback. Added License and Appendix sections.|
@@ -73,51 +58,52 @@ Paul Chou (NVIDIA)
 |November 2022|0.58|Rob Strong (AMD)|In section ‘Caliptra RTM hitless update’, added a definition for ‘hitless’.|
 |January 2023|0.59|Jeff Andersen|Added commentary on LDevID and field entropy; added owner authz fuse details.|
 |January 2023|0.60|Jeff Andersen|Added additional details on hitless update attestation.|
-|January 2023|0.61|Jeff Andersen|Removed KEY MANIFEST SVN from.|
+|January 2023|0.61|Jeff Andersen|Removed KEY MANIFEST SVN from spec.|
+|February 2023|0.62|Piotr Kwidzinski|Moved spec to Caliptra GitHub repo.|
 
 # Acronyms and Abbreviations
 
 For the purposes of this document, the following abbreviations apply:
 
 | Abbreviation | Description |
-|:-------------|:-----------|
-| <a id="bmc"></a>BMC           | Baseboard Management Controller        |
-| <a id="CA"></a>CA             | Certificate Authority                  |
-| <a id="CDI"></a>CDI           | Composite Device Identifier            |
-| <a id="CPU"></a>CPU           | Central Processing Unit                |
-| <a id="CRL"></a>CRL           | Certificate Revocation List            |   
-| <a id="CSR"></a>**CSR**       | Certificate Signing Request            |
-| <a id="CSP"></a>**CSP**       | Critical Security Parameter            |
-| <a id="DICE"></a>**DICE**     | Device Identifier Composition Engine   |
-| <a id="DRBG"></a>**DRBG**     | Deterministic Random Bit Generator     |  
-| <a id="ECDSA"></a>**ECDSA**   | Elliptic Curve Digital Signature Algorithm |
-| <a id="FMC"></a>**FMC**       | FW First Mutable Code      |
-| <a id="GPU"></a>**GPU**       | Graphics Processing Unit   |
-| <a id="IDevId"></a>**IDevId** | Initial Device Identifier  |
-| <a id="iRoT"></a>**iRoT**     | Internal Root of Trust |
-| <a id="KAT"></a>**KAT**       | Known Answer Test |
-| <a id="LDevId"></a>**LDevId** | Locally Significant Device Identifier |
-| <a id="MCTP"></a>**MCTP**     | Management Component Transport Protocol |
-| <a id="NIC"></a>**NIC**       | Network Interface Card |
+|:-------------|:------------|
+| <a id="bmc"></a>**BMC**       | Baseboard Management Controller                |
+| <a id="CA"></a>**CA**         | Certificate Authority                          |
+| <a id="CDI"></a>**CDI**       | Composite Device Identifier                    |
+| <a id="CPU"></a>**CPU**       | Central Processing Unit                        |
+| <a id="CRL"></a>**CRL**       | Certificate Revocation List                    |
+| <a id="CSR"></a>**CSR**       | Certificate Signing Request                    |
+| <a id="CSP"></a>**CSP**       | Critical Security Parameter                    |
+| <a id="DICE"></a>**DICE**     | Device Identifier Composition Engine           |
+| <a id="DRBG"></a>**DRBG**     | Deterministic Random Bit Generator             |
+| <a id="ECDSA"></a>**ECDSA**   | Elliptic Curve Digital Signature Algorithm     |
+| <a id="FMC"></a>**FMC**       | FW First Mutable Code                          |
+| <a id="GPU"></a>**GPU**       | Graphics Processing Unit                       |
+| <a id="IDevId"></a>**IDevId** | Initial Device Identifier                      |
+| <a id="iRoT"></a>**iRoT**     | Internal Root of Trust                         |
+| <a id="KAT"></a>**KAT**       | Known Answer Test                              |
+| <a id="LDevId"></a>**LDevId** | Locally Significant Device Identifier          |
+| <a id="MCTP"></a>**MCTP**     | Management Component Transport Protocol        |
+| <a id="NIC"></a>**NIC**       | Network Interface Card                         |
 | <a id="NIST"></a>**NIST**     | National Institute of Standards and technology |
-| <a id="OCP"></a>**OCP**       | Open Compute Project |
-| <a id="OTP"></a>**OTP**       | One-time programmable |
-| <a id="PKI"></a>**PKI**       | Public Key infrastructure |
-| <a id="PTRNG"></a>**P-TRNG**  | Parallel True Random Number Generator |
-| <a id="PUF"></a>**PUF**       | Physically unclonable function |
-| <a id="RoT"></a>**RoT**       | Root of Trust |
-| <a id="RTI"></a>**RTI**       | RoT for Identity |
-| <a id="RTM"></a>**RTM**       | RoT for Measurement |
-| <a id="RTR"></a>**RTR**       | RoT for Reporting |
-| <a id="SoC"></a>**SoC**       | System on Chip |
-| <a id="SPDM"></a>**SPDM**     | Security Protocol and Data Model |
-| <a id="SSD"></a>**SSD**       | Solid State Drive |
-| <a id="TCB"></a>**TCB**       | Trusted Computing Base |
-| <a id="TCI"></a>**TCI**       | TCB Component Identifier |
-| <a id="TCG"></a>**TCG**       | Trusted Computing Group |
-| <a id="TEE"></a>**TEE**       | Trusted Execution Environment |
-| <a id="TRNG"></a>**TRNG**     | True Random Number Generator |
-| <a id="UECC"></a>**UECC**     | Uncorrectable Error Correction Code |
+| <a id="OCP"></a>**OCP**       | Open Compute Project                           |
+| <a id="OTP"></a>**OTP**       | One-time programmable                          |
+| <a id="PKI"></a>**PKI**       | Public Key infrastructure                      |
+| <a id="PTRNG"></a>**P-TRNG**  | Parallel True Random Number Generator          |
+| <a id="PUF"></a>**PUF**       | Physically unclonable function                 |
+| <a id="RoT"></a>**RoT**       | Root of Trust                                  |
+| <a id="RTI"></a>**RTI**       | RoT for Identity                               |
+| <a id="RTM"></a>**RTM**       | RoT for Measurement                            |
+| <a id="RTR"></a>**RTR**       | RoT for Reporting                              |
+| <a id="SoC"></a>**SoC**       | System on Chip                                 |
+| <a id="SPDM"></a>**SPDM**     | Security Protocol and Data Model               |
+| <a id="SSD"></a>**SSD**       | Solid State Drive                              |
+| <a id="TCB"></a>**TCB**       | Trusted Computing Base                         |
+| <a id="TCI"></a>**TCI**       | TCB Component Identifier                       |
+| <a id="TCG"></a>**TCG**       | Trusted Computing Group                        |
+| <a id="TEE"></a>**TEE**       | Trusted Execution Environment                  |
+| <a id="TRNG"></a>**TRNG**     | True Random Number Generator                   |
+| <a id="UECC"></a>**UECC**     | Uncorrectable Error Correction Code            |
 
 # Requirements Terminology
 
@@ -125,16 +111,17 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 # References
 
-1. NIST Special Publication 800-193 Platform Firmware Resiliency Guidelines
-2. Global Platform Technology Root of Trust Definitions and Requirements Version 1.1 Public 
-4. TCG DICE Layering Architecture Version 1.0 Revision 0.19 July 23, 2020
-5. Key-Establishment Schemes Using Discrete Logarithm Cryptography
-6. [Open Compute Project Secure Boot Specification](https://www.opencompute.org/documents/secure-boot-2-pdf)
-7. TCG DICE Attestation Architecture Version 1.00 Revision 0.23 March 1, 2021
-8. TCG Hardware Requirements for a Device Identifier Composition Engine Family “2.0” Level
-9. [Side-Channel Attacks: Ten Years After Its Publication and the Impacts on Cryptographic Module Security Testing](https://csrc.nist.gov/csrc/media/events/physical-security-testing-workshop/documents/papers/physecpaper19.pdf)
-10. [Attestation V1.0 White Paper](https://www.opencompute.org/documents/attestation-v1-0-20201104-pdf)
-11. [Attestation of System Components v1.0 Requirements and Recommendations](https://www.opencompute.org/documents/attestation-v1-0-20201104-pdf)
+1. <a id="ref-1"></a>NIST Special Publication 800-193 Platform Firmware Resiliency Guidelines
+2. <a id="ref-2"></a>Global Platform Technology Root of Trust Definitions and Requirements Version 1.1 Public 
+3. <a id="ref-3"></a>[Open Compute Project Secure Boot Specification](https://www.opencompute.org/documents/secure-boot-2-pdf)
+4. <a id="ref-4"></a>TCG DICE Layering Architecture Version 1.0 Revision 0.19 July 23, 2020
+5. <a id="ref-5"></a>TCG DICE Attestation Architecture Version 1.00 Revision 0.23 March 1, 2021
+6. <a id="ref-6"></a>TCG Hardware Requirements for a Device Identifier Composition Engine Family “2.0” Level
+7. <a id="ref-7"></a>[Side-Channel Attacks: Ten Years After Its Publication and the Impacts on Cryptographic Module Security Testing](https://csrc.nist.gov/csrc/media/events/physical-security-testing-workshop/documents/papers/physecpaper19.pdf)
+8. <a id="ref-8"></a>[Attestation V1.0 White Paper](https://www.opencompute.org/documents/attestation-v1-0-20201104-pdf)
+9. <a id="ref-9"></a>[Attestation of System Components v1.0 Requirements and Recommendations](https://www.opencompute.org/documents/attestation-v1-0-20201104-pdf)
+10. <a id="ref-10"></a>OCP Security WG: Ownership Transfer
+11. <a id="ref-11"></a>Ownership and Control of Firmware in Open Compute Project Devices (Open Compute Project, Security WG)
 
 # Theory of Operation
 
@@ -200,7 +187,7 @@ In this version, Caliptra Silicon RoT desired capabilities address the basics of
 
 ### Supply Chain Security
 
-- **Mutable Code Integrity:** The objective here is to prove the device is running genuine firmware that the device manufacturer can vouch for its authenticity & integrity, and the device owner can ensure only authorized updates are applied to the device. This flow is aligned with [Reference 4](#References) and can be achieved with dual signature verification of equal imposition.
+- **Mutable Code Integrity:** The objective here is to prove the device is running genuine firmware that the device manufacturer can vouch for its authenticity & integrity, and the device owner can ensure only authorized updates are applied to the device. This flow is aligned with [Reference 10](#ref-10) and can be achieved with dual signature verification of equal imposition.
 - **Configuration & Lifecycle Management**: allow the platform owner to securely configure the RoT capabilities, and enable/authorize lifecycle state transitions of the SoC.
 
 ### DICE Protection Environment
@@ -213,7 +200,7 @@ This specification follows the industry standards and specifications listed in [
 
 ## NIST SP800-193 Platform Firmware Resiliency
 
-Per [Reference 1](#References), RoT subsystems are required to fulfill three principles: *Protection, Detection* and *Recovery*. The associated RoT services are referred to as:
+Per [Reference 1](#ref-1), RoT subsystems are required to fulfill three principles: *Protection, Detection* and *Recovery*. The associated RoT services are referred to as:
 
 - **The Root of Trust for Update (RTU)** is responsible for authenticating firmware updates and critical data changes to support platform protection capabilities.
 - **The Root of Trust for Detection (RTD)** is responsible for firmware and critical data corruption detection capabilities.
@@ -233,15 +220,15 @@ Detection of corrupted critical code & data (configuration) requires strong end 
 
 **Measurements** include **Code** and **Configuration**. Configuration includes invasive capabilities that impact the user service level agreement (SLA) on Confidentiality -- for example, the enablement of debug capabilities that grant an operator access to raw, unencrypted registers for any tenant context. In order to measure and attest Configuration, the Silicon RoT must be in control of the Configuration.
 
-As an extension to controlling Configuration, the Silicon RoT must control the security states (refer to *[Caliptra Security States*](Security States)*). Certain security states by design grant full invasive capabilities to an external operator, for debug or field analysis.
+As an extension to controlling Configuration, the Silicon RoT must control the security states (refer to *[Caliptra Security States](#caliptra-security-states)*). Certain security states by design grant full invasive capabilities to an external operator, for debug or field analysis.
 
 Measurements must be uniquely bound to the device & its manufacturer to a minimum. This establishes the need for **Identity** services in the Silicon RoT, that serves as the basis for key derivation and attestation authenticity.
 
-For further details about how Caliptra addresses NIST SP800-193, refer to [Device Resilience](#_page49_x72.00_y72.00).
+For further details about how Caliptra addresses NIST SP800-193, refer to [Device Resilience](#device-resilience).
 
 ## Trusted Computing Group (TCG) DICE Attestation
 
-In accordance with OCP Attestation specification [Reference 16](#References), devices must have a Cryptographic Identity for the endorsement of attestation quotes. The RTM implementation follows TCG DICE (refer to [Reference 6](#References) and [Reference 13](#References)). One of the benefits of TCG DICE device identities is having renewable security. This renewability complements ownership transfer and circular economy. The new owner is not burdened with the identity of the previous owner, nor is the new owner burdened with trusting an irrevocable hardware identity certificate. This benefits the transferee, as their identities can be revoked through standard PKI mechanisms. DICE based certificates are fully compatible with Public Key Infrastructure (PKI), including full life cycle management and PKI Certificate Revocation List (CRL).
+In accordance with OCP Attestation specification [Reference 9](#ref-9), devices must have a Cryptographic Identity for the endorsement of attestation quotes. The RTM implementation follows TCG DICE (refer to [Reference 4](#ref-4), [Reference 5](#ref-5), and [Reference 6](#ref-6)). One of the benefits of TCG DICE device identities is having renewable security. This renewability complements ownership transfer and circular economy. The new owner is not burdened with the identity of the previous owner, nor is the new owner burdened with trusting an irrevocable hardware identity certificate. This benefits the transferee, as their identities can be revoked through standard PKI mechanisms. DICE based certificates are fully compatible with Public Key Infrastructure (PKI), including full life cycle management and PKI Certificate Revocation List (CRL).
 
 Operational security during the manufacture process is critical, to ensure the DICE entropy is securely initialized, certified, and registered, avoiding any pilfering of this asset by eavesdroppers. Operational security is outside the scope of this specification.
 
@@ -257,7 +244,7 @@ Threat scenarios as comprehended by assets & possible attack paths are as comple
 
 Attacker profile is the outcome of following factors like tools accessible to the attacker, level of access to the target of evaluation &  expertise of the attacker to use these methods. Next level of details of these capabilities scoped for this discussion are as follows.
 
-*Table* *1: Tools Accessible to Attacker*
+*Table 1: Tools Accessible to Attacker*
 
 | **Attack Tools** | **Type of Attack** | **Purpose/Usage** |
 | :--------- | :--------- | :--------- |
@@ -328,9 +315,9 @@ Trust levels of Caliptra and the SoC security engine are not hierarchical. These
 
 ### Caliptra Interactions
 
-The “Caliptra Core” blocks consume the Tcc and Tcw Trust level components.   This boundary includes crypto accelerators, hardware key sequencer, key vault, Caliptra microcontroller, ROM and subsystem interconnects.  The Caliptra Core provides deterministic Caliptra behavior.  The Caliptra Subsystem includes the Tc, Tcw, Tse and Trs, this subsystem extends Trust level into the SoC subsystem and allows for customization of the SoC initialization.   For information on Caliptra Core and Caliptra Subsystem, see section: [Caliptra Profiles](#_page34_x72.00_y409.13)
+The “Caliptra Core” blocks consume the Tcc and Tcw Trust level components.  This boundary includes crypto accelerators, hardware key sequencer, key vault, Caliptra microcontroller, ROM and subsystem interconnects.  The Caliptra Core provides deterministic Caliptra behavior.  The Caliptra Subsystem includes the Tc, Tcw, Tse and Trs, this subsystem extends Trust level into the SoC subsystem and allows for customization of the SoC initialization.  For information on Caliptra Core and Caliptra Subsystem, see section: [Caliptra Profiles](#caliptra-profiles)
 
-### Caliptra Assets & Threats
+### <a id="assets"></a>Caliptra Assets & Threats
 
 Assets are defined to be secrets or abilities that must be protected by an owner or user of the asset.  Ownership means that the owner has the responsibility to protect these assets and must only make them available based on a defined mechanism while protecting all other assets.
 
@@ -411,61 +398,30 @@ An example of when an owner must protect assets would be moving from secure mode
     <td>1. Environmental monitoring &amp; protection<br>2. Error check before consuming values from fuse various ways</td>
   </tr>
   <tr>
-    <td rowspan="8">Die unique assets</td>
+    <td rowspan="7">Die unique assets</td>
     <td>UDS (802.1AR Unique Device Secret)</td>
-    <td>Confidentiality and Integrity</td>
-    <td>Proficient</td>
-    <td>1. Software reading actual secrets<br>2. Side channel attack to infer secret</td>
-    <td>1. Secrets locked in key vault, not readable by SW<br>2. SCA Protections</td>
+    <td rowspan="7">Confidentiality and Integrity</td>
+    <td rowspan="7">Proficient</td>
+    <td rowspan="7">1. Software reading actual secrets<br>2. Side channel attack to infer secret</td>
+    <td rowspan="7">1. Secrets locked in key vault, not readable by SW<br>2. SCA Protections</td>
   </tr>
   <tr>
-    <td>DICE UDS (DICE Unique Device Secret)</td>
-    <td>Confidentiality and Integrity</td>
-    <td>Proficient</td>
-    <td>1. Software reading actual secrets<br>2. Side channel attack to infer secret</td>
-    <td>1. Secrets locked in key vault, not readable by SW<br>2. SCA Protections</td>
+    <td>CDI<sub>n</sub> (DICE component device identifier for Layer n)</td>
   </tr>
   <tr>
-    <td>CDI0 (DICE component device identifier for Layer 0)</td>
-    <td>Confidentiality and Integrity</td>
-    <td>Proficient</td>
-    <td>1. Software reading actual secrets<br>2. Side channel attack to infer secret</td>
-    <td>1. Secrets locked in key vault, not readable by SW<br>2. SCA Protections</td>
+    <td>IDevID<sub>Priv</sub></td>
   </tr>
   <tr>
-    <td>CDI1-n ((DICE component device identifier for Layer x)</td>
-    <td>Confidentiality and Integrity</td>
-    <td>Proficient</td>
-    <td>1. Software reading actual secrets<br>2. Side channel attack to infer secret</td>
-    <td>1. Secrets locked in key vault, not readable by SW<br>2. SCA Protections</td>
-  </tr>
-  <tr>
-    <td>IDevID_Priv</td>
-    <td>Confidentiality and Integrity</td>
-    <td>Proficient</td>
-    <td>1. Software reading actual secrets<br>2. Side channel attack to infer secret</td>
-    <td>1. Secrets locked in key vault, not readable by SW<br>2. SCA Protections</td>
-  </tr>
-  <tr>
-    <td>LDevID_Priv</td>
-    <td>Confidentiality and Integrity</td>
-    <td>Proficient</td>
-    <td>1. Software reading actual secrets<br>2. Side channel attack to infer secret</td>
-    <td>1. Secrets locked in key vault, not readable by SW<br>2. SCA Protections</td>
+    <td>LDevID<sub>Priv</sub></td>
   </tr>
   <tr>
     <td>Obfuscation Key</td>
-    <td>Confidentiality and Integrity</td>
-    <td>Proficient</td>
-    <td>1. Software reading actual secrets<br>2. Side channel attack to infer secret</td>
-    <td>1. Secrets locked in key vault, not readable by SW<br>2. SCA Protections</td>
   </tr>
   <tr>
-    <td>Alias_Key_Priv</td>
-    <td>Confidentiality and Integrity</td>
-    <td>Proficient</td>
-    <td>1. Software reading actual secrets<br>2. Side channel attack to infer secret</td>
-    <td>1. Secrets locked in key vault, not readable by SW<br>2. SCA Protections</td>
+    <td>AliasFMC_Key<sub>Priv</sub></td>
+  </tr>
+  <tr>
+    <td>AliasRT_Key<sub>Priv</sub></td>
   </tr>
   <tr>
     <td rowspan="5">Root of trust execution</td>
@@ -554,19 +510,19 @@ A Caliptra RTM subsystem has the following basic, high-level blocks:
 
 ![](Caliptra_HW_diagram.jpeg)
 
-See [HW Section](#Hardware Section) for a detailed discussion.
+See [HW Section](#hardware-section) for a detailed discussion.
 
 ## Caliptra Profiles
 
-Caliptra supports two physical modes of instantiation, the Caliptra Core and the Caliptra Subsystem.   Within Caliptra Core there are two modes of integration with different security postures and firmware loading techniques.  The first is Boot Media Integrated Profile (formerly Active Profile) where Caliptra loads its firmware directly from persistent storage (eg. SPI) while in Boot Media Dependent Profile (formerly Passive Profile) Caliptra firmware is pushed into mailbox SRAM buffer by the SoC immutable code (HW or ROM) that controls the persistent storage of the firmware code.
+Caliptra supports two physical modes of instantiation, the Caliptra Core and the Caliptra Subsystem.  Within Caliptra Core there are two modes of integration with different security postures and firmware loading techniques.  The first is Boot Media Integrated Profile (formerly Active Profile) where Caliptra loads its firmware directly from persistent storage (eg. SPI) while in Boot Media Dependent Profile (formerly Passive Profile) Caliptra firmware is pushed into mailbox SRAM buffer by the SoC immutable code (HW or ROM) that controls the persistent storage of the firmware code.
 
-### Caliptra Core - Boot Media Integrated (BMI)
+### <a id="bmi"></a>Caliptra Core - Boot Media Integrated (BMI)
 
 When Caliptra is integrated into an SoC in Boot Media Integrated mode, Caliptra RTM is the first uncore microcontroller taken out of reset with direct access to persistent storage. The flow for boot is as follows:
 
 	1. Hardware executes SoC power-on reset logic.
 	2. Caliptra ROM executes first and performs cryptographic identity generation, reads in Caliptra firmware from flash.
-	3. Caliptra ROM measures and verifies its firmware before loading/executing it. Refer to Error Reporting and Handling for details regarding FMC verification failures.
+	3. Caliptra ROM measures and verifies its firmware before loading/executing it. Refer to [Error Reporting and Handling](#error-reporting-and-handling) for details regarding FMC verification failures.
 	4. After loading, verifying  and executing its firmware, Caliptra copies the SoC First Mutable Code (FMC) into an SoC internal SRAM mailbox buffer and measures that firmware.
 	5. At this point, Caliptra may signal to SoC ROM and SoC uncore to continue power-on reset as shown in Figure 1.
 
@@ -579,7 +535,7 @@ In the Boot Media Integrated profile, the Caliptra Trusted Computing Base (TCB) 
 	1. The SoC design ingests firmware through Caliptra
 	2. Caliptra IP, Caliptra ROM, and Caliptra Firmware
 
-### Caliptra Core - Boot Media Dependent (BMD)
+### <a id="bmd"></a>Caliptra Core - Boot Media Dependent (BMD)
 
 To facilitate ease of integration and reliable measurement, the Caliptra RTM is the first uncore controller to be taken out of reset by the SoC ROM.  Once loaded, it provides callback signals for the remaining SoC subsystem to resume normal reset flow.
 
@@ -595,7 +551,7 @@ In the BMD profile, the Caliptra trusted computing base (TCB) for integrity of C
 	6. Caliptra signals back to SoC to resume reset.
 	7. SoC reads in its firmware, cryptographically authenticates its FW and provides measurements to Caliptra before executing.
 
-Refer to Error Reporting and Handling for details regarding Caliptra and SoC firmware load and verification error handling.
+Refer to [Error Reporting and Handling](#error-reporting-and-handling) for details regarding Caliptra and SoC firmware load and verification error handling.
 
 *Figure 4: Boot Media Independent Boot Flow*
 
@@ -641,11 +597,11 @@ The Caliptra UDS is stored in fuses, and is encrypted at rest by an obfuscation 
 
 ### IDevID key
 
-A Caliptra RTM's IDevID key is a hardware identity generated by Caliptra ROM during manufacturing. This key must be solely wielded by Caliptra ROM, and shall never be exposed externally at any phase of the Caliptra life cycle. IDevID is used to endorse LDevID. The IDevID certificate is endorsed by the vendor’s provisioning CA (pCA) implemented via a HSM appliance connected to High Volume Manufacturing flows (see provisioning CA in [Reference 16](#References)).
+A Caliptra RTM's IDevID key is a hardware identity generated by Caliptra ROM during manufacturing. This key must be solely wielded by Caliptra ROM, and shall never be exposed externally at any phase of the Caliptra life cycle. IDevID is used to endorse LDevID. The IDevID certificate is endorsed by the vendor’s provisioning CA (pCA) implemented via a HSM appliance connected to High Volume Manufacturing flows (see provisioning CA in [Reference 9](#ref-9)).
 
 There are likely multiple networked components between a Caliptra ROM execution supplying an IDevID CSR and the HSM appliance consuming that CSR to endorse with pCA. To mitigate man-in-the-middle attacks, Caliptra ROM shall sign the IDevID CSR with a “CSR envelope” private key. The CSR envelope private key is an ECDSA-P384 private key that is a chip-class secret provisioned by the vendor. The vendor should provision the CSR envelope public key to their HSM appliance, enabling them to authenticate the CSR prior to endorsement.
 
-See [Provisioning IDevID During Manufacturing](#_page43_x72.00_y72.00) for further details on IDevID provisioning.
+See [Provisioning IDevID During Manufacturing](#provisioning-idevid-during-manufacturing) for further details on IDevID provisioning.
 
 ### LDevID key
 
@@ -698,7 +654,7 @@ Note that the owner key, when represented in fuses or in the FMC's alias certifi
 
 ![](./images/Caliptra_manuf_flow1.jpeg)
 
-*Figure 4: Device Manufacturing Identity Flow*
+*Figure 7: Device Manufacturing Identity Flow*
 
 1. High Volume Manufacturing (HVM) programs NIST compliant UDS into fuses using SOC specific fuse programming flow. Note that this UDS goes through an obfuscation function within Caliptra IP. Hence it is fine for HVM to generate the UDS.
 2. SOC will drive the security state indicating that its a manufacturing flow. Refer to “Caliptra Security States” for encodings.
@@ -715,7 +671,7 @@ Note that the owner key, when represented in fuses or in the FMC's alias certifi
 
 ## Certificate Format
 
-Device Identity Certificates are following X.509 v3 format described in RFC 5280.  The values in the X.509 certificate shall follow the DICE TCBInfo fields, as defined in [Reference 12](#References).   The owner public key shall be extended into VendorInfo, with the security operational state reflecting the flags of DICE TCBInfo.  Additional fields may be extended into VendorInfo.
+Device Identity Certificates are following X.509 v3 format described in RFC 5280.  The values in the X.509 certificate shall follow the DICE TCBInfo fields, as defined in [Reference 5](#ref-5).  The owner public key shall be extended into VendorInfo, with the security operational state reflecting the flags of DICE TCBInfo.  Additional fields may be extended into VendorInfo.
 
 [**TODO for 0.8 release**: The x509 owner key, JTAG state, public key used to verify firmware should be extended in the Cert. ]
 
@@ -723,7 +679,7 @@ Caliptra Security States
 
 ![](./images/Caliptra_security_states.png)
 
-*Figure 5: Caliptra Security States*
+*Figure 8: Caliptra Security States*
 
 **Definitions**
 
@@ -741,16 +697,16 @@ Caliptra Security States
 	- Lower 2 bits are mapped to device lifecycle (Unprovisioned, Manufacturing, Production)
 - SOC’s security state may also be influenced by its own device life cycle.
 - Caliptra’s security state determines Caliptra’s debug state and the state of its security assets.
-- In general, if Caliptra is in unsecure state, all keys, assets are ‘zeroized’. Zeroized may mean switching to all 0s or 1s or debug keys based on the key. Refer to Caliptra Assets for a description of Caliptra assets.
+- In general, if Caliptra is in unsecure state, all keys, assets are ‘zeroized’. Zeroized may mean switching to all 0s or 1s or debug keys based on the key. Refer to [Caliptra Assets](#assets) for a description of Caliptra assets.
 
 *Table 7: Security States*
 
-| {Security State, Device Life Cycle State[1:0]} | State                         | Definition                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | State Transition Requirement                                                                                                                                                                                                                                                                                                         |
-|------------------------------------------------|-------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 000b                                           | DebugUnlocked & Unprovisioned | This is Caliptra’s default state; it is used for development and early Caliptra bring up. This state is not used to provision the Caliptra assets. In this state: <ul><li>UDS and all other identity critical assets shall not be not programmed in fuses. Un-programmed Fuse bits shall be read as 0s (zero).<ul><li>The debug UDS shall be obfuscated and de-obfuscated using the debug obfuscation key.</li></ul></li><li>Obfuscation key: The debug obfuscation key shall be used</li><li>Caliptra JTAG is unlocked and allows microcontroller debug</li><li>Caliptra JTAG can access IP internal registers through FW</li></ul>                                                                                                                                                                               | Unprovisioned to any other state requires cold boot cycle of Caliptra & SOC                                                                                                                                                                                                                                                          |
-| 100b                                           | DebugLocked & Manufacturing   | Caliptra is commanded to enter this state during the secure High-Volume-Manufacturing (HVM) process. In this state: <ul><li>UDS and other identity critical assets shall be programmed into Fuses. They are written into Caliptra fuse registers, similar to the ‘Secure’ state.</li><li>All security assets shall be in production mode (production UDS and obfuscation shall be used)</li><li>Caliptra JTAG shall be locked – microcontroller debug shall be disabled</li><li>Caliptra microcontroller can be interrupted through JTAG mailbox</ul>                                                                                                                                                                                                                                                                                              | Manufacturing -> Unsecure State transition possible without power cycle and Caliptra will clear all the security critical assets/registers before JTAG is opened  Manufacturing -> Secured state possible ONLY with a power cycle  Refer to Provisioning During Manufacturing for details on manufacturing and provisioning details. |
-| 101b                                           | DebugLocked & Production      | All security assets are in production mode. In this state: <ul><li>Production UDS and obfuscation key shall be used.</li><li>CPU execution shall be enabled</li><li>All ‘backdoor’ functionality shall be disabled (e.g., developer functions/functionality that could reveal sensitive information or result in escalation of privileges, etc.)</li><li>Debug functions shall be disabled<ul><li>Caliptra JTAG is locked – microcontroller debug shall be disabled</li><li>Caliptra microcontroller shall not be interruptible through JTAG mailbox</li></ul></li><li>DFT functions shall be disabled</li></ul>                                                                                                                                                                                                                                                                      | DebugLocked -> Debug Unlocked possible without power cycle and Caliptra will clear all the security critical assets/registers before JTAG is opened                                                                                                                                                                                  |
-| 001b                                           | DebugUnlocked & Production    | This state is used when debugging of Caliptra RTM is required. When in this state: <ul><li>UDS and other identity critical assets are programmed into Fuses. They may not have been written into Caliptra fuse registers if the unsecure state entered before Caliptra is out of reset. If unsecure state transition happened after fuses are written to Caliptra, they are cleared on seeing the security state transition from secure/manufacturing -> unsecure</li><li>Caliptra state: All security assets are in debug mode (UDS & Obfuscation key are in production state)<ul><li>UDS: Reverts to a ‘well-known’ debug value</li><li>Obfuscation key: Switched to debug key</li><li>Key Vault is also cleared</li><li>Caliptra JTAG is unlocked and allows microcontroller debug</li><li>Caliptra JTAG can access IP internal registers through FW or directly</li></ul></li></ul> | Debug Unlocked -> Debug Locked possible ONLY with a power cycle.                                                                                                                                                                                                                                                                     |
+| {Security State, Device Life Cycle State[1:0]} | State                         | Definition                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | State Transition Requirement                                                |
+|------------------------------------------------|-------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| 000b                                           | DebugUnlocked & Unprovisioned | This is Caliptra’s default state; it is used for development and early Caliptra bring up. This state is not used to provision the Caliptra assets. In this state: <ul><li>UDS and all other identity critical assets shall not be not programmed in fuses. Un-programmed Fuse bits shall be read as 0s (zero).<ul><li>The debug UDS shall be obfuscated and de-obfuscated using the debug obfuscation key.</li></ul></li><li>Obfuscation key: The debug obfuscation key shall be used</li><li>Caliptra JTAG is unlocked and allows microcontroller debug</li><li>Caliptra JTAG can access IP internal registers through FW</li></ul>                                                                                                                                                                                                                                                    | Unprovisioned to any other state requires cold boot cycle of Caliptra & SOC |
+| 100b                                           | DebugLocked & Manufacturing   | Caliptra is commanded to enter this state during the secure High-Volume-Manufacturing (HVM) process. In this state: <ul><li>UDS and other identity critical assets shall be programmed into Fuses. They are written into Caliptra fuse registers, similar to the ‘Secure’ state.</li><li>All security assets shall be in production mode (production UDS and obfuscation shall be used)</li><li>Caliptra JTAG shall be locked – microcontroller debug shall be disabled</li><li>Caliptra microcontroller can be interrupted through JTAG mailbox</ul>                                                                                                                                                                                                                                                                                                                                   | Manufacturing -> Unsecure State transition possible without power cycle and Caliptra will clear all the security critical assets/registers before JTAG is opened  Manufacturing -> Secured state possible ONLY with a power cycle  Refer to [Provisioning During Manufacturing](#provisioning-idevid-during-manufacturing) for details on manufacturing and provisioning details. |
+| 101b                                           | DebugLocked & Production      | All security assets are in production mode. In this state: <ul><li>Production UDS and obfuscation key shall be used.</li><li>CPU execution shall be enabled</li><li>All ‘backdoor’ functionality shall be disabled (e.g., developer functions/functionality that could reveal sensitive information or result in escalation of privileges, etc.)</li><li>Debug functions shall be disabled<ul><li>Caliptra JTAG is locked – microcontroller debug shall be disabled</li><li>Caliptra microcontroller shall not be interruptible through JTAG mailbox</li></ul></li><li>DFT functions shall be disabled</li></ul>                                                                                                                                                                                                                                                                        | DebugLocked -> Debug Unlocked possible without power cycle and Caliptra will clear all the security critical assets/registers before JTAG is opened |
+| 001b                                           | DebugUnlocked & Production    | This state is used when debugging of Caliptra RTM is required. When in this state: <ul><li>UDS and other identity critical assets are programmed into Fuses. They may not have been written into Caliptra fuse registers if the unsecure state entered before Caliptra is out of reset. If unsecure state transition happened after fuses are written to Caliptra, they are cleared on seeing the security state transition from secure/manufacturing -> unsecure</li><li>Caliptra state: All security assets are in debug mode (UDS & Obfuscation key are in production state)<ul><li>UDS: Reverts to a ‘well-known’ debug value</li><li>Obfuscation key: Switched to debug key</li><li>Key Vault is also cleared</li><li>Caliptra JTAG is unlocked and allows microcontroller debug</li><li>Caliptra JTAG can access IP internal registers through FW or directly</li></ul></li></ul> | Debug Unlocked -> Debug Locked possible ONLY with a power cycle.            |
 
 **Note:** End of life state is owned by SOC. In end-of-life device life cycle state, Caliptra shall not not be brought out of reset.
 
@@ -770,43 +726,128 @@ The service surface of a Caliptra RTM has multiple vectors. All use cases are co
 
 ## Device Resilience
 
-As noted earlier in this document, Caliptra has a role to play in maintaining the resilience posture of the SoC as defined by NIST SP800-193 Platform Firmware Resiliency Guidelines [Reference 1](#References). As the Silicon RTM, Caliptra is either responsible for, or participates in, various Protection and Detection requirements described in the NIST publication.
+As noted earlier in this document, Caliptra has a role to play in maintaining the resilience posture of the SoC as defined by NIST SP800-193 Platform Firmware Resiliency Guidelines [Reference 1](#ref-1). As the Silicon RTM, Caliptra is either responsible for, or participates in, various Protection and Detection requirements described in the NIST publication.
 
 Table 8: NIST SP800-193 Requirements describes the NIST SP800-193 requirements that Caliptra shall meet, either on its own or in conjunction with other components within the SoC or Platform. Requirements not listed should be assumed not covered and out-of-scope for Caliptra. In particular, most requirements related to firmware update and recovery are out-of-scope and must be handled by other components of the system.
 
 *Table 8: NIST SP800-193 Requirements*
 
-|**NIST SP800-193 Chapter**|**Requirement**|**Caliptra Responsibility**|
-| :-: | - | - |
-|4.1.1|All security mechanisms and functions shall be founded to Roots of Trust.|Caliptra forms the basis for all trust in the SoC starting from execution of its immutable ROM. See chapter on Secure Boot Flow.|
-|4.1.1|If Chains of Trust (CoT) are used, RoT shall serve as the anchor for the CoT.|All other firmware shall be authenticated and executed as part of a Chain of Trust extended from the Caliptra ROM. See chapter on Secure Boot Flow.|
-|4.1.1|All RoTs and CoTs shall either be immutable or protected using mechanisms which ensure all RoTs and CoTs remain in a state of integrity.|All other firmware is authenticated and executed as part of a Chain of Trust extended from the Caliptra ROM. See chapter on Secure Boot Flow.|
-|4.1.1|All elements of the Chains of Trust for Update, Detection and Recovery in non-volatile storage shall be implemented in platform firmware.|Caliptra forms the basis for Root of Trust for Measurement (or Detection). All other silicon RoT capabilities are extended by additional firmware loaded in the SoC and anchored by the Caliptra RTM.|
-|4.1.1|The functions of the RoTs or CoTs shall be resistant to any tampering attempted by software running under, or as part of, the operating system on the host processor.|Caliptra shall run on a dedicated microcontroller, isolated physically from access by other components in the system.|
-|4.1.1|Information transferred from the software on the host processor to the platform firmware shall be treated as untrusted. | Caliptra shall verify the authenticity of its firmware using an approved digital signature verification mechanism.|
-|4.1.1|CoTs may be extended to include elements that are not from non-volatile storage. Before use, those elements shall be cryptographically verified by an earlier element of the CoT.|Caliptra shall verify the authenticity of its firmware using an approved digital signature verification mechanism. Caliptra shall also measure the SoC Security Processor FMC code before it is verified and executed by the SoC.|
-|4.1.2|If the key store is updateable, then the key store shall be updated using an authenticated update mechanism, absent unambiguous physical presence through a secure local update.|Hashes for the keys used to authenticate Caliptra FW are programmed into fuses during manufacturing. If a key is deemed to be compromised, that key may be revoked and the next key used instead. See chapter on Fuse/OTP Requirements.|
-|4.1.3|Each platform device which implements a detection capability shall rely on either a Root of Trust for Detection (RTD), or a Chain of Trust for Detection (CTD) which is anchored by an RTD, for its detection.|Caliptra forms the basis for all trust in the SoC starting from execution of its immutable ROM. All other firmware shall be authenticated and executed as part of a Chain of Trust extended from the Caliptra ROM. See chapter on Secure Boot Flow.|
-|4.1.3|The RTD or CTD shall include or have access to information necessary to detect corruption of firmware code and critical data.|Caliptra relies on hashes of authorized keys stored in fuses. Those hashes are then checked against public keys found in firmware headers to authenticate Caliptra’s runtime firmware. Caliptra relies on redundancy in the fuses to protect the key and configuration data. See chapter on Fuse/OTP Requirements|
-|4.2.3|If Critical Platform Firmware code in non-volatile memory is copied into RAM to be executed (for performance, or for other reasons) then the firmware program in RAM shall be protected from modification by software or shall complete its function before software starts.|Caliptra shall run on a dedicated microcontroller, isolated physically from access by other components in the system.|
-|4.2.3|If Critical Platform Firmware uses RAM for temporary data storage, then this memory shall be protected from software running on the Platform until the data’s use is complete. | Caliptra shall run on a dedicated microcontroller, isolated physically from access by other components in the system. |
-|4.2.3|Software shall not be able to interfere with the intended function of Critical Platform Firmware. For example, by denying execution, modifying the processor mode, or polluting caches.|Caliptra shall run on a dedicated microcontroller, isolated physically from access by other components in the system. In addition, the Caliptra subsystem begins execution before other firmware is allowed to run.|
-|4.2.4|Critical data shall be modifiable only through the device itself or defined interfaces provided by device firmware. Examples of defined interfaces include proprietary or public application programming interfaces (APIs) used by the device’s firmware, or standards-based interfaces. Symbiont devices may rely on their host devices to meet this requirement.|Caliptra receives firmware and configuration input only via defined interfaces within the SoC. See chapter on Mailboxes.|
-|4.2.1.3|The authenticated update mechanism shall be capable of preventing unauthorized updates of the device firmware to an earlier authentic version that has a security weakness or would enable updates to a version with a known security weakness.|Caliptra supports a mechanism for detecting and preventing execution of a prior firmware image that is no longer authorized. See chapter on Anti-rollback Support.|
-|4.3.1|A successful attack which corrupts the active critical data or the firmware image, or subverts their protection mechanisms, shall not in and of itself result in a successful attack on the RTD or the information necessary to detect corruption of the firmware image.| Caliptra shall verify the signature of any firmware it loads during each boot. If the signature verification fails, Caliptra shall notify the SoC that firmware recovery must be performed. Refer to Error Reporting and Handling. |
-|4.3.1|Verify integrity, using an approved digital signature algorithm or cryptographic hash, of device firmware code prior to execution of code outside the RTD. | Caliptra shall perform digital signature verification of its FMC code, as well as that of the SoC Security Processor FMC before they are allowed to execute. |
-|4.3.1|If firmware corruption is detected, the RTD or CTD should be capable of starting a recovery process to restore the device firmware code back to an authentic version.|Caliptra shall notify the SoC via the Mailbox interface to initiate the recovery process.|
-|4.3.1|The detection mechanism should be capable of creating notifications of firmware corruption.|Caliptra shall notify the SoC via the Mailbox interface to initiate the recovery process.|
-|4.3.1|The detection mechanism should be capable of logging events when firmware corruption is detected.|It is the responsibility of the SoC to log any corruption events upon notification by Caliptra.|
-|4.3.2|The RTD or CTD shall perform integrity checks on the critical data prior to use. Integrity checks may take the form, for example, of validating the data against known valid values or verifying the hash of the data storage.|Caliptra relies on redundant fuses to store its configuration data, which is owned and passed to Caliptra through the Mailbox.|
-|4.3.2|The RTD or CTD should be capable of creating notifications of data corruption.|Refer to Error Reporting and Handling.|
-|4.3.2|The detection mechanism should be capable of logging events when data corruption is detected.|It is the responsibility of the SoC to log any corruption events upon notification by Caliptra.|
+<table>
+    <thead>
+        <tr>
+            <th><b>NIST SP800-193 Chapter</b></th>
+            <th><b>Requirement</b></th>
+            <th><b>Caliptra Responsibility</b></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+			<td rowspan=7>4.1.1</td>
+			<td>All security mechanisms and functions shall be founded to Roots of Trust.</td>
+			<td>Caliptra forms the basis for all trust in the SoC starting from execution of its immutable ROM. See chapter on Secure Boot Flow.</td>
+		</tr>
+		<tr>
+			<td>If Chains of Trust (CoT) are used, RoT shall serve as the anchor for the CoT.</td>
+			<td>All other firmware shall be authenticated and executed as part of a Chain of Trust extended from the Caliptra ROM. See chapter on Secure Boot Flow.</td>
+		</tr>
+		<tr>
+			<td>All RoTs and CoTs shall either be immutable or protected using mechanisms which ensure all RoTs and CoTs remain in a state of integrity.</td>
+			<td>All other firmware is authenticated and executed as part of a Chain of Trust extended from the Caliptra ROM. See chapter on Secure Boot Flow.</td>
+		</tr>
+		<tr>
+			<td>All elements of the Chains of Trust for Update, Detection and Recovery in non-volatile storage shall be implemented in platform firmware.</td>
+			<td>Caliptra forms the basis for Root of Trust for Measurement (or Detection). All other silicon RoT capabilities are extended by additional firmware loaded in the SoC and anchored by the Caliptra RTM.</td>
+		</tr>
+		<tr>
+			<td>The functions of the RoTs or CoTs shall be resistant to any tampering attempted by software running under, or as part of, the operating system on the host processor.</td>
+			<td>Caliptra shall run on a dedicated microcontroller, isolated physically from access by other components in the system.</td>
+		<tr>
+			<td>Information transferred from the software on the host processor to the platform firmware shall be treated as untrusted.</td>
+			<td>Caliptra shall verify the authenticity of its firmware using an approved digital signature verification mechanism.</td>
+		</tr>
+		<tr>
+			<td>CoTs may be extended to include elements that are not from non-volatile storage. Before use, those elements shall be cryptographically verified by an earlier element of the CoT.</td>
+			<td>Caliptra shall verify the authenticity of its firmware using an approved digital signature verification mechanism. Caliptra shall also measure the SoC Security Processor FMC code before it is verified and executed by the SoC.</td>
+		</tr>
+		<tr>
+			<td>4.1.2</td>
+			<td>If the key store is updateable, then the key store shall be updated using an authenticated update mechanism, absent unambiguous physical presence through a secure local update.</td>
+			<td>Hashes for the keys used to authenticate Caliptra FW are programmed into fuses during manufacturing. If a key is deemed to be compromised, that key may be revoked and the next key used instead. See chapter on Fuse/OTP Requirements.</td>
+		</tr>
+		<tr>
+			<td rowspan=2>4.1.3</td>
+			<td>Each platform device which implements a detection capability shall rely on either a Root of Trust for Detection (RTD), or a Chain of Trust for Detection (CTD) which is anchored by an RTD, for its detection.</td>
+			<td>Caliptra forms the basis for all trust in the SoC starting from execution of its immutable ROM. All other firmware shall be authenticated and executed as part of a Chain of Trust extended from the Caliptra ROM. See chapter on Secure Boot Flow.</td>
+		</tr>
+		<tr>
+			<td>The RTD or CTD shall include or have access to information necessary to detect corruption of firmware code and critical data.</td>
+			<td>Caliptra relies on hashes of authorized keys stored in fuses. Those hashes are then checked against public keys found in firmware headers to authenticate Caliptra’s runtime firmware. Caliptra relies on redundancy in the fuses to protect the key and configuration data. See chapter on Fuse/OTP Requirements</td>
+		</tr>
+		<tr>
+			<td rowspan=3>4.2.3</td>
+			<td>If Critical Platform Firmware code in non-volatile memory is copied into RAM to be executed (for performance, or for other reasons) then the firmware program in RAM shall be protected from modification by software or shall complete its function before software starts.</td>
+			<td>Caliptra shall run on a dedicated microcontroller, isolated physically from access by other components in the system.</td>
+		</tr>
+		<tr>
+			<td>If Critical Platform Firmware uses RAM for temporary data storage, then this memory shall be protected from software running on the Platform until the data’s use is complete.</td>
+			<td>Caliptra shall run on a dedicated microcontroller, isolated physically from access by other components in the system.</td>
+		</tr>
+		<tr>
+			<td>Software shall not be able to interfere with the intended function of Critical Platform Firmware. For example, by denying execution, modifying the processor mode, or polluting caches.</td>
+			<td>Caliptra shall run on a dedicated microcontroller, isolated physically from access by other components in the system. In addition, the Caliptra subsystem begins execution before other firmware is allowed to run.</td>
+		</tr>
+		<tr>
+			<td>4.2.4</td>
+			<td>Critical data shall be modifiable only through the device itself or defined interfaces provided by device firmware. Examples of defined interfaces include proprietary or public application programming interfaces (APIs) used by the device’s firmware, or standards-based interfaces. Symbiont devices may rely on their host devices to meet this requirement.</td>
+			<td>Caliptra receives firmware and configuration input only via defined interfaces within the SoC. See chapter on Mailboxes.</td>
+		</tr>
+		<tr>
+			<td>4.2.1.3</td>
+			<td>The authenticated update mechanism shall be capable of preventing unauthorized updates of the device firmware to an earlier authentic version that has a security weakness or would enable updates to a version with a known security weakness.</td>
+			<td>Caliptra supports a mechanism for detecting and preventing execution of a prior firmware image that is no longer authorized. See chapter on Anti-rollback Support.</td>
+		</tr>
+		<tr>
+			<td rowspan=5>4.3.1</td>
+			<td>A successful attack which corrupts the active critical data or the firmware image, or subverts their protection mechanisms, shall not in and of itself result in a successful attack on the RTD or the information necessary to detect corruption of the firmware image.</td>
+			<td>Caliptra shall verify the signature of any firmware it loads during each boot. If the signature verification fails, Caliptra shall notify the SoC that firmware recovery must be performed. Refer to [Error Reporting and Handling](#error-reporting-and-handling).</td>
+		</tr>
+		<tr>
+			<td>Verify integrity, using an approved digital signature algorithm or cryptographic hash, of device firmware code prior to execution of code outside the RTD.</td>
+			<td>Caliptra shall perform digital signature verification of its FMC code, as well as that of the SoC Security Processor FMC before they are allowed to execute.</td>
+		</tr>
+		<tr>
+			<td>If firmware corruption is detected, the RTD or CTD should be capable of starting a recovery process to restore the device firmware code back to an authentic version.</td>
+			<td>Caliptra shall notify the SoC via the Mailbox interface to initiate the recovery process.</td>
+		</tr>
+		<tr>
+			<td>The detection mechanism should be capable of creating notifications of firmware corruption.</td>
+			<td>Caliptra shall notify the SoC via the Mailbox interface to initiate the recovery process.</td>
+		</tr>
+		<tr>
+			<td>The detection mechanism should be capable of logging events when firmware corruption is detected.</td>
+			<td>It is the responsibility of the SoC to log any corruption events upon notification by Caliptra.</td>
+		</tr>
+		<tr>
+			<td rowspan=3>4.3.2</td>
+			<td>The RTD or CTD shall perform integrity checks on the critical data prior to use. Integrity checks may take the form, for example, of validating the data against known valid values or verifying the hash of the data storage.</td>
+			<td>Caliptra relies on redundant fuses to store its configuration data, which is owned and passed to Caliptra through the Mailbox.</td>
+		</tr>
+		<tr>
+			<td>The RTD or CTD should be capable of creating notifications of data corruption.</td>
+			<td>Refer to [Error Reporting and Handling](#error-reporting-and-handling).</td>
+		</tr>
+		<tr>
+			<td>The detection mechanism should be capable of logging events when data corruption is detected.</td>
+			<td>It is the responsibility of the SoC to log any corruption events upon notification by Caliptra.</td>
+		</tr>
+	</tbody>
+</table>
 
 ## Secure Boot Flow
 
-A Caliptra RTM shall follow/implement the secure boot guidelines as described in [Reference 11](#References).
+A Caliptra RTM shall follow/implement the secure boot guidelines as described in [Reference 3](#ref-3).
 
-Detailed flow described in [HW Section](#_page65_x72.00_y72.00).
+Detailed flow described in [HW Section](#caliptra-ip-hardware-boot-flow).
 
 ## Hitless Update
 
@@ -814,16 +855,15 @@ A ‘hitless’ (aka ‘impactless’) update occurs when an update is applied t
 
 Caliptra contains multiple hardware isolated registers for Platform Configuration Registers (PCR).  These PCRs serve as volatile storage for concise cryptographic measurement of security state, including Caliptra’s own firmware.
 
-Why journey measurements matter: hitless updates present a challenge for devices that only capture their current firmware version and state, particularly where the previous state may have impacted the current state of dependent components within the SoC.  For example, a device might move from firmware version A to firmware version B without assuming a clean start to flush state. Vulnerabilities in firmware version A, might impact version B.  Preserving a device boot measurement and currently running measurement can highlight differences, but it cannot distinguish between transitional states whereby intermediate updates have the potential to expose the device to vulnerabilities.  For example, a device may move from firmware version A, to B, then to C without a restart, whereas another device of the same type might transition from A to C without transitioning through B.   If tracking only boot and current firmware version, should a vulnerability be found in version B, it would be impossible to identify which devices transitioned through B compared to devices that transitioned from A to C directly.
+Why journey measurements matter: hitless updates present a challenge for devices that only capture their current firmware version and state, particularly where the previous state may have impacted the current state of dependent components within the SoC.  For example, a device might move from firmware version A to firmware version B without assuming a clean start to flush state. Vulnerabilities in firmware version A, might impact version B.  Preserving a device boot measurement and currently running measurement can highlight differences, but it cannot distinguish between transitional states whereby intermediate updates have the potential to expose the device to vulnerabilities.  For example, a device may move from firmware version A, to B, then to C without a restart, whereas another device of the same type might transition from A to C without transitioning through B.  If tracking only boot and current firmware version, should a vulnerability be found in version B, it would be impossible to identify which devices transitioned through B compared to devices that transitioned from A to C directly.
 
 To capture all firmware and configuration changes, Caliptra tracks and attests to both current measurements and cumulative measurement PCR banks.  The current measurement is a snapshot of the currently running firmware and configuration.  This provides easy reference for the current version.  If current and cumulative measurements are different, it can safely be assumed the device has undergone some update.  The cumulative measurement captures all the firmware and state transitions from a clean cold boot to the current version.  The cumulative measurement must be accompanied by a log structure that describes the path from boot to current measurement using hash extensions.  A verifier can understand a device’s path to its current state by replaying log entries to reconstruct the cumulative measurement.
 
-The log and cumulative measurement mechanism is similar to that used in TPM.   In this model, Caliptra only needs to securely manage the measurements; the log does not need to be secured or maintained by Caliptra or the SoC.  The construction of measurements through cryptographic hash extensions means the log must provide the exact order and evidence needed to reconstruct the measurement.  As such, the log is tamper evident by design and does not need to be kept secure.
+The log and cumulative measurement mechanism is similar to that used in TPM.  In this model, Caliptra only needs to securely manage the measurements; the log does not need to be secured or maintained by Caliptra or the SoC.  The construction of measurements through cryptographic hash extensions means the log must provide the exact order and evidence needed to reconstruct the measurement.  As such, the log is tamper evident by design and does not need to be kept secure.
 
 Caliptra contains \[32\] PCR 384 banks that are extendible by the SHA engine, and readable by Caliptra firmware.  The usage of the PCR Banks is as follows:
 
 *Table 9: PCR Bank Usage*
-
 
 |**PCR Number**|**Type**|**Extend Ctrl**|**Description**|
 | - | - | - | - |
@@ -900,7 +940,7 @@ Note: as all DPE leaf keys are derived using Caliptra runtime firmware's CDI, a 
 
 ## Anti-rollback Support
 
-A Caliptra RTM shall provide Fuse banks (refer to *Table 9: Caliptra Secret Fuse Descriptor Table*) that are used for storing monotonic counters to provide anti-rollback enforcement for Caliptra mutable firmware. Each distinctly-signed boot stage shall be associated with its own anti-rollback Fuse field. Together with the vendor, a Caliptra RTM allows owners to enforce strong anti-rollback requirements, in addition to supporting rollback to a previous firmware version – this is a critical capability for hyper scalar owners.
+A Caliptra RTM shall provide Fuse banks (refer to *Table 13: Caliptra Secret Fuse Descriptor Table*) that are used for storing monotonic counters to provide anti-rollback enforcement for Caliptra mutable firmware. Each distinctly-signed boot stage shall be associated with its own anti-rollback Fuse field. Together with the vendor, a Caliptra RTM allows owners to enforce strong anti-rollback requirements, in addition to supporting rollback to a previous firmware version – this is a critical capability for hyper scalar owners.
 
 Every mutable Caliptra RTM boot layer shall include a SVN value in the signed header. If a layer's signed SVN value is less than the current counter value for that layer's fuse bank, the Caliptra RTM shall refuse to boot that layer, regardless of whether the signature is valid.
 
@@ -965,7 +1005,7 @@ Another way to obtain access to secret entropy with “unlimited supply chain ti
 
 Any private key material or symmetric key material embedded in the RTL (and therefore “global”) must be treated as having low value, reaching zero value in a number of quarters. A supply chain attacker can destructively obtain the key material, and loss of one part is not going to trigger any alarms.
 
-Mitigation against SCA is not necessarily trivial and may be implemented in a variety of ways. \[**14**\] provides a comprehensive overview of methods and techniques used in various SCA as well as recommendations for countermeasures against such attacks (including feasibility and applicability). Additionally, there are many academic papers available from NIST and other resources that discuss SCA and their countermeasures.
+Mitigation against SCA is not necessarily trivial and may be implemented in a variety of ways. [[Reference 7](#ref-7)] provides a comprehensive overview of methods and techniques used in various SCA as well as recommendations for countermeasures against such attacks (including feasibility and applicability). Additionally, there are many academic papers available from NIST and other resources that discuss SCA and their countermeasures.
 
 ## Compliance and Certification Requirements
 
@@ -973,7 +1013,7 @@ Due to the Identity service surface offered to other SoC subsystems, a Caliptra 
 
 It is important to highlight it’s not necessary for the RTM itself to unilaterally attain e.g. FIPS 140-3 L3. It is only relevant insofar the RTM is included in the “bag” that wants to obtain a compliance certification. For example, if a cloud provider wants to FIPS-certify PCIe link encryption in transit rooted to an ASIC identity emanating from a Caliptra RTM.
 
-Refer to [Reference 14](#References) for requirements related to Keys, Entropy, and Random Bits and cryptographic modules and algorithms.
+Refer to [Reference 8](#ref-8) for requirements related to Keys, Entropy, and Random Bits and cryptographic modules and algorithms.
 
 ### Known Answer Test (KAT) Support
 
@@ -995,7 +1035,14 @@ A detailed description of the POST and CAST KATs can be found at csrc.nist.gov.
 
 *Table 11: POST/CAST Usage*
 
-![](./images/POST_CAST_Usage.png)
+| **Crypto Algorithm** | **Caliptra Boot ROM** | **Caliptra FMC** | **Caliptra Runtime FW**
+| -------------------- | --------------------- | ---------------- | -----------------------
+| ECDSA[^8]            | Yes                   | Yes              | Yes
+| AES                  | Yes                   | No               | No
+| SHA[^9]              | Yes                   | Yes              | Yes
+| DRBG                 | No                    | No               | No
+| HMAC                 | Yes (CDI generation)  | No               | No
+| KDF                  | Yes                   | Yes              | No
 
 As shown in Table 11: POST/CAST Usage, since the cryptographic algorithms required by the Caliptra RTM Boot ROM are considered POSTs and those same algorithms are used by Caliptra FMC and FW (green boxes), there is no requirement that FMC and Runtime FW implement CASTs for those algorithms.
 
@@ -1007,9 +1054,9 @@ Each layer is signed by a vendor-controlled key. In addition, each layer may als
 
 During boot, Caliptra ROM shall verify the vendor signature over FMC before allowing that FMC to run.
 
-See the [Owner endorsement](#_page42_x72.00_y72.00) section for how the owner key is used.
+See the [Owner endorsement](#owner-authorization) section for how the owner key is used.
 
-Caliptra RTM FW signature generation and verification shall follow the requirements described in [Reference 11](#References).
+Caliptra RTM FW signature generation and verification shall follow the requirements described in [Reference 3](#ref-3).
 
 ### Post-Quantum Cryptography (PQC) Requirements
 
@@ -1017,11 +1064,13 @@ As NIST publishes new standards with PQC resilience, algorithms applicable to Ca
 
 ### Key Rotation
 
-Firmware signing key rotation shall follow the requirements described in [Reference 11](#References).
+Firmware signing key rotation shall follow the requirements described in [Reference 3](#ref-3).
 
 # Hardware Section
 
 Caliptra Core Block Diagram
+
+*Figure 9: Core Block Diagram*
 
 ![](./images/Caliptra_HW_diagram.jpeg)
 
@@ -1042,6 +1091,8 @@ Caliptra Core Block Diagram
 
 Caliptra IP HW Boot Flow
 
+*Figure 10: Hardware Boot Flow*
+
 ![](./images/Caliptra_boot_flow2.jpeg)
 
 1. As a part of SOC boot flow, SOC may have a bunch of infrastructure and other entities that boot. That part of the flow is outside the scope of this document. If SOC chooses to bypass Caliptra, then it should have a capability to bypass the Caliptra entirely through its proprietary flow. This may be needed for A0 power on and other early validation.
@@ -1055,11 +1106,13 @@ Caliptra IP HW Boot Flow
 	a. **Open:** To reduce the overall complexity, there is a proposal to write a SOC generated random number as a part of fuse population. From there, FW will implement DRBG using DRNG as a starting point.
 
 8. Caliptra IP will deassert Ready\_for\_Fuse wire as soon as the fuse write done register is written.
-8. Caliptra IP moves security critical assets in fuse registers (eg. UDS) to Key Vault.
+9. Caliptra IP moves security critical assets in fuse registers (eg. UDS) to Key Vault.
 
 ## Boot Media Independent Flows
 
 ### Caliptra FW Push Flow
+
+*Figure 11: FW Push Flow*
 
 ![](./images/Caliptra_boot_flow3.jpeg)
 
@@ -1067,7 +1120,7 @@ Caliptra IP HW Boot Flow
 2. Caliptra ROM will now enable the Mailbox. (until this point any accidental/non-accidental writes that target the mailbox are dropped by the hardware)
 3. Caliptra ROM will assert READY\_FOR\_FW wire. This is done by writing an internal register. This register is also visible to read on the APB interface. SOC can choose to poll on this bit instead of using the wire (it is SOC integration choice).
 4. SOC will follow the mailbox protocol and push Caliptra FW into the mailbox
-5. Caliptra’s mailbox HW will assert an interrupt to the uController once the GO is written per mailbox protocol. See [Mailbox](#_page71_x72.00_y173.82) for specifics.
+5. Caliptra’s mailbox HW will assert an interrupt to the uController once the GO is written per mailbox protocol. See [Mailbox](#mailbox) for specifics.
 6. Once Caliptra’s FW is authenticated and loaded into ICCM, uController will assert READY\_FOR\_RTFLOWS wire. Refer to ROM & FW spec on next level specifics of various security flows that happen within this step (eg. DICE).
 
 ## SOC FW Authentication flows
@@ -1092,13 +1145,17 @@ Notes:
 
 ### Caliptra FW Load Flow
 
+*Figure 12: FW Load Flow*
+
 ![](./images/Caliptra_boot_flow4.jpeg)
 
 1. Once Caliptra uController is out of reset, ROM starts executing and triggers the crypto block to run the UDS decrypt flow.
 2. Caliptra ROM will use the internal SPI peripheral to read the platform flash and load the FW. Note that SPI will be operating in basic functional single-IO mode and at 20MHz frequency.
 3. Once Caliptra’s FW is authenticated and loaded into ICCM, uController will assert READY\_FOR\_RTFLOWS wire. Refer to ROM & FW spec on next level specifics of various security flows that happen within this step (eg. DICE).
 
-### CPU Warm Reset or PCIe Hot Reset Flow →  Caliptra IP reset
+### <a id="reset-flow"></a>CPU Warm Reset or PCIe Hot Reset Flow →  Caliptra IP reset
+
+*Figure 13: Hardware Reset Flow*
 
 ![](./images/Caliptra_boot_flow5.jpeg)
 
@@ -1145,6 +1202,8 @@ Mailboxes are generic data passing structures, we will only enforce the protocol
 **Notes on behavior:**
 Once LOCK is granted, the mailbox is locked until that device has concluded its operation. Mailbox is responsible for only accepting writes from the device that requested and locked the mailbox.
 
+*Figure 14: Mailbox Sender Flow*
+
 ![](./images/Caliptra_mbox_state.png)
 
 ### Receiver Protocol
@@ -1160,6 +1219,7 @@ Upon receiving indication that the mailbox has been populated, the appropriate d
 4. Receiver resets the EXECUTE register.
 	1. This releases the LOCK on the mailbox.
 
+*Figure 15: Mailbox Receiver Flow*
 
 ![](./images/Caliptra_mbox_sequence.png)
 
@@ -1221,6 +1281,8 @@ Caliptra provides a HW API to do a SHA384 hash calculation. The SoC can access t
 
 ### JTAG/TAP Debug
 
+*Figure 16: Debug Flow*
+
 ![](./images/Caliptra_boot_flow6.jpeg)
 
 *Figure 4: Debug Flow*
@@ -1265,33 +1327,30 @@ To ensure that the security claims of a Caliptra RTM are achieved, specific Fuse
 - If JTAG is enabled pre or post SoC reset, a Calpitra RTM’s dedicated Fuses shall not be accessible (shall not be readable, shall not be writable) by a Caliptra RTM or other SoC IP. This restriction shall be applicable to a Caliptra RTM’s Fuse shadow registers as well (refer to Physical Attack Countermeasures).
 - SoC should ensure that the integrity of each fuse is maintained through the life of the part.  The integrity of the fuses can be maintained by fuse redundancy, ECC or other means determined sufficient by the SoC.
 
-Note: In addition to the Fuse bits described below, Fuse bits necessary to support ownership principles as described in [Reference 10](#References) shall be supported.
+Note: In addition to the Fuse bits described below, Fuse bits necessary to support ownership principles as described in [Reference 11](#ref-11) shall be supported.
 
 The following table describes a Calpitra RTM’s Fuse map:
 
-*Table 14: Caliptra Fuse Map*
+*Table 13: Caliptra Fuse Map*
 
-
-
-|**Name**|**Size (bits)**|**ACL**|**Fuse Programming Time**|**Description**|
-| - | :- | - | :- | - |
-|UDS Seed (Obfuscated)|384|ROM|SOC Manufacturing|DICE Unique Device Secret Seed. This seed is unique per device.  The seed is scrambled using an obfuscation function.|
-|Field Entropy (Obfuscated)|256|ROM|<p>Device Owner</p><p>In-Field Programmable</p>|Field-programmable by the owner, used to hedge against UDS disclosure in the supply chain.|
-|KEY MANIFEST PK HASH|384|ROM FMC RUNTIME|SOC Manufacturing|SHA-384 hash of hashes of the Key Manifest Signing the ECC P-384 Public Keys|
-|KEY MANIFEST PK HASH MASK|4|ROM FMC RUNTIME|In-Field Programmable|One-hot encoded list of revoked Key Manifest PK Hash|
-|~~KEY MANIFEST SVN~~|~~32~~|~~ROM FMC RUNTIME~~|~~In-Field Programmable~~|~~Key Manifest security version number.~~|
-|OWNER PK HASH|384|ROM FMC RUNTIME|In-Field Programmable|SHA-384 hash of hashes of the Owner Key ECC P-384 Public Keys|
-|OWNER KEY MANIFEST PK HASH MASK|4|ROM FMC RUNTIME|In-Field Programmable|<p>One-hot encoded list of revoked Owner Key Manifest PK Hash</p><p>**Reset:**</p>|
-|FMC KEY MANIFEST SVN|32|ROM FMC RUNTIME|In-Field Programmable|FMC security version number.|
-|RUNTIME SVN|128|ROM FMC RUNTIME|In-Field Programmable|Runtime Firmware security version number.|
-|ANTI-ROLLB ACK DISABLE|1|ROM FMC RUNTIME|In-Field Programmable|<p>Disables Anti-rollback support from Caliptra.</p><p>(for example if a Platform RoT is managing FW storage and anti-rollback protection external to the SoC)</p>|
-|IDEVID CERT IDEVID ATTR.|768|ROM FMC RUNTIME|SOC Manufacturing|<p>Manufacturer IEEE IDEVID Certificate Generation Attributes.</p><p>Please refer to ROM spec for more details</p>|
-|IDEVID MANUF HSM IDENTIFIER|128|ROM FMC RUNTIME||<p>Manufacturer IDEVID Manufacturer’s HSM identifier (this is used to find the certificate chain from the boot media)</p><p>Please refer to ROM spec for more details</p>|
-|Life Cycle Fuses|2|ROM FMC RUNTIME|SOC Manufacturing|<p>**Caliptra Boot Media Integrated mode usage only**. SOCs that build with a Boot Media Independent profile don’t have to account for these fuses.</p><p>‘00 - Unprovisioned or Manufacturing</p><p>‘01 - Production ‘10 - UNDEF</p><p>‘11 - End Of Life</p><p></p><p>**Reset:** Can only be reset on powergood</p>|
+| **Name**                        | **Size (bits)** | **ACL**         | **Fuse Programming Time**                       | **Description** |
+| ------------------------------- | --------------- | --------------- | ----------------------------------------------- | --------------- |
+| UDS Seed (Obfuscated)           | 384             | ROM             | SOC Manufacturing                               | DICE Unique Device Secret Seed. This seed is unique per device.  The seed is scrambled using an obfuscation function. |
+| Field Entropy (Obfuscated)      | 256             | ROM             | <p>Device Owner</p><p>In-Field Programmable</p> | Field-programmable by the owner, used to hedge against UDS disclosure in the supply chain. |
+| KEY MANIFEST PK HASH            | 384             | ROM FMC RUNTIME | SOC Manufacturing                               | SHA-384 hash of hashes of the Key Manifest Signing the ECC P-384 Public Keys |
+| KEY MANIFEST PK HASH MASK       | 4               | ROM FMC RUNTIME | In-Field Programmable                           | One-hot encoded list of revoked Key Manifest PK Hash |
+| OWNER PK HASH                   | 384             | ROM FMC RUNTIME | In-Field Programmable                           | SHA-384 hash of hashes of the Owner Key ECC P-384 Public Keys |
+| OWNER KEY MANIFEST PK HASH MASK | 4               | ROM FMC RUNTIME | In-Field Programmable                           | <p>One-hot encoded list of revoked Owner Key Manifest PK Hash</p><p>**Reset:**</p> |
+| FMC KEY MANIFEST SVN            | 32              | ROM FMC RUNTIME | In-Field Programmable                           | FMC security version number. |
+| RUNTIME SVN                     | 128             | ROM FMC RUNTIME | In-Field Programmable                           | Runtime Firmware security version number. |
+| ANTI-ROLLBACK DISABLE           | 1               | ROM FMC RUNTIME | In-Field Programmable                           | <p>Disables Anti-rollback support from Caliptra.</p><p>(for example if a Platform RoT is managing FW storage and anti-rollback protection external to the SoC)</p> |
+| IDEVID CERT IDEVID ATTR.        | 768             | ROM FMC RUNTIME | SOC Manufacturing                               | <p>Manufacturer IEEE IDEVID Certificate Generation Attributes.</p><p>Please refer to ROM spec for more details</p> |
+| IDEVID MANUF HSM IDENTIFIER     | 128             | ROM FMC RUNTIME |                                                 | <p>Manufacturer IDEVID Manufacturer’s HSM identifier (this is used to find the certificate chain from the boot media)</p><p>Please refer to ROM spec for more details</p> |
+| Life Cycle Fuses                | 2               | ROM FMC RUNTIME | SOC Manufacturing                               | <p>**Caliptra Boot Media Integrated mode usage only**. SOCs that build with a Boot Media Independent profile don’t have to account for these fuses.</p><p>‘00 - Unprovisioned or Manufacturing</p><p>‘01 - Production ‘10 - UNDEF</p><p>‘11 - End Of Life</p><p></p><p>**Reset:** Can only be reset on powergood</p> |
 
 ## Fuse Programming
 
-All Fuse based cryptographic keying material and seeds (e.g. UDS Seed) shall be generated ( on-chip or off-chip) per requirements described in [Reference 11](#References).
+All Fuse based cryptographic keying material and seeds (e.g. UDS Seed) shall be generated (on-chip or off-chip) per requirements described in [Reference 3](#ref-3).
 
 ### Fuse Zeroing
 
@@ -1306,9 +1365,7 @@ When a cryptographic key (or their hashes) are retired/revoked, then its associa
 
 This section describes Caliptra error reporting and handling.
 
-*Table 15: HW/FW Error Types*
-
-
+*Table 14: HW/FW Error Types*
 
 | | Fatal Errors | Non-fatal Errors |
 | :- | - | - |
@@ -1328,11 +1385,12 @@ This section describes Caliptra error reporting and handling.
 - We will signal this using a CALIPTRA\_NON\_FATAL\_ERROR wire
 - Optional for SOCs to include this signal in their logic.
 
-**FW Errors:**
+**FW Errors**
 
-[Vishal.Soni@microsoft.com ](mailto:Vishal.Soni@microsoft.com)to spec these
+[Vishal.Soni@microsoft.com](mailto:Vishal.Soni@microsoft.com)to spec these
 
-*Table 16: FW Errors and Remedies*
+*Table 15: FW Errors and Remedies*
+
 <table>
     <thead>
         <tr>
@@ -1365,12 +1423,12 @@ This section describes Caliptra error reporting and handling.
 	</tbody>
 </table>
 
-[^1]: ` `*Caliptra. Spanish for “root cap” and describes the deepest part of the root*
+[^1]: *Caliptra. Spanish for “root cap” and describes the deepest part of the root*
 [^2]: This obfuscation secret may be a chip-class secret, or a chip-unique PUF, with the latter preferred.
-[^3]: This memory should only be volatile in the face of a power loss event. See details in [HW Section](#_page70_x72.00_y72.00).
+[^3]: This memory should only be volatile in the face of a power loss event. See details in [HW Section](#reset-flow).
 [^4]: When a hitless update occurs, then following reset, Caliptra shall execute the updated firmware and shall maintain the measurements that it collected during boot and shall support the reporting of these measurements with signed attestations. Hitless update of Caliptra’s FMC shall not be supported as this would require the creation of a new DICE identity which would require access to IDevID and LDevID. Retention of IDevID and LDevID (privkeys), post-boot introduce a security vulnerability.
 [^5]: Upon boot, firmware will defensively treat existing SRAM contents as potentially malicious, emplaced by prior firmware with a vulnerability.
 [^6]: The format of this log is outside the scope of this specification.
 [^7]: The format of this blob is outside the scope of this specification.
-[^8]: 
-[^9]: 
+[^8]: ECDSA is used for FW verification and SPDM (signing)
+[^9]: SHA is used with ECDSA, HMAC and for generating measurements
