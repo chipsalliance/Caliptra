@@ -553,18 +553,18 @@ In the BMD profile, the Caliptra trusted computing base (TCB) for integrity of C
 
 Refer to [Error Reporting and Handling](#error-reporting-and-handling) for details regarding Caliptra and SoC firmware load and verification error handling.
 
-*Figure 4: Boot Media Independent Boot Flow*
+*Figure 4: Boot Media Dependent Boot Flow*
 
 ![](./images/BMD_Boot_flow.jpeg)
 
-The Boot Media Independent profile is less intrusive to integrations, but extends the TCB for Caliptra to include SoC ROM.  The verification of measurement mechanism integration includes:
+The Boot Media Dependent profile is less intrusive to integrations, but extends the TCB for Caliptra to include SoC ROM.  The verification of measurement mechanism integration includes:
 
 	1. The SoC design that executes SoC power-on reset logic.
 	2. SoC ROM, SoC boot controller
 	3. Caliptra IP, Caliptra ROM, and Caliptra Firmware.
 	4. SoC first mutable code.
 
-The trusted computing base for the SoC is larger in Boot Media Independent, but simplifies integration while preserving many of the Caliptra security guarantees.
+The trusted computing base for the SoC is larger in Boot Media Dependent, but simplifies integration while preserving many of the Caliptra security guarantees.
 
 ## Caliptra Security Subsystem
 
@@ -1108,7 +1108,7 @@ Caliptra IP HW Boot Flow
 8. Caliptra IP will deassert Ready\_for\_Fuse wire as soon as the fuse write done register is written.
 9. Caliptra IP moves security critical assets in fuse registers (eg. UDS) to Key Vault.
 
-## Boot Media Independent Flows
+## Boot Media Dependent Flows
 
 ### Caliptra FW Push Flow
 
@@ -1346,7 +1346,7 @@ The following table describes a Calpitra RTM’s Fuse map:
 | ANTI-ROLLBACK DISABLE           | 1               | ROM FMC RUNTIME | In-Field Programmable                           | <p>Disables Anti-rollback support from Caliptra.</p><p>(for example if a Platform RoT is managing FW storage and anti-rollback protection external to the SoC)</p> |
 | IDEVID CERT IDEVID ATTR.        | 768             | ROM FMC RUNTIME | SOC Manufacturing                               | <p>Manufacturer IEEE IDEVID Certificate Generation Attributes.</p><p>Please refer to ROM spec for more details</p> |
 | IDEVID MANUF HSM IDENTIFIER     | 128             | ROM FMC RUNTIME |                                                 | <p>Manufacturer IDEVID Manufacturer’s HSM identifier (this is used to find the certificate chain from the boot media)</p><p>Please refer to ROM spec for more details</p> |
-| Life Cycle Fuses                | 2               | ROM FMC RUNTIME | SOC Manufacturing                               | <p>**Caliptra Boot Media Integrated mode usage only**. SOCs that build with a Boot Media Independent profile don’t have to account for these fuses.</p><p>‘00 - Unprovisioned or Manufacturing</p><p>‘01 - Production ‘10 - UNDEF</p><p>‘11 - End Of Life</p><p></p><p>**Reset:** Can only be reset on powergood</p> |
+| Life Cycle Fuses                | 2               | ROM FMC RUNTIME | SOC Manufacturing                               | <p>**Caliptra Boot Media Integrated mode usage only**. SOCs that build with a Boot Media Dependent profile don’t have to account for these fuses.</p><p>‘00 - Unprovisioned or Manufacturing</p><p>‘01 - Production ‘10 - UNDEF</p><p>‘11 - End Of Life</p><p></p><p>**Reset:** Can only be reset on powergood</p> |
 
 ## Fuse Programming
 
