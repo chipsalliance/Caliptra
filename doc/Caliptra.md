@@ -343,7 +343,7 @@ An example of when an owner must protect assets would be moving from secure mode
     <td rowspan="4">Confidentiality and Integrity</td>
     <td rowspan="4">Expert</td>
     <td>Malicious manufacturing spoofing on UDSseeds</td>
-    <td>UDS obfuscation/encrypt on with class RTL key</td>
+    <td>UDS obfuscation/encryption with class RTL key</td>
   </tr>
   <tr>
     <td>Invasive attack (fuse analysis)</td>
@@ -351,7 +351,7 @@ An example of when an owner must protect assets would be moving from secure mode
   </tr>
   <tr>
     <td>Boot path tampering while retrieving UDS values</td>
-    <td>UDS obfuscation/encrypt on with class RTL key</td>
+    <td>UDS obfuscation/encryption with class RTL key</td>
   </tr>
   <tr>
     <td>Attempting to derive die specific keys by knowing UDS, KDF</td>
@@ -362,7 +362,7 @@ An example of when an owner must protect assets would be moving from secure mode
     <td rowspan="4">Confidentiality and Integrity</td>
     <td rowspan="4">Expert</td>
     <td>Malicious manufacturing spoofing on field entropy</td>
-    <td>Field entropy obfuscation/encrypti on with class RTL key</td>
+    <td>Field entropy obfuscation/encryption with class RTL key</td>
   </tr>
   <tr>
     <td>Invasive attack (fuse analysis)</td>
@@ -370,7 +370,7 @@ An example of when an owner must protect assets would be moving from secure mode
   </tr>
   <tr>
     <td>Boot path tampering while retrieving field entropy values</td>
-    <td>Field entropy obfuscation/encrypti on with class RTL key</td>
+    <td>Field entropy obfuscation/encryption with class RTL key</td>
   </tr>
   <tr>
     <td>Attempting to derive die specific keys by knowing field entropy, KDF</td>
@@ -456,12 +456,12 @@ An example of when an owner must protect assets would be moving from secure mode
     <td>Control flow</td>
     <td>Integrity &amp; Confidentiality if applicable</td>
     <td>Proficient</td>
-    <td>1. Return &amp; jump addresses manipulation<br>2. Return values, errors tampering <br>3. Stack overflow <br>4. Buffer overflows <br>5. Privilege escalations &amp; highjacking</td>
+    <td>1. Return &amp; jump addresses manipulation<br>2. Return values, errors tampering <br>3. Stack overflow <br>4. Buffer overflows <br>5. Privilege escalations &amp; hijacking</td>
     <td>Various control flow integrity measures Secure coding practices and auditing implementation</td>
   </tr>
   <tr>
-    <td>Boot measure ments protected by Caliptra</td>
-    <td>Boot Measurem ents that Caliptra as RTM gathers, stores and reports</td>
+    <td>Boot measurements protected by Caliptra</td>
+    <td>Boot Measurements that Caliptra as RTM gathers, stores and reports</td>
     <td>Integrity</td>
     <td>Expert</td>
     <td>1. Manipulate measurements AiTM while in transit to Caliptra <br>2. SoC sends manipulated measurements to Caliptra</td>
@@ -523,7 +523,7 @@ When Caliptra is integrated into an SoC in Boot Media Integrated mode, Caliptra 
 	1. Hardware executes SoC power-on reset logic.
 	2. Caliptra ROM executes first and performs cryptographic identity generation, reads in Caliptra firmware from flash.
 	3. Caliptra ROM measures and verifies its firmware before loading/executing it. Refer to [Error Reporting and Handling](#error-reporting-and-handling) for details regarding FMC verification failures.
-	4. After loading, verifying  and executing its firmware, Caliptra copies the SoC First Mutable Code (FMC) into an SoC internal SRAM mailbox buffer and measures that firmware.
+	4. After loading, verifying and executing its firmware, Caliptra copies the SoC First Mutable Code (FMC) into an SoC internal SRAM mailbox buffer and measures that firmware.
 	5. At this point, Caliptra may signal to SoC ROM and SoC uncore to continue power-on reset as shown in Figure 1.
 
 *Figure 3: Boot Media Integrated Boot Flow*
