@@ -1072,9 +1072,9 @@ Caliptra Core Block Diagram
 ![](./images/Caliptra_HW_diagram.jpeg)
 
 - SRAM requirements:
-  - 128KB of ICCM0
-  - 128KB for Mailbox as a staged SRAM (for FW staging of impactless updates to do authentication checks on the FW before moving to ICCM)
-  - 128KB for DCCM and 32KB for ROM
+  - 128 KiB of ICCM0
+  - 128 KiB for Mailbox as a staged SRAM (for FW staging of impactless updates to do authentication checks on the FW before moving to ICCM)
+  - 128 KiB for DCCM and 32 KiB for ROM
 - Crypto requirements
   - SHA256 SHA384, SHA512
   - ECC Secp384r1 w/ HMAC-DRBG - Key Generation, Sign & Verification
@@ -1168,7 +1168,7 @@ Notes:
 
 ## Mailbox
 
-The Caliptra Mailbox is a 128KB buffer used for exchanging data between the SoC and the Caliptra microcontroller (uC).
+The Caliptra Mailbox is a 128 KiB buffer used for exchanging data between the SoC and the Caliptra microcontroller (uC).
 
 SoC side will communicate with the mailbox over an APB interface. This allows the SoC to identify the device using the interface to ensure that the mailbox, control registers, and fuses are read or written only by the appropriate device.
 
