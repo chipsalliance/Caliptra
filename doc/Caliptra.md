@@ -68,22 +68,21 @@ For the purposes of this document, the following abbreviations apply:
 | Abbreviation | Description |
 |:-------------|:------------|
 | <a id="bmc"></a>**BMC**       | Baseboard Management Controller                |
-| <a id="CA"></a>**CA**         | Certificate Authority                          |
-| <a id="CDI"></a>**CDI**       | Composite Device Identifier                    |
+| <a id="CA"></a>**CA**         | Certification Authority                        |
+| <a id="CDI"></a>**CDI**       | Compound Device Identifier                     |
 | <a id="CPU"></a>**CPU**       | Central Processing Unit                        |
 | <a id="CRL"></a>**CRL**       | Certificate Revocation List                    |
 | <a id="CSR"></a>**CSR**       | Certificate Signing Request                    |
-| <a id="CSP"></a>**CSP**       | Critical Security Parameter                    |
+| <a id="CSP"></a>**CSP**       | Cloud Service Provider                         |
 | <a id="DICE"></a>**DICE**     | Device Identifier Composition Engine           |
 | <a id="DRBG"></a>**DRBG**     | Deterministic Random Bit Generator             |
 | <a id="ECDSA"></a>**ECDSA**   | Elliptic Curve Digital Signature Algorithm     |
-| <a id="FMC"></a>**FMC**       | FW First Mutable Code                          |
+| <a id="FMC"></a>**FMC**       | First Mutable Code                             |
 | <a id="GPU"></a>**GPU**       | Graphics Processing Unit                       |
 | <a id="IDevId"></a>**IDevId** | Initial Device Identifier                      |
 | <a id="iRoT"></a>**iRoT**     | Internal Root of Trust                         |
 | <a id="KAT"></a>**KAT**       | Known Answer Test                              |
 | <a id="LDevId"></a>**LDevId** | Locally Significant Device Identifier          |
-| <a id="MCTP"></a>**MCTP**     | Management Component Transport Protocol        |
 | <a id="NIC"></a>**NIC**       | Network Interface Card                         |
 | <a id="NIST"></a>**NIST**     | National Institute of Standards and technology |
 | <a id="OCP"></a>**OCP**       | Open Compute Project                           |
@@ -99,11 +98,9 @@ For the purposes of this document, the following abbreviations apply:
 | <a id="SPDM"></a>**SPDM**     | Security Protocol and Data Model               |
 | <a id="SSD"></a>**SSD**       | Solid State Drive                              |
 | <a id="TCB"></a>**TCB**       | Trusted Computing Base                         |
-| <a id="TCI"></a>**TCI**       | TCB Component Identifier                       |
 | <a id="TCG"></a>**TCG**       | Trusted Computing Group                        |
 | <a id="TEE"></a>**TEE**       | Trusted Execution Environment                  |
 | <a id="TRNG"></a>**TRNG**     | True Random Number Generator                   |
-| <a id="UECC"></a>**UECC**     | Uncorrectable Error Correction Code            |
 
 # Requirements Terminology
 
@@ -406,7 +403,7 @@ An example of when an owner must protect assets would be moving from secure mode
     <td rowspan="7">1. Secrets locked in key vault, not readable by SW<br>2. SCA Protections</td>
   </tr>
   <tr>
-    <td>CDI<sub>n</sub> (DICE component device identifier for Layer n)</td>
+    <td>CDI<sub>n</sub> (DICE compound device identifier for Layer n)</td>
   </tr>
   <tr>
     <td>IDevID<sub>Priv</sub></td>
@@ -867,7 +864,7 @@ Caliptra contains \[32\] PCR 384 banks that are extendible by the SHA engine, an
 
 |**PCR Number**|**Type**|**Extend Ctrl**|**Description**|
 | - | - | - | - |
-|PCR0|Cumulative|ROM|Holds Caliptra's RMC firmware update journey; including state and FMC, and measurements extended by ROM.|
+|PCR0|Cumulative|ROM|Holds Caliptra's FMC firmware update journey; including state and FMC, and measurements extended by ROM.|
 |PCR1|Current|ROM|Caliptra’s boot FMC, and and state. This is a snapshot of the current state.|
 |PCR2|Cumulative|FMC|Holds Caliptra's runtime firmware update journey; including state and FMC, and measurements extended by FMC.|
 |PCR3|Current|FMC|Caliptra’s boot and runtime firmware measurement and state.  This is a snapshot of the current state.|
