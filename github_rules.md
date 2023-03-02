@@ -5,7 +5,7 @@ github configuration.
 
 * Require a pull request before merging
 * Require approvals
-* Required number of approvals: 2
+* Required number of approvals: 2 for spec, 1 for code
 * Dismiss stale pull request approvals when new commits are pushed
 * Require review from code owners
 * Require approval of most recent reviewable push (whether the most recent reviewable push must be approved by someone other than the person who pushed it)
