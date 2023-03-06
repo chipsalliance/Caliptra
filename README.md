@@ -1,4 +1,4 @@
-![Caliptra Logo](doc/images/Caliptra_Logo_large.png)
+![Caliptra Logo](doc/images/logo/Caliptra_logo_large.png)
 
 # Caliptra
 
