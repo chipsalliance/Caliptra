@@ -1,6 +1,6 @@
 # Contributing to Caliptra
 
-## CLA
+## Contributor License Agreement
 
 Per the [Charter](Caliptra_WG_Technical_Charter.md), contributors to Caliptra
 must have signed the CHIPS CLA.
@@ -16,15 +16,15 @@ must have signed the CHIPS CLA.
 * The branch protection rules include constraints to maintain a linear history
   and avoid merges in pull requests.
 * Please keep a clean commit history, and no long series
-  of "fixup" patches. Use github's "Squash and merge" option if necessary.
-* New code files must include the Apache license 2.0 header. Commit veification
+  of "fixup" patches. Use GitHub's "Squash and merge" option if necessary.
+* New code files must include the Apache license 2.0 header. Commit verification
   tools enforce this.
-* Fork the repos into your personal repo, and created pull requests from your
+* Fork the repos into your personal repo, and create pull requests from your
   personal repo. Do not pollute the main repo with your personal branches.
 
 ## Design discussion
 
-* All design issues are discussed via github issues.
+* All design issues are discussed via GitHub issues.
 * Please reference the issue in your commit where appropriate.
 * Chat channels should be primarily used for short, tactical discussions
   (example, coordinate resolution of a merge conflict, coordinate update of
@@ -58,7 +58,8 @@ started at `0p8`
 
 ## CCB Issues
 
-RTL design changes or additions after a `$major.5` tag must be bound to a github issue, and the issue must include this questionnaire in its description.
+RTL design changes or additions after a `$major.5` tag must be bound to a GitHub
+issue, and the issue must include this questionnaire in its description.
 
 (Bug fixes do not need this step)
 
@@ -66,16 +67,16 @@ RTL design changes or additions after a `$major.5` tag must be bound to a github
 * Is the Spec change approved? (Yes/No)
 * Is the spec updated? (Yes/No)
 * Is the change needed in the `p8` or `$major.0` milestone?
-** Note: What item qualifies as P1/MVP item is set by Caliptra Arch WG leads
-* Does it have silicon area impact? (Yes/No)
-* Does it have timing impact? (Yes/No)
+  - Note: What item qualifies as P1/MVP item is set by Caliptra Arch WG leads
+* Does it have silicon area impact? (Area size/No)
+* Does it have timing impact? (Breakdown/No)
 * If the change impacts ROM/FMC/RT, did the FW reps approve the change already? (Yes/No)
-* Why should the change be intercepted in Gen 1?
+* Why should the change be intercepted in `$major`?
 * Can the change be handled outside of Caliptra?
-* If there is a schedule impact to a `p8` or `$major.0` milestone, is it approved by voting leads? (Yes/No)
+* If there is a schedule impact to a `p8` or `$major.0` milestone, is it
+  approved by voting leads? (Yes/No)
 * If change completed (implies schedule impact is zero):
-* Lint passing – Yes/No
-* Gate count delta –
-* Tests written for testing the change –
-* Tests checked-in for this change
+  - Lint passing (Yes/No)
+  - Gate count delta (Count/No)
+  - Tests written for testing the change (Link to commit/No)
 * Existing smoke tests passing? – Yes/No
