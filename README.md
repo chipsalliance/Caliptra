@@ -41,6 +41,21 @@ The Caliptra code base and documentation are split across five repositories:
 The github config parameters for all the branches are documented in a [local
 file](github_rules.md)
 
+## Discussion Channels
+
+The Caliptra workgroup meets every Friday at 9am PT. Meeting invite and agenda
+are posted to the [mailing list](https://lists.chipsalliance.org/g/caliptra-wg).
+
+A [Slack channel](https://join.slack.com/t/caliptraworkspace/signup)
+is used for interactive discussions. Keep in mind development activity is focused on
+Github issues and Pull Request reviews, rarely on the Slack channel. If you have
+issues joining please contact the mailing list.
+
+Please sign the [CHIPS CLA](https://github.com/chipsalliance/tsc/tree/main/cla)
+(as an individual or your
+[company](https://github.com/chipsalliance/tsc/blob/main/cla/CLA-status.yml) if
+affiliated) before participating in these channels.
+
 ## License
 
 All Code written for Caliptra and found in these repositories is licensed under
