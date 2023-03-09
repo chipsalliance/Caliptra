@@ -1128,7 +1128,7 @@ Caliptra provides FW authentication & measurement capture service to the SOC.
 2. For SOC FW/Configuration that requires verification, there are two options:
 	1. SOC logic uses the Caliptra provided SHA384 HW API to stream the FW while copying the same to the appropriate destination; SOC logic will write the “FW ID” and send a FW authentication request mailbox command.
 	2. SOC logic can directly report the measurement. SOC logic will write the “FW ID”, Measurement and send a FW measurement mailbox command.
-3. Caliptra RT FW will use the FW ID and the associated hash in the SOC FW Hash Manifest. Caliptra RT FW compares them against the hash of the last streamed FW hash from the internal register when Step 2a was executed or the measurement reported in Step 2b. If they match, Caliptra will capture this hash to extend the appropriate measurement/PCR and report SUCCESS of the mailbox command.
+3. Caliptra RT FW will use the FW ID and the associated hash in the SOC FW Hash Manifest. Caliptra RT FW compares them against the hash of the last streamed FW hash from the internal register when Step 2.1 was executed or the measurement reported in Step 2.2. If they match, Caliptra will capture this hash to extend the appropriate measurement/PCR and report SUCCESS of the mailbox command.
 4. SOC logic will take appropriate action for the FW that was copied to the destination (eg. set execute/mark FW valid for an embedded controller to use it) etc.
 5. Steps 1 through 4 can be used for the next set of FWs that would be loading.
 
@@ -1136,7 +1136,7 @@ Notes:
 
 - Anytime a new SOC FW hash manifest gets loaded (eg. SOC impactless update flows use model), Caliptra will do the comparison against the new hash manifest.
 - Since it’s only a hash comparison, this speeds up the boot flows considerably.
-- We recommend using step 2a for SOC implementations. If Step 2b is used, then the required ROM/FW/logic code should be made transparent through OCP required supply-chain audit channels.
+- It is recommended that step 2.1 is used for SOC implementations. If Step 2.2 is used, then the required ROM/FW/logic code should be made transparent through OCP required supply-chain audit channels.
 
 ## Boot Media Integrated
 
@@ -1174,9 +1174,9 @@ SoC side will communicate with the mailbox over an APB interface. This allows th
 
 When a mailbox is populated by SoC, an interrupt to the FW to indicate that a command is available in the mailbox. The uC will be responsible for reading from and responding to the command.
 
-When a mailbox is populated by the uC, we will send a wire indication to the SoC that a command is available in the mailbox as well as updating the MAILBOX STATUS register. The SoC will be responsible for reading from and responding to the command.
+When a mailbox is populated by the uC, Caliptra will send a wire indication to the SoC that a command is available in the mailbox as well as updating the MAILBOX STATUS register. The SoC will be responsible for reading from and responding to the command.
 
-Mailboxes are generic data passing structures, we will only enforce the protocol for writing to and reading from the mailbox. How the command and data is interpreted by the FW and SoC are not enforced in this document.
+Mailboxes are generic data passing structures, the Caliptra hardware will only enforce the protocol for writing to and reading from the mailbox. How the command and data is interpreted by the FW and SoC are not enforced in this document.
 
 ### Sender Protocol
 
@@ -1372,14 +1372,14 @@ This section describes Caliptra error reporting and handling.
 **Fatal errors**
 
 - Fatal errors will log the FATAL ERROR reasons into an arch register that is RW from the external world. This register must be sticky (as in reset is on powergood)
-- We will signal this using a CALIPTRA\_FATAL\_ERROR wire
+- Caliptra will signal this using a CALIPTRA\_FATAL\_ERROR wire
 	- SOCs must hook this into their SOC error handling logic
 - When a fatal error occurs, all assets (UDS fuses, DEOBF\_KEK, Key Slots etc.)  are cleared. Please note that UDS\_FUSE, DEOBF\_KEK may have already been cleared depending on when the fatal error happened.
 
 **Non-Fatal errors**
 
 - Non-Fatal errors will log the NON-FATAL ERROR reasons into an arch register that is RW from the external world. This register must be sticky (as in reset is on powergood)
-- We will signal this using a CALIPTRA\_NON\_FATAL\_ERROR wire
+- Caliptra will signal this using a CALIPTRA\_NON\_FATAL\_ERROR wire
 - Optional for SOCs to include this signal in their logic.
 
 **FW Errors**
