@@ -8,11 +8,14 @@ github configuration.
 * Required number of approvals: 2 for spec and RTL, 1 for software
 * Dismiss stale pull request approvals when new commits are pushed
 * Require review from code owners
-* Require approval of most recent reviewable push (whether the most recent reviewable push must be approved by someone other than the person who pushed it)
+* Require approval of most recent reviewable push (whether the most recent
+  reviewable push must be approved by someone other than the person who pushed
+  it)
 * Require conversation resolution before merging
 * Restrict who can dismiss pull request reviews
 * Do not allow bypassing the above settings
-* Restrict who can push to matching branches: only relevant folks in [MAINTAINERS](MAINTAINERS.md) for `main` and `release/*` branches
+* Restrict who can push to matching branches: only relevant folks in
+  [MAINTAINERS](MAINTAINERS.md) for `main` and `release/*` branches
 * Require linear history
 
 Will not set
@@ -27,3 +30,9 @@ Will not set _yet_
 * Require status checks to pass before merging
 * Require signed commits
 
+Membership
+* The [GitHub Caliptra
+  group](https://github.com/orgs/chipsalliance/teams/caliptra/members) will be
+  added to all repos
+* Repo [MAINTAINERS](MAINTAINERS.md) will be listed with the Maintain role
+* TAC Voting Members will be listed with the Admin role
