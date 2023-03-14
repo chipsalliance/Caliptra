@@ -15,10 +15,18 @@ must have signed the CHIPS CLA.
   configuration.
 * The branch protection rules include constraints to maintain a linear history
   and avoid merges in pull requests.
-* Please keep a clean commit history, and no long series
-  of "fixup" patches. Use GitHub's "Squash and merge" option if necessary.
+* In order to maintain a clean commit history on the `main` branch, all Pull
+  Requests must be merged using the Squash strategy. Effort should be made to
+  ensure Pull Requests are clean and pass required tests, to prevent a long
+  series of subsequent Pull Requests with simple 'fixup' patches.
 * New code files must include the Apache license 2.0 header. Commit verification
   tools enforce this.
+* With the exception of the Rust toolchain, all third-party code necessary for
+  building release firmware binaries must be placed in the
+  `caliptra-sw/third-party` directory
+* Third party vendored repos included into Caliptra repos may not be ASL 2.0
+  license. However, all vendored repos must be ASL 2.0 compliant and not
+  introduce additional restrictions or encumbrances. Ask the TAC if in doubt.
 * Fork the repos into your personal repo, and create pull requests from your
   personal repo. Do not pollute the main repo with your personal branches.
 
