@@ -15,10 +15,14 @@ must have signed the CHIPS CLA.
   configuration.
 * The branch protection rules include constraints to maintain a linear history
   and avoid merges in pull requests.
-* In order to maintain a clean commit history on the `main` branch, all Pull
-  Requests must be merged using the Squash strategy. Effort should be made to
-  ensure Pull Requests are clean and pass required tests, to prevent a long
-  series of subsequent Pull Requests with simple 'fixup' patches.
+* Please maintain a clean commit history on the `main` branch.
+  - Effort should be made to ensure Pull Requests are clean and pass required
+    tests, to prevent a long series of subsequent Pull Requests with simple
+    'fixup' patches.
+  - By the same criteria, if a Pull Request has a number of 'fixup' patches, it
+    must be Squash and Merged.
+  - Whereas a Pull Request with logically separate, well defined commits, with
+    articulate descriptions, can be merged without squashing.
 * New code files must include the Apache license 2.0 header. Commit verification
   tools enforce this.
 * With the exception of the Rust toolchain, all third-party code necessary for
