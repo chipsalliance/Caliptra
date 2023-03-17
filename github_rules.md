@@ -8,7 +8,6 @@ github configuration.
 * Required number of approvals: 2 for spec and RTL, 1 for software
 * Dismiss stale pull request approvals when new commits are pushed
 * Require review from code owners
-* Require approval of most recent reviewable push (whether the most recent reviewable push must be approved by someone other than the person who pushed it)
 * Require conversation resolution before merging
 * Restrict who can dismiss pull request reviews
 * Do not allow bypassing the above settings
