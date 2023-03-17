@@ -131,7 +131,7 @@ The TAC members will be listed by name, with pseudonym or GitHub username listed
 optionally, in the [MAINTAINERS](MAINTAINERS.md) document within the Workgroup
 open source repository. Membership changes are reflected by pull requests
 against the TAC membership list document and relevant CODEOWNERS files
-([example](CODEOWNERS)).
+([example](CODEOWNERS)). GitHub repository roles need to be updated as well.
 
 ### TAC Chair
 
