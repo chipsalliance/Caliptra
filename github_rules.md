@@ -1,7 +1,7 @@
-# Github Rules
+# GitHub Rules
 
 All Caliptra source code repositories adopt the same set of parameters in their
-github configuration.
+GitHub configuration.
 
 * Require a pull request before merging
 * Require approvals
