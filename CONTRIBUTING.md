@@ -2,13 +2,13 @@
 
 ## Contributor License Agreement
 
-Per the [Charter](Caliptra_WG_Technical_Charter.md), contributors to Caliptra
+Per the [Charter](CaliptraWGTechnicalCharter.md), contributors to Caliptra
 must have signed the CHIPS CLA.
 
 ## Guidelines for code contributions
 
 * Changes must be made via pull request
-* [Branch protection rules](github_rules.md) ensure pull requests are reviewed
+* [Branch protection rules](GitHubRules.md) ensure pull requests are reviewed
   by project members
 * [Maintainers](MAINTAINERS.md) are expected to enforce `CODEOWNERS` rights
   where necessary. Maintainers are also the sole owners of the repo's
