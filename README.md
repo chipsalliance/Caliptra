@@ -26,7 +26,7 @@ sets out the charter governing the Caliptra project.
 
 * [Main Caliptra specification](doc/Caliptra.md)
 * [FMC](https://github.com/chipsalliance/caliptra-sw/tree/main/fmc#readme)
-* [Firmware]()
+* [Firmware](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md)
 
 ## Repositories
 
