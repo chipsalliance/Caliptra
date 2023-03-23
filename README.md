@@ -47,6 +47,10 @@ file](github_rules.md).
 
 The Caliptra workgroup meets every Friday at 9am PT. Meeting invite and agenda
 are posted to the [mailing list](https://lists.chipsalliance.org/g/caliptra-wg).
+The [call
+invite](https://teams.microsoft.com/l/meetup-join/19%3ameeting_ZTViMGQ5MDYtNGY4MS00ODY5LTg4NmQtNDE3N2QwZmVhMmNh%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%22661ec88e-77cb-431c-935a-b377b1078af4%22%7d)
+is also reachable from the [CHIPS Workgroups
+page](https://www.chipsalliance.org/workgroups/).
 
 A [Slack channel](https://join.slack.com/t/caliptraworkspace/signup)
 is used for interactive discussions. Keep in mind development activity is focused on
