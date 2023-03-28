@@ -19,7 +19,7 @@ Project](https://chipsalliance.org/), a Series of LF Projects, LLC.
 
 ## Governance
 
-The [Caliptra WorkGroup Technical Charter](Caliptra_WG_Technical_Charter.md)
+The [Caliptra WorkGroup Technical Charter](CaliptraWGTechnicalCharter.md)
 sets out the charter governing the Caliptra project.
 
 ## Specifications
@@ -41,7 +41,7 @@ The Caliptra code base and documentation are split across five repositories:
 | [Caliptra U-Reg](https://github.com/chipsalliance/caliptra-ureg) | [Issues](https://github.com/chipsalliance/caliptra-ureg/issues) [PRs](https://github.com/chipsalliance/caliptra-ureg/pulls) | General-purpose libraries and tools for manipulating MMIO registers from Rust |
 
 The GitHub config parameters for all the branches are documented in a [local
-file](github_rules.md).
+file](GitHubRules.md).
 
 ## Discussion Channels
 
