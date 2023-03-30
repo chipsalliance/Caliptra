@@ -20,7 +20,8 @@ Project](https://chipsalliance.org/), a Series of LF Projects, LLC.
 ## Governance
 
 The [Caliptra WorkGroup Technical Charter](CaliptraWGTechnicalCharter.md)
-sets out the charter governing the Caliptra project.
+sets out the charter governing the Caliptra project and [its
+marks](CaliptraTrademarkPolicy.md).
 
 ## Specifications
 
