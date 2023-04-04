@@ -30,7 +30,7 @@ product using the Caliptra brand equates to quality and security.
 You may use the Caliptra Marks without prior written permission (subject to the
 rest of this policy):
 
-1. To refer to unmodified source code, register transfer language, or other files
+1. To refer to unmodified source code, register-transfer-level, or other files
 shared in the official CHIPS Alliance Caliptra repositories on GitHub (the
 “Caliptra Project”);
 
