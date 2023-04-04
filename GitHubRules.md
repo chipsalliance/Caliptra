@@ -13,7 +13,12 @@ GitHub configuration.
 * Do not allow bypassing the above settings
 * Restrict who can push to matching branches: only relevant folks in
   [MAINTAINERS](MAINTAINERS.md) for `main` and `release/*` branches
-* Require linear history
+* For caliptra-rtl Repository
+  * Don't require non-linear history
+  * Allow "merge commits"
+* For other Repositories
+  * Require linear history
+  * Disallow "merge commits"
 
 Will not set
 * Allow force pushes
