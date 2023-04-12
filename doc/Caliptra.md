@@ -109,7 +109,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 # References
 
 1. <a id="ref-1"></a>NIST Special Publication 800-193 Platform Firmware Resiliency Guidelines
-2. <a id="ref-2"></a>Global Platform Technology Root of Trust Definitions and Requirements Version 1.1 Public 
+2. <a id="ref-2"></a>Global Platform Technology Root of Trust Definitions and Requirements Version 1.1 Public
 3. <a id="ref-3"></a>[Open Compute Project Secure Boot Specification](https://www.opencompute.org/documents/secure-boot-2-pdf)
 4. <a id="ref-4"></a>TCG DICE Layering Architecture Version 1.0 Revision 0.19 July 23, 2020
 5. <a id="ref-5"></a>TCG DICE Attestation Architecture Version 1.00 Revision 0.23 March 1, 2021
@@ -501,7 +501,7 @@ An example of when an owner must protect assets would be moving from secure mode
 
 # High Level Architecture
 
-A Caliptra RTM subsystem has the following basic, high-level blocks: 
+A Caliptra RTM subsystem has the following basic, high-level blocks:
 
 *Figure 2: Caliptra High Level Blocks*
 
@@ -1344,6 +1344,8 @@ The following table describes a Calpitra RTM’s Fuse map:
 | IDEVID CERT IDEVID ATTR.        | 768             | ROM FMC RUNTIME | SOC Manufacturing                               | <p>Manufacturer IEEE IDEVID Certificate Generation Attributes.</p><p>Please refer to ROM spec for more details</p> |
 | IDEVID MANUF HSM IDENTIFIER     | 128             | ROM FMC RUNTIME |                                                 | <p>Manufacturer IDEVID Manufacturer’s HSM identifier (this is used to find the certificate chain from the boot media)</p><p>Please refer to ROM spec for more details</p> |
 | Life Cycle Fuses                | 2               | ROM FMC RUNTIME | SOC Manufacturing                               | <p>**Caliptra Boot Media Integrated mode usage only**. SOCs that build with a Boot Media Dependent profile don’t have to account for these fuses.</p><p>‘00 - Unprovisioned or Manufacturing</p><p>‘01 - Production ‘10 - UNDEF</p><p>‘11 - End Of Life</p><p></p><p>**Reset:** Can only be reset on powergood</p> |
+| LMS VERIFY                      | 1               | ROM             | In-Field Programmable                           | <p>0 - Verify Caliptra firmware images with ECDSA-only</p><p>1 - Verify Caliptra firmware images with both ECDSA and LMS</p>
+| LMS REVOCATION                  | 32              | ROM             | In-Field Programmable                           | Bits for revoking LMS public keys in the key manifest
 
 ## Fuse Programming
 
