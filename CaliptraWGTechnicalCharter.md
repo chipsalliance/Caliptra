@@ -59,6 +59,8 @@ The responsibilities of these TAC roles within the Workgroup include:
 - Setting the technical criteria for use of the Workgroup marks (if applicable);
 - Determining strategy and promoting the adoption of the Workgroup technology
   through documentation, talks, or other marketing;
+- Administering the [policy for the Caliptra
+  trademarks](CaliptraTrademarkPolicy.md).
 - Determining whether additional public, open source repositories should be
   created for the Workgroup; and
 - Determining whether any Workgroup open source collaborations should be wound
@@ -82,7 +84,7 @@ is scoped to an area of the Caliptra project:
 - **Voting** Members: Only the Voting TAC Members cast the votes for all
   decisions below that require a TAC vote. Where TAC quorum may be needed, only
   a quorum of Voting TAC Members is required. Voting TAC Members are responsible
-  for membership decisions in the TAC.
+  for membership decisions in the TAC, and trademark-related decisions.
 
 All members of the TAC share oversight responsibilities for miscellaneous code
 that does not fall in any of the categories above, and for documentation files.
