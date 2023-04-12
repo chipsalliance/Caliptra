@@ -20,7 +20,8 @@ Project](https://chipsalliance.org/), a Series of LF Projects, LLC.
 ## Governance
 
 The [Caliptra WorkGroup Technical Charter](CaliptraWGTechnicalCharter.md)
-sets out the charter governing the Caliptra project.
+sets out the charter governing the Caliptra project and [its
+marks](CaliptraTrademarkPolicy.md).
 
 ## Specifications
 
@@ -42,6 +43,19 @@ The Caliptra code base and documentation are split across five repositories:
 
 The GitHub config parameters for all the branches are documented in a [local
 file](GitHubRules.md).
+
+### Convenience repo URLs
+
+* [repo.caliptra.io](http://repo.caliptra.io)
+* [spec.caliptra.io](http://spec.caliptra.io)
+* [sw.caliptra.io](http://sw.caliptra.io)
+* [fw.caliptra.io](http://fw.caliptra.io)
+* [hw.caliptra.io](http://hw.caliptra.io)
+* [rtl.caliptra.io](http://rtl.caliptra.io)
+* [dpe.caliptra.io](http://dpe.caliptra.io)
+* [ureg.caliptra.io](http://ureg.caliptra.io)
+* [ireg\[s\].caliptra.io](http://iregs.caliptra.io)
+* [ereg\[s\].caliptra.io](http://eregs.caliptra.io)
 
 ## Discussion Channels
 
