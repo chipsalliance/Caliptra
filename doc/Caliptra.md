@@ -536,7 +536,7 @@ In the Boot Media Integrated Profile, Caliptra unilaterally starts the firmware 
 ![](./images/BMI_Boot_flow.jpeg)
 
 ### <a id="bmd"></a>Caliptra Core - Boot Media Dependent (BMD)
-In the Boot Media Dependent Profile, Caliptra coordinates the start of the firmware chain-of-trust with the immutable component of the SoC ROM. Once the Caliptra ROM has completed initialization, it provides a "stash measurement" API and callback signals for the SoC ROM to proceed with the boot process. Caliptra ROM supports stashing of at most eight measurements prior to the boot of Caliptra firmware. The SoC then may choose to boot Caliptra firmware as the first or second or third ... or ninth mutable code. The boot process is as follows:
+In the Boot Media Dependent Profile, Caliptra coordinates the start of the firmware chain-of-trust with the immutable component of the SoC ROM. Once the Caliptra ROM has completed initialization, it provides a "stash measurement" API and callback signals for the SoC ROM to proceed with the boot process. Caliptra ROM supports stashing of at most eight measurements prior to the boot of Caliptra firmware. The SoC then may choose to boot Caliptra firmware. Any security-sensitive code or configuration loaded by the SoC prior to Caliptra firmware boot must be stashed within Caliptra. If the SoC exceeds Caliptra ROM's measurement stash capacity, attestation must be disabled until next cold reset. The boot process is as follows:
 
 1. Hardware executes SoC power-on reset logic. This logic starts the execution of SoC ROM and Caliptra ROM.
 2. SoC ROM waits for the ready_for_fw signal from Caliptra ROM.
@@ -551,10 +551,6 @@ In the Boot Media Dependent Profile, Caliptra coordinates the start of the firmw
 6. Upon eventual initialization, Caliptra firmware presents attestation APIs using the deposited measurements.
 
 Refer to [Error Reporting and Handling](#error-reporting-and-handling) for details regarding Caliptra and SoC firmware load and verification error handling.
-
-*Figure 4: Boot Media Dependent Boot Flow*
-
-![](./images/BMD_Boot_flow.jpeg)
 
 ## Caliptra Security Subsystem
 
