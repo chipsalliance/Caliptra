@@ -1,6 +1,7 @@
 # Workgroup Charter for Caliptra, a CHIPS Alliance Workgroup
 
-Adopted `[Month, Day, Year]`
+Adopted May 4th 2023.
+
 This Workgroup Charter (the “Charter”) sets forth the responsibilities and
 procedures for technical contribution to, and oversight of the Caliptra
 Workgroup (the “Workgroup”).
