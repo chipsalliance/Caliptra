@@ -60,6 +60,7 @@ The Caliptra Workgroup acknowledges the following individuals for their contribu
 |January 2023|0.60|Jeff Andersen|Added additional details on hitless update attestation.|
 |January 2023|0.61|Jeff Andersen|Removed KEY MANIFEST SVN from spec.|
 |February 2023|0.62|Piotr Kwidzinski|Moved spec to Caliptra GitHub repo.|
+|May 2023|0.63|Caleb Whitehead|Updated Error Reporting and Handling HW Error Table.|
 
 # Acronyms and Abbreviations
 
@@ -1368,20 +1369,25 @@ This section describes Caliptra error reporting and handling.
 
 | | Fatal Errors | Non-fatal Errors |
 | :- | - | - |
-| HW | <p>- ICCM, DCCM SRAM ECC</p><p>- Second WD timer expiry (First one triggers an NMI to FW to correct the issue and clear the interrupt status bit. If the WD expires again, then it gets escalated to FATAL error</p> | <p>- Mailbox SRAM ECC (except initial FW load)</p><p>- Mailbox incorrect protocol/commands</p><p>- Crypto processing errors</p><p> - FW requesting wrong key slot (eg. PCR key slot)</p><p>- Outside the AHB-lite decoding range access</p> |
-| FW | <p>- Boot-time FW authentication failures</p><p>- FW triggered FATAL errors. Examples: ICCM/DCCM misaligned access (potentially in the except subroutine); AHB access hangs that is triggered through WD timer expiry; stack overflow etc. Refer to the table below</p> | <p>- Mailbox API failures</p><p>- First WD timer expiry</p> |
+| HW | <p>- ICCM, DCCM SRAM ECC</p><p>- Second WD timer expiry (First one triggers an NMI to FW to correct the issue and clear the interrupt status bit. If the WD expires again, then it gets escalated to FATAL error</p> | <p>- Mailbox SRAM ECC (except initial FW load)</p><p>- Mailbox incorrect protocol/commands. E.g. Incorrect access ordering; access without Lock.</p> |
+| FW | <p>- Boot-time FW authentication failures</p><p>- FW triggered FATAL errors. Examples: ICCM/DCCM misaligned access (potentially in the except subroutine); AHB access hangs that is triggered through WD timer expiry; AHB access outside the decoding range; stack overflow etc. Refer to the table below</p> | <p>- Mailbox API failures</p><p>- First WD timer expiry</p><p>- Crypto processing errors</p> |
 
 **Fatal errors**
 
-- Fatal errors will log the FATAL ERROR reasons into an arch register that is RW from the external world. This register must be sticky (as in reset is on powergood)
-- Caliptra will signal this using a CALIPTRA\_FATAL\_ERROR wire
-	- SOCs must hook this into their SOC error handling logic
+- Fatal errors will log the FATAL ERROR reasons into an arch register that is RW from the external world. This register must be sticky (as in reset is on powergood).
+- This register may be cleared at any time via register write (W1C).
+- Caliptra will signal this using a cptra\_error\_fatal wire.
+	- SOCs must hook this into their SOC error handling logic.
+    - Error Mask registers (writable only by Caliptra uC) may be used to prevent error signal assertion per-event. Mask registers only impact interrupts when set prior to the error occurrence.
+    - cptra\_error\_fatal will remain asserted until Caliptra system is reset. Note that, although the HW FATAL ERROR register may be cleared at any time, a reset is still required to clear the interrupt.
 - When a fatal error occurs, all assets (UDS fuses, DEOBF\_KEK, Key Slots etc.)  are cleared. Please note that UDS\_FUSE, DEOBF\_KEK may have already been cleared depending on when the fatal error happened.
 
 **Non-Fatal errors**
 
-- Non-Fatal errors will log the NON-FATAL ERROR reasons into an arch register that is RW from the external world. This register must be sticky (as in reset is on powergood)
-- Caliptra will signal this using a CALIPTRA\_NON\_FATAL\_ERROR wire
+- Non-Fatal errors will log the NON-FATAL ERROR reasons into an arch register that is RW from the external world. This register must be sticky (as in reset is on powergood).
+- This register may be cleared at any time via register write (W1C).
+- Caliptra will signal this using a cptra\_error\_non\_fatal wire.
+- System reset or a write to clear the NON-FATAL ERROR register will cause the interrupt to deassert.
 - Optional for SOCs to include this signal in their logic.
 
 **FW Errors**
