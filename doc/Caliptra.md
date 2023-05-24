@@ -556,15 +556,6 @@ Refer to [Error Reporting and Handling](#error-reporting-and-handling) for detai
 
 ![](./images/BMD_Boot_flow.png)
 
-The Boot Media Dependent profile is less intrusive to integrations, but extends the TCB for Caliptra to include SoC ROM.  The verification of measurement mechanism integration includes:
-
-	1. The SoC design that executes SoC power-on reset logic.
-	2. SoC ROM, SoC boot controller
-	3. Caliptra IP, Caliptra ROM, and Caliptra Firmware.
-	4. SoC first mutable code.
-
-The trusted computing base for the SoC is larger in Boot Media Dependent, but simplifies integration while preserving many of the Caliptra security guarantees.
-
 ## Caliptra Security Subsystem
 
 In order to enable a transparent and reusable security subsystem Caliptra solution, this specification provides for a full security subsystem solution that is a combination of fully open source digital logic & licensable analog components that are technology dependent such as TRNG analog sources  or technology dependent fuse controllers.
