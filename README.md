@@ -46,6 +46,8 @@ file](GitHubRules.md).
 
 ### Convenience repo URLs
 
+All these URLs redirect into the repos above.
+
 * [repo.caliptra.io](http://repo.caliptra.io)
 * [spec.caliptra.io](http://spec.caliptra.io)
 * [sw.caliptra.io](http://sw.caliptra.io)
@@ -79,4 +81,5 @@ affiliated) before participating in these channels.
 ## License
 
 All code written for Caliptra and found in these repositories is licensed under
-the [Apache Source License 2.0](LICENSE).
+the [Apache Source License 2.0](LICENSE). You can find out more by reading our
+document on [how to contribute](CONTRIBUTING.md).

@@ -1,5 +1,21 @@
 # Contributing to Caliptra
 
+Top level things to know
+
+* Use of Caliptra requires no CLA.
+
+* Contribution to Caliptra source requires [CHIPS
+  CLA](#contributor-license-agreement)
+
+* Contribution as a named author of Caliptra specs released to OCP requires [OCP
+  paperwork](https://www.opencompute.org/contributions/how-to-contribute)
+
+* Approval of Caliptra integration compliance is
+  [handled](CaliptraTrademarkPolicy.md) by Caliptra TAC
+
+* [License to use Caliptra trademark](CaliptraTrademarkPolicy.md) is handled by
+  Linux Foundation after Caliptra TAC integration compliance approval
+
 ## Contributor License Agreement
 
 Per the [Charter](CaliptraWGTechnicalCharter.md), contributors to Caliptra
