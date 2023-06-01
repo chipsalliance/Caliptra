@@ -1377,9 +1377,9 @@ This section describes Caliptra error reporting and handling.
 - Fatal errors will log the FATAL ERROR reasons into an arch register that is RW from the external world. This register must be sticky (as in reset is on powergood).
 - This register may be cleared at any time via register write (W1C).
 - Caliptra will signal this using a cptra\_error\_fatal wire.
-	- SOCs must connect this into their SOC error handling logic. Upon detection of a FATAL ERROR in Caliptra, SOC shall treat any outstanding commands with Caliptra as failed, and perform a core reset using the signal `cptra_rst_b`. If Caliptra is instantiated in the Security Subsystem configuration, the whole subsystem should be reset.
+	- SOCs must connect this into their SOC error handling logic. Upon detection of a FATAL ERROR in Caliptra, SOC shall treat any outstanding commands with Caliptra as failed, and perform a reset using the signal `cptra_rst_b`.
     - Error Mask registers (writable only by Caliptra uC) may be used to prevent error signal assertion per-event. Mask registers only impact interrupts when set prior to the error occurrence.
-    - cptra\_error\_fatal will remain asserted until Caliptra Core is reset. Note that, although the HW FATAL ERROR register fields may be cleared at any time, a reset is still required to clear the interrupt.
+    - cptra\_error\_fatal will remain asserted until Caliptra is reset. Note that, although the HW FATAL ERROR register fields may be cleared at any time, a reset is still required to clear the interrupt.
 - When a fatal error occurs, all assets (UDS fuses, DEOBF\_KEK, Key Slots etc.) are cleared. Please note that UDS\_FUSE, DEOBF\_KEK may have already been cleared depending on when the fatal error happened.
 
 **Non-Fatal errors**
@@ -1387,7 +1387,7 @@ This section describes Caliptra error reporting and handling.
 - Non-Fatal errors will log the NON-FATAL ERROR reasons into an arch register that is RW from the external world. This register must be sticky (as in reset is on powergood).
 - This register may be cleared at any time via register write (W1C).
 - Caliptra will signal this using a cptra\_error\_non\_fatal wire.
-- Caliptra Core reset via `cptra_rst_b` or a write to clear the NON-FATAL ERROR register will cause the interrupt to deassert.
+- Caliptra reset via `cptra_rst_b` or a write to clear the NON-FATAL ERROR register will cause the interrupt to deassert.
 - Optional for SOCs to include this signal in their logic.
 
 **FW Errors**
