@@ -514,57 +514,50 @@ See [HW Section](#hardware-section) for a detailed discussion.
 
 ## Caliptra Profiles
 
-Caliptra supports two physical modes of instantiation, the Caliptra Core and the Caliptra Subsystem.  Within Caliptra Core there are two modes of integration with different security postures and firmware loading techniques.  The first is Boot Media Integrated Profile where Caliptra loads its firmware directly from persistent storage (eg. FLASH memory) while in Boot Media Dependent Profile Caliptra firmware is pushed into mailbox SRAM buffer by the SoC immutable code (HW or ROM) that controls the persistent storage of the firmware code.
+Caliptra supports two physical modes of instantiation, the Caliptra Core and the Caliptra Subsystem.  Within Caliptra Core there are two modes of integration with different security postures and firmware loading techniques.
+
+1. Boot Media Integrated (BMI) Profile (formerly Active Profile): Caliptra loads its firmware directly from SPI boot media. SoC boot cannot proceed through any other boot media.
+2. Boot Media Dependent (BMD) Profile (formerly Passive Profile): Caliptra receives its firmware from SoC actors with access to the boot media.
+
+In both Profiles, Caliptra is among the first uncore microcontrollers taken out of reset by the power-on reset logic. The difference is in the TCB for integrity of the Core Root of Trust for Measurement. In the BMI Profile, this TCB is the Caliptra Core. In the BMD Profile, this TCB additionally includes the immutable element of the SoC ROM. The BMD Profile trades increased TCB for lower integration cost. BMD Profile does not put Caliptra firmware in the performance-critical or recovery-critical code paths of the SoC boot process.
+
+Caliptra 1.0 will only support the BMD Profile.
 
 ### <a id="bmi"></a>Caliptra Core - Boot Media Integrated (BMI)
+In the Boot Media Integrated Profile, Caliptra unilaterally starts the firmware chain-of-trust. The boot process is as follows:
 
-When Caliptra is integrated into an SoC in Boot Media Integrated mode, Caliptra RTM is the first uncore microcontroller taken out of reset with direct access to persistent storage. The flow for boot is as follows:
-
-	1. Hardware executes SoC power-on reset logic.
-	2. Caliptra ROM executes first and performs cryptographic identity generation, reads in Caliptra firmware from persistent storage.
-	3. Caliptra ROM measures and verifies its firmware before loading/executing it. Refer to [Error Reporting and Handling](#error-reporting-and-handling) for details regarding FMC verification failures.
-	4. After loading, verifying and executing its firmware, Caliptra copies the SoC First Mutable Code (FMC) into an SoC internal SRAM mailbox buffer and measures that firmware.
-	5. At this point, Caliptra may signal to SoC ROM and SoC uncore to continue power-on reset as shown in Figure 1.
+1. Hardware executes SoC power-on reset logic. This logic starts the execution of Caliptra ROM.
+2. Caliptra ROM fetches the Caliptra firmware from SPI boot media.
+3. Caliptra ROM authenticates/measures/loads/executes Caliptra firmware. Refer to [Error Reporting and Handling](#error-reporting-and-handling) for details regarding FMC verification failures.
+4. Caliptra firmware copies the SoC First Mutable Code (FMC) into the Caliptra mailbox and measures it.
+5. Caliptra firmware signals to SoC ROM to continue the boot process by fetching the firmware from Caliptra's mailbox.
+6. SoC FMC continues the boot process, forming a boot firmware chain-of-trust: each firmware fetches/authenticates/measures/executes the next firmware needed to establish the device operating environment. Each firmware deposits the next firmware's measurements into Caliptra prior to execution.
+7. Caliptra firmware presents attestation APIs using the deposited measurements.
 
 *Figure 3: Boot Media Integrated Boot Flow*
 
-![](BMI_Boot_flow.png)
-
-In the Boot Media Integrated profile, the Caliptra Trusted Computing Base (TCB) for integrity of Core Root of Trust measurement is the Caliptra Core.  The verification of measurement includes:
-
-	1. The SoC design ingests firmware through Caliptra
-	2. Caliptra IP, Caliptra ROM, and Caliptra Firmware
+![](./images/BMI_Boot_flow.png)
 
 ### <a id="bmd"></a>Caliptra Core - Boot Media Dependent (BMD)
+In the Boot Media Dependent Profile, Caliptra coordinates the start of the firmware chain-of-trust with the immutable component of the SoC ROM. Once the Caliptra ROM has completed initialization, it provides a "stash measurement" API and callback signals for the SoC ROM to proceed with the boot process. Caliptra ROM supports stashing of at most eight measurements prior to the boot of Caliptra firmware. The SoC then may choose to boot Caliptra firmware. Any security-sensitive code or configuration loaded by the SoC prior to Caliptra firmware boot must be stashed within Caliptra. If the SoC exceeds Caliptra ROM's measurement stash capacity, attestation must be disabled until next cold reset. The boot process is as follows:
 
-To facilitate ease of integration and reliable measurement, the Caliptra RTM is the first uncore controller to be taken out of reset by the SoC ROM.  Once loaded, it provides callback signals for the remaining SoC subsystem to resume normal reset flow.
-
-All firmware that is loaded from an outside entity (and subsequently executed on the microprocessor) shall be considered untrusted; this firmware's measurements shall be reported to the Caliptra RTM before it is allowed to run within the SoC. Caliptra provides a HW API where the hash calculation, FW authentication and measurement capture is performed by Caliptra itself vs just reporting the measurements.
-
-In the BMD profile, the Caliptra trusted computing base (TCB) for integrity of Core Root of Trust measurement is the Caliptra Core and SoC ROM.  The verification of measurement mechanism includes:
-
-	1. Hardware executes SoC power-on reset logic.
-	2. SoC ROM executes, reads Caliptra firmware into Mailbox SRAM buffer.
-	3. SoC ROM signals Caliptra for its ROM to execute
-	4. SoC ROM pauses and waits for a signal (resume) from Caliptra
-	5. Caliptra ROM cryptographically authenticates its FW, measures and (if valid) executes its FW and then derives cryptographic identities
-	6. Caliptra signals back to SoC to resume reset.
-	7. SoC reads in its firmware, cryptographically authenticates its FW and provides measurements to Caliptra before executing.
+1. Hardware executes SoC power-on reset logic. This logic starts the execution of SoC ROM and Caliptra ROM.
+2. SoC ROM waits for the ready_for_fw signal from Caliptra ROM.
+3. SoC ROM fetches the First Mutable Code.
+    1. If the FMC is Caliptra firmware:
+        1. SoC ROM loads the Caliptra firmware into the Caliptra mailbox and issues the Caliptra "firmware load" command.
+        2. Caliptra ROM authenticates/measures/starts the Caliptra firmware.
+    3. If the FMC is not Caliptra firmware:
+        1. SoC ROM authenticates and measures that firmware as the SoC FMC, and issues the Caliptra "stash measurement" command prior to executing SoC FMC.
+4. SoC ROM executes SoC FMC.
+5. As in #6 from the BMI flow, SoC FMC continues the boot process, forming a boot firmware chain-of-trust: each firmware fetches/authenticates/measures/executes the next firmware needed to establish the device operating environment. Each firmware deposits the next firmware's measurements into Caliptra prior to execution. The exception is Caliptra's firmware: SoC firmware shall delegate the measurement and execution of Caliptra's firmware to Caliptra ROM.
+6. Upon eventual initialization, Caliptra firmware presents attestation APIs using the deposited measurements.
 
 Refer to [Error Reporting and Handling](#error-reporting-and-handling) for details regarding Caliptra and SoC firmware load and verification error handling.
 
 *Figure 4: Boot Media Dependent Boot Flow*
 
 ![](./images/BMD_Boot_flow.png)
-
-The Boot Media Dependent profile is less intrusive to integrations, but extends the TCB for Caliptra to include SoC ROM.  The verification of measurement mechanism integration includes:
-
-	1. The SoC design that executes SoC power-on reset logic.
-	2. SoC ROM, SoC boot controller
-	3. Caliptra IP, Caliptra ROM, and Caliptra Firmware.
-	4. SoC first mutable code.
-
-The trusted computing base for the SoC is larger in Boot Media Dependent, but simplifies integration while preserving many of the Caliptra security guarantees.
 
 ## Caliptra Security Subsystem
 
