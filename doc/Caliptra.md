@@ -60,7 +60,9 @@ The Caliptra Workgroup acknowledges the following individuals for their contribu
 |January 2023|0.60|Jeff Andersen|Added additional details on hitless update attestation.|
 |January 2023|0.61|Jeff Andersen|Removed KEY MANIFEST SVN from spec.|
 |February 2023|0.62|Piotr Kwidzinski|Moved spec to Caliptra GitHub repo.|
+|February 2023|0.62|Piotr Kwidzinski|Moved spec to Caliptra GitHub repo.|
 |May 2023|0.63|Caleb Whitehead|Updated Error Reporting and Handling HW Error Table.|
+|June 2023|0.64|Varun Sampath (NVIDIA)|Warm reset and journey measurement handling.|
 
 # Acronyms and Abbreviations
 
@@ -876,7 +878,7 @@ Caliptra contains \[32\] PCR 384 banks that are extendible by the SHA engine, an
 |PCR8|Cumulative|RT - PA3||
 |…|-|-||
 
-## Attestation of Caliptra's update journey
+### Attestation of Caliptra's update journey
 
 The Caliptra hardware ROM will extend Caliptra's FMC measurement and security state into the cumulative and current PCR banks (0 and 1 respectively).  The FMC captures the current measurement of Caliptra's Runtime Firmware upon every cold boot and hitless update. These measurements are used to derive a CDI and an alias key given to runtime firmware. FMC places runtime firmware's measurements into runtime firmware's alias key certificate, and signs that certificate with FMC's alias key.
 
@@ -924,7 +926,7 @@ Thus satisfied that version B has never run since power-on, the verifier can als
 
 Finally, the verifier can confirm freshness by comparing the nonce in (6) to the one emitted in the original challenge. As DPE will only allow a derived leaf key to be used if the measurements present in its leaf certificate are a reflection of the current state, the fact that the freshness nonce was signed by DPE is evidence that the measurements in (4) are fresh.
 
-### Commentary: maintaining sealed secrets across a power cycle
+#### Commentary: maintaining sealed secrets across a power cycle
 
 Caliptra does not seal secrets directly. However, Caliptra does implement DPE, which allows secrets to be sealed to an external sealer such as a TPM, with a policy that only allows those secrets to be unsealed if Caliptra allows the host to wield a particular leaf DPE key. This leaf DPE key is permuted based on the hitless update journey of the various components whose measurements are stored within Caliptra.
 
@@ -935,6 +937,19 @@ Let us assume that upon each hitless update, the firmware update is also written
 To anticipate this eventuality, before a power cycle the SoC can instruct DPE to predict what the DPE leaf public key will be if the microcode journey is simply \[C\], using DPE's simulation context. The SoC can then re-seal secrets to the external sealer with a policy that can be satisfied if the computed public key is used.
 
 Note: as all DPE leaf keys are derived using Caliptra runtime firmware's CDI, a DPE simulation context cannot predict the leaf key that would be available if a different Caliptra firmware image were to boot (as one Caliptra firmware image does not have access to a different image's CDI). Therefore, if a different Caliptra firmware image is staged to persistent storage, Caliptra must first be hitlessly updated to that image before a simulation context can be used to predict public keys that will be available to that image on next cold-boot.
+
+### Attestation of SoC update journey
+
+Caliptra shall also attest to the journeys of SoC components. A SoC component's journey may change independently of other components. For example, SoC components may implement partial resets or hitless updates that cause the component's firmware or configuration to reload.
+
+Caliptra shall maintain a reboot counter for each component. Caliptra shall increment the reboot counter and update the journey measurement for calls that indicate that the component's state changed. Caliptra  shall attest the journey measurement and report the counter value on-demand. The verifier is assumed to have knowledge of update events at an associated reboot counter (via an event log) but not have knowledge of reset events. The verifier can compute the journey measurement via multiplicatively extending the current measurement by the reset counter. For example:
+1. Upon cold boot, SoC component boots firmware A. Reboot counter is 0. The tuple of (0,A) is in the event log.
+2. SoC component is partial reset once. Reboot counter is 1.
+3. SoC component is hitlessly updated to firmware B. Reboot counter is 2. The tuple of (2,B) is in the event log.
+4. SoC component is partial reset twice. Reboot counter is 4.
+   
+The corresponding journey measurement computation is the chained extension of \[A->A->B->B->B\]. The verifier can ascertain this through the two event log entries.
+
 
 ## Anti-rollback Support
 
@@ -1164,6 +1179,8 @@ Notes:
 3. Caliptra IP’s reset is de-asserted by the SOC
 4. At this point the HW boot flow will be the same cold boot flow
 5. Caliptra’s ROM reads an internal register to differentiate b/w warm vs cold vs impactless flow. If it's a warm reset flow, then it skips DICE key gen, FW load flows (because keys were already derived and FW is already present in ICCM). This is an important reset time optimization for devices that need to meet the hot reset spec time.
+
+Given warm reset is a pin input to Caliptra, Caliptra may not be idle when a warm reset occurs. If a warm reset occurs while Caliptra ROM, FMC, or RT initialization code is executing, Caliptra may be inoperable until a subsequent cold reset. If a warm reset occurs while Caliptra runtime is servicing a request, Caliptra shall remain operable but may refuse to wield production assets for subsequent requests.
 
 **Note:** Cold reset flow is not explicitly mentioned but it would look like cold boot flow as Caliptra IP has no state through a cold reset.
 
