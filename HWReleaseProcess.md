@@ -51,7 +51,8 @@
 ## Release Rules/Opens
 
 - All fixes go into a main branch first and then any required fixes for a release will get cherrypicked over.
-- All releases will come from a release candidate branch
+- All releases will come from a release candidate branch and have a TAG created.
+- Once a release is made the release candidate branch SHALL be deleted.
 
 <br> *Caliptra Release Flow*
 ![Caliptra Release Flow Chart](doc/images/Caliptra_release_flow.svg)
