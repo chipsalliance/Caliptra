@@ -28,20 +28,20 @@
 
 - Release ZIP File
   - RTL SRC
-    - ROM binary files (BIN ,ELF, and HEX)
-    - Additional Documentation
-    - All specs?
-    - Register Documentation (External)
-    - Header files with:
-      - Register definitions.
-      - Reference code for mailbox, etc.
-    - Release notes TXT file
-    - Which tests were run and which ones passed/failed?
-    - All relevant Git commit hashes from both repos
+  - ROM binary files (BIN ,ELF, and HEX)
+  - Additional Documentation
+  - All specs?
+  - Register Documentation (External)
+  - Header files with:
+    - Register definitions.
+    - Reference code for mailbox, etc.
+  - Release notes TXT file
+  - Which tests were run and which ones passed/failed?
+  - All relevant Git commit hashes from both repos
 - Separate Supporting ZIP File (due to size concerns)
   - FPGA Bitstream file
   - C HW model
-  - Headers and static library
+    - Headers and static library
   - Firmware signed (development key) binary files (BIN, ELF)
   - Integrator Test Checklist
     - Fuse Matrix
