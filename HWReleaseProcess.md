@@ -3,7 +3,7 @@
 ## Nightly
 
 1. When a new release is triggered a new **nightly release** branch will be created from the HEAD of the **main** branch in the **caliptra-sw** repo.
-    - Naming of the branch fill indicate it is a release candidate and will have a target point release version (ex. HWRC 0.8_0; HWRC 0.8_1)
+    - Naming of the branch will indicate it is a nightly release and will have a target point release version (ex. release_"date")
 2. A new commit will update the RTL submodule pointer to point to the new RTL release candidate branch creates in Step #1, and update the registers RDL
 3. If all the caliptra-sw repo CI tests pass:
     1. A **release collateral** archive will be generated and pushed as a Github Artifact
