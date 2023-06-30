@@ -10,11 +10,11 @@
 
 ## RTL Submodule Pointer Update
 
-    1. A new commit will update the RTL submodule pointer to point to the HEAD of the main branch, and update the registers RDL
-    2. A new **nightly release** branch will be created from the HEAD of the **main** branch in the **caliptra-sw** repo
-       - Naming of the branch will indicate it is a nightly release and will have a target point release date (ex. release_"date")
-    3. The branch will be triggered as a PR, therefore all the CI tests required to submit a PR will be executed
-    4. Upon succesfully completion of the CI tests, the branch will be merged and deleted
+1. A new commit will update the RTL submodule pointer to point to the HEAD of the main branch, and update the registers RDL
+2. A new **nightly release** branch will be created from the HEAD of the **main** branch in the **caliptra-sw** repo
+   - Naming of the branch will indicate it is a nightly release and will have a target point release date (ex. release_"date")
+3. The branch will be triggered as a PR, therefore all the CI tests required to submit a PR will be executed
+4. Upon succesfully completion of the CI tests, the branch will be merged and deleted
 
 ## Major Releases
 
