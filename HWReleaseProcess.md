@@ -2,18 +2,25 @@
 
 ## Nightly
 
-1. When a new release is triggered a new **nightly release** branch will be created from the HEAD of the **main** branch in the **caliptra-sw** repo.
-    - Naming of the branch will indicate it is a nightly release and will have a target point release version (ex. release_"date")
-2. A new commit will update the RTL submodule pointer to point to the new RTL release candidate branch creates in Step #1, and update the registers RDL
-3. If all the caliptra-sw repo CI tests pass:
+1. When a new release is triggered, if the RTL submodule pointer is comparaed against HEAD of the **main** branch
+    - In case of divergece, the **RTL Submodule Pointer Update** flow will be executed
+2. A verilator smoke test regression test will be executed against the HEAD of the **main** branch.
+3. If the verilator smoke test passes:
     1. A **release collateral** archive will be generated and pushed as a Github Artifact
-    2. If the RTL submodule pointer has been updated (and no other changes were required to be cherry-picked), **nightly release * will turn into a PR into main
+
+## RTL Submodule Pointer Update
+    1. A new commit will update the RTL submodule pointer to point to the HEAD of the main branch, and update the registers RDL
+    2. A new **nightly release** branch will be created from the HEAD of the **main** branch in the **caliptra-sw** repo
+       - Naming of the branch will indicate it is a nightly release and will have a target point release date (ex. release_"date")
+    3. The branch will be triggered as a PR, therefore all the CI tests required to submit a PR will be executed
+    4. Upon succesfully completion of the CI tests, the branch will be merged and deleted
 
 ## Major Releases
 
-1. The **release collateral** will be manually used for a RTL DV Checkout
-2. If the RTL Regression passes a new release will be made on the **caliptra** repo and a ZIP file containing the release collateral will be included as part of the release.
-3. The **caliptra-rtl** and **caliptra-sw** repos will be tagged with a **release** version tag.
+1. The **release collateral** will be manually handed over the RTL team to be verified in the DV environment
+2. Upon success of the DV verification a new release will be made on the **caliptra** repo
+    -  A ZIP file containing the release collateral will be included as part of the release.
+4. The **caliptra-rtl** and **caliptra-sw** repos will be tagged with a **release** version tag.
 
 ## Fail Case
 
