@@ -28,7 +28,7 @@
     1. Manual intervention required. Create a new issue into the SW Repo. The fix will be made on the **main** branch.
     2. The next **nightly release** workflow will generate the release
 2. Failure in RTL Repo
-    1. Manual intervention required. Create a new issue into the RTL Repo. Nightly releases are gated until fix.
+    1. Manual intervention required. Create a new issue into the RTL Repo. Nightly releases are gated to become major until a fix is merged to main.
     2. While HW fix requires longer time to be submitted, it is acceptable to temporarly diverging from the main branch.
         - A dev branch will be created from the tip of the RTL main branch, and WA fixes will be applied as individual commits
         - The RTL Sumbodule pointer in the **caliptra sw** repo will maunally be updated to point to the dev branch.
