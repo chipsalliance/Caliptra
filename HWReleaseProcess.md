@@ -2,7 +2,7 @@
 
 ## Nightly
 
-1. When a new release is triggered, if the RTL submodule pointer is comparaed against HEAD of the **main** branch
+1. When a new release is triggered, if the RTL submodule pointer is compared against HEAD of the **main** branch
     - In case of divergece, the **RTL Submodule Pointer Update** flow will be executed
 2. A verilator smoke test regression test will be executed against the HEAD of the **main** branch.
 3. If the verilator smoke test passes:
