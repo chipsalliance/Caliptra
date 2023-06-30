@@ -9,6 +9,7 @@
     1. A **release collateral** archive will be generated and pushed as a Github Artifact
 
 ## RTL Submodule Pointer Update
+
     1. A new commit will update the RTL submodule pointer to point to the HEAD of the main branch, and update the registers RDL
     2. A new **nightly release** branch will be created from the HEAD of the **main** branch in the **caliptra-sw** repo
        - Naming of the branch will indicate it is a nightly release and will have a target point release date (ex. release_"date")
