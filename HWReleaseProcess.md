@@ -2,18 +2,20 @@
 
 ## Nightly
 
-1. When a new release is triggered, the RTL submodule pointer is compared against the HEAD of the **main** branch
-    - In case of divergece, the **RTL Submodule Pointer Update** flow will be executed
-2. The verilator smoke test regression test will be executed against the HEAD of the **main** branch.
-3. If the verilator smoke test passes a **release collateral** archive will be generated and pushed as a Github Artifact
+1. When a new release is triggered, the **RTL Submodule Pointer Update** flow is called
+2. The **nightly-verilator** smoke test regression test will be executed against the HEAD of the **main** branch
+    -  If the the test passes a **release collateral** archive will be generated and pushed as a Github Artifact
+    -  Repo tag will be added as well in the form "release_v#yyyy#mm#dd_#n"
 
 ## RTL Submodule Pointer Update
 
-1. A new commit will update the RTL submodule pointer to point to the HEAD of the main branch, and update the registers RDL
-2. A new **nightly release** branch will be created from the HEAD of the **main** branch in the **caliptra-sw** repo
-   - Naming of the branch will indicate it is a nightly release and will have a target point release date (ex. release_"date")
-3. The branch will be triggered as a PR, therefore all the CI tests required to submit a PR will be executed
-4. Upon succesfully completion of the CI tests, the branch will be merged and deleted
+1. The RTL submodule pointer is compared against the of **main** of the **caliptra RTL** repo
+    - In case they both point to the same **SHA commit** the rest of the flow is skipped 
+2. A new commit will update the RTL submodule pointer to point to the HEAD of the main branch, and update the registers RDL
+3. A new **nightly release** branch will be created from the HEAD of the **main** branch in the **caliptra-sw** repo
+   - Naming of the branch will indicate it is a nightly release and will have a target point release date (ci_rtl_#yyyy#mm#dd_#n)
+4. The branch will be triggered as a PR, therefore all the CI tests required to submit a PR will be executed
+5. Upon succesfully completion of the CI tests, the branch will be merged and deleted
 
 ## Major Releases
 
