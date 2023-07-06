@@ -2,7 +2,7 @@
 
 ## Nightly
 
-1. When a new release is triggered, the **RTL Submodule Pointer Update** flow is called
+1. When the **HW Release Workflow** is triggered, the **RTL Submodule Pointer Update** flow is called
 2. The **nightly-verilator** smoke test regression test will be executed against the HEAD of the **main** branch
     -  If the the test passes a **release collateral** archive will be generated and pushed as a Github Artifact
     -  Repo tag will be added as well in the form "release_v#yyyy#mm#dd_#n"
