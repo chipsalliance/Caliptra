@@ -41,7 +41,7 @@
 
 - Release ZIP File
   - RTL SRC
-  - ROM binary files (BIN ,ELF, and HEX)
+  - ROM binary files (BIN, ELF, and HEX)
   - Additional Documentation
   - All specs?
   - Register Documentation (External)
