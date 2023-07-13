@@ -43,7 +43,9 @@
   - RTL SRC
   - ROM binary files (BIN, ELF, and HEX)
   - Additional Documentation
-  - All specs?
+  - Caliptra Main Specs
+  - Caliptra ROM Specs
+  - Caliptra RTL Notes
   - Register Documentation (External)
   - Header files with:
     - Register definitions.
