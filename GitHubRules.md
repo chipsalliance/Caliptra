@@ -7,6 +7,7 @@ GitHub configuration.
 * Require approvals
 * Required number of approvals: 2 for spec and RTL, 1 for software
 * Dismiss stale pull request approvals when new commits are pushed
+* Allow auto-merge
 * Require review from code owners
 * Require conversation resolution before merging
 * Restrict who can dismiss pull request reviews
