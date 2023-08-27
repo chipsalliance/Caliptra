@@ -1245,7 +1245,6 @@ The Caliptra mailbox commands are specified in the runtime firmware specificatio
 
 The Caliptra firmware image format is specified in the ROM specification: https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md#8-firmware-image-bundle
 
-
 ### Hash Calculation HW API
 
 Caliptra provides a HW API to do a SHA384 hash calculation. The SoC can access the accelerator through this hardware API and stream data to be hashed over the APB interface. The hash is captured into a register for SOC to use or Caliptra FW to be used for Signature Authentication API.
