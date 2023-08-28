@@ -38,6 +38,7 @@ The Caliptra Workgroup acknowledges the following individuals for their contribu
 * Sudhir Mathane (AMD)
 * Varun Sampath (NVIDIA)
 * Vishal Soni (Microsoft)
+* Steven Bellock (NVIDIA)
 
 <div style="page-break-after: always"></div>
 
@@ -1107,10 +1108,7 @@ Caliptra IP HW Boot Flow
 4. Caliptra IP will now evaluate the strap settings driven through various interface wires (eg. BMD vs BMI mode, security/debug state of the SOC etc)
 5. If SOC is in a debug mode, then security assets are cleared/switched to debug mode
 6. Caliptra IP will assert Ready\_For\_Fuse wire to the SOC
-7. SOC will populate the fuse registers and set a fuse write done bit in the same fuse register block. Note that Caliptra HW drops writes to any registers that cannot be changed unless there is a power cycle (eg. UDS). So SOC is free to write all the registers.
-
-	a. **Open:** To reduce the overall complexity, there is a proposal to write a SOC generated random number as a part of fuse population. From there, FW will implement DRBG using DRNG as a starting point.
-
+7. SOC will populate the fuse registers, the internal TRNG configuration registers, and the ROM WDT cycle count, then set the CPTRA\_FUSE\_WR\_DONE bit. Note that Caliptra HW drops writes to any registers that cannot be changed unless there is a power cycle (eg. UDS). So SOC is free to write all the registers.
 8. Caliptra IP will deassert Ready\_for\_Fuse wire as soon as the fuse write done register is written.
 9. Caliptra IP moves security critical assets in fuse registers (eg. UDS) to Key Vault.
 
@@ -1170,7 +1168,7 @@ Notes:
 1. Caliptra IP’s reset is asserted by the SOC
 2. Caliptra’s internal BootFSM will reset the uController and then resets all the logic (including the SOC facing APB interface). Only registers or flops that are sitting on powergood are left to have the same value. Note that SRAMs do not have a reset.
 3. Caliptra IP’s reset is de-asserted by the SOC
-4. At this point the HW boot flow will be the same cold boot flow
+4. At this point the HW boot flow will be the same cold boot flow. SoC is required to configure the internal TRNG and ROM WDT and then set CPTRA\_FUSE\_WR\_DONE. This will cause Caliptra IP to deassert the Ready\_for\_Fuse wire.
 5. Caliptra’s ROM reads an internal register to differentiate b/w warm vs cold vs impactless flow. If it's a warm reset flow, then it skips DICE key gen, FW load flows (because keys were already derived and FW is already present in ICCM). This is an important reset time optimization for devices that need to meet the hot reset specification time.
 
 Given warm reset is a pin input to Caliptra, Caliptra may not be idle when a warm reset occurs. If a warm reset occurs while Caliptra ROM, FMC, or RT initialization code is executing, Caliptra may be inoperable until a subsequent cold reset. If a warm reset occurs while Caliptra runtime is servicing a request, Caliptra shall remain operable but may refuse to wield production assets for subsequent requests.
@@ -1240,48 +1238,12 @@ The PAUSER field of the APB interface will be used to encode device attributes f
 
 ### Mailbox Commands
 
-\[\*\] denotes commands that are implemented in ROM; all others are implemented only in mutable firmware. Note that once Caliptra firmware is executing, firmware may provide alternate implementations of the noted commands.
+The Caliptra mailbox commands are specified in the runtime firmware specification: https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#maibox-commands
 
-*Table 12: Caliptra Mailbox Commands*
 
-<table>
-<thead>
-  <tr>
-    <th>Command Name</th>
-    <th>Encoding</th>
-    <th>Description</th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td>CALIPTRA_FW_LOAD</td>
-    <td><pre>Command: 0x4657_4C44 ("FWLD")<br><br>Input:<br>{<br>  data: u8[..]<br>}</pre></td>
-    <td>Caliptra FMC+FW image supplied from the external entity over the mailbox interface.<br><br>FMC is validated in-place before being copied to ICCM; app firmware is left in the mailbox for FMC to validate and then copy to ICCM before locking ICCM</td>
-  </tr>
-  <tr>
-    <td>DIAG_STATUS*<br></td>
-    <td><pre>Command: 0x4449_4147 ("DIAG")<br><br>Output: <br>{ <br>  flags: u64 <br>  caliptra_pubkey_hash_word0: u32,<br>  owner_pubkey_hash_word0: u32,<br>  rom_hash_word0: u32,<br>  fmc_hash_word0: u32,<br>  fw_hash_word0: u32<br>}</pre> </td>
-    <td>Returns status flags and debug info fw_hash_word0 refers to currently-running firmware.</td>
-  </tr>
-  <tr>
-    <td>SHA384_HASH*</td>
-    <td><pre>Command: 0x4841_5348 ("HASH")<br><br>Input:<br>{<br><br>  flags: u32,<br>  data_len: u32,<br>  data: u8[data_len]<br>}<br>FLAG_START = (1 &lt;&lt; 0)<br>FLAG_END = (1 &lt;&lt; 1)<br>Output (if FLAG_END)<br>{<br>  data: u8[48]<br>}<br><br><br>Output (if !FLAG_END)<br>{<br>}</pre></td>
-    <td>Starts or extends or completes a hash. TODO: parameter decides which.<br>TODO: state machine language.<br>TODO: Do we care about hashing values that have a non-multiple-of-8-bit length?</td>
-  </tr>
-  <tr>
-    <td>ECDSA384_SIGNATURE_VERIFY</td>
-    <td><pre>Command: 0x5349_4756 ("SIGV")<br><br>Input:<br>{<br>  data: u8[48],<br>  pub_key_x: u8[48],<br><br>  pub_key_y: u8[48],<br>  signature_r: u8[48],<br>  signature_s: u8[48]<br>}<br><br>Output:<br>{<br><br>  result: u32<br>}</pre></td>
-    <td>Generic crypto offload for signature verification.<br><br>Provided content will have hash of the data to be authenticated, ECDSA public key, and the signature.<br>	<br>Returns 0 on success, error code on failure.<br></td>
-  </tr>
-  <tr>
-    <td>STASH_MEASUREMENT</td>
-    <td><pre>Command: 0x4D45_4153 ("MEAS")<br><br>TODO: need to flesh this out. How many measurements does this need to hold? What's up with hitless update? <br>Can we just have this command be used only by SoC ROM to measure SoC FMC, so other command semantics can evolve separately.<br><br>Input:<br>{					<br>  metadata: u8[4],<br>  measurement: u8[48]<br>}<br><br>Output:<br><br>{<br>}<br></pre></td>
-    <td>Invokes a DPE command.<br>Input `data` is a DPE command structure as defined by the <a href="https://github.com/TrustedComputingGroup/Server-Internal/blob/main/dpe-irot-profile/dpe-irot-profile-latest.pdf">[DPE iRoT profile](https://github.com/TrustedComputingGroup/Server-Internal/blob/main/dpe-irot-profile/dpe-irot-profile-latest.pdf)</a>.<br>Output `data` is a DPE response structure as defined by the <a href="https://github.com/TrustedComputingGroup/Server-Internal/blob/main/dpe-irot-profile/dpe-irot-profile-latest.pdf">[DPE iRoT profile](https://github.com/TrustedComputingGroup/Server-Internal/blob/main/dpe-irot-profile/dpe-irot-profile-latest.pdf)</a>.</td>
-  </tr>
-</tbody>
-</table>
+## Caliptra firmware image format
 
-## Caliptra firmware image format TODO
+The Caliptra firmware image format is specified in the ROM specification: https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md#8-firmware-image-bundle
 
 ### Hash Calculation HW API
 
@@ -1323,7 +1285,7 @@ Few notes:
 
 ### Architectural Registers
 
-These registers are accessible over APB to be read according to the register access permissions. **TODO: Additional pointer to HTML here,**
+These registers are accessible over APB to be read according to the register access permissions. The register reference manual is available at https://ereg.caliptra.org
 
 ### Fuse Requirements
 
