@@ -8,15 +8,17 @@
 
 <div style="page-break-after: always"></div>
 
-# Foreword
+# Introduction
 
-Caliptra[^1] was originally created as part of the Open Compute Project ([OCP](https://www.opencompute.org/)). The major revisions of the Caliptra specifications are published at OCP. The evolving source code and documentation for Caliptra live in this repository within the [CHIPS Alliance Project](https://chipsalliance.org/), a Series of LF Projects, LLC.
+Caliptra[^1] was originally created as part of the Open Compute Project ([OCP](https://www.opencompute.org/)). The major revisions of the Caliptra specifications are published at OCP. The evolving source code and documentation for Caliptra are in this repository within the [CHIPS Alliance Project](https://chipsalliance.org/), a Series of LF Projects, LLC.
+
+The objective of Caliptra is to define core RoT capabilities that must be implemented in the System on Chip (SoC) or ASIC of any device in a cloud platform. The collection of these RoT capabilities is referred to as the ***Silicon RoT Services (Silicon RoT).***
 
 ## Acknowledgments
 
-The Caliptra Workgroup acknowledges the following individuals for their contributions to this specification:
+The Caliptra Workgroup acknowledges the following individuals for their contributions to this specification.
 
-**CONTRIBUTORS:**
+**CONTRIBUTORS**
 
 * Andrés Lagar-Cavilla (Google)
 * Anjana Parthasarathy (Microsoft)
@@ -42,33 +44,32 @@ The Caliptra Workgroup acknowledges the following individuals for their contribu
 
 <div style="page-break-after: always"></div>
 
-**Revision Table**
+**Revisions**
 
 |**Date**|**Revision #**|**Author**|**Description**|
 | - | - | - | - |
-|February 2022|0.2|Prabhu Jayana (AMD)</p> Bryan Kelly (Microsoft)</p> Andrés Lagar-Cavilla (Google)</p> Jeff Andersen (Google)</p> | Initial proposal draft |
-|March 2022|0.4| Rob Strong (AMD)</p> Prabhu Jayana (AMD)</p>| Migrated to OCP template</p>Edits to clarify language use and added sections related LifeCycle support, fuse, crypto requirements, Kat support, etc.</p> |
-|April 12, 2022|0.5|Rob Strong (AMD)|Various edits and formatting modifications to get to v.5|
-|June 2022|0.51|Rob Strong (AMD)|Updated the FW Signing/Verification Algorithms section - added references to OCP Secure Boot specification.</p>Updated Physical Attack Countermeasures - updated the section to reference NiST paper ([[7](#ref-7)]) that discusses SCA as well as their countermeasures.|
-|June 2022|0.52|Nathan Nadarajah (AMD) Sudhir Mathane (AMD)|Added Threat Model section and initial content |
+|February 2022|0.2|Prabhu Jayana (AMD)</p> Bryan Kelly (Microsoft)</p> Andrés Lagar-Cavilla (Google)</p> Jeff Andersen (Google)</p> | Created initial proposal draft. |
+|March 2022|0.4| Rob Strong (AMD)</p> Prabhu Jayana (AMD)</p>| Migrated to OCP template.</p>Edited to clarify language use and added sections related lifecycle support, fuse, crypto requirements, Kat support, etc.</p> |
+|April 2022|0.5|Rob Strong (AMD)|Edited and formatted to get to v.5.|
+|June 2022|0.51|Rob Strong (AMD)|Updated the FW Signing/Verification Algorithms section and added references to OCP Secure Boot specification.</p>Updated Physical Attack Countermeasures and updated the section to reference NiST paper ([[7](#ref-7)]) that discusses SCA as well as their countermeasures.|
+|June 2022|0.52|Nathan Nadarajah (AMD) Sudhir Mathane (AMD)|Added Threat Model section and initial content. |
 |July 2022|0.53|Louis Ferraro (AMD)|Added Device Resilience chapter and updated related text.|
 |August 2022|0.54|Rob Strong (AMD)|Updated with OCP template and feedback. Added License and Appendix sections.|
-|September 2022|0.55|Bharat S Pillilli (Microsoft)|Caliptra TRNG view, Caliptra Subsystem View, RAS/Error information, Fuse updates|
-|October 2022|0.56|Bharat S Pillilli (Microsoft)|SHA384 acceleration HW API, Mailbox commands table added, Added flows on the usage of SHA384 acceleration HW API|
-|November 2022|0.57|Jeff Andersen|Mailbox Command Table with encodings|
-|November 2022|0.58|Rob Strong (AMD)|In section ‘Caliptra RTM hitless update’, added a definition for ‘hitless’.|
-|January 2023|0.59|Jeff Andersen|Added commentary on LDevID and field entropy; added owner authz fuse details.|
-|January 2023|0.60|Jeff Andersen|Added additional details on hitless update attestation.|
+|September 2022|0.55|Bharat S Pillilli (Microsoft)|Updated Caliptra TRNG view, Caliptra Subsystem View, RAS/Error information, and Fuse information.|
+|October 2022|0.56|Bharat S Pillilli (Microsoft)|Added SHA384 acceleration HW API and Mailbox commands table. Added flows on the usage of SHA384 acceleration HW API.|
+|November 2022|0.57|Jeff Andersen|Added Mailbox Command Table with encodings.|
+|November 2022|0.58|Rob Strong (AMD)|Added a definition for ‘hitless’ in ‘Caliptra RTM hitless update’ section.|
+|January 2023|0.59|Jeff Andersen|Added commentary on LDevID and field entropy. Added owner authz fuse details.|
+|January 2023|0.60|Jeff Andersen|Added details on hitless update attestation.|
 |January 2023|0.61|Jeff Andersen|Removed KEY MANIFEST SVN from specification.|
 |February 2023|0.62|Piotr Kwidzinski|Moved specification to Caliptra GitHub repo.|
-|February 2023|0.62|Piotr Kwidzinski|Moved specification to Caliptra GitHub repo.|
 |May 2023|0.63|Caleb Whitehead|Updated Error Reporting and Handling HW Error Table.|
-|June 2023|0.64|Varun Sampath (NVIDIA)|Warm reset and journey measurement handling.|
-|August 2023|0.7|Piotr Kwidzinski|Cleanup references, links and figures. Minor edits|
+|June 2023|0.64|Varun Sampath (NVIDIA)|Added warm reset and journey measurement handling.|
+|August 2023|0.7|Piotr Kwidzinski|Cleaned up references, links, and figures. Minor edits.|
 
-# Acronyms and Abbreviations
+# Acronyms and abbreviations
 
-For the purposes of this document, the following abbreviations apply:
+The following acronyms and abbreviations are used throughout this document.
 
 | Abbreviation | Description |
 |:-------------|:------------|
@@ -89,7 +90,7 @@ For the purposes of this document, the following abbreviations apply:
 | <a id="KAT"></a>**KAT**       | Known Answer Test                              |
 | <a id="LDevId"></a>**LDevId** | Locally Significant Device Identifier          |
 | <a id="NIC"></a>**NIC**       | Network Interface Card                         |
-| <a id="NIST"></a>**NIST**     | National Institute of Standards and technology |
+| <a id="NIST"></a>**NIST**     | National Institute of Standards and Technology |
 | <a id="OCP"></a>**OCP**       | Open Compute Project                           |
 | <a id="OTP"></a>**OTP**       | One-time programmable                          |
 | <a id="PKI"></a>**PKI**       | Public Key infrastructure                      |
@@ -107,9 +108,9 @@ For the purposes of this document, the following abbreviations apply:
 | <a id="TEE"></a>**TEE**       | Trusted Execution Environment                  |
 | <a id="TRNG"></a>**TRNG**     | True Random Number Generator                   |
 
-# Requirements Terminology
+# Requirements terminology
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [[BCP 14](https://tools.ietf.org/html/bcp14)] [[RFC2119](https://tools.ietf.org/html/rfc2119)] [[RFC8174](https://tools.ietf.org/html/rfc8174)] when, and only when, they appear in all capitals, as shown here.
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [[BCP 14](https://tools.ietf.org/html/bcp14)] [[RFC2119](https://tools.ietf.org/html/rfc2119)] [[RFC8174](https://tools.ietf.org/html/rfc8174)] when, and only when, they appear in all capitals.
 
 # References
 
@@ -120,32 +121,32 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 5. <a id="ref-5"></a>TCG DICE Attestation Architecture Version 1.00 Revision 0.23 March 1, 2021
 6. <a id="ref-6"></a>TCG Hardware Requirements for a Device Identifier Composition Engine Family “2.0” Level
 7. <a id="ref-7"></a>[Side-Channel Attacks: Ten Years After Its Publication and the Impacts on Cryptographic Module Security Testing](https://csrc.nist.gov/csrc/media/events/physical-security-testing-workshop/documents/papers/physecpaper19.pdf)
-8. <a id="ref-8"></a>[Attestation V1.0 White Paper](https://www.opencompute.org/documents/attestation-v1-0-20201104-pdf)
+8. <a id="ref-8"></a>[Attestation of System Components v1.0 Requirements and Recommendations](https://www.opencompute.org/documents/attestation-v1-0-20201104-pdf)
 9. <a id="ref-9"></a>OCP Security WG: Ownership Transfer
 
-# Theory of Operation
+# Background
 
-Establishing a core root of trust along with a chain of trust that attests to the integrity of configuration and mutable code is fundamental to the overall security posture of silicon devices.
+The overall security posture of silicon devices depends on establishing a core root of trust (RoT) and chain of trust. The core root of trust and chain of trust must attest to the integrity of configuration and mutable code.
 
-Traditional RoT architectures have offered a multitude of intrinsic security services and hosted security applications on a trusted execution environment (TEE)  that consist of (but not limited to) hardware capabilities (cryptographic and microprocessor), ROM, Firmware and API infrastructure. These solutions have been instantiated in discrete or integrated forms in various platform and component architectures.
+Traditional RoT architectures offer many intrinsic security services and hosted security applications on a trusted execution environment (TEE). These architectures include (but are not limited to) hardware capabilities (cryptographic and microprocessor), ROM, firmware, and API infrastructure. These solutions are instantiated in discrete or integrated forms in various platform and component architectures.
 
-Some of these solutions are either proprietary or aligned to specific parts of an industry standards/consortium/association specifications (e.g.,National Institutes of Standards and technology (NIST), Open Compute Project (OCP), Trusted Computing Group (TCG), Distributed Management Task Force (DMTF), Institute of Electrical and Electronics Engineers (IEEE), etc.) and may be certified to various conformance standards (e.g., NIST cryptographic algorithm Validation program (CAVP), etc.).
+Some of these solutions are either proprietary or aligned to specific parts of industry standards, consortium, or association specifications; for example, National Institutes of Standards and Technology (NIST), Open Compute Project (OCP), Trusted Computing Group (TCG), Distributed Management Task Force (DMTF), Institute of Electrical and Electronics Engineers (IEEE), etc. These solutions may be certified to conform to various standards; for example, the NIST cryptographic algorithm Validation program (CAVP).
 
-Establishing a consistent root of trust on very different hardware configurations while maintaining configuration and deployment flexibility is challenging.  There is no uniform configuration across Cloud Service Providers. Example:  A system with host processors, has very different firmware security measures when compared to systems without head-nodes or host processors.
+Establishing a consistent RoT on very different hardware configurations while maintaining configuration and deployment flexibility is challenging.  There is no uniform configuration across Cloud Service Providers (CSPs). For example, a system with host processors has very different firmware security measures when compared to a system without head-nodes or host processors.
 
-The OCP Security WG specifications are making progress towards establishing the platform and peripheral security architecture [recommendations](https://docs.google.com/document/d/1-bfAF86cEKcn1guF-Qj2C2HhMM2oJ2njNGdHxZeetR0/edit#heading=h.pdkwdxyrhnco) necessary to attain the desired consistency in platform security orchestration.
+The OCP Security WG specifications are making progress toward establishing the platform and peripheral security architecture [recommendations](https://docs.google.com/document/d/1-bfAF86cEKcn1guF-Qj2C2HhMM2oJ2njNGdHxZeetR0/edit#heading=h.pdkwdxyrhnco) that are necessary to attain the desired consistency in platform security orchestration.
 
-The objective of this specification is to define core RoT capabilities that must be implemented in the SoC or ASIC of any device in a cloud platform. The collection of these RoT capabilities is referred to as the ***Silicon RoT Services (Silicon RoT).***
 
-## Silicon RoT Goals
 
-The scope of a Caliptra Silicon RoT is deliberately minimalistic in nature to drive agility of specification definition, to maximize applicability, and to drive industry alignment, consistency and faster adoption of foundational device security primitives. A well and narrowly defined specification maximizes architectural composability, reusability across CSPs, products and vendors, and feasibility of open sourcing.
+## Silicon RoT goals
 
-Enhancements, advanced use cases and applications are outside the scope of this specification and may be developed in the form of a roadmap for the Silicon RoT and community engagement.
+To drive agility of specification definition and to maximize applicability, the scope of Caliptra is deliberately minimalistic. This minimalist approach drives industry alignment, consistency, and faster adoption of foundational device security primitives. A well and narrowly defined specification maximizes architectural composability; reusability across CSPs, products, and vendors; and feasibility of open sourcing.
 
-Caliptra defines a design standard for a Silicon internal RoT baseline. The standard satisfies a Root of Trust for Measurement (RTM) role. The open-source implementation of Caliptra drives transparency into the RTM and measurement mechanism that anchors hardware attestation. The Caliptra Silicon RoT must boot the SoC, measure the mutable code it loads, and measure and control mutation of non-volatile configuration bits in the SoC. The Caliptra Silicon RoT reports these measurements with signed attestations rooted in unique per-asset cryptographic entropy. As such, the Caliptra Silicon RoT serves as a Root of Trust for Identity for the SoC.
+Enhancements and advanced use cases and applications are outside the scope of this specification and may be developed in the form of a roadmap for the Silicon RoT and community engagement.
 
-No other capabilities are part of this specification, to satisfy the criteria for success outlined above, and to decouple platform integrity capabilities that can be enforced and evolve independently via other platform devices or services – such as Update, Protection and Recovery.
+Caliptra defines a design standard for a Silicon internal RoT baseline. This standard satisfies a Root of Trust for Measurement (RTM) role. The open-source implementation of Caliptra drives transparency into the RTM and measurement mechanism that anchor hardware attestation. The Caliptra Silicon RoT must boot the SoC, measure the mutable code that it loads, and measure and control mutation of non-volatile configuration bits in the SoC. The Caliptra Silicon RoT reports these measurements with signed attestations rooted in unique per-asset cryptographic entropy. As such, the Caliptra Silicon RoT serves as a Root of Trust for Identity (RTI) for the SoC.
+
+To satisfy these Silicon Rot goals, no other capabilities are part of this specification. This scope decouples platform integrity capabilities that can be enforced and evolve independently through other platform devices or services – such as update, protection, and recovery.
 
 Within this scope, the goals for a Caliptra 1.0 specification include:
 
@@ -157,18 +158,18 @@ Within this scope, the goals for a Caliptra 1.0 specification include:
     * Attestation APIs
     * Internal SoC services
   * Reference implementation
-  * Open Source Reference ( including RTL and firmware reference code):
-    * For implementation consistency, leverage open source dynamics to avoid pitfalls and common mistakes
-    * For accelerated adoption (e.g., so that future products can leverage existing designs and avoid having to start the design process from scratch)
+  * Open source reference (including RTL and firmware reference code):
+    * For implementation consistency, using open source dynamics to avoid pitfalls and common mistakes
+    * For accelerated adoption, so that future products can leverage existing designs and avoid having to start the design process from scratch
     * For greater transparency, to avoid fragmentation in the implementation space
-  * Firmware and RTL logical design are open, managed by consortium.
-* Consistency - across the industry in the internal RoT (iRoT) architecture and implementation
-  * DICE Identity, Measurement and Recovery
+  * Firmware and RTL logical design are open, managed by consortium
+* Consistency - across the industry in the internal RoT (iRoT) architecture and implementation:
+  * DICE identity, measurement, and recovery
 * The silicon iRoT scope includes all datacenter-focused server class SoC / ASIC (datacenter focused) devices (SSD - DC, NIC, CPU, GPU - DC):
   * Critical priority are devices with the ability to handle user plain text data
     * Top priority are CPU SoCs
     * Other examples include SmartNIC and accelerators
-  * Over time scope includes further data center devices
+  * Over time, the scope includes further datacenter devices
     * SSD, HDD, BMC, DIMM
 
 Explicitly out of scope is how silicon integration into backend work is performed such as:
@@ -179,58 +180,58 @@ Explicitly out of scope is how silicon integration into backend work is performe
 * Post manufacture test and initialization (OSAT)
 * Certification
 
-## Use Cases
+## Use cases
 
-The Silicon RoT use cases can be supported through the adoption of specific industry standards and association/consortium specifications. Refer to specific documents in [References](#References).
+The Silicon RoT use cases can be supported through the adoption of specific industry standards, and association and consortium specifications. For more information, see specific documents in [References](#References).
 
 In this version, Caliptra Silicon RoT desired capabilities address the basics of supply chain security use cases.
 
-### Supply Chain Security
+### Supply chain security
 
-* **Mutable Code Integrity:** The objective here is to prove the device is running genuine firmware that the device manufacturer can vouch for its authenticity and integrity, and the device owner can ensure only authorized updates are applied to the device. This flow is aligned with [Reference 9](#ref-9) and can be achieved with dual signature verification of equal imposition.
-* **Configuration and Lifecycle Management**: allow the platform owner to securely configure the RoT capabilities, and enable/authorize lifecycle state transitions of the SoC.
+* **Mutable code integrity:** The objective is to prove the device is running genuine firmware such that the device manufacturer can vouch for its authenticity and integrity, and the device owner can ensure only authorized updates are applied to the device. This flow is aligned with [Reference 9](#ref-9) and can be achieved with dual signature verification of equal imposition.
+* **Configuration and lifecycle management**: The objective is to allow the platform owner to securely configure the RoT capabilities, and to enable and authorize lifecycle state transitions of the SoC.
 
-### DICE Protection Environment
+### DICE protection environment
 
-A Caliptra RTM implements the DPE API, allowing Caliptra to derive and wield a DICE identity on behalf of other elements within the SoC. Use-cases for this API includes serving as a signing oracle for an SPDM responder executing in the SoC Application Processor, as well as authentication to a discrete TPM device.
+A Caliptra RTM implements the DPE API, allowing Caliptra to derive and wield a DICE identity on behalf of other elements within the SoC. Use cases for this API include serving as a signing oracle for a Security Protocol and Data Model (SPDM) responder that is executing in the SoC application processor, as well as authentication to a discrete TPM device.
 
-# Industry Standards and Association / Consortium Specifications
+# Industry standards and specifications
 
 This specification follows the industry standards and specifications listed in [References](#References).
 
 ## NIST SP800-193 Platform Firmware Resiliency
 
-Per [Reference 1](#ref-1), RoT subsystems are required to fulfill three principles: *Protection, Detection* and *Recovery*. The associated RoT services are referred to as:
+Per [Reference 1](#ref-1), RoT subsystems are required to fulfill three principles: *protection, detection* and *recovery*. The associated RoT services are referred to as:
 
 * **The Root of Trust for Update (RTU)** is responsible for authenticating firmware updates and critical data changes to support platform protection capabilities.
 * **The Root of Trust for Detection (RTD)** is responsible for firmware and critical data corruption detection capabilities.
 * **The Root of Trust for Recovery (RTRec)** is responsible for recovery of firmware and critical data when corruption is detected, or when instructed by an administrator.
 
-These RoT services can be hosted by a complex RoT as a whole or it can be spread across one or more components within a platform. This determination has a basis in physical risk. Physical adversaries with reasonable skill can bypass a discrete RoT’s detection capabilities, for example, with SPI interposers.
+These RoT services can be hosted by a complex RoT as a whole or these services can be spread across one or more components within a platform. This determination has a basis in physical risk. Physical adversaries with reasonable skill can bypass a discrete RoT’s detection capabilities, for example, with SPI interposers.
 
-However, an RoT embedded within an SoC or ASIC represents a much higher detection bar for a physical adversary to defeat. For this reason, a Caliptra Silicon RoT shall deliver the **Detection** (or Measurement) capability.
+However, an RoT embedded within a SoC or ASIC represents a much higher detection bar for a physical adversary to defeat. For this reason, a Caliptra Silicon RoT shall deliver the **Detection** (or Measurement) capability.
 
-With the objectives of minimalistic scope for Silicon RoT and maximizing applicability and adoption of this specification, **Update** and **Recovery** are decoupled from Caliptra and are expected to be provided by an external RoT subsystem such as a discrete RoT board element on a datacenter platform. Because a physical adversary can trivially nullify any Recovery or Update capabilities, no matter where implemented, decoupling represents no regression in a security posture, while enabling simplicity and applicability for the internal SoC silicon RoT.
+With the objectives of minimalistic scope for Silicon RoT and maximizing applicability and adoption of this specification, **Update** and **Recovery** are decoupled from Caliptra and are expected to be provided by an external RoT subsystem, such as a discrete RoT board element on a datacenter platform. Because a physical adversary can trivially nullify any recovery or update capabilities, no matter where implemented, decoupling represents no regression in a security posture, while enabling simplicity and applicability for the internal SoC silicon RoT.
 
 Detection of corrupted critical code and data (configuration) requires strong end to end cryptographic integrity verification. To meet the RTD requirements, Silicon RoT shall:
 
 * Cryptographically measure its code and configuration
 * Sign these measurements with a unique attestation key
-* Report measurements to a host and/or external entity, which can further verify the authenticity and integrity of the device (a.k.a Attestation)
+* Report measurements to a host or external entity, which can further verify the authenticity and integrity of the device (also known as *attestation*)
 
-**Measurements** include **Code** and **Configuration**. Configuration includes invasive capabilities that impact the user service level agreement (SLA) on Confidentiality -- for example, the enablement of debug capabilities that grant an operator access to raw, unencrypted registers for any tenant context. In order to measure and attest Configuration, the Silicon RoT must be in control of the Configuration.
+**Measurements** include **Code** and **Configuration**. Configuration includes invasive capabilities that impact the user service level agreement (SLA) on confidentiality; for example, the enablement of debug capabilities that grant an operator access to raw, unencrypted registers for any tenant context. In order to measure and attest configuration, the Silicon RoT must be in control of the configuration.
 
-As an extension to controlling Configuration, the Silicon RoT must control the security states (refer to *[Caliptra Security States](#caliptra-security-states)*). Certain security states by design grant full invasive capabilities to an external operator, for debug or field analysis.
+As an extension to controlling configuration, the Silicon RoT must control the security states (for more information, see *[Caliptra Security States](#caliptra-security-states)*). Certain security states by design grant full invasive capabilities to an external operator, for debug or field analysis.
 
-Measurements must be uniquely bound to the device and its manufacturer to a minimum. This establishes the need for **Identity** services in the Silicon RoT, that serves as the basis for key derivation and attestation authenticity.
+Measurements must be uniquely bound to the device and its manufacturer at a minimum. This establishes the need for **Identity** services in the Silicon RoT, which serve as the basis for key derivation and attestation authenticity.
 
-For further details about how Caliptra addresses NIST SP800-193, refer to [Device Resilience](#device-resilience).
+For further details about how Caliptra addresses NIST SP800-193, see [Device Resilience](#device-resilience).
 
 ## Trusted Computing Group (TCG) DICE Attestation
 
-In accordance with OCP Attestation specification [Reference 8](#ref-8), devices must have a Cryptographic Identity for the endorsement of attestation quotes. The RTM implementation follows TCG DICE (refer to [Reference 4](#ref-4), [Reference 5](#ref-5), and [Reference 6](#ref-6)). One of the benefits of TCG DICE device identities is having renewable security. This renewability complements ownership transfer and circular economy. The new owner is not burdened with the identity of the previous owner, nor is the new owner burdened with trusting an irrevocable hardware identity certificate. This benefits the transferee, as their identities can be revoked through standard PKI mechanisms. DICE based certificates are fully compatible with Public Key Infrastructure (PKI), including full life cycle management and PKI Certificate Revocation List (CRL).
+In accordance with OCP Attestation specification [Reference 8](#ref-8), devices must have a cryptographic identity for the endorsement of attestation quotes. The RTM implementation follows TCG DICE (for information, see [Reference 4](#ref-4), [Reference 5](#ref-5), and [Reference 6](#ref-6)). One of the benefits of TCG DICE device identities is having renewable security. This renewability complements ownership transfer and circular economy. The new owner is not burdened with the identity of the previous owner, nor is the new owner burdened with trusting an irrevocable hardware identity certificate. This benefits the transferee, as their identities can be revoked through standard PKI mechanisms. DICE based certificates are fully compatible with Public Key Infrastructure (PKI), including full lifecycle management and PKI Certificate Revocation List (CRL).
 
-Operational security during the manufacture process is critical, to ensure the DICE entropy is securely initialized, certified, and registered, avoiding any pilfering of this asset by eavesdroppers. Operational security is outside the scope of this specification.
+Operational security during the manufacturing process is critical, to ensure the DICE entropy is securely initialized, certified, and registered. Operational security avoids any pilfering of this asset by eavesdroppers. Operational security is outside the scope of this specification.
 
 # Threat Model
 
