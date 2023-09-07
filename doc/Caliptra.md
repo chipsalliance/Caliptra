@@ -132,7 +132,7 @@ Traditional RoT architectures offer many intrinsic security services and hosted 
 
 Some of these solutions are either proprietary or aligned to specific parts of industry standards, consortium, or association specifications; for example, National Institutes of Standards and Technology (NIST), Open Compute Project (OCP), Trusted Computing Group (TCG), Distributed Management Task Force (DMTF), Institute of Electrical and Electronics Engineers (IEEE), etc. These solutions may be certified to conform to various standards; for example, the NIST cryptographic algorithm Validation program (CAVP).
 
-Establishing a consistent RoT on very different hardware configurations while maintaining configuration and deployment flexibility is challenging.  There is no uniform configuration across Cloud Service Providers (CSPs). For example, a system with host processors has very different firmware security measures when compared to a system without head-nodes or host processors.
+Establishing a consistent RoT on very different hardware configurations while maintaining configuration and deployment flexibility is challenging. There is no uniform configuration across Cloud Service Providers (CSPs). For example, a system with host processors has very different firmware security measures when compared to a system without head-nodes or host processors.
 
 The OCP Security WG specifications are making progress toward establishing the platform and peripheral security architecture [recommendations](https://docs.google.com/document/d/1-bfAF86cEKcn1guF-Qj2C2HhMM2oJ2njNGdHxZeetR0/edit#heading=h.pdkwdxyrhnco) that are necessary to attain the desired consistency in platform security orchestration.
 
@@ -146,7 +146,7 @@ Enhancements and advanced use cases and applications are outside the scope of th
 
 Caliptra defines a design standard for a Silicon internal RoT baseline. This standard satisfies a Root of Trust for Measurement (RTM) role. The open-source implementation of Caliptra drives transparency into the RTM and measurement mechanism that anchor hardware attestation. The Caliptra Silicon RoT must boot the SoC, measure the mutable code that it loads, and measure and control mutation of non-volatile configuration bits in the SoC. The Caliptra Silicon RoT reports these measurements with signed attestations rooted in unique per-asset cryptographic entropy. As such, the Caliptra Silicon RoT serves as a Root of Trust for Identity (RTI) for the SoC.
 
-To satisfy these Silicon Rot goals, no other capabilities are part of this specification. This scope decouples platform integrity capabilities that can be enforced and evolve independently through other platform devices or services – such as update, protection, and recovery.
+To satisfy these Silicon RoT goals, no other capabilities are part of this specification. This scope decouples platform integrity capabilities that can be enforced and evolve independently through other platform devices or services – such as update, protection, and recovery.
 
 Within this scope, the goals for a Caliptra 1.0 specification include:
 
@@ -191,7 +191,7 @@ In this version, Caliptra Silicon RoT desired capabilities address the basics of
 * **Mutable code integrity:** The objective is to prove the device is running genuine firmware such that the device manufacturer can vouch for its authenticity and integrity, and the device owner can ensure only authorized updates are applied to the device. This flow is aligned with [Reference 9](#ref-9) and can be achieved with dual signature verification of equal imposition.
 * **Configuration and lifecycle management**: The objective is to allow the platform owner to securely configure the RoT capabilities, and to enable and authorize lifecycle state transitions of the SoC.
 
-### DICE protection environment
+### DICE Protection Environment
 
 A Caliptra RTM implements the DPE API, allowing Caliptra to derive and wield a DICE identity on behalf of other elements within the SoC. Use cases for this API include serving as a signing oracle for a Security Protocol and Data Model (SPDM) responder that is executing in the SoC application processor, as well as authentication to a discrete TPM device.
 
