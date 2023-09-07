@@ -1220,12 +1220,16 @@ Mailboxes are generic data passing structures, the Caliptra hardware will only e
 3. Requester writes the data length in bytes to the DLEN register.
 4. Requester writes data packets to the MBOX DATAIN register.
 5. Requester writes to the EXECUTE register.
-6. Requester reads the STATUS register.
+6. Requester reads the STATUS register until a value other than CMD\_BUSY is detected. This is also indicated by a dedicated wire that asserts when STATUS is changed.
     1. Status can return:
     2. DATA\_READY – Indicates the return data is in the mailbox for requested command
     3. CMD\_COMPLETE – Indicates the successful completion of the requested command
     4. CMD\_FAILURE – Indicates the requested command failed
     5. CMD\_BUSY – Indicates the requested command is still in progress
+7. If response data is expected and the requester reads a STATUS of DATA\_READY:
+    1. Requester reads from the DLEN register to ascertain the size of the response data
+    2. Requester reads data from the DATAOUT register until DLEN bytes are read.
+8. After reading the response data, if any, requester writes 0 to the EXECUTE register to clear LOCK.
 
 **Notes on behavior:**
 Once LOCK is granted, the mailbox is locked until that device has concluded its operation. Mailbox is responsible for only accepting writes from the device that requested and locked the mailbox.
@@ -1236,7 +1240,7 @@ Once LOCK is granted, the mailbox is locked until that device has concluded its 
 
 ### Receiver Protocol
 
-Upon receiving indication that the mailbox has been populated, the appropriate device can read the mailbox. This is indicated by a dedicated wire that is asserted when Caliptra populates the mailbox for SoC consumption, also by the STATUS register returning DATA\_READY
+Upon receiving indication that the mailbox has been populated, the appropriate device can read the mailbox. This is indicated by a dedicated wire that is asserted when Caliptra populates the mailbox for SoC consumption.
 
 **Receiving data from the mailbox:**
 
@@ -1244,8 +1248,13 @@ Upon receiving indication that the mailbox has been populated, the appropriate d
 2. Receiver reads the DLEN register.
 3. Receiver reads the MBOX DATAOUT register.
     1. Continue reading MBOX DATAOUT register until DLEN bytes are read.
-4. Receiver resets the EXECUTE register.
-    1. This releases the LOCK on the mailbox.
+4. If response data is required:
+    1. Receiver writes the size of the response data to the DLEN register
+    2. Receiver writes to the DATAIN register until DLEN bytes are written.
+    3. NOTE: Response data is only supported for Caliptra, to SOC-initiated commands. SOC cannot provide response data for Caliptra-initiated commands.
+5. Receiver writes to the STATUS register
+    1. If response data was provided, STATUS should be written to DATA\_READY
+    2. Otherwise, STATUS should be written to CMD\_COMPLETE (or CMD\_FAILURE)
 
 *Figure 15: Mailbox Receiver Flow*
 
