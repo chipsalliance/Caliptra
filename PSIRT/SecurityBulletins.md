@@ -1,3 +1,5 @@
+This page is only a placeholder/sample
+
 # Caliptra Security Bulletins
 
 | Bulletin ID      | Title                                                    | CVEs           | Published Date | Last Update  |

@@ -1,3 +1,5 @@
+This page is only a placeholder/sample
+
 # Caliptra Security
 
 Security is important to Caliptra.

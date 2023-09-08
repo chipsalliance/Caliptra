@@ -1,3 +1,5 @@
+This page is only a placeholder/sample
+
 # Sample Vulnerability #2
 
 **Bulletin ID:** CALIPTRA-SB-xxx2
