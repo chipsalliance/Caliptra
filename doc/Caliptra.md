@@ -619,7 +619,7 @@ Owners are not required to program field entropy. Caliptra generates LDevID from
 
 It is the responsibility of the owner or the user to identify the certificate they wish to trust, and to potentially endorse with their own certificate authority: pCA, IDevID, LDevID, or Alias<sub>FMC</sub>.
 
-## FMC alias key
+### FMC alias key
 
 The LDevID CDI is mixed with a hash of FMC, as well as the security state of the device, via a FIPS-compliant HMAC, to produce CDI<sub>FMC</sub>. ROM uses CDI<sub>FMC</sub> to derive the Alias<sub>FMC</sub> keypair. ROM wields LDevID to issue a certificate for Alias. The Alias<sub>FMC</sub> certificate includes measurements of the security state and FMC. ROM makes CDI<sub>FMC</sub>, Alias<sub>FMC</sub>, and its certificate, available to FMC.
 
@@ -707,10 +707,11 @@ Each of these security states may be mapped to different SoC level debug and sec
 The service surface of a Caliptra RTM has multiple vectors. All use cases are control plane services, useful to power on a system or start a task. Supporting line rate high performance IO cryptography or any other data path capability is not required.
 
 * **Logic IOs:** Required to indicate status of the IP, availability of a message through APB, and to enable or disable certain debug capabilities (like JTAG enable or disable).
-* **Command mailbox**: Caliptra shall offer services to other parts of the SoC:
+* **Command mailbox**: Caliptra shall offer services to other parts of the SoC. The APIs are documented in the [Caliptra Runtime specification](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md) and summarized below:
   * **Loading firmware**: Caliptra firmware is loaded via the mailbox at cold boot. In addition, Caliptra firmware can be loaded at runtime to support hitless or impactless updates.
-  * **DICE-as-a-Service**: A Caliptra RTM shall expose a "DICE-as-a-Service" API, allowing Caliptra to derive and wield a DICE identity on behalf of other elements within the SoC.
-  * A potential use case includes serving as a signing oracle for an SPDM responder executing in the SoC application processor.
+  * **DICE-as-a-Service**: Caliptra shall expose the TCG DICE Protection Environment iRoT Profile API, allowing Caliptra to derive and wield a DICE identity on behalf of other elements within the SoC. For example, Caliptra can sign messages for an SPDM responder.
+  * **Measurement Vault**: Caliptra shall support stashing of measurements for the code and configuration of the SoC. Caliptra can provide these measurements via PCR Quote API or via DPE.
+  * **FW Authentication**: Caliptra supports ECDSA verification for SoC firmware beyond its own. The SHA384 block exposes a HW API for hashing firmware. The runtime firmware exposes an ECDSA verification API that uses the hash computed by the SHA384 block.
 
 ## Device resilience
 
@@ -1113,24 +1114,6 @@ The following figure describes the Caliptra IP HW boot flow.
 4. SoC follows the mailbox protocol and pushes Caliptra FW into the mailbox.
 5. Caliptra’s mailbox HW  asserts an interrupt to the uController after the GO is written, per mailbox protocol. See [Mailbox](#mailbox) for specifics.
 6. After Caliptra’s FW is authenticated and loaded into ICCM, uController asserts READY\_FOR\_RTFLOWS wire. See the [Caliptra ROM specification](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md) for specific information on security flows that occur within this step (for example, DICE).
-
-## SOC FW Authentication flows
-
-Caliptra provides FW authentication and measurement capture service to the SOC.
-
-1. SOC logic (ROM or HW or FW \[depending on the context of the flow\]) provides the SOC FW hash manifest for authentication. SOC hash manifest is signed using the same key as the Caliptra FW. Format of the SOC hash manifest contains global meta data of “Impactless” field, “FWID” and the “Associated Hash”. Refer to [Caliptra ROM specification](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md) and [Caliptra Runtime specification](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md) for more details.
-2. For SOC FW/Configuration that requires verification, there are two options:
-    1. SOC logic uses the Caliptra provided SHA384 HW API to stream the FW while copying the same to the appropriate destination; SOC logic will write the “FW ID” and send a FW authentication request mailbox command.
-    2. SOC logic can directly report the measurement. SOC logic will write the “FW ID”, Measurement and send a FW measurement mailbox command.
-3. Caliptra RT FW will use the FW ID and the associated hash in the SOC FW Hash Manifest. Caliptra RT FW compares them against the hash of the last streamed FW hash from the internal register when Step 2.1 was executed or the measurement reported in Step 2.2. If they match, Caliptra will capture this hash to extend the appropriate measurement/PCR and report SUCCESS of the mailbox command.
-4. SOC logic will take appropriate action for the FW that was copied to the destination (eg. set execute/mark FW valid for an embedded controller to use it) etc.
-5. Steps 1 through 4 can be used for the next set of FWs that would be loading.
-
-Notes:
-
-* Anytime a new SOC FW hash manifest gets loaded (eg. SOC impactless update flows use model), Caliptra will do the comparison against the new hash manifest.
-* Since it’s only a hash comparison, this speeds up the boot flows considerably.
-* It is recommended that step 2.1 is used for SOC implementations. If Step 2.2 is used, then the required ROM/FW/logic code should be made transparent through OCP required supply-chain audit channels.
 
 ## Boot Media Integrated
 
