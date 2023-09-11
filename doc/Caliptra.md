@@ -296,7 +296,7 @@ Invasive attacks that involve depackaging or delayering of the SoC/ASIC are out-
 
 *Table 5: Logical attacks*
 
-| **Attack** | **Description** | **Included and excluded** |
+| **Attack** | **Description** | **Threat model scope** |
 | :--------- | :--------- | :--------- |
 | Debug and register interfaces | Manipulation of externally accessible registers of Caliptra.|Includes all buses that are accessible to components external to Caliptra, including JTAG.|
 | Software interfaces       | Attacker invokes software interfaces that are exposed by Caliptra to external components. | <p>Includes all externally exposed software interfaces from both non-RoT firmware as well as interfaces accessed by external IP blocks.</p><p>Includes exploiting both design and implementation flaws.</p><p>For high value assets only (see next subsection), the attacker is assumed to fully control all mutable code of the SoC, including privileged Caliptra mutable code.</p> |
@@ -496,7 +496,7 @@ An example of when an owner must protect assets is moving from secure mode to un
     <td>JTAG debug</td>
     <td>Integrity</td>
     <td>Proficient</td>
-    <td>1. Attempt to manipulate RoT execution via JTAG to non POR flows <br>2. Attempt to retrieve device secrets via JTAG when product is field-deployed<br>3. Attempt to retrieve device secrets via JTAG when product is under development and debug</td>
+    <td>1. Attempt to manipulate RoT execution via JTAG to non POR flows <br>2. Attempt to retrieve device secrets via JTAG when product is field-deployed<br>3. Attempt to retrieve device secrets via JTAG while the product is being developed and debugged</td>
     <td>Implement security mode management within Caliptra</td>
   </tr>
 </tbody>
