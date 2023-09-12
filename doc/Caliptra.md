@@ -235,15 +235,13 @@ Operational security during the manufacturing process is critical, to ensure the
 
 # Threat model
 
-This section describes the profile of attacks and attackers that Caliptra is expected to defend against.
-
 The Caliptra threat model describes attacker profiles, assets and attack surfaces, and paths to these assets based on attacker profiles. Subsections provide further details.
 
 Threat scenarios as comprehended by assets and possible attack paths are as complete as possible but focus on the worst case scenarios. Thus not every attack path to asset is captured in this threat model.
 
 ## Attacker profiles
 
-Attacker profile is the outcome of factors like the tools that are accessible to the attacker, the level of access to the target of evaluation, and expertise of the attacker to use these methods. These factors are described in the following tables.
+An attacker profile is based on factors like the tools that are accessible to the attacker, the level of access to the target of evaluation, and expertise of the attacker to use these methods. These factors are described in the following tables.
 
 *Table 1: Tools accessible to attacker*
 
@@ -265,8 +263,8 @@ Attacker profile is the outcome of factors like the tools that are accessible to
 
 |**Proficiency level**|**Definition**|**Detailed definition**|
 | :--------- | :--------- | :--------- |
-| **Expert** | <p>Can use chip invasive, fault injections, side channel, and logical tools.</p><p>Understands hardware and software in depth.</p><p>Familiar with implementation:</p><p><ul><li>Algorithms</li><li>Protocols</li><li>Hardware structures</li><li>Principle and security concepts</li></ul></p> | <ul><li>Developer-level knowledge ofalgorithms, protocols, hardware structure, and principles.</li><li>Understands techniques and tools for attacks.</li></ul> |
-| **Proficient** |<p>Can use fault injections, side channel, and logical tools.</p><p>Has reasonable understanding of hardware and software.</p><p>Familiar with security behavior.</p> | Familiar with security behavior and classical attacks. |
+| **Expert** | <p>Can use chip invasive, fault injections, side channels, and logical tools.</p><p>Understands hardware and software in depth.</p><p>Familiar with implementation:</p><p><ul><li>Algorithms</li><li>Protocols</li><li>Hardware structures</li><li>Principle and security concepts</li></ul></p> | <ul><li>Developer-level knowledge of algorithms, protocols, hardware structure, and principles.</li><li>Understands techniques and tools for attacks.</li></ul> |
+| **Proficient** |<p>Can use fault injections, side channels, and logical tools.</p><p>Has reasonable understanding of hardware and software.</p><p>Familiar with security behavior.</p> | Familiar with security behavior and classical attacks. |
 | **Layperson** | No particular expertise. | No particular expertise. |
 
 ## Types of attacks
@@ -291,7 +289,7 @@ Invasive attacks that involve depackaging or delayering of the SoC/ASIC are out-
 | Electric – passive    | Attacker probes the external pins of the package and observes electrical signals and characteristics including capacitance, current, and voltage signal. | <p>Includes both analog attacks and digital signal attacks.</p><p>Excludes attacks that require removing the package lid.</p> |
 | Electric – active     | Attacker alters the electrical signal or characteristics of external pins. | <p>Includes both analog attacks and digital signal attacks.</p><p>Excludes attacks that require removing the package lid.</p> |
 | Temperature – passive | Attacker observes the temperature of the product or portions of the product.| Excludes attacks that require removing the package lid. |
-| Temperature – active  | Attacker applies external heat sources or sinks to alter the temperature of the product, possibly in a rapid fashion. | <p>Includes all temperature ranges (for example, pouring liquid nitrogen over the package or heating the package to above 100C).</p><p>Excludes attacks that require removing the package lid.</p>|
+| Temperature – active  | Attacker applies external heat sources or sinks to alter the temperature of the product, possibly in a rapid fashion. | <p>Includes all temperature ranges (for example, pouring liquid nitrogen over the package or heating the package to above 100 C).</p><p>Excludes attacks that require removing the package lid.</p>|
 | Sound - passive | Attacker observes the sounds emitted by the product. | <p>Includes all frequencies.</p><p>Excludes attacks that require removing the package lid.</p> |
 
 *Table 5: Logical attacks*
@@ -342,7 +340,7 @@ An example of when an owner must protect assets is moving from secure mode to un
     <td rowspan="4">UDS Seed</td>
     <td rowspan="4">Confidentiality and integrity</td>
     <td rowspan="4">Expert</td>
-    <td>Malicious manufacturing spoofing on UDS Seeds</td>
+    <td>Malicious manufacturing spoofing of UDS Seeds</td>
     <td>UDS obfuscation/encryption with class RTL key</td>
   </tr>
   <tr>
@@ -354,7 +352,7 @@ An example of when an owner must protect assets is moving from secure mode to un
     <td>UDS obfuscation/encryption with class RTL key</td>
   </tr>
   <tr>
-    <td>Attempting to derive die specific keys by knowing UDS and KDF</td>
+    <td>Attempting to derive die specific keys by knowing UDS</td>
     <td>Confine unobfuscated UDS and subsequent derivations to key vault</td>
   </tr>
   <tr>
@@ -373,7 +371,7 @@ An example of when an owner must protect assets is moving from secure mode to un
     <td>Field entropy obfuscation and encryption with class RTL key</td>
   </tr>
   <tr>
-    <td>Attempting to derive die specific keys by knowing field entropy and KDF</td>
+    <td>Attempting to derive die specific keys by knowing field entropy</td>
     <td>Confine field entropy and subsequent derivations to key vault</td>
   </tr>
   <tr>
@@ -381,7 +379,7 @@ An example of when an owner must protect assets is moving from secure mode to un
     <td>Integrity</td>
     <td>Proficient</td>
     <td>Glitching</td>
-    <td>1. Redundant decision making on critical code execution<br>2. Error check before consuming values from fuse<br>3. Environmental monitoring and protection<br></td>
+    <td>1. Redundant decision making on critical code execution<br>2. Error check before consuming values from fuses<br>3. Environmental monitoring and protection<br></td>
   </tr>
   <tr>
     <td>Versioning information from fuses</td>
@@ -496,7 +494,7 @@ An example of when an owner must protect assets is moving from secure mode to un
     <td>JTAG debug</td>
     <td>Integrity</td>
     <td>Proficient</td>
-    <td>1. Attempt to manipulate RoT execution via JTAG to non POR flows <br>2. Attempt to retrieve device secrets via JTAG when product is field-deployed<br>3. Attempt to retrieve device secrets via JTAG while the product is being developed and debugged</td>
+    <td>1. Attempt to manipulate RoT execution via JTAG to flows that are not plan-of-record<br>2. Attempt to retrieve device secrets via JTAG when product is field-deployed<br>3. Attempt to retrieve device secrets via JTAG while the product is being developed and debugged</td>
     <td>Implement security mode management within Caliptra</td>
   </tr>
 </tbody>
