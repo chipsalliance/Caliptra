@@ -233,106 +233,104 @@ In accordance with OCP Attestation specification [Reference 8](#ref-8), devices 
 
 Operational security during the manufacturing process is critical, to ensure the DICE entropy is securely initialized, certified, and registered. Operational security avoids any pilfering of this asset by eavesdroppers. Operational security is outside the scope of this specification.
 
-# Threat Model
+# Threat model
 
-This section describes the Caliptra RoT threat model in terms of the profile of the attacks and the attackers that the Caliptra RoT is expected to defend against.
-
-Threat model as described here takes into account attacker profile, assets and attack surfaces or paths to these assets based on attacker profiles. Subsequent subsections delve into each of these topics.
+The Caliptra threat model describes attacker profiles, assets and attack surfaces, and paths to these assets based on attacker profiles. Subsections provide further details.
 
 Threat scenarios as comprehended by assets and possible attack paths are as complete as possible but focus on the worst case scenarios. Thus not every attack path to asset is captured in this threat model.
 
-## Attacker Profiles
+## Attacker profiles
 
-Attacker profile is the outcome of following factors like tools accessible to the attacker, level of access to the target of evaluation and expertise of the attacker to use these methods. Next level of details of these capabilities scoped for this discussion are as follows.
+An attacker profile is based on factors like the tools that are accessible to the attacker, the level of access to the target of evaluation, and expertise of the attacker to use these methods. These factors are described in the following tables.
 
-*Table 1: Tools Accessible to Attacker*
+*Table 1: Tools accessible to attacker*
 
-| **Attack Tools** | **Type of Attack** | **Purpose/Usage** |
+| **Attack tools** | **Type of attack** | **Purpose and usage** |
 | :--------- | :--------- | :--------- |
-| <ul><li>Debuggers</li><li>Fuzzing devices</li><li>Image reverse engineering tools</li><li>Software payloads</li></ul>| Logical Fault Injection | Find logical and functional vulnerabilities and exploit those to achieve unauthorized operations |
-| <ul><li>Clock fault injectors</li><li>Voltage fault injectors</li><li>Electromagnetic fault injectors</li><li>Optical fault injectors</li><li>Micro probing</li></ul> | Environmental Fault Injection | Alter execution flow of the critical decision points, especially in the early execution |
-| <ul><li>Power analyzers</li><li>Timing analyzers (Scopes etc)</li><li>Low speed bus analyzers</li><li>Optical emission analyzers</li></ul>| Side Channel Analysis | Infer security sensitive information by analyzing various operational conditions |
-| <ul><li>Microscopic imaging</li><li>Reverse engineering</li><li>Scanning electron microscope imaging</li><li>Focussed ion beam (FIB)</li></ul> | Chip Invasive Attacks| Decapsulation, Depackaging, rebonding to probe internals of the chip |
+| <ul><li>Debuggers</li><li>Fuzzing devices</li><li>Image reverse engineering tools</li><li>Software payloads</li></ul>| Logical fault injection | Find logical and functional vulnerabilities and exploit those to achieve unauthorized operations. |
+| <ul><li>Clock fault injectors</li><li>Voltage fault injectors</li><li>Electromagnetic fault injectors</li><li>Optical fault injectors</li><li>Micro probing</li></ul> | Environmental fault injection | Alter the execution flow of the critical decision points, especially in the early execution. |
+| <ul><li>Power analyzers</li><li>Timing analyzers (scopes, etc.)</li><li>Low speed bus analyzers</li><li>Optical emission analyzers</li></ul>| Side channel analysis | Infer security sensitive information by analyzing various operational conditions. |
+| <ul><li>Microscopic imaging</li><li>Reverse engineering</li><li>Scanning electron microscope imaging</li><li>Focused ion beam (FIB)</li></ul> | Chip invasive attacks| Decapsulation, depackaging, and rebonding to probe the internals of the chip. |
 
-*Table 2: Level of Access to TOE*
+*Table 2: Type of access to level of access*
 
-| **Type of Access** | **Levels of Access** | **Attack Paths Available** |
+| **Type of access** | **Levels of access** | **Attack paths available** |
 | :--------- | :--------- | :--------- |
-| Physical Access | Unrestricted access for physical and logical attacks |<p>Chip invasive</p><p>Chip non invasive</p> |
-| Remote Access | Limited access for attacks with both privileged and unprivileged access rights | <p>Chip non invasive attacks</p><p>Network attacks</p> |
+| Physical access | Unrestricted access for physical and logical attacks. |<p>Chip invasive attacks</p><p>Chip non-invasive attacks</p> |
+| Remote access | Limited access for attacks with both privileged and unprivileged access rights. | <p>Chip non-invasive attacks</p><p>Network attacks</p> |
 
-*Table 3: Definition of Expertise (JIL)*
+*Table 3: Definition of expertise (JIL)*
 
 |**Proficiency level**|**Definition**|**Detailed definition**|
 | :--------- | :--------- | :--------- |
-| **Expert** | <p>Can use chip invasive, fault injections, side channel and logical tools</p><p>Understands HW and SW in depth</p><p>Familiar with implementation</p><p><ul><li>Algorithms</li><li>Protocols</li><li>HW structures</li><li>Principle and security concepts</li></ul></p> | <ul><li>Familiar with developers knowledge namely algorithms, protocols, hardware structure, principles</li><li>Techniques and tools for attacks</li></ul> |
-| **Proficient** |<p>Can use fault injections, side channel and logical tools</p><p>Understands HW and SW in reasonably</p><p>Familiar with security behavior</p> | Familiar with security behavior, classical attacks |
-| **Laymen** | No particular expertise | No particular expertise |
+| **Expert** | <p>Can use chip invasive, fault injections, side channels, and logical tools.</p><p>Understands hardware and software in depth.</p><p>Familiar with implementation:</p><p><ul><li>Algorithms</li><li>Protocols</li><li>Hardware structures</li><li>Principle and security concepts</li></ul></p> | <ul><li>Developer-level knowledge of algorithms, protocols, hardware structure, and principles.</li><li>Understands techniques and tools for attacks.</li></ul> |
+| **Proficient** |<p>Can use fault injections, side channels, and logical tools.</p><p>Has reasonable understanding of hardware and software.</p><p>Familiar with security behavior.</p> | Familiar with security behavior and classical attacks. |
+| **Layperson** | No particular expertise. | No particular expertise. |
 
-## Types of Attacks
+## Types of attacks
 
-### Physical Attacks
+### Physical attacks
 
-A physical attacker has full access to the electrical and physical components and interfaces/connectors/ports of the SoC/ASIC in which the Caliptra RoT is integrated without restriction.
+A physical attacker has full access to the electrical and physical components. This includes access to interfaces, connectors, and ports of the SoC/ASIC in which Caliptra is integrated without restriction.
 
-Invasive attacks involving depackaging/delayering of the SoC/ASIC is out-of-scope. Non-Invasive attacks are in-scope.
+Invasive attacks that involve depackaging or delayering of the SoC/ASIC are out-of-scope. Non-invasive attacks are in scope.
 
-* Fault Injection attacks
+* Fault injection attacks
   * *Counter measurements - as strong recommendation*
-* Power and Electromagnetic analysis attacks
+* Power and electromagnetic analysis attacks
   * *Counter measurements - as strong recommendation*
 
-*Table 4: Attack Types*
+*Table 4: Attack types*
 
-| **Attack** |  **Description** | **Threat Model Scope** |
+| **Attack** |  **Description** | **Threat model scope** |
 | :--------- | :--------- | :--------- |
-| Electromagnetic – Passive | Attacker observes the electromagnetic power spectrum and signals radiated from the product. | <p>Includes all attacks at all frequency ranges, including radio frequencies, infrared, optical, and ultraviolet.</p><p>Excludes attacks requiring removing the package lid.</p> |
-| Electromagnetic – Active  | Attacker directs electromagnetic radiation at the product or portions of the product. | <p>Includes all attacks at all frequency ranges, including radio frequencies, infrared, optical, and ultraviolet.</p><p>Excludes attacks requiring removing the package lid.</p> |
-| Electric – Passive    | Attacker probes the external pins of the package and observes electrical signals and characteristics including capacitance, current, and voltage signal. | <p>Includes both analog attacks and digital signal attacks.</p><p>Excludes attacks requiring removing the package lid.</p> |
-| Electric – Active     | Attacker alters the electrical signal or characteristics of external pins. | <p>Includes both analog attacks and digital signal attacks.</p><p>Excludes attacks requiring removing the package lid.</p> |
-| Temperature – Passive | Attacker observes the temperature of the product or portions of the product.| Excludes attacks requiring removing the package lid. |
-| Temperature – Active  | Attacker applies external heat sources or sinks to alter the temperature of the product, possibly in a rapid fashion. | <p>Includes all temperature ranges (e.g. pouring liquid nitrogen over the package or heating the package to above 100C)</p><p>Excludes attacks requiring removing the package lid.</p>|
-| Sound - Passive | Attacker observes the sounds emitted by the product. | <p>Includes all frequencies.</p><p>Excludes attacks requiring removing the package lid.</p> |
+| Electromagnetic – passive | Attacker observes the electromagnetic power spectrum and signals radiated from the product. | <p>Includes all attacks at all frequency ranges, including radio frequencies, infrared, optical, and ultraviolet.</p><p>Excludes attacks that require removing the package lid.</p> |
+| Electromagnetic – active  | Attacker directs electromagnetic radiation at the product or portions of the product. | <p>Includes all attacks at all frequency ranges, including radio frequencies, infrared, optical, and ultraviolet.</p><p>Excludes attacks that require removing the package lid.</p> |
+| Electric – passive    | Attacker probes the external pins of the package and observes electrical signals and characteristics including capacitance, current, and voltage signal. | <p>Includes both analog attacks and digital signal attacks.</p><p>Excludes attacks that require removing the package lid.</p> |
+| Electric – active     | Attacker alters the electrical signal or characteristics of external pins. | <p>Includes both analog attacks and digital signal attacks.</p><p>Excludes attacks that require removing the package lid.</p> |
+| Temperature – passive | Attacker observes the temperature of the product or portions of the product.| Excludes attacks that require removing the package lid. |
+| Temperature – active  | Attacker applies external heat sources or sinks to alter the temperature of the product, possibly in a rapid fashion. | <p>Includes all temperature ranges (for example, pouring liquid nitrogen over the package or heating the package to above 100 C).</p><p>Excludes attacks that require removing the package lid.</p>|
+| Sound - passive | Attacker observes the sounds emitted by the product. | <p>Includes all frequencies.</p><p>Excludes attacks that require removing the package lid.</p> |
 
-*Table 5: Logical Attacks*
+*Table 5: Logical attacks*
 
-| **Attack** | **Description** | **Included / Excluded** |
+| **Attack** | **Description** | **Threat model scope** |
 | :--------- | :--------- | :--------- |
-| Debug/Register Interfaces | Manipulation of externally accessible registers of the Caliptra RoT|Includes all buses accessible to components external to Caliptra RoT including JTAG.|
-| Software Interfaces       | Attacker invokes software interfaces exposed by the Caliptra RoT to external components. | <p>Includes all externally exposed software interfaces from both non-RoT firmware as well as interfaces accessed by external IP blocks.</p><p>Includes exploiting both design and implementation flaws.</p><p>For High Value Assets only (see next subsection), the attacker is assumed to fully control all mutable code of the SoC, including privileged Caliptra RoT mutable code.</p> |
-|Side channel - Timing|Attacker observes the elapsed time of different sensitive operations.|Includes attacks where the attacker actively stimulates the sensitive operations while timing.|
-|Cryptographic Analysis|Attacker observes plaintext, ciphertext, related data, or immediate values in cryptography to overcome cryptographic controls|<p>Includes all practical cryptanalysis attacks.</p><p>Assumes NIST-unapproved algorithms provide no security. (e.g. SHA-1, Single DES, ChaCha20)</p><p>Assumes any cryptographic algorithm that provides less than 128 bits of security (as determined by NIST SP 800-57) provides no security.</p><p>Excludes quantum computer attacks. This exclusion will be removed soon.</p>|
+| Debug and register interfaces | Manipulation of externally accessible registers of Caliptra.|Includes all buses that are accessible to components external to Caliptra, including JTAG.|
+| Software interfaces       | Attacker invokes software interfaces that are exposed by Caliptra to external components. | <p>Includes all externally exposed software interfaces from both non-RoT firmware as well as interfaces accessed by external IP blocks.</p><p>Includes exploiting both design and implementation flaws.</p><p>For high value assets only (see next subsection), the attacker is assumed to fully control all mutable code of the SoC, including privileged Caliptra mutable code.</p> |
+|Side channel - timing|Attacker observes the elapsed time of different sensitive operations.|Includes attacks where the attacker actively stimulates the sensitive operations while timing.|
+|Cryptographic analysis|Attacker observes plaintext, ciphertext, related data, or immediate values in cryptography to overcome cryptographic controls.|<p>Includes all practical cryptanalysis attacks.</p><p>Assumes NIST-unapproved algorithms provide no security (for example, SHA-1, Single DES, ChaCha20).</p><p>Assumes any cryptographic algorithm that provides less than 128 bits of security (as determined by NIST SP 800-57) provides no security.</p><p>Excludes quantum computer attacks. This exclusion will be removed soon.</p>|
 
-### Trust Boundaries
+### Trust boundaries
 
-Following diagram establishes trust boundaries for the discussion of threat modeling. Caliptra based SoCs are expected to have Caliptra as silicon RoT, platform or SoC security engine to orchestrate SoC security needs and rest of the SoC.
+The following figure shows trust boundaries for the discussion of threat modeling. SoCs based on Caliptra are expected to have Caliptra as silicon RoT, and are expected to have a platform or SoC security engine to orchestrate SoC security needs and the rest of the SoC.
 
 Trust levels of Caliptra and the SoC security engine are not hierarchical. These two entities are responsible for different security aspects of the chip.
 
-*Figure 1: Caliptra Trust Boundaries*
+*Figure 1: Caliptra trust boundaries*
 
 ![Caliptra_trust_boundary](./images/Caliptra_trust_boundary.png)
 
-### Caliptra Interactions
+### Caliptra interactions
 
-The “Caliptra Core” blocks consume the Tcc and Tcw Trust level components.  This boundary includes crypto accelerators, hardware key sequencer, key vault, Caliptra microcontroller, ROM and subsystem interconnects.  The Caliptra Core provides deterministic Caliptra behavior.  The Caliptra Subsystem includes the Tc, Tcw, Tse and Trs, this subsystem extends Trust level into the SoC subsystem and allows for customization of the SoC initialization.  For information on Caliptra Core and Caliptra Subsystem, see section: [Caliptra Profiles](#caliptra-profiles)
+The Caliptra Core blocks consume the Tcc and Tcw trust level components.  This boundary includes crypto accelerators, hardware key sequencer, key vault, Caliptra microcontroller, ROM, and subsystem interconnects.  The Caliptra Core provides deterministic Caliptra behavior.  The Caliptra subsystem includes the Tc, Tcw, Tse, and Trs. The Caliptra subsystem extends the trust level into the SoC subsystem and allows for customization of the SoC initialization.  For information on Caliptra Core and the Caliptra subsystem, see [Caliptra Profiles](#caliptra-profiles).
 
-### <a id="assets"></a>Caliptra Assets and Threats
+### <a id="assets"></a>Caliptra assets and threats
 
 Assets are defined to be secrets or abilities that must be protected by an owner or user of the asset.  Ownership means that the owner has the responsibility to protect these assets and must only make them available based on a defined mechanism while protecting all other assets.
 
-An example of when an owner must protect assets would be moving from secure mode to unsecure.  Another example would be moving from one owner to another.  Before moving through these transitions, the owner will need to ensure all assets are removed, disabled or protected based on use-case definition.
+An example of when an owner must protect assets is moving from secure mode to unsecure mode.  Another example is moving from one owner to another. Before moving through these transitions, the owner must ensure all assets are removed, disabled, or protected based on how the use case is defined.
 
 *Table 6: Assets*
 
 <table>
 <thead>
   <tr>
-    <th>Asset<br>Category</th>
+    <th>Asset<br>category</th>
     <th>Asset</th>
-    <th>Security<br>Property</th>
-    <th>Attack<br>Profile</th>
-    <th>Attack Path</th>
+    <th>Security<br>property</th>
+    <th>Attack<br>profile</th>
+    <th>Attack path</th>
     <th>Mitigation</th>
   </tr>
 </thead>
@@ -340,9 +338,9 @@ An example of when an owner must protect assets would be moving from secure mode
   <tr>
     <td rowspan="11">Fuse/OTP high value secrets</td>
     <td rowspan="4">UDS Seed</td>
-    <td rowspan="4">Confidentiality and Integrity</td>
+    <td rowspan="4">Confidentiality and integrity</td>
     <td rowspan="4">Expert</td>
-    <td>Malicious manufacturing spoofing on UDSseeds</td>
+    <td>Malicious manufacturing spoofing of UDS Seeds</td>
     <td>UDS obfuscation/encryption with class RTL key</td>
   </tr>
   <tr>
@@ -354,15 +352,15 @@ An example of when an owner must protect assets would be moving from secure mode
     <td>UDS obfuscation/encryption with class RTL key</td>
   </tr>
   <tr>
-    <td>Attempting to derive die specific keys by knowing UDS, KDF</td>
-    <td>Confine unobfuscated UDS &amp; subsequent derivations to key vault</td>
+    <td>Attempting to derive die specific keys by knowing UDS</td>
+    <td>Confine unobfuscated UDS and subsequent derivations to key vault</td>
   </tr>
   <tr>
-    <td rowspan="4">Field Entropy</td>
-    <td rowspan="4">Confidentiality and Integrity</td>
+    <td rowspan="4">Field entropy</td>
+    <td rowspan="4">Confidentiality and integrity</td>
     <td rowspan="4">Expert</td>
     <td>Malicious manufacturing spoofing on field entropy</td>
-    <td>Field entropy obfuscation/encryption with class RTL key</td>
+    <td>Field entropy obfuscation and encryption with class RTL key</td>
   </tr>
   <tr>
     <td>Invasive attack (fuse analysis)</td>
@@ -370,40 +368,40 @@ An example of when an owner must protect assets would be moving from secure mode
   </tr>
   <tr>
     <td>Boot path tampering while retrieving field entropy values</td>
-    <td>Field entropy obfuscation/encryption with class RTL key</td>
+    <td>Field entropy obfuscation and encryption with class RTL key</td>
   </tr>
   <tr>
-    <td>Attempting to derive die specific keys by knowing field entropy, KDF</td>
-    <td>Confine field entropy &amp; subsequent derivations to key vault</td>
+    <td>Attempting to derive die specific keys by knowing field entropy</td>
+    <td>Confine field entropy and subsequent derivations to key vault</td>
   </tr>
   <tr>
     <td>FW authentication keys</td>
     <td>Integrity</td>
     <td>Proficient</td>
     <td>Glitching</td>
-    <td>1. Redundant decision making on critical code execution<br>2. Error check before consuming values from fuse<br>3. Environmental monitoring &amp; protection<br></td>
+    <td>1. Redundant decision making on critical code execution<br>2. Error check before consuming values from fuses<br>3. Environmental monitoring and protection<br></td>
   </tr>
   <tr>
     <td>Versioning information from fuses</td>
     <td>Integrity</td>
     <td>Proficient</td>
     <td>Glitching</td>
-    <td>Environmental monitoring &amp; protection</td>
+    <td>Environmental monitoring and protection</td>
   </tr>
   <tr>
     <td>IDEVID CERT chain</td>
     <td>Integrity</td>
     <td>Proficient</td>
     <td>Glitching</td>
-    <td>1. Environmental monitoring &amp; protection<br>2. Error check before consuming values from fuse various ways</td>
+    <td>1. Environmental monitoring and protection<br>2. Error check before consuming values from fuse in various ways</td>
   </tr>
   <tr>
     <td rowspan="7">Die unique assets</td>
     <td>UDS (802.1AR Unique Device Secret)</td>
-    <td rowspan="7">Confidentiality and Integrity</td>
+    <td rowspan="7">Confidentiality and integrity</td>
     <td rowspan="7">Proficient</td>
     <td rowspan="7">1. Software reading actual secrets<br>2. Side channel attack to infer secret</td>
-    <td rowspan="7">1. Secrets locked in key vault, not readable by SW<br>2. SCA Protections</td>
+    <td rowspan="7">1. Secrets locked in key vault, not readable by software<br>2. SCA protections</td>
   </tr>
   <tr>
     <td>CDI<sub>n</sub> (DICE compound device identifier for Layer n)</td>
@@ -415,7 +413,7 @@ An example of when an owner must protect assets would be moving from secure mode
     <td>LDevID<sub>Priv</sub></td>
   </tr>
   <tr>
-    <td>Obfuscation Key</td>
+    <td>Obfuscation key</td>
   </tr>
   <tr>
     <td>AliasFMC_Key<sub>Priv</sub></td>
@@ -429,39 +427,39 @@ An example of when an owner must protect assets would be moving from secure mode
     <td>Integrity</td>
     <td>Proficient</td>
     <td>Glitching</td>
-    <td>1. Redundant decision making on critical code execution<br>2. Environmental monitoring &amp; protection</td>
+    <td>1. Redundant decision making on critical code execution<br>2. Environmental monitoring and protection</td>
   </tr>
   <tr>
     <td>Execution unauthorized runtime FW</td>
-    <td>Authenticity &amp; Integrity</td>
+    <td>Authenticity and integrity</td>
     <td>Proficient</td>
     <td>Modify boot media</td>
-    <td>Authenticity &amp; integrity check using PKI DSA upon power on</td>
+    <td>Authenticity and integrity check using PKI DSA upon power on</td>
   </tr>
   <tr>
     <td>Execution unauthorized runtime FW</td>
-    <td>Authenticity &amp; Integrity</td>
+    <td>Authenticity and integrity</td>
     <td>Proficient</td>
     <td>Arbitrary payload pushed into execution</td>
-    <td>Authenticity &amp; integrity check using PKI DSA during software updates &amp; power on</td>
+    <td>Authenticity and integrity check using PKI DSA during software updates and power on</td>
   </tr>
   <tr>
     <td>Rollback Attack</td>
     <td>Versioning</td>
     <td>Proficient</td>
     <td>1. Modify boot media to host older versions<br>2. Bypass version check during boot</td>
-    <td>1. Authenticity &amp; integrity check using PKI DSA upon power on<br>2. Failproof, audited boot code implementation responsible to load images</td>
+    <td>1. Authenticity and integrity check using PKI DSA upon power on<br>2. Failproof, audited boot code implementation responsible for loading images</td>
   </tr>
   <tr>
     <td>Control flow</td>
-    <td>Integrity &amp; Confidentiality if applicable</td>
+    <td>Integrity and confidentiality if applicable</td>
     <td>Proficient</td>
-    <td>1. Return &amp; jump addresses manipulation<br>2. Return values, errors tampering <br>3. Stack overflow <br>4. Buffer overflows <br>5. Privilege escalations &amp; hijacking</td>
-    <td>Various control flow integrity measures Secure coding practices and auditing implementation</td>
+    <td>1. Return and jump addresses manipulation<br>2. Return values and errors tampering <br>3. Stack overflow <br>4. Buffer overflows <br>5. Privilege escalations and hijacking</td>
+    <td>1. Various control flow integrity measures<br> 2. Secure coding practices and auditing implementation</td>
   </tr>
   <tr>
     <td>Boot measurements protected by Caliptra</td>
-    <td>Boot Measurements that Caliptra as RTM gathers, stores and reports</td>
+    <td>Boot measurements that Caliptra RTM gathers, stores, and reports</td>
     <td>Integrity</td>
     <td>Expert</td>
     <td>1. Manipulate measurements AiTM while in transit to Caliptra <br>2. SoC sends manipulated measurements to Caliptra</td>
@@ -473,7 +471,7 @@ An example of when an owner must protect assets would be moving from secure mode
     <td>Integrity</td>
     <td>Proficient</td>
     <td>Glitching</td>
-    <td>Environmental monitoring &amp; protection</td>
+    <td>Environmental monitoring and protection</td>
   </tr>
   <tr>
     <td></td>
@@ -481,22 +479,22 @@ An example of when an owner must protect assets would be moving from secure mode
     <td>Integrity</td>
     <td>Proficient</td>
     <td>Glitching</td>
-    <td>Environmental monitoring &amp; protection</td>
+    <td>Environmental monitoring and protection</td>
   </tr>
   <tr>
     <td></td>
-    <td>Pauser Attribute</td>
+    <td>Pauser attribute</td>
     <td>Integrity</td>
     <td>Proficient</td>
     <td>Glitching</td>
-    <td>Environmental monitoring &amp; protection</td>
+    <td>Environmental monitoring and protection</td>
   </tr>
   <tr>
     <td></td>
     <td>JTAG debug</td>
     <td>Integrity</td>
     <td>Proficient</td>
-    <td>1. Attempt to manipulate RoT execution via JTAG to non POR flows <br>2. Attempt to retrieve device secrets via JTAG when product is field-deployed<br>3. Attempt to retrieve device secrets via JTAG when product is under development/debug</td>
+    <td>1. Attempt to manipulate RoT execution via JTAG to flows that are not plan-of-record<br>2. Attempt to retrieve device secrets via JTAG when product is field-deployed<br>3. Attempt to retrieve device secrets via JTAG while the product is being developed and debugged</td>
     <td>Implement security mode management within Caliptra</td>
   </tr>
 </tbody>
