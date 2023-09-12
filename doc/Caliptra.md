@@ -502,90 +502,90 @@ An example of when an owner must protect assets would be moving from secure mode
 </tbody>
 </table>
 
-# High Level Architecture
+# High level architecture
 
-A Caliptra RTM subsystem has the following basic, high-level blocks:
+The following figure shows the basic high-level blocks of the Caliptra RoT for Measurement (RTM) subsystem.
 
-*Figure 2: Caliptra High Level Blocks*
+*Figure 2: Caliptra high level blocks*
 
 ![](./images/Caliptra_HW_diagram.png)
 
-See [HW Section](#hardware-section) for a detailed discussion.
+See the [HW Section](#hardware-section) for a detailed discussion.
 
-## Caliptra Profiles
+## Caliptra profiles
 
-Caliptra supports two physical modes of instantiation, the Caliptra Core and the Caliptra Subsystem.  Within Caliptra Core there are two modes of integration with different security postures and firmware loading techniques.
+Caliptra supports two physical modes of instantiation, the Caliptra Core and the Caliptra subsystem.  Within Caliptra Core there are two modes of integration with different security postures and firmware loading techniques.
 
-1. Boot Media Integrated (BMI) Profile: Caliptra loads its firmware directly from SPI boot media. SoC boot cannot proceed through any other boot media.
-2. Boot Media Dependent (BMD) Profile: Caliptra receives its firmware from SoC actors with access to the boot media.
+1. Boot Media Integrated (BMI) profile: Caliptra loads its firmware directly from SPI boot media. SoC boot cannot proceed through any other boot media.
+2. Boot Media Dependent (BMD) profile: Caliptra receives its firmware from SoC actors with access to the boot media.
 
-In both Profiles, Caliptra is among the first uncore microcontrollers taken out of reset by the power-on reset logic. The difference is in the TCB for integrity of the Core Root of Trust for Measurement. In the BMI Profile, this TCB is the Caliptra Core. In the BMD Profile, this TCB additionally includes the immutable element of the SoC ROM. The BMD Profile trades increased TCB for lower integration cost. BMD Profile does not put Caliptra firmware in the performance-critical or recovery-critical code paths of the SoC boot process.
+In both profiles, Caliptra is among the first uncore microcontrollers taken out of reset by the power-on reset logic. The difference is in the Trusted Computing Base (TCB) for integrity of the Core RTM. In the BMI profile, this TCB is the Caliptra Core. In the BMD profile, this TCB additionally includes the immutable element of the SoC ROM. The BMD profile trades increased TCB for lower integration cost. The BMD profile does not put Caliptra firmware in the performance-critical or recovery-critical code paths of the SoC boot process.
 
-Caliptra 1.0 will only support the BMD Profile.
+Caliptra 1.0 only supports the BMD profile.
 
 ### <a id="bmi"></a>Caliptra Core - Boot Media Integrated (BMI)
 
-In the Boot Media Integrated Profile, Caliptra unilaterally starts the firmware chain-of-trust. The boot process is as follows:
+In the BMI profile, Caliptra unilaterally starts the firmware chain-of-trust. The boot process is as follows:
 
 1. Hardware executes SoC power-on reset logic. This logic starts the execution of Caliptra ROM.
 2. Caliptra ROM fetches the Caliptra firmware from SPI boot media.
-3. Caliptra ROM authenticates/measures/loads/executes Caliptra firmware. Refer to [Error Reporting and Handling](#error-reporting-and-handling) for details regarding FMC verification failures.
+3. Caliptra ROM authenticates, measures, loads, and executes Caliptra firmware. Refer to [Error Reporting and Handling](#error-reporting-and-handling) for details regarding FMC verification failures.
 4. Caliptra firmware copies the SoC First Mutable Code (FMC) into the Caliptra mailbox and measures it.
 5. Caliptra firmware signals to SoC ROM to continue the boot process by fetching the firmware from Caliptra's mailbox.
-6. SoC FMC continues the boot process, forming a boot firmware chain-of-trust: each firmware fetches/authenticates/measures/executes the next firmware needed to establish the device operating environment. Each firmware deposits the next firmware's measurements into Caliptra prior to execution.
+6. SoC FMC continues the boot process, forming a boot firmware chain-of-trust: each firmware fetches, authenticates, measures, and executes the next firmware needed to establish the device operating environment. Each firmware deposits the next firmware's measurements into Caliptra prior to execution.
 7. Caliptra firmware presents attestation APIs using the deposited measurements.
 
-*Figure 3: Boot Media Integrated Boot Flow*
+*Figure 3: Boot Media Integrated boot flow*
 
 ![](./images/BMI_Boot_flow.png)
 
-In the Boot Media Integrated profile, the Caliptra Trusted Computing Base (TCB) for integrity of Core Root of Trust measurement is the Caliptra Core.  The verification of measurement includes:
+In the BMI profile, the Caliptra TCB for integrity of Core RTM is the Caliptra Core.  The verification of measurement includes:
 
-1. The SoC design ingests firmware through Caliptra
-2. Caliptra IP, Caliptra ROM, and Caliptra Firmware
+1. The SoC design ingests firmware through Caliptra.
+2. Caliptra IP, Caliptra ROM, and Caliptra Firmware.
 
 ### <a id="bmd"></a>Caliptra Core - Boot Media Dependent (BMD)
 
-In the Boot Media Dependent Profile, Caliptra coordinates the start of the firmware chain-of-trust with the immutable component of the SoC ROM. Once the Caliptra ROM has completed initialization, it provides a "stash measurement" API and callback signals for the SoC ROM to proceed with the boot process. Caliptra ROM supports stashing of at most eight measurements prior to the boot of Caliptra firmware. The SoC then may choose to boot Caliptra firmware. Any security-sensitive code or configuration loaded by the SoC prior to Caliptra firmware boot must be stashed within Caliptra. If the SoC exceeds Caliptra ROM's measurement stash capacity, attestation must be disabled until next cold reset. The boot process is as follows:
+In the BMD profile, Caliptra coordinates the start of the firmware chain-of-trust with the immutable component of the SoC ROM. After the Caliptra ROM completes initialization, it provides a "stash measurement" API and callback signals for the SoC ROM to proceed with the boot process. Caliptra ROM supports stashing of at most eight measurements prior to the boot of Caliptra firmware. The SoC then may choose to boot Caliptra firmware. Any security-sensitive code or configuration loaded by the SoC prior to Caliptra firmware boot must be stashed within Caliptra. If the SoC exceeds Caliptra ROM's measurement stash capacity, attestation must be disabled until next cold reset. The boot process is as follows:
 
 1. Hardware executes SoC power-on reset logic. This logic starts the execution of SoC ROM and Caliptra ROM.
 2. SoC ROM waits for the ready_for_fw signal from Caliptra ROM.
-3. SoC ROM fetches the First Mutable Code.
+3. SoC ROM fetches the FMC.
     1. If the FMC is Caliptra firmware:
         1. SoC ROM loads the Caliptra firmware into the Caliptra mailbox and issues the Caliptra "firmware load" command.
-        2. Caliptra ROM authenticates/measures/starts the Caliptra firmware.
+        2. Caliptra ROM authenticates, measures, and starts the Caliptra firmware.
     2. If the FMC is not Caliptra firmware:
         1. SoC ROM authenticates and measures that firmware as the SoC FMC, and issues the Caliptra "stash measurement" command prior to executing SoC FMC.
 4. SoC ROM executes SoC FMC.
-5. As in #6 from the BMI flow, SoC FMC continues the boot process, forming a boot firmware chain-of-trust: each firmware fetches/authenticates/measures/executes the next firmware needed to establish the device operating environment. Each firmware deposits the next firmware's measurements into Caliptra prior to execution. The exception is Caliptra's firmware: SoC firmware shall delegate the measurement and execution of Caliptra's firmware to Caliptra ROM.
+5. As in #6 from the BMI flow, SoC FMC continues the boot process, forming a boot firmware chain-of-trust: each firmware fetches, authenticates, measures, and executes the next firmware needed to establish the device operating environment. Each firmware deposits the next firmware's measurements into Caliptra prior to execution. The exception is Caliptra's firmware: SoC firmware delegates the measurement and execution of Caliptra's firmware to Caliptra ROM.
 6. Upon eventual initialization, Caliptra firmware presents attestation APIs using the deposited measurements.
 
-Refer to [Error Reporting and Handling](#error-reporting-and-handling) for details regarding Caliptra and SoC firmware load and verification error handling.
+See [Error Reporting and Handling](#error-reporting-and-handling) for details about Caliptra and SoC firmware load and verification error handling.
 
-*Figure 4: Boot Media Dependent Boot Flow*
+*Figure 4: Boot Media Dependent boot flow*
 
 ![](./images/BMD_Boot_flow.png)
 
-## Caliptra Security Subsystem
+## Caliptra security subsystem
 
-In order to enable a transparent and reusable security subsystem Caliptra solution, this specification provides for a full security subsystem solution that is a combination of fully open source digital logic and licensable analog components that are technology dependent such as TRNG analog sources  or technology dependent fuse controllers.
+To enable a transparent and reusable security subsystem, the Caliptra specification includes a full security subsystem solution. This solution is a combination of fully open source digital logic and licensable analog components that are technology dependent, such as TRNG analog sources or technology dependent fuse controllers.
 
-* SoC Controller has configurable SRAMs to allow per SoC firmware customization
-* SoC reference ROM allows for configurable initialization
-* RHL (Resource handling logic) is used to bring up subsystem components such as PUF, PLL, Fuse controller, \[P-\]TRNG etc. all and process requests from Caliptra to the outside components (e.g., P-TRNG request input to Caliptra’s internal TRNG)
-* Some of the analog components are licensable IPs that are used to build the subsystem (e.g., PUF, PLL)
+* SoC Controller has configurable SRAMs to allow per SoC firmware customization.
+* SoC reference ROM allows for configurable initialization.
+* Resource handling logic (RHL) brings up subsystem components such as PUF, PLL, Fuse controller, \[P-\]TRNG. etc. RHL processes requests from Caliptra to the outside components (for example, P-TRNG request input to Caliptra’s internal TRNG).
+* Some of the analog components are licensable IPs that are used to build the subsystem (for example, PUF, and PLL).
 
-*Figure 5: Caliptra Security Subsystem*
+*Figure 5: Caliptra security subsystem*
 
 ![](./images/Caliptra_HW_Block_diagram.png)
 
-The Caliptra subsystem offers a complete Root of Trust subsystem, with open source programmable components for customization of SoC boot flows.
+The Caliptra subsystem offers a complete RoT subsystem, with open source programmable components for customization of SoC boot flows.
 
 ## Identity
 
 A Caliptra RTM must provide its runtime code with a cryptographic identity in accordance with the TCG DICE specification. This identity must be rooted in ROM, and provides an attestation over the security state of the RTM as well as the code that the RTM booted.
 
-*Figure 6: DICE Cert/Key Generation*
+*Figure 6: DICE Cert/Key generation*
 
 ![](./images/Caliptra_cert_creation.png)
 
@@ -597,59 +597,58 @@ The Caliptra UDS is stored in fuses, and is encrypted at rest by an obfuscation 
 
 ### IDevID key
 
-A Caliptra RTM's IDevID key is a hardware identity generated by Caliptra ROM during manufacturing. This key must be solely wielded by Caliptra ROM, and shall never be exposed externally at any phase of the Caliptra life cycle. IDevID is used to endorse LDevID. The IDevID certificate is endorsed by the vendor’s provisioning CA (pCA) implemented via a HSM appliance connected to High Volume Manufacturing flows (see provisioning CA in [Reference 8](#ref-8)).
+A Caliptra RTM's IDevID key is a hardware identity generated by Caliptra ROM during manufacturing. This key must be solely wielded by Caliptra ROM, and shall never be exposed externally at any phase of the Caliptra lifecycle. IDevID is used to endorse LDevID. The IDevID certificate is endorsed by the vendor’s provisioning CA (pCA) that is implemented via a HSM appliance connected to High Volume Manufacturing (HVM) flows (see provisioning CA in [Reference 8](#ref-8)).
 
 See [Provisioning IDevID During Manufacturing](#provisioning-idevid-during-manufacturing) for further details on IDevID provisioning.
 
 ### LDevID key
 
-Caliptra RTMs shall support field-programmable entropy which factors into the device's LDevID identity.  The LDevID identity is endorsed by IDevID and in turn endorses the FMC alias key.
+Caliptra RTMs shall support field-programmable entropy, which factors into the device's LDevID identity.  The LDevID identity is endorsed by IDevID and in turn endorses the FMC alias key.
 
-Caliptra's field-programmable entropy shall consist of four 32-byte slots. All slots are used to derive LDevID. An owner may decide to program as few or as many slots as they wish. Upon programming new entropy, on next reset the device will begin wielding its fresh LDevID. Owners will need to validate the new LDevID by way of IDevID.
+Caliptra's field-programmable entropy shall consist of four 32-byte slots. All slots are used to derive LDevID. An owner may decide to program as few or as many slots as they wish. Upon programming new entropy, on the next reset the device begins wielding its fresh LDevID. Owners need to validate the new LDevID by using IDevID.
 
 ### Commentary: threat analysis
 An ideal IDevID has the following properties:
-* cannot be altered by entities besides Caliptra in manufacturing security state.
-* cannot be impersonated by entities that are not a Caliptra instatiation for that device class.
-* cannot be cloned to additional devices of the same class.
-* private component cannot be extracted from Caliptra.
+* Cannot be altered by entities besides Caliptra in manufacturing security state.
+* Cannot be impersonated by entities that are not a Caliptra instatiation for that device class.
+* Cannot be cloned to additional devices of the same class.
+* Private component cannot be extracted from Caliptra.
 
-Caliptra 1.0 alone does not fully address these properties. For example, a person-in-the-middle supply chain adversary could impersonate Caliptra by submitting its own IDevID CSR to the pCA. Vendors should threat model the IDevID generation and endorsement flows for their SoC. Threat actors to consider are
+Caliptra 1.0 alone does not fully address these properties. For example, a person-in-the-middle supply chain adversary could impersonate Caliptra by submitting its own IDevID Certificate Signing Request (CSR) to the pCA. Vendors should threat model the IDevID generation and endorsement flows for their SoC. Threat actors to consider are the following:
 * Components involved in UDS injection flows: can they inject the same obfuscated UDS to multiple devices, or to devices of different classes? Can they wield the deobfuscation key to leak the UDS?
 * Components servicing the connectivity between the Caliptra instantiation and the HSM applicance performing IDevID endorsement: can they alter or impersonate Caliptra's IDevID CSR?
-* Physical attackers: see [Physical Attack Countermeasures](#physical-attack-countermeasures)
+* Physical attackers: see [Physical Attack Countermeasures](#physical-attack-countermeasures).
 
-Vendors are incentivized to mitigate these threats. The vendor identity chain secures RMA and confidential computing workflows.
+Vendors have incentives to mitigate these threats. The vendor identity chain secures RMA and confidential computing workflows.
 
 Ultimately though, IDevID is not renewable. Renewable security, often referred to as trusted computing base recovery, is a base design principle in Caliptra. Therefore, it is a design goal to reduce the operational dependency on IDevID. Field entropy and LDevID satisfy this need.
 
-Field entropy is a limited resource, consisting of only four 32-byte slots of one-time programmable fuses. It is not generally expected that a second-hand purchaser will be able to program all or even any of these slots. Caliptra's DICE identity remains usable even after all field entropy slots are programmed, so this feature does not preclude a circular economy. Field entropy is a feature primarily designed for users who purchase new parts.
+Field entropy is a limited resource, consisting of only four 32-byte slots of one-time programmable fuses. It is not generally expected that a second-hand purchaser can program all or even any of these slots. Caliptra's DICE identity remains usable even after all field entropy slots are programmed, so this feature does not preclude a circular economy. Field entropy is a feature primarily designed for users who purchase new parts.
 
 Field entropy and LDevID are intended to hedge against attackers with the following abilities:
 
 * Can obtain UDS before the part first arrives at the owner's facility.
-* Can wield that stolen UDS to impersonate the part after it has been deployed within the owner's facility.
-  * The attacker can derive and wield IDevID to mint an attacker-controlled DICE hierarchy, e.g. LDevID, FMC alias key, or Runtime firmware alias key.
+* Can wield that stolen UDS to impersonate the part after it is deployed within the owner's facility. The attacker can derive and wield IDevID to mint an attacker-controlled DICE hierarchy; for example, LDevID, FMC alias key, or Runtime firmware alias key.
 * Cannot fully impersonate the part during initial onboarding within the owner's facility.
 * Cannot extract field entropy after initial onboarding.
 
-During initial onboarding, the owner is expected to instruct the device to program field entropy. Upon device reset, this will result in a fresh LDevID. Attackers that have previously obtained UDS will not be able to derive this LDevID. The owner is expected to register the new LDevID and subsequently validate all future DICE keys for the device against that LDevID.
+During initial onboarding, the owner is expected to instruct the device to program field entropy. Upon device reset, this results in a fresh LDevID. Attackers that have previously obtained UDS are not able to derive this LDevID. The owner is expected to register the new LDevID and subsequently validate all future DICE keys for the device against that LDevID.
 
-When registering LDevID during device onboarding, the owner is expected to rely on IDevID as an authenticity signal over LDevID. It is assumed that the attacker has obtained UDS at this point, and therefore can themselves wield IDevID. Therefore, the authenticity signal granted by IDevID cannot be the only signal used to determine LDevID's trustworthiness. The owner's device onboarding flow must be resistant to remote MITM attackers that may attempt to use a previously-exfiltrated UDS to register a forged LDevID.
+When registering LDevID during device onboarding, the owner is expected to rely on IDevID as an authenticity signal over LDevID. It is assumed that the attacker has obtained UDS at this point, and therefore can themselves wield IDevID. Therefore, the authenticity signal granted by IDevID cannot be the only signal used to determine LDevID's trustworthiness. The owner's device onboarding flow must be resistant to remote person-in-the-middle attackers that may attempt to use a previously exfiltrated UDS to register a forged LDevID.
 
-Once an owner has registered a device's LDevID as part of their device onboarding flow, and unless the device again passes through the owner's device onboarding flow, the owner should not trust IDevID to endorse any other LDevIDs.
+After an owner registers a device's LDevID as part of their device onboarding flow, and unless the device again passes through the owner's device onboarding flow, the owner should not trust IDevID to endorse any other LDevIDs.
 
-This scheme does not defend against supply-chain attackers that obtain fuse data for devices that enter the supply chain *after* their field entropy has been programmed, such as during RMA flows. The LDevID certificate also does not support revocation as there is no generic Caliptra OCSP service. Owners should either maintain an allowlist of LDevID certificates or revoke any of the upstream certificate authorities.
+This approach does not defend against supply-chain attackers that obtain fuse data for devices that enter the supply chain *after* their field entropy has been programmed, such as during RMA flows. The LDevID certificate also does not support revocation because there is no generic Caliptra OCSP service. Owners should either maintain an allowlist of LDevID certificates or revoke any of the upstream certificate authorities.
 
-Owners are not required to program field entropy. Caliptra will generate LDevID from the value of the field entropy fuses, which could be all zeroes or ones. Caliptra uses UDS as input to LDevID generation so that its properties are no worse than IDevID. Field entropy is expected to be stored in fuses to achieve equivalent physical attack barrier to UDS.
+Owners are not required to program field entropy. Caliptra generates LDevID from the value of the field entropy fuses, which could be all zeroes or ones. Caliptra uses UDS as input to LDevID generation so that LDevID properties are no worse than IDevID. Field entropy is expected to be stored in fuses to achieve an equivalent physical attack barrier to UDS.
 
-It is the responsibility of the owner or the user to identify the certificate they wish to trust, and potentially endorse with their own certificate authority: pCA, IDevID, LDevID, or Alias<sub>FMC</sub>.
+It is the responsibility of the owner or the user to identify the certificate they wish to trust, and to potentially endorse with their own certificate authority: pCA, IDevID, LDevID, or Alias<sub>FMC</sub>.
 
 ## FMC alias key
 
-The LDevID CDI is mixed with a hash of FMC, as well as the security state of the device, via a FIPS-compliant HMAC, to produce CDI<sub>FMC</sub> . ROM uses CDI<sub>FMC</sub> to derive the Alias<sub>FMC</sub> keypair. ROM wields LDevID to issue a certificate for Alias . The Alias<sub>FMC</sub> certificate includes measurements of the security state and FMC. ROM makes CDI<sub>FMC</sub> , Alias<sub>FMC</sub> , and its certificate, available to FMC.
+The LDevID CDI is mixed with a hash of FMC, as well as the security state of the device, via a FIPS-compliant HMAC, to produce CDI<sub>FMC</sub>. ROM uses CDI<sub>FMC</sub> to derive the Alias<sub>FMC</sub> keypair. ROM wields LDevID to issue a certificate for Alias. The Alias<sub>FMC</sub> certificate includes measurements of the security state and FMC. ROM makes CDI<sub>FMC</sub>, Alias<sub>FMC</sub>, and its certificate, available to FMC.
 
-FMC wields Alias<sub>FMC</sub> to issue a CSR for Alias<sub>FMC</sub>. FMC then mixes CDI<sub>FMC</sub> with a hash of runtime firmware to produce CD<sub>RT</sub>. FMC uses CDI<sub>RT</sub> to derive the Alias<sub>RT</sub> alias keypair. FMC wields Alias<sub>FMC</sub> to issue a certificate for Alias<sub>RT</sub>. This alias certificate includes measurements of runtime firmware. FMC makes CDI<sub>RT</sub> , Alias<sub>RT</sub> , its certificate, available to application firmware, while withholding CDI<sub>FMC</sub> and Alias<sub>FMC</sub> .
+FMC wields Alias<sub>FMC</sub> to issue a CSR for Alias<sub>FMC</sub>. FMC then mixes CDI<sub>FMC</sub> with a hash of runtime firmware to produce CD<sub>RT</sub>. FMC uses CDI<sub>RT</sub> to derive the Alias<sub>RT</sub> alias keypair. FMC wields Alias<sub>FMC</sub> to issue a certificate for Alias<sub>RT</sub>. This alias certificate includes measurements of runtime firmware. FMC makes CDI<sub>RT</sub>, Alias<sub>RT</sub>, and its certificate, available to application firmware, while withholding CDI<sub>FMC</sub> and Alias<sub>FMC</sub>.
 
 For owner certification flows, Caliptra only emits a CSR for Alias<sub>FMC</sub>.
 
@@ -659,13 +658,13 @@ Devices may support features like debug unlock or JTAG. These features, when ena
 
 ### Owner authorization
 
-Caliptra RTM firmware shall be signed by the vendor. In addition, this firmware may also be signed by the owner when ownership control is enforced. If a second signature is present for ownership authorization, Caliptra must extract the owner's public key from the firmware image during cold boot, and latch the owner key into Caliptra's RAM for the remainder of its uptime[^3]. Caliptra will then use both the vendor key and owner key to verify hitless firmware updates.
+Caliptra RTM firmware shall be signed by the vendor. In addition, this firmware may also be signed by the owner when ownership control is enforced. If a second signature is present for ownership authorization, Caliptra must extract the owner's public key from the firmware image during cold boot, and latch the owner key into Caliptra's RAM for the remainder of its uptime[^3]. Caliptra then uses both the vendor key and owner key to verify hitless firmware updates.
 
-Caliptra shall attest to the value of the owner key, enabling external verifiers to ensure that the correct owner key has been provisioned into the device. Caliptra shall do so by including the owner key as an input to the FMC's CDI (as part of "other attributes" from Figure 6 above), and represent it within the FMC's alias certificate.
+Caliptra shall attest to the value of the owner key, enabling external verifiers to ensure that the correct owner key was provisioned into the device. To perform this attestation, Caliptra includes the owner key as an input to the FMC's CDI (as part of "other attributes" from Figure 6 above), and represents it within the FMC's alias certificate.
 
-The SoC may support a fuse bank for representing the hash of the owner's public key. If the SoC reports this value to Caliptra, Caliptra will refuse to boot firmware unless it has been dual-signed by the key reported by SoC ROM's fuse registers.
+The SoC may support a fuse bank for representing the hash of the owner's public key. If the SoC reports this value to Caliptra, Caliptra refuses to boot firmware unless the firmware was dual-signed by the key reported by SoC ROM's fuse registers.
 
-Note that the owner key, when represented in fuses or in the FMC's alias certificate, is a SHA-384 hash of a structure containing a list of owner public keys, to support key rotation.
+The owner key, when represented in fuses or in the FMC's alias certificate, is a SHA-384 hash of a structure that contains a list of owner public keys. This supports key rotation.
 
 ## Provisioning IDevID During Manufacturing
 
