@@ -303,7 +303,7 @@ Invasive attacks that involve depackaging or delayering of the SoC/ASIC are out-
 
 ### Trust boundaries
 
-The following figure shows trust boundaries for the discussion of threat modeling. SOCs based on Caliptra are expected to have Caliptra as silicon RoT, and are expected to have a platform or SoC security engine to orchestrate SoC security needs and the rest of the SoC.
+The following figure shows trust boundaries for the discussion of threat modeling. SoCs based on Caliptra are expected to have Caliptra as silicon RoT, and are expected to have a platform or SoC security engine to orchestrate SoC security needs and the rest of the SoC.
 
 Trust levels of Caliptra and the SoC security engine are not hierarchical. These two entities are responsible for different security aspects of the chip.
 
