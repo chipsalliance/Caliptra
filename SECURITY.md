@@ -1,4 +1,4 @@
-# Caliptra Project Security Incidence Response
+# Caliptra Project Security Incident Response
 
 ## Security Communication
 
