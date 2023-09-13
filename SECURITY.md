@@ -111,7 +111,7 @@ flowchart TB
     Triage --> Assigned
     Triage <--> Rejected
     Assigned <--> Review
-    Review --> Rejected
+    Review ---> Rejected
     Review --> Accepted
     Accepted --> Public
 ```
