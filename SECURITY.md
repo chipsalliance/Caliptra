@@ -103,7 +103,20 @@ Creators Vulnerability Alert Registry&gt;.
 
 Issues within this bug tracking system will transition through a number of states according to this diagram:
 
-**TODO** Insert diagram from https://docs.zephyrproject.org/latest/security/reporting.html#security-issue-management
+<center>
+
+```mermaid
+flowchart TB
+    New --> Triage
+    Triage --> Assigned
+    Triage <--> Rejected
+    Assigned <--> Review
+    Review --> Rejected
+    Review --> Accepted
+    Accepted --> Public
+```
+
+</center>
 
 - **New:** This state represents new reports that have been entered directly by a reporter. When entered by the response team in response to an
 email, the issue shall be transitioned directly to *Triage*.
