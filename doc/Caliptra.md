@@ -44,29 +44,6 @@ The Caliptra Workgroup acknowledges the following individuals for their contribu
 
 <div style="page-break-after: always"></div>
 
-**Revisions**
-
-|**Date**|**Revision #**|**Author**|**Description**|
-| - | - | - | - |
-|February 2022|0.2|Prabhu Jayana (AMD)</p> Bryan Kelly (Microsoft)</p> Andrés Lagar-Cavilla (Google)</p> Jeff Andersen (Google)</p> | Created initial proposal draft. |
-|March 2022|0.4| Rob Strong (AMD)</p> Prabhu Jayana (AMD)</p>| Migrated to OCP template.</p>Edited to clarify language use and added sections related lifecycle support, fuse, crypto requirements, Kat support, etc.</p> |
-|April 2022|0.5|Rob Strong (AMD)|Edited and formatted to get to v.5.|
-|June 2022|0.51|Rob Strong (AMD)|Updated the FW Signing/Verification Algorithms section and added references to OCP Secure Boot specification.</p>Updated Physical Attack Countermeasures and updated the section to reference NiST paper ([[7](#ref-7)]) that discusses SCA as well as their countermeasures.|
-|June 2022|0.52|Nathan Nadarajah (AMD) Sudhir Mathane (AMD)|Added Threat Model section and initial content. |
-|July 2022|0.53|Louis Ferraro (AMD)|Added Device Resilience chapter and updated related text.|
-|August 2022|0.54|Rob Strong (AMD)|Updated with OCP template and feedback. Added License and Appendix sections.|
-|September 2022|0.55|Bharat S Pillilli (Microsoft)|Updated Caliptra TRNG view, Caliptra Subsystem View, RAS/Error information, and Fuse information.|
-|October 2022|0.56|Bharat S Pillilli (Microsoft)|Added SHA384 acceleration HW API and Mailbox commands table. Added flows on the usage of SHA384 acceleration HW API.|
-|November 2022|0.57|Jeff Andersen|Added Mailbox Command Table with encodings.|
-|November 2022|0.58|Rob Strong (AMD)|Added a definition for ‘hitless’ in ‘Caliptra RTM hitless update’ section.|
-|January 2023|0.59|Jeff Andersen|Added commentary on LDevID and field entropy. Added owner authz fuse details.|
-|January 2023|0.60|Jeff Andersen|Added details on hitless update attestation.|
-|January 2023|0.61|Jeff Andersen|Removed KEY MANIFEST SVN from specification.|
-|February 2023|0.62|Piotr Kwidzinski|Moved specification to Caliptra GitHub repo.|
-|May 2023|0.63|Caleb Whitehead|Updated Error Reporting and Handling HW Error Table.|
-|June 2023|0.64|Varun Sampath (NVIDIA)|Added warm reset and journey measurement handling.|
-|August 2023|0.7|Piotr Kwidzinski|Cleaned up references, links, and figures. Minor edits.|
-
 # Acronyms and abbreviations
 
 The following acronyms and abbreviations are used throughout this document.
