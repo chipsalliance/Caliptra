@@ -849,11 +849,11 @@ To capture all firmware and configuration changes, Caliptra tracks and attests t
 
 The log and cumulative measurement mechanism is similar to that used in TPM. In this model, Caliptra only needs to securely manage the measurements; the log does not need to be secured or maintained by Caliptra or the SoC. The construction of measurements through cryptographic hash extensions means that the log must provide the exact order and evidence needed to reconstruct the measurement. As such, the log is tamper evident by design and does not need to be kept secure.
 
-Caliptra contains 32 PCR 384 banks that are extendable by the SHA engine, and readable by Caliptra firmware.  The usage of the PCR banks is as follows:
+Caliptra contains 32 384-bit PCR banks that are extendable by the SHA engine, and readable by Caliptra firmware.  The usage of the PCR banks is as follows:
 
 *Table 9: PCR bank usage*
 
-|**PCR number**|**Type**|**Extend Ctrl**|**Description**|
+|**PCR number**|**Type**|**Extend control**|**Description**|
 | - | - | - | - |
 |PCR0|Current|ROM|Holds Caliptra’s FMC measurement and ROM policy configuration.|
 |PCR1|Cumulative|ROM|Holds journey of Caliptra’s FMC measurement and ROM policy configuration.|
@@ -992,8 +992,6 @@ A Caliptra RTM shall implement countermeasures designed to deter both glitching 
 The Caliptra threat model guides the priority of which physical countermeasures are based on a specific physical implementation.
 
 From the top, an adversary in the supply chain has essentially unlimited time to glitch the chip and make it reveal any private key material or symmetric secrets. [One Glitch To Rule Them All ](https://arxiv.org/abs/2108.04575)is one example with recency bias. The most critical countermeasures must prevent non-destructive extraction of those secrets. Otherwise, an adversary who succeeds can silently impersonate production-serving assets at a later time.
-
-General protection of the embedded microprocessor while running arbitrary firmware is required to protect the UDS or other private entropy from logical and physical attacks, including firmware running within Caliptra itself. Control flow integrity, analog reference voltage, and clock sources, as well as defensive programming, are encouraged.  Likewise, pointer authentication, encryption, separate code vs. data stacks, and memory tagging are all encouraged.
 
 Randomly generated per-part entropy is subject to physical inspection attacks in the supply chain as well. The fuses that store the UDS entropy shall be protected to a degree that forces an attacker to perform a destructive operation to read their values. Decapping and fibbing attacks should at least penetrate enough layers and metal shielding to render the part useless, if not being outright impossible to carry out. Entropy tied to a damaged asset typically requires injection of counterfeit devices in the supply chain, which is a very powerful adversary model.
 
