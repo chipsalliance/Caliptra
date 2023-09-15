@@ -837,23 +837,23 @@ A Caliptra RTM shall follow and implement the secure boot guidelines as describe
 
 For the detailed flow, see the [HW Section](#hardware-section).
 
-## Hitless Update
+## Hitless update
 
-A ‘hitless’ (aka ‘impactless’) update occurs when an update is applied to the Caliptra’s executing firmware without requiring a SoC/machine reboot. A hitless update allows Caliptra FW[^4] to remain up to date with FW security and/or functional patches while preventing/reducing machine downtime. Hitless update shall take effect immediately upon application (post-cryptographic verification). Updates to the machine’s persistent storage is still required as this will ensure that Caliptra will reboot to the latest FW if the system requires a re-start/re-boot.
+A ‘hitless’ (aka ‘impactless’) update occurs when an update is applied to Caliptra’s executing firmware without requiring a SoC or machine reboot. A hitless update allows Caliptra FW[^4] to remain up to date with FW security and/or functional patches while preventing or reducing machine downtime. Hitless update shall take effect immediately upon application (post-cryptographic verification). Updates to the machine’s persistent storage are still required because they ensure that Caliptra reboots to the latest FW if the system requires a restart or reboot.
 
-Caliptra contains multiple hardware isolated registers for Platform Configuration Registers (PCR).  These PCRs serve as volatile storage for concise cryptographic measurement of security state, including Caliptra’s own firmware.
+Caliptra contains multiple hardware isolated registers for Platform Configuration Registers (PCR). These PCRs serve as volatile storage for concise cryptographic measurement of security state, including Caliptra’s own firmware.
 
-Why journey measurements matter: hitless updates present a challenge for devices that only capture their current firmware version and state, particularly where the previous state may have impacted the current state of dependent components within the SoC.  For example, a device might move from firmware version A to firmware version B without assuming a clean start to flush state. Vulnerabilities in firmware version A, might impact version B.  Preserving a device boot measurement and currently running measurement can highlight differences, but it cannot distinguish between transitional states whereby intermediate updates have the potential to expose the device to vulnerabilities.  For example, a device may move from firmware version A, to B, then to C without a restart, whereas another device of the same type might transition from A to C without transitioning through B.  If tracking only boot and current firmware version, should a vulnerability be found in version B, it would be impossible to identify which devices transitioned through B compared to devices that transitioned from A to C directly.
+Journey measurements matter because hitless updates are a challenge for devices that only capture their current firmware version and state. This is particularly true when the previous state may have impacted the current state of dependent components within the SoC. For example, a device might move from firmware version A to firmware version B without assuming a clean start to flush state. Vulnerabilities in firmware version A might impact version B.  Preserving a device boot measurement and currently running measurement can highlight differences, but preserving these measurements does not distinguish between transitional states, such as when intermediate updates have the potential to expose the device to vulnerabilities. For example, a device may move from firmware version A, to B, and then to C without a restart, whereas another device of the same type might transition from A to C without transitioning through B. If tracking only the boot and current firmware version, should a vulnerability be found in version B, it is impossible to identify which devices transitioned through B compared to devices that transitioned from A to C directly.
 
-To capture all firmware and configuration changes, Caliptra tracks and attests to both current measurements and cumulative measurement PCR banks.  The current measurement is a snapshot of the currently running firmware and configuration.  This provides easy reference for the current version.  If current and cumulative measurements are different, it can safely be assumed the device has undergone some update.  The cumulative measurement captures all the firmware and state transitions from a clean cold boot to the current version.  The cumulative measurement must be accompanied by a log structure that describes the path from boot to current measurement using hash extensions.  A verifier can understand a device’s path to its current state by replaying log entries to reconstruct the cumulative measurement.
+To capture all firmware and configuration changes, Caliptra tracks and attests to both current measurements and cumulative measurement PCR banks. The current measurement is a snapshot of the currently running firmware and configuration. This provides easy reference for the current version. If the current and cumulative measurements are different, it can safely be assumed that the device has undergone some update. The cumulative measurement captures all of the firmware and state transitions from a clean cold boot to the current version. The cumulative measurement must be accompanied by a log structure that describes the path from boot to current measurement using hash extensions. A verifier can understand a device’s path to its current state by replaying log entries to reconstruct the cumulative measurement.
 
-The log and cumulative measurement mechanism is similar to that used in TPM.  In this model, Caliptra only needs to securely manage the measurements; the log does not need to be secured or maintained by Caliptra or the SoC.  The construction of measurements through cryptographic hash extensions means the log must provide the exact order and evidence needed to reconstruct the measurement.  As such, the log is tamper evident by design and does not need to be kept secure.
+The log and cumulative measurement mechanism is similar to that used in TPM. In this model, Caliptra only needs to securely manage the measurements; the log does not need to be secured or maintained by Caliptra or the SoC. The construction of measurements through cryptographic hash extensions means that the log must provide the exact order and evidence needed to reconstruct the measurement. As such, the log is tamper evident by design and does not need to be kept secure.
 
-Caliptra contains 32 PCR 384 banks that are extendable by the SHA engine, and readable by Caliptra firmware.  The usage of the PCR Banks is as follows:
+Caliptra contains 32 384-bit PCR banks that are extendable by the SHA engine, and readable by Caliptra firmware.  The usage of the PCR banks is as follows:
 
-*Table 9: PCR Bank Usage*
+*Table 9: PCR bank usage*
 
-|**PCR Number**|**Type**|**Extend Ctrl**|**Description**|
+|**PCR number**|**Type**|**Extend control**|**Description**|
 | - | - | - | - |
 |PCR0|Current|ROM|Holds Caliptra’s FMC measurement and ROM policy configuration.|
 |PCR1|Cumulative|ROM|Holds journey of Caliptra’s FMC measurement and ROM policy configuration.|
@@ -874,7 +874,7 @@ When runtime firmware boots following a hitless update, it will use the followin
 * Its journey measurements in PCR3, extended by FMC
 * SRAM state, established by the prior runtime firmware image
 
-SRAM state will consist of measurements captured by prior runtime firmware image(s), and will not contain secrets or executable data[^5]. Therefore, the trustworthiness of runtime firmware will be reflected in the measurements captured by FMC and evident in runtime firmware's alias certificate.
+SRAM state consists of measurements captured by prior runtime firmware images, and does not contain secrets or executable data[^5]. Therefore, the trustworthiness of runtime firmware is reflected in the measurements captured by FMC and is evident in the runtime firmware alias certificate.
 
 Caliptra firmware will attest to PCR3 by including it as an input in all DPE leaf key derivations and as evidence in all DPE leaf key certificates.
 
@@ -886,7 +886,7 @@ Suppose the following Caliptra firmware images exist:
 * Version B: known-bad
 * Version C: presumed-good
 
-A remote verifier wishes to confirm that a given Caliptra device has not run version B since cold-boot. The remote verifier can challenge the SoC with a freshness nonce; higher-layer software will pass that freshness nonce as a request to Caliptra's DPE for signing. The remote verifier receives the following pieces of evidence:
+A remote verifier wishes to confirm that a given Caliptra device has not run version B since cold boot. The remote verifier can challenge the SoC with a freshness nonce; higher-layer software passes that freshness nonce as a request to Caliptra's DPE for signing. The remote verifier receives the following pieces of evidence:
 
 1. An endorsement over LDevID, which may take a number of forms, including:
     1. Caliptra's vendor-signed certificate over IDevID, and an IDevID-signed certificate over LDevID.
@@ -898,7 +898,7 @@ A remote verifier wishes to confirm that a given Caliptra device has not run ver
 5. A log structure[^6] that represents the measurements that have been extended into PCR3.
 6. A leaf-DPE-signed blob[^7] containing the freshness nonce.
 
-The remote verifier will evaluate (1) according to ownership policies to determine whether the Caliptra device is trustworthy, before proceeding to verify the rest of the attestation response.
+The remote verifier evaluates (1) according to ownership policies to determine whether the Caliptra device is trustworthy, before proceeding to verify the rest of the attestation response.
 
 Thus satisfied in the trustworthiness of the Caliptra device, the remote verifier can then evaluate the trustworthiness of FMC by inspecting the measurements in (2), Alias<sub>FMC</sub>'s certificate. The verifier can reject the attestation if those measurements do not conform to a known-good value.
 
@@ -906,27 +906,27 @@ Thus satisfied in the trustworthiness of FMC, the remote verifier can then evalu
 
 Thus satisfied that version B is not currently running and that PCR3 is an accurate reflection of the hardware register, the remote verifier can then compare the log in (5) to PCR3 in (4) to confirm its authenticity, then walk the log to confirm that FMC never launched version B since cold-boot. If version B did run, that firmware could have maliciously modified DPE measurements stashed in SRAM, but could not have modified the contents of PCR3 to erase the evidence that version B ran at all, and could not have influenced the behavior of firmware versions A or C to prevent them from accurately reporting the contents of PCR3.
 
-Thus satisfied that version B has never run since power-on, the verifier can also optionally inspect other measurements in (4) to evaluate the journey of other SoC components, whose measurements were previously stored within Caliptra's SRAM.
+Thus satisfied that version B has not run since power-on, the verifier can also optionally inspect other measurements in (4) to evaluate the journey of other SoC components, whose measurements were previously stored within Caliptra's SRAM.
 
-Finally, the verifier can confirm freshness by comparing the nonce in (6) to the one emitted in the original challenge. As DPE will only allow a derived leaf key to be used if the measurements present in its leaf certificate are a reflection of the current state, the fact that the freshness nonce was signed by DPE is evidence that the measurements in (4) are fresh.
+Finally, the verifier can confirm freshness by comparing the nonce in (6) to the one emitted in the original challenge. Because DPE only allows a derived leaf key to be used if the measurements present in its leaf certificate are a reflection of the current state, the fact that the freshness nonce was signed by DPE is evidence that the measurements in (4) are fresh.
 
 #### Commentary: maintaining sealed secrets across a power cycle
 
 Caliptra does not seal secrets directly. However, Caliptra does implement DPE, which allows secrets to be sealed to an external sealer such as a TPM, with a policy that only allows those secrets to be unsealed if Caliptra allows the host to wield a particular leaf DPE key. This leaf DPE key is permuted based on the hitless update journey of the various components whose measurements are stored within Caliptra.
 
-This poses a challenge for maintaining sealed secrets across a power cycle. Suppose the SoC cold-booted CPU microcode A, then hitlessly updated to B, then to C. The measurements stored within Caliptra's SRAM will represent the \[A->B->C\] update journey, and DPE's leaf key will be derived based on this journey.
+This poses a challenge for maintaining sealed secrets across a power cycle. Suppose the SoC cold booted CPU microcode A, then hitlessly updated to B, and then to C. The measurements stored within Caliptra's SRAM will represent the \[A->B->C\] update journey, and DPE's leaf key is derived based on this journey.
 
-Let us assume that upon each hitless update, the firmware update is also written to persistent storage, such that on next cold-boot the new firmware will run. Thus, on next boot the SoC's microcode update journey will simply be \[C\]. This is a different journey than \[A->B->C\], and so DPE's leaf key will differ. The old secret sealed to the old DPE leaf key will no longer be accessible to the SoC.
+Let us assume that upon each hitless update, the firmware update is also written to persistent storage, such that on the next cold boot the new firmware will run. Thus, on the next boot, the SoC's microcode update journey is simply \[C\]. This is a different journey than \[A->B->C\], and so DPE's leaf key will differ. The old secret sealed to the old DPE leaf key is no longer accessible to the SoC.
 
-To anticipate this eventuality, before a power cycle the SoC can instruct DPE to predict what the DPE leaf public key will be if the microcode journey is simply \[C\], using DPE's simulation context. The SoC can then re-seal secrets to the external sealer with a policy that can be satisfied if the computed public key is used.
+To anticipate this eventuality, before a power cycle, the SoC can instruct DPE to predict what the DPE leaf public key will be if the microcode journey is simply \[C\], using DPE's simulation context. The SoC can then reseal secrets to the external sealer with a policy that can be satisfied if the computed public key is used.
 
-Note: as all DPE leaf keys are derived using Caliptra runtime firmware's CDI, a DPE simulation context cannot predict the leaf key that would be available if a different Caliptra firmware image were to boot (as one Caliptra firmware image does not have access to a different image's CDI). Therefore, if a different Caliptra firmware image is staged to persistent storage, Caliptra must first be hitlessly updated to that image before a simulation context can be used to predict public keys that will be available to that image on next cold-boot.
+Note: as all DPE leaf keys are derived using Caliptra runtime firmware's CDI, a DPE simulation context cannot predict the leaf key that would be available if a different Caliptra firmware image were to boot (because one Caliptra firmware image does not have access to a different image's CDI). Therefore, if a different Caliptra firmware image is staged to persistent storage, Caliptra must first be hitlessly updated to that image before a simulation context can be used to predict public keys that will be available to that image on the next cold boot.
 
 ### Attestation of SoC update journey
 
 Caliptra shall also attest to the journeys of SoC components. A SoC component's journey may change independently of other components. For example, SoC components may implement partial resets or hitless updates that cause the component's firmware or configuration to reload.
 
-Caliptra shall maintain a reboot counter for each component. Caliptra shall increment the reboot counter and update the journey measurement for calls that indicate that the component's state changed. Caliptra  shall attest the journey measurement and report the counter value on-demand. The verifier is assumed to have knowledge of update events at an associated reboot counter (via an event log) but not have knowledge of reset events. The verifier can compute the journey measurement via multiplicatively extending the current measurement by the reset counter. For example:
+Caliptra shall maintain a reboot counter for each component. Caliptra shall increment the reboot counter and update the journey measurement for calls that indicate that the component's state changed. Caliptra shall attest the journey measurement and report the counter value on-demand. The verifier is assumed to have knowledge of update events at an associated reboot counter (via an event log) but not have knowledge of reset events. The verifier can compute the journey measurement via multiplicatively extending the current measurement by the reset counter. For example:
 
 1. Upon cold boot, SoC component boots firmware A. Reboot counter is 0. The tuple of (0,A) is in the event log.
 2. SoC component is partial reset once. Reboot counter is 1.
@@ -935,18 +935,18 @@ Caliptra shall maintain a reboot counter for each component. Caliptra shall incr
 
 The corresponding journey measurement computation is the chained extension of \[A->A->B->B->B\]. The verifier can ascertain this through the two event log entries.
 
-## Anti-rollback Support
+## Anti-rollback support
 
-A Caliptra RTM shall provide Fuse banks (refer to *Table 13: Caliptra Secret Fuse Descriptor Table*) that are used for storing monotonic counters to provide anti-rollback enforcement for Caliptra mutable firmware. Each distinctly-signed boot stage shall be associated with its own anti-rollback Fuse field. Together with the vendor, a Caliptra RTM allows owners to enforce strong anti-rollback requirements, in addition to supporting rollback to a previous firmware version – this is a critical capability for hyper scalar owners.
+A Caliptra RTM shall provide fuse banks (refer to *Table 13: Caliptra Secret Fuse Descriptor Table*) that are used for storing monotonic counters to provide anti-rollback enforcement for Caliptra mutable firmware. Each distinctly signed boot stage shall be associated with its own anti-rollback fuse field. Together with the vendor, a Caliptra RTM allows owners to enforce strong anti-rollback requirements, in addition to supporting rollback to a previous firmware version. This is a critical capability for hyper scalar owners.
 
 Every mutable Caliptra RTM boot layer shall include a SVN value in the signed header. If a layer's signed SVN value is less than the current counter value for that layer's fuse bank, the Caliptra RTM shall refuse to boot that layer, regardless of whether the signature is valid.
 
 Each signed boot layer shall also include a MIN\_SVN value in the signed header. Upon successful validation of a signed boot layer, if the layer's signed MIN\_SVN value is greater than the current counter value for that layer's fuse bank, Caliptra shall increment that fuse bank counter until it equals MIN\_SVN.
 
-Vendors shall issue security-critical fixes requiring anti-rollback protection in sets of two signed firmware:
+Vendors shall issue security critical fixes requiring anti-rollback protection in sets of two signed firmware:
 
-* Version number (X+1) which carries the security fix, with an incremented SVN and an unchanged MIN\_SVN, as compared to version (X).
-* Version number (X+2), identical to (X+1) except its MIN\_SVN value has been incremented.
+* Version number (X+1), which carries the security fix, with an incremented SVN and an unchanged MIN\_SVN, as compared to version (X).
+* Version number (X+2), identical to (X+1), except its MIN\_SVN value has been incremented.
 
 Owners may upgrade their fleet in two stages: first from (X) to (X+1), and then from (X+1) to (X+2).
 
@@ -956,83 +956,80 @@ Each of Caliptra's internal anti-rollback fuse banks shall support a minimum cou
 
 If a given firmware image's SVN is less than its MIN\_SVN value, that image shall be considered invalid.
 
-Alternatively, platform vendors may prefer to manage firmware storage and rollback protection in a different manner, such as through a dedicated Platform RoT. In such cases, the vendor may wish to disable anti-rollback support from Caliptra entirely. This disable is available via an OTP/fuse setting.
+Alternatively, platform vendors may prefer to manage firmware storage and rollback protection in a different manner, such as through a dedicated Platform RoT. In such cases, the vendor may wish to disable anti-rollback support from Caliptra entirely. This disable support is available via an OTP/fuse setting.
 
 **Informative comment: Example**
 
-The following is an example of how the anti-roll back mechanism may be used to revoke a signed image while supporting rollback to the prior image.
+The following is an example of how the anti-rollback mechanism may be used to revoke a signed image while supporting rollback to the prior image. Assuming Caliptra is in the following state:
 
-* Assuming Caliptra is in the following state:
 * Currently running firmware version: 4.2
 * Caliptra firmware's signed SVN value: 1
 * Caliptra firmware's signed MIN\_SVN value: 1
 * Caliptra's firmware anti-rollback fuse bank counter value: 1
 
-A vulnerability is discovered in firmware version 4.2. The vendor issues a fix in firmware version 4.3. However, owners may still wish to roll back to firmware version 4.2, while version 4.3 is being qualified in their fleet. Updating to firmware version 4.3 will place the Calipra RTM in the following state:
+A vulnerability is discovered in firmware version 4.2. The vendor issues a fix in firmware version 4.3. However, owners may still wish to roll back to firmware version 4.2, while version 4.3 is being qualified in their fleet. Updating to firmware version 4.3 places the Calipra RTM in the following state:
 
 * Currently running firmware version: 4.3
 * Caliptra firmware's signed SVN value: 2
 * Caliptra firmware's signed MIN\_SVN value: 1
 * Caliptra's firmware anti-rollback fuse bank counter value: 1
 
-In this state, since the anti-rollback fuse bank counter has not yet been incremented, the Caliptra RTM will still allow the firmware to roll back to version 4.2.
+In this state, since the anti-rollback fuse bank counter is not yet incremented, the Caliptra RTM still allows the firmware to roll back to version 4.2.
 
-Once firmware version 4.3 is fully qualified, the owner will wish to revoke version 4.2. The vendor will issue a follow-up firmware version 4.4, which will place the Calipra RTM in the following state:
+After firmware version 4.3 is fully qualified, the owner wishes to revoke version 4.2. The vendor issues a follow-up firmware version 4.4, which places the Calipra RTM in the following state:
 
 * Currently running firmware version: 4.4
 * Caliptra firmware's signed SVN value: 2
 * Caliptra firmware's signed MIN\_SVN value: 2
 * Caliptra's firmware anti-rollback fuse bank counter value: 2
 
-Upon validating firmware version 4.4, the Caliptra RTM will note that that firmware's signed MIN\_SVN value is 2, and will increment its internal fuse bank counter to match. Once a chip has received firmware version 4.4, it will no longer be able to roll back to version 4.2. However, it *will* continue to be able to roll back to version 4.3.
+Upon validating firmware version 4.4, the Caliptra RTM notes that that firmware's signed MIN\_SVN value is 2, and increments its internal fuse bank counter to match. After a chip receives firmware version 4.4, it is no longer able to roll back to version 4.2. However, it *will* continue to be able to roll back to version 4.3.
 
-## Physical Attack Countermeasures
+## Physical attack countermeasures
 
-A Caliptra RTM shall implement counter measures designed to deter both glitching (also referred to fault-injection (FI) and side-channel attacks (simple power analysis (SPA) and differential power analysis (DPA)).
+A Caliptra RTM shall implement countermeasures designed to deter both glitching (also referred to fault-injection (FI)) and side-channel attacks (simple power analysis (SPA) and differential power analysis (DPA)).
 
 The Caliptra threat model guides the priority of which physical countermeasures are based on a specific physical implementation.
 
-From the top, an adversary in the supply chain has essentially unlimited time to glitch the chip and make it reveal any private key material or symmetric secrets. [One Glitch To Rule Them All ](https://arxiv.org/abs/2108.04575)is one example with recency bias. The most critical counter-measures must prevent non-destructive extraction of those secrets. Otherwise, an adversary succeeding may be able to silently impersonate production serving assets at a later time.
+From the top, an adversary in the supply chain has essentially unlimited time to glitch the chip and make it reveal any private key material or symmetric secrets. [One Glitch To Rule Them All](https://arxiv.org/abs/2108.04575)is one example with recency bias. The most critical countermeasures must prevent non-destructive extraction of those secrets. Otherwise, an adversary who succeeds can silently impersonate production-serving assets at a later time.
 
-General protection of the embedded microprocessor while running arbitrary firmware is required to protect the UDS or other private entropy from logical and physical attacks, including firmware running within the Caliptra itself. Control flow integrity, analog reference voltage and clock sources, as well as defensive programming are encouraged.  Likewise, pointer authentication, encryption, separate code vs data stacks, and memory tagging are all encouraged.
+Randomly generated per-part entropy is subject to physical inspection attacks in the supply chain as well. The fuses that store the UDS entropy shall be protected to a degree that forces an attacker to perform a destructive operation to read their values. Decapping and fibbing attacks should at least penetrate enough layers and metal shielding to render the part useless, if not being outright impossible to carry out. Entropy tied to a damaged asset typically requires injection of counterfeit devices in the supply chain, which is a very powerful adversary model.
 
-Randomly generated per part entropy is subject to physical inspection attacks in the supply chain, as well. The Fuses storing the UDS entropy shall be protected to a degree that forces an attacker to perform a destructive operation to read their values. Decapping and fibbing attacks should at least penetrate enough layers and metal shielding to render the part useless, if not being outright impossible to carry out. Entropy tied to a damaged asset typically requires injection of counterfeit devices in the supply chain, which is a very powerful adversary model.
-
-Another way to obtain access to secret entropy with “unlimited supply chain time” is to observe side channels while the SoC is executing. Because a Caliptra RTM is expected to be a <1 mm<sup>2</sup> fraction of a large SoC, side-channel mitigation is required only against extremely resourceful attackers that can wade and discern through a large number of confounding signals and power profiles. With that priority in mind, DPA and DMA attacks should be mitigated via decoy value generation.
+Another way to obtain access to secret entropy with “unlimited supply chain time” is to observe side channels while the SoC is executing. Because a Caliptra RTM is expected to be a <1 mm<sup>2</sup> fraction of a large SoC, side-channel mitigation is required only against extremely resourceful attackers that can wade through and discern a large number of confounding signals and power profiles. With that priority in mind, DPA and DMA attacks should be mitigated via decoy value generation.
 
 Any private key material or symmetric key material embedded in the RTL (and therefore “global”) must be treated as having low value, reaching zero value in a number of quarters. A supply chain attacker can destructively obtain the key material, and loss of one part is not going to trigger any alarms.
 
-Mitigation against SCA is not necessarily trivial and may be implemented in a variety of ways. [[Reference 7](#ref-7)] provides a comprehensive overview of methods and techniques used in various SCA as well as recommendations for countermeasures against such attacks (including feasibility and applicability). Additionally, there are many academic papers available from NIST and other resources that discuss SCA and their countermeasures.
+Mitigation against SCA is not trivial and may be implemented in a variety of ways. [[Reference 7](#ref-7)] provides a comprehensive overview of methods and techniques used in various SCA as well as recommendations for countermeasures against such attacks (including feasibility and applicability). Additionally, there are academic papers available from NIST and other resources that discuss SCA and their countermeasures.
 
-## Compliance and Certification Requirements
+## Compliance and certification requirements
 
-Due to the Identity service surface offered to other SoC subsystems, a Caliptra RTM may fall under the ToE (Target of Evaluation) of an application that wishes to attain a specific compliance level for business reasons.
+Due to the identity service surface offered to other SoC subsystems, a Caliptra RTM may fall under the Target of Evaluation (ToE) of an application that wishes to attain a specific compliance level for business reasons.
 
-It is important to highlight it’s not necessary for the RTM itself to unilaterally attain e.g. FIPS 140-3 L3. It is only relevant insofar the RTM is included in the “bag” that wants to obtain a compliance certification. For example, if a cloud provider wants to FIPS-certify PCIe link encryption in transit rooted to an ASIC identity emanating from a Caliptra RTM.
+It is important to highlight that it’s not necessary for the RTM itself to unilaterally attain (for example, FIPS 140-3 L3). It is only relevant when the RTM is included in the “bag” that wants to obtain a compliance certification. For example, it is relevant when a cloud provider wants to FIPS-certify PCIe link encryption in transit rooted to an ASIC identity emanating from a Caliptra RTM.
 
-Refer to [Reference 8](#ref-8) for requirements related to Keys, Entropy, and Random Bits and cryptographic modules and algorithms.
+See [Reference 8](#ref-8) for requirements related to keys, entropy, random bits, cryptographic modules, and algorithms.
 
-### Known Answer Test (KAT) Support
+### Known Answer Test (KAT) support
 
-In order to certify a cryptographic module, pre-operational self-tests must be performed when the system is booted. Implementation of KATs are required for FIPS certification. However, regardless of FIPS certification, it is considered a security best practice to ensure that the supported cryptographic algorithms are functioning properly so as to guarantee correct security posture.
+To certify a cryptographic module, pre-operational self-tests must be performed when the system is booted. Implementing KATs is required for FIPS certification. However, regardless of FIPS certification, it is considered a security best practice to ensure that the supported cryptographic algorithms are functioning properly to guarantee correct security posture.
 
-KAT execution are described as two types
+KAT execution is described as two types:
 
 * Pre-operational Self-Test (POST)
 * Conditional Algorithm Self-Test (CAST)
 
 A detailed description of the POST and CAST KATs can be found at csrc.nist.gov.
 
-*Table 10: KAT Failure Mitigations*
+*Table 10: KAT failure mitigations*
 
-|KAT Type|If fails|
+|KAT type|If fails|
 | - | - |
-|POST|Failure of a POST KAT (e.g., ECDSA) shall result in Caliptra RTM ***boot failure***. A reset may or may not result in successful POST completion.|
+|POST|Failure of a POST KAT (for example, ECDSA) shall result in Caliptra RTM ***boot failure***. A reset may or may not result in successful POST completion.|
 |CAST|Failure of a CAST KAT shall cause Caliptra RTM to fail any operation that has a dependency on the associated cryptographic algorithm.|
 
-*Table 11: POST/CAST Usage*
+*Table 11: POST/CAST usage*
 
-| **Crypto Algorithm** | **Caliptra Boot ROM** | **Caliptra FMC** | **Caliptra Runtime FW**
+| **Crypto algorithm** | **Caliptra Boot ROM** | **Caliptra FMC** | **Caliptra Runtime FW**
 | -------------------- | --------------------- | ---------------- | -----------------------
 | ECDSA[^8]            | Yes                   | Yes              | Yes
 | AES                  | Yes                   | No               | No
@@ -1041,13 +1038,13 @@ A detailed description of the POST and CAST KATs can be found at csrc.nist.gov.
 | HMAC                 | Yes (CDI generation)  | No               | No
 | KDF                  | Yes                   | Yes              | No
 
-As shown in Table 11: POST/CAST Usage, since the cryptographic algorithms required by the Caliptra RTM Boot ROM are considered POSTs and those same algorithms are used by Caliptra FMC and FW (green boxes), there is no requirement that FMC and Runtime FW implement CASTs for those algorithms.
+As shown in *Table 11: POST/CAST usage*, since the cryptographic algorithms required by the Caliptra RTM Boot ROM are considered POSTs, and those same algorithms are used by Caliptra FMC and FW, there is no requirement that FMC and Runtime FW implement CASTs for those algorithms.
 
-## FW Signing/Verification Algorithms
+## FW Signing/Verification algorithms
 
 Caliptra firmware is composed of multiple layers: an FMC and an application firmware image. Each layer is signed individually by ECDSA P384 keys.
 
-Each layer is signed by a vendor-controlled key. In addition, each layer may also be signed by an owner-controlled key. The image header contains both the owner public key as well as the signature using that key.
+Each layer is signed by a vendor-controlled key. In addition, each layer may also be signed by an owner-controlled key. The image header contains both the owner public key and the signature using that key.
 
 During boot, Caliptra ROM shall verify the vendor signature over FMC before allowing that FMC to run.
 
@@ -1055,11 +1052,11 @@ See the [Owner endorsement](#owner-authorization) section for how the owner key 
 
 Caliptra RTM FW signature generation and verification shall follow the requirements described in [Reference 3](#ref-3).
 
-### Post-Quantum Cryptography (PQC) Requirements
+### Post-Quantum Cryptography (PQC) requirements
 
 As NIST publishes new standards with PQC resilience, algorithms applicable to Caliptra will be described in this document.
 
-### Key Rotation
+### Key rotation
 
 Firmware signing key rotation shall follow the requirements described in [Reference 3](#ref-3).
 
