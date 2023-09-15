@@ -26,8 +26,9 @@ marks](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkPoli
 ## Specifications
 
 * [Main Caliptra specification](https://github.com/chipsalliance/Caliptra/blob/main/doc/Caliptra.md)
+* [ROM](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md)
 * [FMC](https://github.com/chipsalliance/caliptra-sw/blob/main/fmc/README.md)
-* [Firmware](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md)
+* [Firmware](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md)
 
 ## Repositories
 
