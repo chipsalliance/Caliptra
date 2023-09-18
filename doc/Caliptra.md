@@ -1332,64 +1332,62 @@ The following table describes Caliptra's fuse map:
 | LMS VERIFY                      | 1               | ROM             | In-field programmable                           | <p>0 - Verify Caliptra firmware images with ECDSA-only.</p><p>1 - Verify Caliptra firmware images with both ECDSA and LMS.</p>
 | LMS REVOCATION                  | 32              | ROM             | In-field programmable                           | Bits for revoking LMS public keys in the key manifest.
 
-# Error Reporting and Handling
+# Error reporting and handling
 
 This section describes Caliptra error reporting and handling.
 
-*Table 14: HW/FW Error Types*
+*Table 14: Hardware and firmware error types*
 
-| | Fatal Errors | Non-fatal Errors |
+| | Fatal errors | Non-fatal errors |
 | :- | - | - |
-| HW | <p>- ICCM, DCCM SRAM ECC</p><p>- Second WD timer expiry (First one triggers an NMI to FW to correct the issue and clear the interrupt status bit. If the WD expires again, then it gets escalated to FATAL error</p> | <p>- Mailbox SRAM ECC (except initial FW load)</p><p>- Mailbox incorrect protocol/commands. E.g. Incorrect access ordering; access without Lock.</p> |
-| FW | <p>- Boot-time FW authentication failures</p><p>- FW triggered FATAL errors. Examples: ICCM/DCCM misaligned access (potentially in the except subroutine); AHB access hangs that is triggered through WD timer expiry; AHB access outside the decoding range; stack overflow etc. Refer to the table below</p> | <p>- Mailbox API failures</p><p>- First WD timer expiry</p><p>- Crypto processing errors</p> |
+| Hardware | <p>- ICCM, DCCM SRAM ECC</p><p>- Second WD timer expiry. The first timer expiry triggers an NMI to firmware to correct the issue and clear the interrupt status bit. If the WD expires again, then it is escalated to a FATAL error.</p> | <p>- Mailbox SRAM ECC (except initial firmware load)</p><p>- Mailbox incorrect protocol or commands. For example, incorrect access ordering or access without Lock.</p> |
+| Firmware | <p>- Boot-time firmware authentication failures</p><p>- Firmware triggered FATAL errors. Examples: ICCM or DCCM have misaligned access (potentially in the except subroutine); AHB access hangs, triggered through WD timer expiry; AHB access outside of the decoding range; and stack overflow errors. For more information, see the table below.</p> | <p>- Mailbox API failures</p><p>- First WD timer expiry</p><p>- Cryptography processing errors</p> |
 
 **Fatal errors**
 
-* Fatal errors will log the FATAL ERROR reasons into an arch register that is RW from the external world. This register must be sticky (as in reset is on powergood).
+* Fatal errors log the FATAL ERROR reasons into an arch register that is RW from the external world. This register must be sticky (as in, reset is on powergood).
 * This register may be cleared at any time via register write (W1C).
-* Caliptra will signal this using a cptra\_error\_fatal wire.
+* Caliptra signals fatal errors using a cptra\_error\_fatal wire.
   * SoCs should connect this into their SoC error handling logic. Upon detection of a FATAL ERROR in Caliptra, SoC shall treat any outstanding commands with Caliptra as failed, and SoC may recover by performing a Caliptra reset using the signal `cptra_rst_b`.
-  * This signal is used to prevent forward progress of the boot process if measurement submission to Caliptra fails. If SoC detects a Caliptra fatal error while the SoC is in steady state, then there is no obligation for the SoC to immediately address that error. If rebooting the SoC for such failures is deemed unacceptable to uptime, the SoC should implement the ability to trigger a Caliptra Warm Reset independently of the SoC, and may use this mechanism to recover.
-  * Error Mask registers (writable only by Caliptra uC) may be used to prevent error signal assertion per-event. Mask registers only impact interrupts when set prior to the error occurrence.
-  * cptra\_error\_fatal will remain asserted until Caliptra is reset. Note that, although the HW FATAL ERROR register fields may be cleared at any time, a reset is still required to clear the interrupt.
-* When a fatal error occurs, all assets (UDS fuses, DEOBF\_KEK, Key Slots etc.) are cleared. Note that UDS\_FUSE, DEOBF\_KEK may have already been cleared depending on when the fatal error happened.
+  * This signal prevents forward progress of the boot process if measurement submission to Caliptra fails. If SoC detects a Caliptra fatal error while the SoC is in steady state, then there is no obligation for the SoC to immediately address that error. If rebooting the SoC for such failures is deemed unacceptable to uptime, the SoC should implement the ability to trigger a Caliptra warm reset independently of the SoC, and may use this mechanism to recover.
+  * Error mask registers (writable only by Caliptra uC) may be used to prevent error signal assertion per-event. Mask registers only impact interrupts when they are set prior to the error occurrence.
+  * cptra\_error\_fatal remains asserted until Caliptra is reset. Note that, although the HW FATAL ERROR register fields may be cleared at any time, a reset is still required to clear the interrupt.
+* When a fatal error occurs, all assets (UDS fuses, DEOBF\_KEK, key slots, etc.) are cleared. Note that UDS\_FUSE and DEOBF\_KEK may already be cleared depending on when the fatal error happened.
 
-**Non-Fatal errors**
+**Non-fatal errors**
 
-* Non-Fatal errors will log the NON-FATAL ERROR reasons into an arch register that is RW from the external world. This register must be sticky (as in reset is on powergood).
+* Non-fatal errors log the NON-FATAL ERROR reasons into an arch register that is RW from the external world. This register must be sticky (as in, reset is on powergood).
 * This register may be cleared at any time via register write (W1C).
-* Caliptra will signal this using a cptra\_error\_non\_fatal wire.
-* Caliptra reset via `cptra_rst_b` or a write to clear the NON-FATAL ERROR register will cause the interrupt to deassert.
-* Optional for SoCs to include this signal in their logic.
+* Caliptra signals non-fatal errors using a cptra\_error\_non\_fatal wire.
+* Caliptra reset via `cptra_rst_b`, or a write to clear the NON-FATAL ERROR register, cause the interrupt to deassert.
+* It is optional for SoCs to include this signal in their logic.
 
-**FW Errors**
+**Firmware errors**
 
-[Vishal.Soni@microsoft.com](mailto:Vishal.Soni@microsoft.com)to spec these
-
-*Table 15: FW Errors and Remedies*
+*Table 15: Firmware errors and remedies*
 
 <table>
     <thead>
         <tr>
             <th><b>Condition</b></th>
-            <th><b>When occurs</b></th>
+            <th><b>When error occurs</b></th>
             <th><b>Remediation</b></th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td>SoC FMC verification failure due to invalid digital signature invalid, invalid anti-rollback value)</td>
-            <td>During boot as described in <a href="#bmi">Boot Media Integrated</a>, <a href="#bmd">Boot Media Dependent (BMD)</a>, <a href="#secure-boot-flow">Secure Boot Flow</a></td>
+            <td>SoC FMC verification failure due to invalid digital signature or invalid anti-rollback value)</td>
+            <td>During boot, as described in <a href="#bmi">Boot Media Integrated</a>, <a href="#bmd">Boot Media Dependent (BMD)</a>, <a href="#secure-boot-flow">Secure Boot Flow</a>.</td>
             <td></td>
         </tr>
         <tr>
             <td>Caliptra FMC invalid</td>
-            <td>During boot as described in <a href="#bmi">Boot Media Integrated</a>, <a href="#bmd">Boot Media Dependent (BMD)</a>, <a href="#secure-boot-flow">Secure Boot Flow</a></td>
+            <td>During boot, as described in <a href="#bmi">Boot Media Integrated</a>, <a href="#bmd">Boot Media Dependent (BMD)</a>, <a href="#secure-boot-flow">Secure Boot Flow.</a></td>
             <td></td>
         </tr>
         <tr>
-            <td>Caliptra runtime FW invalid</td>
-            <td>During boot as described in <a href="#bmi">Boot Media Integrated</a>, <a href="#bmd">Boot Media Dependent (BMD)</a>, <a href="#secure-boot-flow">Secure Boot Flow</a></td>
+            <td>Caliptra runtime firmware invalid</td>
+            <td>During boot, as described in <a href="#bmi">Boot Media Integrated</a>, <a href="#bmd">Boot Media Dependent (BMD)</a>, <a href="#secure-boot-flow">Secure Boot Flow</a>.</td>
             <td></td>
         </tr>
         <tr>
@@ -1400,12 +1398,20 @@ This section describes Caliptra error reporting and handling.
     </tbody>
 </table>
 
-[^1]: *Caliptra. Spanish for “root cap” and describes the deepest part of the root*
+[^1]: Caliptra is Spanish for “root cap” and describes the deepest part of the root.
+
 [^2]: This obfuscation secret may be a chip-class secret, or a chip-unique PUF, with the latter preferred.
-[^3]: This memory should only be volatile in the face of a power loss event. See details in [HW Section](#reset-flow).
-[^4]: When a hitless update occurs, then following reset, Caliptra shall execute the updated firmware and shall maintain the measurements that it collected during boot and shall support the reporting of these measurements with signed attestations. Hitless update of Caliptra’s FMC shall not be supported as this would require the creation of a new DICE identity which would require access to IDevID and LDevID. Retention of IDevID and LDevID (privkeys), post-boot introduce a security vulnerability.
-[^5]: Upon boot, firmware will defensively treat existing SRAM contents as potentially malicious, emplaced by prior firmware with a vulnerability.
+
+[^3]: This memory should only be volatile in a power loss event. See details in [HW Section](#reset-flow).
+
+[^4]: When a hitless update occurs, and then following reset, Caliptra shall execute the updated firmware and shall maintain the measurements that it collected during boot. Caliptra shall support the reporting of these measurements with signed attestations. Hitless update of Caliptra’s FMC shall not be supported. Hitless update requires creating a new DICE identity, which would require access to IDevID and LDevID. Retention of IDevID and LDevID (privkeys) during post-boot introduce a security vulnerability.
+
+[^5]: Upon boot, firmware defensively treats existing SRAM contents as potentially malicious, emplaced by prior firmware with a vulnerability.
+
 [^6]: The format of this log is outside the scope of this specification.
+
 [^7]: The format of this blob is outside the scope of this specification.
-[^8]: ECDSA is used for FW verification and SPDM (signing)
-[^9]: SHA is used with ECDSA, HMAC and for generating measurements
+
+[^8]: ECDSA is used for firmware verification and SPDM (signing).
+
+[^9]: SHA is used with ECDSA and HMAC, and is also used to generate measurements.
