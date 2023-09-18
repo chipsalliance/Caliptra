@@ -1060,7 +1060,7 @@ As NIST publishes new standards with PQC resilience, algorithms applicable to Ca
 
 Firmware signing key rotation shall follow the requirements described in [Reference 3](#ref-3).
 
-# Hardware section
+# Hardware
 
 The following figure describes the Caliptra Core.
 
@@ -1072,7 +1072,7 @@ The following figure describes the Caliptra Core.
   * 128 KiB of ICCM0
   * 128 KiB for Mailbox as a staged SRAM (for FW staging of impactless updates to do authentication checks on the FW before moving to ICCM)
   * 128 KiB for DCCM and 32 KiB for ROM
-* Crypto requirements:
+* Cryptography requirements:
   * SHA256 SHA384, SHA512
   * ECC Secp384r1 w/ HMAC-DRBG - Key Generation, Sign and Verification
   * HMAC SHA384
