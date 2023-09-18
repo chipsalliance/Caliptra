@@ -1150,7 +1150,7 @@ Notes:
 
 ![](./images/Caliptra_boot_flow5.png)
 
-**Note:** Since Caliptra IP may be placed in an S5 ACPI domain of the device, there may be devices where Caliptra IP may not go through reset on a device hot reset or CPU warm reset. But the flow shows what happens when such a reset happens.
+**Note:** Since Caliptra IP may be placed in an ACPI S5 domain of the device, there may be devices where Caliptra IP may not go through reset on a device hot reset or CPU warm reset. But the flow shows what happens when such a reset happens.
 
 1. Caliptra IP’s reset is asserted by the SoC.
 2. Caliptra’s internal BootFSM resets the uController and then resets all of the logic (including the SoC-facing APB interface). Only registers or flops that are sitting on powergood are left with the same value. Note that SRAMs do not have a reset.
