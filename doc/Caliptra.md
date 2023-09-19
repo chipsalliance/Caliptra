@@ -1340,23 +1340,23 @@ This section describes Caliptra error reporting and handling.
 
 | | Fatal errors | Non-fatal errors |
 | :- | - | - |
-| Hardware | <p>- ICCM, DCCM SRAM ECC</p><p>- Second WD timer expiry. The first timer expiry triggers an NMI to firmware to correct the issue and clear the interrupt status bit. If the WD expires again, then it is escalated to a FATAL error.</p> | <p>- Mailbox SRAM ECC (except initial firmware load)</p><p>- Mailbox incorrect protocol or commands. For example, incorrect access ordering or access without Lock.</p> |
+| Hardware | <p>- ICCM, DCCM SRAM ECC</p><p>- Second watchdog (WD) timer expiry. The first timer expiry triggers an NMI to firmware to correct the issue and clear the interrupt status bit. If the WD expires again, then it is escalated to a FATAL error.</p> | <p>- Mailbox SRAM ECC (except initial firmware load)</p><p>- Mailbox incorrect protocol or commands. For example, incorrect access ordering or access without Lock.</p> |
 | Firmware | <p>- Boot-time firmware authentication failures</p><p>- Firmware triggered FATAL errors. Examples: ICCM or DCCM have misaligned access (potentially in the except subroutine); AHB access hangs, triggered through WD timer expiry; AHB access outside of the decoding range; and stack overflow errors. For more information, see the table below.</p> | <p>- Mailbox API failures</p><p>- First WD timer expiry</p><p>- Cryptography processing errors</p> |
 
 **Fatal errors**
 
-* Fatal errors log the FATAL ERROR reasons into an arch register that is RW from the external world. This register must be sticky (as in, reset is on powergood).
+* Fatal errors log the FATAL ERROR reasons into an architectural register that is RW from the external world. This register must be sticky (as in, reset is on powergood).
 * This register may be cleared at any time via register write (W1C).
 * Caliptra signals fatal errors using a cptra\_error\_fatal wire.
   * SoCs should connect this into their SoC error handling logic. Upon detection of a FATAL ERROR in Caliptra, SoC shall treat any outstanding commands with Caliptra as failed, and SoC may recover by performing a Caliptra reset using the signal `cptra_rst_b`.
   * This signal prevents forward progress of the boot process if measurement submission to Caliptra fails. If SoC detects a Caliptra fatal error while the SoC is in steady state, then there is no obligation for the SoC to immediately address that error. If rebooting the SoC for such failures is deemed unacceptable to uptime, the SoC should implement the ability to trigger a Caliptra warm reset independently of the SoC, and may use this mechanism to recover.
   * Error mask registers (writable only by Caliptra uC) may be used to prevent error signal assertion per-event. Mask registers only impact interrupts when they are set prior to the error occurrence.
   * cptra\_error\_fatal remains asserted until Caliptra is reset. Note that, although the HW FATAL ERROR register fields may be cleared at any time, a reset is still required to clear the interrupt.
-* When a fatal error occurs, all assets (UDS fuses, DEOBF\_KEK, key slots, etc.) are cleared. Note that UDS\_FUSE and DEOBF\_KEK may already be cleared depending on when the fatal error happened.
+* When a fatal error occurs, all volatile assets that are stored in memory (UDS fuses, DEOBF\_KEK, key slots, etc.) are cleared. Note that UDS\_FUSE and DEOBF\_KEK may already be cleared depending on when the fatal error happened.
 
 **Non-fatal errors**
 
-* Non-fatal errors log the NON-FATAL ERROR reasons into an arch register that is RW from the external world. This register must be sticky (as in, reset is on powergood).
+* Non-fatal errors log the NON-FATAL ERROR reasons into an architectural register that is RW from the external world. This register must be sticky (as in, reset is on powergood).
 * This register may be cleared at any time via register write (W1C).
 * Caliptra signals non-fatal errors using a cptra\_error\_non\_fatal wire.
 * Caliptra reset via `cptra_rst_b`, or a write to clear the NON-FATAL ERROR register, cause the interrupt to deassert.
