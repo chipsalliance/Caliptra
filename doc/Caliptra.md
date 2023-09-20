@@ -652,7 +652,7 @@ The owner key, when represented in fuses or in the FMC's alias certificate, is a
 3. SoC (using a GPIO pin or SoC ROM) drives BootFSMBrk (this is also used for debug cases). This can be driven at any time before cptra\_rst\_b is deasserted.
 4. SoC follows the boot flow as defined in Caliptra IP HW boot flow to assert cptra\_pwrgood and deassert cptra\_rst\_b, followed by writing to the fuse registers.
 5. HVM, through JTAG or using the Caliptra SoC interface, writes to “CPTRA\_DBG\_MANUF\_SERVICE\_REG”, requesting a CSR (see the [Caliptra ROM specification](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md) for bit definitions).
-6. HVM, through JTAG or using the Caliptra SoC interface, writes to “CPTRA\_BOOTFSM\_GO” to allow Caliptra’s internal BootFSM to continue to bring up uController out of reset.
+6. HVM, through JTAG or using the Caliptra SoC interface, writes to “CPTRA\_BOOTFSM\_GO” to allow Caliptra’s internal BootFSM to continue to bring up microcontroller out of reset.
 7. ROM looks at the manufacturing state encoding, “CPTRA\_DBG\_MANUF\_SERVICE\_REG”, and populates the Caliptra internal SRAM \[the mailbox SRAM hardware structure is reused\] with the CSR and CSR envelope signature. It then writes to the Caliptra internal register to indicate the CSR is valid (see the [Caliptra ROM specification](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md) and [Identity](#identity) sections in this document on the ROM steps to generate the CSR).
 8. HVM, through JTAG or using the SoC interface, polls for “requested service\[s\]” bit\[s\] available in “CPTRA\_BOOT\_STATUS” register.
 9. HVM, through JTAG, reads mbox\_status\[3:0\] to check if the data is ready to be read (DATA\_READY encoding).
@@ -671,8 +671,8 @@ Device identity certificates follow the X.509 v3 format described in RFC 5280.  
 
 **Definitions**
 
-* **Non-Debug:** Caliptra JTAG is not open for uController and HW debug.
-* **Debug:** Caliptra JTAG is open for uController and HW debug.
+* **Non-Debug:** Caliptra JTAG is not open for microcontroller and HW debug.
+* **Debug:** Caliptra JTAG is open for microcontroller and HW debug.
 * **Unprovisioned:** Blank/unprogrammed fuse part.
 * **Manufacturing:** Device is in the manufacturing flow where HVM Caliptra fuses are programmed.
 * **Production:** All of Caliptra’s HVM fuses are programmed.
@@ -696,7 +696,7 @@ Device identity certificates follow the X.509 v3 format described in RFC 5280.  
 | 101b                                           | DebugLocked and production      | All security assets are in production mode. In this state: <ul><li>Production UDS and obfuscation key shall be used.</li><li>CPU execution shall be enabled.</li><li>All ‘backdoor’ functionality shall be disabled (for example, developer functions and functionality that could reveal sensitive information or result in escalation of privileges).</li><li>Debug functions shall be disabled.<ul><li>Caliptra JTAG is locked – microcontroller debug shall be disabled.</li><li>Caliptra microcontroller shall not be interruptible through JTAG mailbox.</li></ul></li><li>DFT functions shall be disabled.</li></ul>                                                                                                                                                                                                                                                                        | DebugLocked -> debug unlocked possible without power cycle and Caliptra clears all of the security critical assets and registers before JTAG is opened. |
 | 001b                                           | DebugUnlocked and production    | This state is used when debugging of Caliptra RTM is required. When in this state: <ul><li>UDS and other identity critical assets are programmed into fuses. They may not have been written into Caliptra fuse registers if the insecure state entered before Caliptra is out of reset. If the insecure state transition happened after fuses are written to Caliptra, they are cleared when the security state transitions from secure/manufacturing -> insecure.</li><li>Caliptra state: All security assets are in debug mode (UDS and obfuscation key are in production state).<ul><li>UDS: Reverts to a ‘well-known’ debug value.</li><li>Obfuscation key: Switched to debug key.</li><li>Key Vault is also cleared.</li><li>Caliptra JTAG is unlocked and allows microcontroller debug.</li><li>Caliptra JTAG can access IP internal registers through FW or directly.</li></ul></li></ul> | Debug unlocked -> debug locked is possible ONLY with a power cycle.            |
 
-**Notes:** 
+**Notes:**
 * End-of-life state is owned by SoC. In end-of-life device lifecycle state, Caliptra shall not not be brought out of reset.
 * Other encodings are reserved and always assumed to be in a secure state.
 
@@ -1108,12 +1108,12 @@ The following figure describes the Caliptra IP HW boot flow.
 
 ![](./images/Caliptra_boot_flow3.png)
 
-1. After the Caliptra uController is out of reset, ROM starts executing and triggers the crypto block to run the UDS decrypt flow.
+1. After the Caliptra microcontroller is out of reset, ROM starts executing and triggers the crypto block to run the UDS decrypt flow.
 2. Caliptra ROM enables the mailbox. (Until this point, any accidental or non-accidental writes that target the mailbox are dropped by the hardware.)
 3. Caliptra ROM asserts READY\_FOR\_FW wire. This is done by writing an internal register. This register is also visible to read on the APB interface. SoC can choose to poll on this bit instead of using the wire (it is the SoC integration choice).
 4. SoC follows the mailbox protocol and pushes Caliptra FW into the mailbox.
-5. Caliptra’s mailbox HW  asserts an interrupt to the uController after the GO is written, per mailbox protocol. See [Mailbox](#mailbox) for specifics.
-6. After Caliptra’s FW is authenticated and loaded into ICCM, uController asserts READY\_FOR\_RTFLOWS wire. See the [Caliptra ROM specification](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md) for specific information on security flows that occur within this step (for example, DICE).
+5. Caliptra’s mailbox HW  asserts an interrupt to the microcontroller after the GO is written, per mailbox protocol. See [Mailbox](#mailbox) for specifics.
+6. After Caliptra’s FW is authenticated and loaded into ICCM, microcontroller asserts READY\_FOR\_RTFLOWS wire. See the [Caliptra ROM specification](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md) for specific information on security flows that occur within this step (for example, DICE).
 
 ## Boot Media Integrated
 
@@ -1123,9 +1123,9 @@ The following figure describes the Caliptra IP HW boot flow.
 
 ![](./images/Caliptra_boot_flow4.png)
 
-1. After the Caliptra uController is out of reset, ROM starts executing and triggers the crypto block to run the UDS decrypt flow.
+1. After the Caliptra microcontroller is out of reset, ROM starts executing and triggers the crypto block to run the UDS decrypt flow.
 2. Caliptra ROM uses the internal SPI peripheral to read from the platform's persistent storage and load the FW. Note that SPI is operating in basic functional single-IO mode and at 20 MHz frequency.
-3. After Caliptra’s FW is authenticated and loaded into ICCM, uController asserts READY\_FOR\_RTFLOWS wire. See the [Caliptra ROM specification](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md) for specific information about security flows that happen within this step (for example, DICE).
+3. After Caliptra’s FW is authenticated and loaded into ICCM, microcontroller asserts READY\_FOR\_RTFLOWS wire. See the [Caliptra ROM specification](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md) for specific information about security flows that happen within this step (for example, DICE).
 
 ### <a id="reset-flow"></a>CPU warm reset or PCIe hot reset flow →  Caliptra IP reset
 
@@ -1136,7 +1136,7 @@ The following figure describes the Caliptra IP HW boot flow.
 **Note:** Since Caliptra IP may be placed in an ACPI S5 domain of the device, there may be devices where Caliptra IP may not go through reset on a device hot reset or CPU warm reset. But the flow shows what happens when such a reset happens.
 
 1. Caliptra IP’s reset is asserted by the SoC.
-2. Caliptra’s internal BootFSM resets the uController and then resets all of the logic (including the SoC-facing APB interface). Only registers or flops that are sitting on powergood are left with the same value. Note that SRAMs do not have a reset.
+2. Caliptra’s internal BootFSM resets the microcontroller and then resets all of the logic (including the SoC-facing APB interface). Only registers or flops that are sitting on powergood are left with the same value. Note that SRAMs do not have a reset.
 3. Caliptra IP’s reset is deasserted by the SoC.
 4. At this point, the HW boot flow is the same as the cold boot flow. SoC is required to configure the internal TRNG and ROM WDT and then set CPTRA\_FUSE\_WR\_DONE. This causes Caliptra IP to deassert the Ready\_for\_Fuse wire.
 5. Caliptra’s ROM reads an internal register to differentiate between warm, cold, and impactless flow. If it's a warm reset flow, then it skips DICE key generation and FW load flows (because keys were already derived and FW is already present in ICCM). This is an important reset time optimization for devices that need to meet the hot reset specification time.
@@ -1147,13 +1147,13 @@ Because warm reset is a pin input to Caliptra, Caliptra may not be idle when a w
 
 ## Mailbox
 
-The Caliptra Mailbox is a 128 KiB buffer that is used to exchange data between the SoC and the Caliptra microcontroller (uC).
+The Caliptra Mailbox is a 128 KiB buffer that is used to exchange data between the SoC and the Caliptra microcontroller.
 
 The SoC communicates with the mailbox over an APB interface. This allows the SoC to identify the device that is using the interface. This ensures that the mailbox, control registers, and fuses are read or written only by the appropriate device.
 
-When a mailbox is populated by SoC, an interrupt to the FW occurs. This indicates that a command is available in the mailbox. The uC is responsible for reading from and responding to the command.
+When a mailbox is populated by SoC, an interrupt to the FW occurs. This indicates that a command is available in the mailbox. The microcontroller is responsible for reading from and responding to the command.
 
-When a mailbox is populated by the uC, Caliptra sends a wire indication to the SoC that a command is available in the mailbox as well as updating the MAILBOX STATUS register. The SoC is responsible for reading from and responding to the command.
+When a mailbox is populated by the microcontroller, Caliptra sends a wire indication to the SoC that a command is available in the mailbox as well as updating the MAILBOX STATUS register. The SoC is responsible for reading from and responding to the command.
 
 Mailboxes are generic data passing structures, and the Caliptra hardware only enforces the protocol for writing to and reading from the mailbox. How the command and data are interpreted by the FW and SoC are not enforced in Caliptra.
 
@@ -1237,9 +1237,9 @@ Caliptra provides a HW API to do a SHA384 hash calculation. The SoC can access t
 2. SoC (using a GPIO pin or SoC ROM) drives BootFSMBrk (this is also used for debug cases). This can be driven at any time before cptra\_rst\_b is deasserted.
 3. SoC follows the boot flow as defined in Caliptra IP HW boot flow to assert cptra\_pwrgood and deassert cptra\_rst\_b, followed by writing to the fuse registers.
 4. HVM, through JTAG or through the Caliptra SoC interface, writes to “CPTRA\_DBG\_MANUF\_SERVICE\_REG”, requesting the appropriate debug service (see the ROM/Runtime specifications for bit definitions).
-5. HVM, through JTAG, can also inject uController TAP commands at this point following the [VeeR Specification](https://github.com/chipsalliance/Cores-VeeR-EL2).
-6. HVM, through JTAG or through the Caliptra SoC interface, writes to “CPTRA\_BOOTFSM\_GO” to allow Caliptra’s internal BootFSM to continue to bring up uController out of reset.
-7. uController executes the appropriate debug service.
+5. HVM, through JTAG, can also inject microcontroller TAP commands at this point following the [VeeR Specification](https://github.com/chipsalliance/Cores-VeeR-EL2).
+6. HVM, through JTAG or through the Caliptra SoC interface, writes to “CPTRA\_BOOTFSM\_GO” to allow Caliptra’s internal BootFSM to continue to bring up microcontroller out of reset.
+7. Microcontroller executes the appropriate debug service.
 8. Specific SoC interface registers (MBOX\_DLEN, MBOX\_DOUT, MBOX\_STATUS, CPTRA\_BOOT\_STATUS, CPTRA\_HW\_ERRROR\_ENC, CPTRA\_FW\_ERRROR\_ENC, BOOTFSM\_GO, CPTRA\_DBG\_MANUF\_SERVICE\_REG) are accessible over the JTAG interface in debug (or manufacturing mode). The following are the JTAG register addresses for these registers:
     1. DMI\_REG\_MBOX\_DLEN = 7'h50; (Read-only)
     2. DMI\_REG\_MBOX\_DOUT = 7'h51; (Read-only)
@@ -1333,7 +1333,7 @@ This section describes Caliptra error reporting and handling.
 * Caliptra signals fatal errors using a cptra\_error\_fatal wire.
   * SoCs should connect this into their SoC error handling logic. Upon detection of a FATAL ERROR in Caliptra, SoC shall treat any outstanding commands with Caliptra as failed, and SoC may recover by performing a Caliptra reset using the signal `cptra_rst_b`.
   * This signal prevents forward progress of the boot process if measurement submission to Caliptra fails. If SoC detects a Caliptra fatal error while the SoC is in steady state, then there is no obligation for the SoC to immediately address that error. If rebooting the SoC for such failures is deemed unacceptable to uptime, the SoC should implement the ability to trigger a Caliptra warm reset independently of the SoC, and may use this mechanism to recover.
-  * Error mask registers (writable only by Caliptra uC) may be used to prevent error signal assertion per-event. Mask registers only impact interrupts when they are set prior to the error occurrence.
+  * Error mask registers (writable only by Caliptra microcontroller) may be used to prevent error signal assertion per-event. Mask registers only impact interrupts when they are set prior to the error occurrence.
   * cptra\_error\_fatal remains asserted until Caliptra is reset. Note that, although the HW FATAL ERROR register fields may be cleared at any time, a reset is still required to clear the interrupt.
 * When a fatal error occurs, all volatile assets that are stored in memory (UDS fuses, DEOBF\_KEK, key slots, etc.) are cleared. Note that UDS\_FUSE and DEOBF\_KEK may already be cleared depending on when the fatal error happened.
 
