@@ -740,7 +740,7 @@ A vulnerability is discovered in firmware version 4.2. The vendor issues a fix i
 
 In this state, since the anti-rollback fuse bank counter is not yet incremented, Caliptra still allows the firmware to roll back to version 4.2.
 
-After firmware version 4.3 is fully qualified, the owner wishes to revoke version 4.2. The vendor issues a follow-up firmware version 4.4, which places the Caliptra RTM in the following state:
+After firmware version 4.3 is fully qualified, the owner wishes to revoke version 4.2. The vendor issues a follow-up firmware version 4.4, which places Caliptra in the following state:
 
 * Currently running firmware version: 4.4
 * Caliptra firmware's signed SVN value: 2
