@@ -731,7 +731,7 @@ The following is an example of how the anti-rollback mechanism may be used to re
 * Caliptra firmware's signed MIN\_SVN value: 1
 * Caliptra's firmware anti-rollback fuse bank counter value: 1
 
-A vulnerability is discovered in firmware version 4.2. The vendor issues a fix in firmware version 4.3. However, owners may still wish to roll back to firmware version 4.2, while version 4.3 is being qualified in their fleet. Updating to firmware version 4.3 places Calipra in the following state:
+A vulnerability is discovered in firmware version 4.2. The vendor issues a fix in firmware version 4.3. However, owners may still wish to roll back to firmware version 4.2, while version 4.3 is being qualified in their fleet. Updating to firmware version 4.3 places Caliptra in the following state:
 
 * Currently running firmware version: 4.3
 * Caliptra firmware's signed SVN value: 2
@@ -740,7 +740,7 @@ A vulnerability is discovered in firmware version 4.2. The vendor issues a fix i
 
 In this state, since the anti-rollback fuse bank counter is not yet incremented, Caliptra still allows the firmware to roll back to version 4.2.
 
-After firmware version 4.3 is fully qualified, the owner wishes to revoke version 4.2. The vendor issues a follow-up firmware version 4.4, which places the Calipra RTM in the following state:
+After firmware version 4.3 is fully qualified, the owner wishes to revoke version 4.2. The vendor issues a follow-up firmware version 4.4, which places the Caliptra RTM in the following state:
 
 * Currently running firmware version: 4.4
 * Caliptra firmware's signed SVN value: 2
