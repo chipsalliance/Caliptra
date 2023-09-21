@@ -113,8 +113,6 @@ Establishing a consistent RoT on very different hardware configurations while ma
 
 The OCP Security WG specifications are making progress toward establishing the platform and peripheral security architecture [recommendations](https://docs.google.com/document/d/1-bfAF86cEKcn1guF-Qj2C2HhMM2oJ2njNGdHxZeetR0/edit#heading=h.pdkwdxyrhnco) that are necessary to attain the desired consistency in platform security orchestration.
 
-
-
 ## Silicon RoT goals
 
 To drive agility of specification definition and to maximize applicability, the scope of Caliptra is deliberately minimalistic. This minimalist approach drives industry alignment, consistency, and faster adoption of foundational device security primitives. A well and narrowly defined specification maximizes architectural composability; reusability across CSPs, products, and vendors; and feasibility of open sourcing.
@@ -300,182 +298,36 @@ An example of when an owner must protect assets is moving from secure mode to in
 
 *Table 6: Assets*
 
-<table>
-<thead>
-  <tr>
-    <th>Asset<br>category</th>
-    <th>Asset</th>
-    <th>Security<br>property</th>
-    <th>Attack<br>profile</th>
-    <th>Attack path</th>
-    <th>Mitigation</th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td rowspan="11">Fuse/OTP high value secrets</td>
-    <td rowspan="4">UDS Seed</td>
-    <td rowspan="4">Confidentiality and integrity</td>
-    <td rowspan="4">Expert</td>
-    <td>Malicious manufacturing spoofing of UDS Seeds</td>
-    <td>UDS obfuscation/encryption with class RTL key</td>
-  </tr>
-  <tr>
-    <td>Invasive attack (fuse analysis)</td>
-    <td>Shield fuse IP</td>
-  </tr>
-  <tr>
-    <td>Boot path tampering while retrieving UDS values</td>
-    <td>UDS obfuscation/encryption with class RTL key</td>
-  </tr>
-  <tr>
-    <td>Attempting to derive die specific keys by knowing UDS</td>
-    <td>Confine unobfuscated UDS and subsequent derivations to key vault</td>
-  </tr>
-  <tr>
-    <td rowspan="4">Field entropy</td>
-    <td rowspan="4">Confidentiality and integrity</td>
-    <td rowspan="4">Expert</td>
-    <td>Malicious manufacturing spoofing on field entropy</td>
-    <td>Field entropy obfuscation and encryption with class RTL key</td>
-  </tr>
-  <tr>
-    <td>Invasive attack (fuse analysis)</td>
-    <td>Shield fuse IP</td>
-  </tr>
-  <tr>
-    <td>Boot path tampering while retrieving field entropy values</td>
-    <td>Field entropy obfuscation and encryption with class RTL key</td>
-  </tr>
-  <tr>
-    <td>Attempting to derive die specific keys by knowing field entropy</td>
-    <td>Confine field entropy and subsequent derivations to key vault</td>
-  </tr>
-  <tr>
-    <td>FW authentication keys</td>
-    <td>Integrity</td>
-    <td>Proficient</td>
-    <td>Glitching</td>
-    <td>1. Redundant decision making on critical code execution<br>2. Error check before consuming values from fuses<br>3. Environmental monitoring and protection<br></td>
-  </tr>
-  <tr>
-    <td>Versioning information from fuses</td>
-    <td>Integrity</td>
-    <td>Proficient</td>
-    <td>Glitching</td>
-    <td>Environmental monitoring and protection</td>
-  </tr>
-  <tr>
-    <td>IDEVID CERT chain</td>
-    <td>Integrity</td>
-    <td>Proficient</td>
-    <td>Glitching</td>
-    <td>1. Environmental monitoring and protection<br>2. Error check before consuming values from fuse in various ways</td>
-  </tr>
-  <tr>
-    <td rowspan="7">Die unique assets</td>
-    <td>UDS (802.1AR Unique Device Secret)</td>
-    <td rowspan="7">Confidentiality and integrity</td>
-    <td rowspan="7">Proficient</td>
-    <td rowspan="7">1. Software reading actual secrets<br>2. Side channel attack to infer secret</td>
-    <td rowspan="7">1. Secrets locked in key vault, not readable by software<br>2. SCA protections</td>
-  </tr>
-  <tr>
-    <td>CDI<sub>n</sub> (DICE compound device identifier for Layer n)</td>
-  </tr>
-  <tr>
-    <td>IDevID<sub>Priv</sub></td>
-  </tr>
-  <tr>
-    <td>LDevID<sub>Priv</sub></td>
-  </tr>
-  <tr>
-    <td>Obfuscation key</td>
-  </tr>
-  <tr>
-    <td>AliasFMC_Key<sub>Priv</sub></td>
-  </tr>
-  <tr>
-    <td>AliasRT_Key<sub>Priv</sub></td>
-  </tr>
-  <tr>
-    <td rowspan="5">Root of trust execution</td>
-    <td>ROM FW</td>
-    <td>Integrity</td>
-    <td>Proficient</td>
-    <td>Glitching</td>
-    <td>1. Redundant decision making on critical code execution<br>2. Environmental monitoring and protection</td>
-  </tr>
-  <tr>
-    <td>Execution unauthorized runtime FW</td>
-    <td>Authenticity and integrity</td>
-    <td>Proficient</td>
-    <td>Modify boot media</td>
-    <td>Authenticity and integrity check using PKI DSA upon power on</td>
-  </tr>
-  <tr>
-    <td>Execution unauthorized runtime FW</td>
-    <td>Authenticity and integrity</td>
-    <td>Proficient</td>
-    <td>Arbitrary payload pushed into execution</td>
-    <td>Authenticity and integrity check using PKI DSA during software updates and power on</td>
-  </tr>
-  <tr>
-    <td>Rollback Attack</td>
-    <td>Versioning</td>
-    <td>Proficient</td>
-    <td>1. Modify boot media to host older versions<br>2. Bypass version check during boot</td>
-    <td>1. Authenticity and integrity check using PKI DSA upon power on<br>2. Failproof, audited boot code implementation responsible for loading images</td>
-  </tr>
-  <tr>
-    <td>Control flow</td>
-    <td>Integrity and confidentiality if applicable</td>
-    <td>Proficient</td>
-    <td>1. Return and jump addresses manipulation<br>2. Return values and errors tampering <br>3. Stack overflow <br>4. Buffer overflows <br>5. Privilege escalations and hijacking</td>
-    <td>1. Various control flow integrity measures<br> 2. Secure coding practices and auditing implementation</td>
-  </tr>
-  <tr>
-    <td>Boot measurements protected by Caliptra</td>
-    <td>Boot measurements that Caliptra RTM gathers, stores, and reports</td>
-    <td>Integrity</td>
-    <td>Expert</td>
-    <td>1. Manipulate measurements AiTM while in transit to Caliptra <br>2. SoC sends manipulated measurements to Caliptra</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>Caliptra inputs</td>
-    <td>Security state</td>
-    <td>Integrity</td>
-    <td>Proficient</td>
-    <td>Glitching</td>
-    <td>Environmental monitoring and protection</td>
-  </tr>
-  <tr>
-    <td></td>
-    <td>Mode selection (Boot Media Integrated and dependent selections)</td>
-    <td>Integrity</td>
-    <td>Proficient</td>
-    <td>Glitching</td>
-    <td>Environmental monitoring and protection</td>
-  </tr>
-  <tr>
-    <td></td>
-    <td>Pauser attribute</td>
-    <td>Integrity</td>
-    <td>Proficient</td>
-    <td>Glitching</td>
-    <td>Environmental monitoring and protection</td>
-  </tr>
-  <tr>
-    <td></td>
-    <td>JTAG debug</td>
-    <td>Integrity</td>
-    <td>Proficient</td>
-    <td>1. Attempt to manipulate RoT execution via JTAG to flows that are not plan-of-record<br>2. Attempt to retrieve device secrets via JTAG when product is field-deployed<br>3. Attempt to retrieve device secrets via JTAG while the product is being developed and debugged</td>
-    <td>Implement security mode management within Caliptra</td>
-  </tr>
-</tbody>
-</table>
+| Asset category | Asset      | Security property | Attack profile | Attack path | Mitigation |
+| :------------- | :--------- | :---------------- | :------------- | :---------- | :--------- |
+| Fuse/OTP high value secrets | UDS Seed | Confidentiality and integrity | Expert | Malicious manufacturing spoofing of UDS Seeds | UDS obfuscation/encryption with class RTL key |
+| Fuse/OTP high value secrets | UDS Seed | Confidentiality and integrity | Expert | Invasive attack (fuse analysis) | Shield fuse IP |
+| Fuse/OTP high value secrets | UDS Seed | Confidentiality and integrity | Expert | Boot path tampering while retrieving UDS values | UDS obfuscation/encryption with class RTL key |
+| Fuse/OTP high value secrets | UDS Seed | Confidentiality and integrity | Expert | Attempting to derive die specific keys by knowing UDS | Confine unobfuscated UDS and subsequent derivations to key vault |
+| Fuse/OTP high value secrets | Field entropy | Confidentiality and integrity | Expert | Malicious manufacturing spoofing on field entropy | Field entropy obfuscation and encryption with class RTL key |
+| Fuse/OTP high value secrets | Field entropy | Confidentiality and integrity | Expert | Invasive attack (fuse analysis) | Shield fuse IP |
+| Fuse/OTP high value secrets | Field entropy | Confidentiality and integrity | Expert | Boot path tampering while retrieving field entropy values | Field entropy obfuscation and encryption with class RTL key |
+| Fuse/OTP high value secrets | Field entropy | Confidentiality and integrity | Expert | Attempting to derive die specific keys by knowing field entropy | Confine field entropy and subsequent derivations to key vault |
+| Fuse/OTP high value secrets | FW authentication keys | Integrity | Proficient | Glitching | 1. Redundant decision making on critical code execution<br>2. Error check before consuming values from fuses<br>3. Environmental monitoring and protection |
+| Fuse/OTP high value secrets | Versioning information from fuses | Integrity | Proficient | Glitching | Environmental monitoring and protection |
+| Fuse/OTP high value secrets | IDEVID CERT chain | Integrity | Proficient | Glitching | 1. Environmental monitoring and protection<br>2. Error check before consuming values from fuse in various ways |
+| Die unique assets | UDS (802.1AR Unique Device Secret) | Confidentiality and integrity | Proficient | 1. Software reading actual secrets<br>2. Side channel attack to infer secret | 1. Secrets locked in key vault, not readable by software<br>2. SCA protections |
+| Die unique assets | CDI<sub>n</sub> (DICE compound device identifier for Layer n) | Confidentiality and integrity | Proficient | 1. Software reading actual secrets<br>2. Side channel attack to infer secret | 1. Secrets locked in key vault, not readable by software<br>2. SCA protections |
+| Die unique assets | IDevID<sub>Priv</sub> | Confidentiality and integrity | Proficient | 1. Software reading actual secrets<br>2. Side channel attack to infer secret | 1. Secrets locked in key vault, not readable by software<br>2. SCA protections |
+| Die unique assets | LDevID<sub>Priv</sub> | Confidentiality and integrity | Proficient | 1. Software reading actual secrets<br>2. Side channel attack to infer secret | 1. Secrets locked in key vault, not readable by software<br>2. SCA protections |
+| Die unique assets | Obfuscation key | Confidentiality and integrity | Proficient | 1. Software reading actual secrets<br>2. Side channel attack to infer secret | 1. Secrets locked in key vault, not readable by software<br>2. SCA protections |
+| Die unique assets | AliasFMC_Key<sub>Priv</sub> | Confidentiality and integrity | Proficient | 1. Software reading actual secrets<br>2. Side channel attack to infer secret | 1. Secrets locked in key vault, not readable by software<br>2. SCA protections |
+| Die unique assets | AliasRT_Key<sub>Priv</sub> | Confidentiality and integrity | Proficient | 1. Software reading actual secrets<br>2. Side channel attack to infer secret | 1. Secrets locked in key vault, not readable by software<br>2. SCA protections |
+| Root of trust execution | ROM FW | Integrity | Proficient | Glitching | 1. Redundant decision making on critical code execution<br>2. Environmental monitoring and protection |
+| Root of trust execution | Execution unauthorized runtime FW | Authenticity and integrity | Proficient | Modify boot media | Authenticity and integrity check using PKI DSA upon power on |
+| Root of trust execution | Execution unauthorized runtime FW | Authenticity and integrity | Proficient | Arbitrary payload pushed into execution | Authenticity and integrity check using PKI DSA during software updates and power on |
+| Root of trust execution | Rollback Attack | Versioning | Proficient | 1. Modify boot media to host older versions<br>2. Bypass version check during boot | 1. Authenticity and integrity check using PKI DSA upon power on<br>2. Failproof, audited boot code implementation responsible for loading images |
+| Root of trust execution | Control flow | Integrity and confidentiality if applicable | Proficient | 1. Return and jump addresses manipulation<br>2. Return values and errors tampering <br>3. Stack overflow <br>4. Buffer overflows <br>5. Privilege escalations and hijacking | 1. Various control flow integrity measures<br> 2. Secure coding practices and auditing implementation |
+| Boot measurements protected by Caliptra | Boot measurements that Caliptra RTM gathers, stores, and reports | Integrity | Expert | 1. Manipulate measurements AiTM while in transit to Caliptra <br>2. SoC sends manipulated measurements to Caliptra |  |
+| Caliptra inputs | Security state | Integrity | Proficient | Glitching | Environmental monitoring and protection |
+| Caliptra inputs | Mode selection (Boot Media Integrated and dependent selections) | Integrity | Proficient | Glitching | Environmental monitoring and protection |
+| Caliptra inputs | PAUSER attribute | Integrity | Proficient | Glitching | Environmental monitoring and protection |
+| Caliptra inputs | JTAG debug | Integrity | Proficient | 1. Attempt to manipulate RoT execution via JTAG to flows that are not plan-of-record<br>2. Attempt to retrieve device secrets via JTAG when product is field-deployed<br>3. Attempt to retrieve device secrets via JTAG while the product is being developed and debugged | Implement security mode management within Caliptra |
 
 # High level architecture
 
@@ -721,116 +573,31 @@ The following table describes the NIST SP 800-193 requirements that Caliptra sha
 
 *Table 8: NIST SP 800-193 requirements*
 
-<table>
-    <thead>
-        <tr>
-            <th><b>NIST SP 800-193 Chapter</b></th>
-            <th><b>Requirement</b></th>
-            <th><b>Caliptra responsibility</b></th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td rowspan=7>4.1.1</td>
-            <td>All security mechanisms and functions shall be founded to Roots of Trust (RoT).</td>
-            <td>Caliptra forms the basis for all trust in the SoC starting from execution of its immutable ROM. See the Secure Boot Flow section.</td>
-        </tr>
-        <tr>
-            <td>If Chains of Trust (CoT) are used, RoT shall serve as the anchor for the CoT.</td>
-            <td>All other firmware shall be authenticated and executed as part of a Chain of Trust extended from the Caliptra ROM. See the Secure Boot Flow section.</td>
-        </tr>
-        <tr>
-            <td>All RoTs and CoTs shall either be immutable or protected using mechanisms that ensure all RoTs and CoTs remain in a state of integrity.</td>
-            <td>All other firmware is authenticated and executed as part of a Chain of Trust extended from the Caliptra ROM. See the Secure Boot Flow section.</td>
-        </tr>
-        <tr>
-            <td>All elements of the CoT for update, detection, and recovery in non-volatile storage shall be implemented in platform firmware.</td>
-            <td>Caliptra forms the basis for RTM (or detection). All other silicon RoT capabilities are extended by additional firmware loaded in the SoC and anchored by the Caliptra RTM.</td>
-        </tr>
-        <tr>
-            <td>The functions of the RoTs or CoTs shall be resistant to any tampering attempted by software running under, or as part of, the operating system on the host processor.</td>
-            <td>Caliptra shall run on a dedicated microcontroller, isolated physically from access by other components in the system.</td>
-        <tr>
-            <td>Information transferred from the software on the host processor to the platform firmware shall be treated as untrusted.</td>
-            <td>Caliptra shall verify the authenticity of its firmware using an approved digital signature verification mechanism.</td>
-        </tr>
-        <tr>
-            <td>CoTs may be extended to include elements that are not from non-volatile storage. Before use, those elements shall be cryptographically verified by an earlier element of the CoT.</td>
-            <td>Caliptra shall verify the authenticity of its firmware using an approved digital signature verification mechanism. Caliptra shall also measure the SoC security processor FMC code before it is verified and executed by the SoC.</td>
-        </tr>
-        <tr>
-            <td>4.1.2</td>
-            <td>If the key store is updateable, then the key store shall be updated using an authenticated update mechanism, absent unambiguous physical presence through a secure local update.</td>
-            <td>Hashes for the keys used to authenticate Caliptra FW are programmed into fuses during manufacturing. If a key is deemed to be compromised, that key may be revoked and the next key used instead. See the Fuse/OTP Requirements section.</td>
-        </tr>
-        <tr>
-            <td rowspan=2>4.1.3</td>
-            <td>Each platform device that implements a detection capability shall rely on either a Root of Trust for Detection (RTD), or a Chain of Trust for Detection (CTD). The CTD is anchored by an RTD for its detection.</td>
-            <td>Caliptra forms the basis for all trust in the SoC starting from execution of its immutable ROM. All other firmware shall be authenticated and executed as part of a CoT extended from the Caliptra ROM. See the Secure Boot Flow section.</td>
-        </tr>
-        <tr>
-            <td>The RTD or CTD shall include or have access to information necessary to detect corruption of firmware code and critical data.</td>
-            <td>Caliptra relies on hashes of authorized keys stored in fuses. Those hashes are then checked against public keys found in firmware headers to authenticate Caliptra’s runtime firmware. Caliptra relies on redundancy in the fuses to protect the key and configuration data. See the Fuse/OTP Requirements section.</td>
-        </tr>
-        <tr>
-            <td rowspan=3>4.2.3</td>
-            <td>If critical platform firmware code in non-volatile memory is copied into RAM to be executed (for performance, or for other reasons) then the firmware program in RAM shall be protected from modification by software or shall complete its function before software starts.</td>
-            <td>Caliptra shall run on a dedicated microcontroller, isolated physically from access by other components in the system.</td>
-        </tr>
-        <tr>
-            <td>If critical platform firmware uses RAM for temporary data storage, then this memory shall be protected from software running on the platform until the data’s use is complete.</td>
-            <td>Caliptra shall run on a dedicated microcontroller, isolated physically from access by other components in the system.</td>
-        </tr>
-        <tr>
-            <td>Software shall not be able to interfere with the intended function of critical platform firmware. For example, by denying execution, modifying the processor mode, or polluting caches.</td>
-            <td>Caliptra shall run on a dedicated microcontroller, isolated physically from access by other components in the system. In addition, the Caliptra subsystem begins execution before other firmware is allowed to run.</td>
-        </tr>
-        <tr>
-            <td>4.2.4</td>
-            <td>Critical data shall be modifiable only through the device itself or defined interfaces provided by device firmware. Examples of defined interfaces include proprietary or public application programming interfaces (APIs) used by the device’s firmware, or standards-based interfaces. Symbiont devices may rely on their host devices to meet this requirement.</td>
-            <td>Caliptra receives firmware and configuration input only via defined interfaces within the SoC. See the Mailboxes section.</td>
-        </tr>
-        <tr>
-            <td>4.2.1.3</td>
-            <td>The authenticated update mechanism shall be capable of preventing unauthorized updates of the device firmware to an earlier authentic version that has a security weakness or would enable updates to a version with a known security weakness.</td>
-            <td>Caliptra supports a mechanism for detecting and preventing execution of a prior firmware image that is no longer authorized. See the Anti-rollback Support section.</td>
-        </tr>
-        <tr>
-            <td rowspan=5>4.3.1</td>
-            <td>A successful attack that corrupts the active critical data or the firmware image, or subverts their protection mechanisms, shall not in and of itself result in a successful attack on the RTD or the information necessary to detect corruption of the firmware image.</td>
-            <td>Caliptra shall verify the signature of any firmware it loads during each boot. If the signature verification fails, Caliptra shall notify the SoC that firmware recovery must be performed. See the Error Reporting and Handling section.</td>
-        </tr>
-        <tr>
-            <td>Verify integrity, using an approved digital signature algorithm or cryptographic hash, of device firmware code prior to execution of code outside the RTD.</td>
-            <td>Caliptra shall perform digital signature verification of its FMC code, as well as that of the SoC security processor FMC, before they are allowed to execute.</td>
-        </tr>
-        <tr>
-            <td>If firmware corruption is detected, the RTD or CTD should be capable of starting a recovery process to restore the device firmware code back to an authentic version.</td>
-            <td>Caliptra shall notify the SoC via the Mailbox interface to initiate the recovery process.</td>
-        </tr>
-        <tr>
-            <td>The detection mechanism should be capable of creating notifications of firmware corruption.</td>
-            <td>Caliptra shall notify the SoC via the Mailbox interface to initiate the recovery process.</td>
-        </tr>
-        <tr>
-            <td>The detection mechanism should be capable of logging events when firmware corruption is detected.</td>
-            <td>It is the responsibility of the SoC to log any corruption events upon notification by Caliptra.</td>
-        </tr>
-        <tr>
-            <td rowspan=3>4.3.2</td>
-            <td>The RTD or CTD shall perform integrity checks on the critical data prior to use. Integrity checks may take the form, for example, of validating the data against known valid values or verifying the hash of the data storage.</td>
-            <td>Caliptra relies on redundant fuses to store its configuration data, which is owned and passed to Caliptra through the Mailbox.</td>
-        </tr>
-        <tr>
-            <td>The RTD or CTD should be capable of creating notifications of data corruption.</td>
-            <td>See the Error Reporting and Handling section.</td>
-        </tr>
-        <tr>
-            <td>The detection mechanism should be capable of logging events when data corruption is detected.</td>
-            <td>It is the responsibility of the SoC to log any corruption events upon notification by Caliptra.</td>
-        </tr>
-    </tbody>
-</table>
+| NIST SP 800-193 Chapter | Requirement | Caliptra responsibility |
+| :---------------------- | :---------- | :---------------------- |
+| 4.1.1 | All security mechanisms and functions shall be founded to Roots of Trust (RoT). | Caliptra forms the basis for all trust in the SoC starting from execution of its immutable ROM. See the Secure Boot Flow section. |
+| 4.1.1 | If Chains of Trust (CoT) are used, RoT shall serve as the anchor for the CoT. | All other firmware shall be authenticated and executed as part of a Chain of Trust extended from the Caliptra ROM. See the Secure Boot Flow section. |
+| 4.1.1 | All RoTs and CoTs shall either be immutable or protected using mechanisms that ensure all RoTs and CoTs remain in a state of integrity. | All other firmware is authenticated and executed as part of a Chain of Trust extended from the Caliptra ROM. See the Secure Boot Flow section. |
+| 4.1.1 | All elements of the CoT for update, detection, and recovery in non-volatile storage shall be implemented in platform firmware. | Caliptra forms the basis for RTM (or detection). All other silicon RoT capabilities are extended by additional firmware loaded in the SoC and anchored by the Caliptra RTM. |
+| 4.1.1 | The functions of the RoTs or CoTs shall be resistant to any tampering attempted by software running under, or as part of, the operating system on the host processor. | Caliptra shall run on a dedicated microcontroller, isolated physically from access by other components in the system. |
+| 4.1.1 | Information transferred from the software on the host processor to the platform firmware shall be treated as untrusted. | Caliptra shall verify the authenticity of its firmware using an approved digital signature verification mechanism. |
+| 4.1.1 | CoTs may be extended to include elements that are not from non-volatile storage. Before use, those elements shall be cryptographically verified by an earlier element of the CoT. | Caliptra shall verify the authenticity of its firmware using an approved digital signature verification mechanism. Caliptra shall also measure the SoC security processor FMC code before it is verified and executed by the SoC. |
+| 4.1.2 | If the key store is updateable, then the key store shall be updated using an authenticated update mechanism, absent unambiguous physical presence through a secure local update. | Hashes for the keys used to authenticate Caliptra FW are programmed into fuses during manufacturing. If a key is deemed to be compromised, that key may be revoked and the next key used instead. See the Fuse/OTP Requirements section. |
+| 4.1.3 | Each platform device that implements a detection capability shall rely on either a Root of Trust for Detection (RTD), or a Chain of Trust for Detection (CTD). The CTD is anchored by an RTD for its detection. | Caliptra forms the basis for all trust in the SoC starting from execution of its immutable ROM. All other firmware shall be authenticated and executed as part of a CoT extended from the Caliptra ROM. See the Secure Boot Flow section. |
+| 4.1.3 | The RTD or CTD shall include or have access to information necessary to detect corruption of firmware code and critical data. | Caliptra relies on hashes of authorized keys stored in fuses. Those hashes are then checked against public keys found in firmware headers to authenticate Caliptra’s runtime firmware. Caliptra relies on redundancy in the fuses to protect the key and configuration data. See the Fuse/OTP Requirements section. |
+| 4.2.3 | If critical platform firmware code in non-volatile memory is copied into RAM to be executed (for performance, or for other reasons) then the firmware program in RAM shall be protected from modification by software or shall complete its function before software starts. | Caliptra shall run on a dedicated microcontroller, isolated physically from access by other components in the system. |
+| 4.2.3 | If critical platform firmware uses RAM for temporary data storage, then this memory shall be protected from software running on the platform until the data’s use is complete. | Caliptra shall run on a dedicated microcontroller, isolated physically from access by other components in the system. |
+| 4.2.3 | Software shall not be able to interfere with the intended function of critical platform firmware. For example, by denying execution, modifying the processor mode, or polluting caches. | Caliptra shall run on a dedicated microcontroller, isolated physically from access by other components in the system. In addition, the Caliptra subsystem begins execution before other firmware is allowed to run. |
+| 4.2.4 | Critical data shall be modifiable only through the device itself or defined interfaces provided by device firmware. Examples of defined interfaces include proprietary or public application programming interfaces (APIs) used by the device’s firmware, or standards-based interfaces. Symbiont devices may rely on their host devices to meet this requirement. | Caliptra receives firmware and configuration input only via defined interfaces within the SoC. See the Mailboxes section. |
+| 4.2.1.3 | The authenticated update mechanism shall be capable of preventing unauthorized updates of the device firmware to an earlier authentic version that has a security weakness or would enable updates to a version with a known security weakness. | Caliptra supports a mechanism for detecting and preventing execution of a prior firmware image that is no longer authorized. See the Anti-rollback Support section. |
+| 4.3.1 | A successful attack that corrupts the active critical data or the firmware image, or subverts their protection mechanisms, shall not in and of itself result in a successful attack on the RTD or the information necessary to detect corruption of the firmware image. | Caliptra shall verify the signature of any firmware it loads during each boot. If the signature verification fails, Caliptra shall notify the SoC that firmware recovery must be performed. See the Error Reporting and Handling section. |
+| 4.3.1 | Verify integrity, using an approved digital signature algorithm or cryptographic hash, of device firmware code prior to execution of code outside the RTD. | Caliptra shall perform digital signature verification of its FMC code, as well as that of the SoC security processor FMC, before they are allowed to execute. |
+| 4.3.1 | If firmware corruption is detected, the RTD or CTD should be capable of starting a recovery process to restore the device firmware code back to an authentic version. | Caliptra shall notify the SoC via the Mailbox interface to initiate the recovery process. |
+| 4.3.1 | The detection mechanism should be capable of creating notifications of firmware corruption. | Caliptra shall notify the SoC via the Mailbox interface to initiate the recovery process. |
+| 4.3.1 | The detection mechanism should be capable of logging events when firmware corruption is detected. | It is the responsibility of the SoC to log any corruption events upon notification by Caliptra. |
+| 4.3.2 | The RTD or CTD shall perform integrity checks on the critical data prior to use. Integrity checks may take the form, for example, of validating the data against known valid values or verifying the hash of the data storage. | Caliptra relies on redundant fuses to store its configuration data, which is owned and passed to Caliptra through the Mailbox. |
+| 4.3.2 | The RTD or CTD should be capable of creating notifications of data corruption. | See the Error Reporting and Handling section. |
+| 4.3.2 | The detection mechanism should be capable of logging events when data corruption is detected. | It is the responsibility of the SoC to log any corruption events upon notification by Caliptra. |
 
 ## Secure boot flow
 
@@ -1349,37 +1116,12 @@ This section describes Caliptra error reporting and handling.
 
 *Table 15: Firmware errors and remedies*
 
-<table>
-    <thead>
-        <tr>
-            <th><b>Condition</b></th>
-            <th><b>When error occurs</b></th>
-            <th><b>Remediation</b></th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>SoC FMC verification failure due to invalid digital signature or invalid anti-rollback value)</td>
-            <td>During boot, as described in <a href="#bmi">Boot Media Integrated</a>, <a href="#bmd">Boot Media Dependent (BMD)</a>, <a href="#secure-boot-flow">Secure Boot Flow</a>.</td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Caliptra FMC invalid</td>
-            <td>During boot, as described in <a href="#bmi">Boot Media Integrated</a>, <a href="#bmd">Boot Media Dependent (BMD)</a>, <a href="#secure-boot-flow">Secure Boot Flow.</a></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Caliptra runtime firmware invalid</td>
-            <td>During boot, as described in <a href="#bmi">Boot Media Integrated</a>, <a href="#bmd">Boot Media Dependent (BMD)</a>, <a href="#secure-boot-flow">Secure Boot Flow</a>.</td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Fuse programming errors</td>
-            <td></td>
-            <td></td>
-        </tr>
-    </tbody>
-</table>
+| Condition | When error occurs | Remediation |
+| :-------- | :---------------- | :---------- |
+| SoC FMC verification failure due to invalid digital signature or invalid anti-rollback value) | During boot, as described in [Boot Media Integrated](#bmi), [Boot Media Dependent](#bmd), [Secure Boot Flow](#secure-boot-flow) |  |
+| Caliptra FMC invalid | During boot, as described in [Boot Media Integrated](#bmi), [Boot Media Dependent](#bmd), [Secure Boot Flow](#secure-boot-flow) |  |
+| Caliptra runtime firmware invalid | During boot, as described in [Boot Media Integrated](#bmi), [Boot Media Dependent](#bmd), [Secure Boot Flow](#secure-boot-flow) |  |
+| Fuse programming errors |  |  |
 
 [^1]: Caliptra is Spanish for “root cap” and describes the deepest part of the root.
 
