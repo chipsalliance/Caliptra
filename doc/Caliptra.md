@@ -590,7 +590,7 @@ An ideal IDevID has the following properties:
 * Private component cannot be extracted from Caliptra.
 
 Caliptra 1.0 alone does not fully address these properties. For example, a person-in-the-middle supply chain adversary could impersonate Caliptra by submitting its own IDevID Certificate Signing Request (CSR) to the pCA. Vendors should threat model the IDevID generation and endorsement flows for their SoC. Threat actors to consider are the following:
-* Components involved in UDS injection flows: can they inject the same obfuscated UDS to multiple devices, or to devices of different classes? Can they wield the deobfuscation key to leak the UDS?
+* Components involved in UDS injection flows: can they inject the same obfuscated UDS to multiple devices, or to devices of different classes? Can they wield the obfuscation key to leak the UDS?
 * Components servicing the connectivity between the Caliptra instantiation and the HSM applicance performing IDevID endorsement: can they alter or impersonate Caliptra's IDevID CSR?
 * Physical attackers: see [Physical Attack Countermeasures](#physical-attack-countermeasures).
 
@@ -1335,7 +1335,7 @@ This section describes Caliptra error reporting and handling.
   * This signal prevents forward progress of the boot process if measurement submission to Caliptra fails. If SoC detects a Caliptra fatal error while the SoC is in steady state, then there is no obligation for the SoC to immediately address that error. If rebooting the SoC for such failures is deemed unacceptable to uptime, the SoC should implement the ability to trigger a Caliptra warm reset independently of the SoC, and may use this mechanism to recover.
   * Error mask registers (writable only by Caliptra microcontroller) may be used to prevent error signal assertion per-event. Mask registers only impact interrupts when they are set prior to the error occurrence.
   * cptra\_error\_fatal remains asserted until Caliptra is reset. Note that, although the HW FATAL ERROR register fields may be cleared at any time, a reset is still required to clear the interrupt.
-* When a fatal error occurs, all volatile assets that are stored in memory (UDS fuses, DEOBF\_KEK, key slots, etc.) are cleared. Note that UDS\_FUSE and DEOBF\_KEK may already be cleared depending on when the fatal error happened.
+* When a fatal error occurs, all volatile assets that are stored in key vault are cleared.
 
 **Non-fatal errors**
 
