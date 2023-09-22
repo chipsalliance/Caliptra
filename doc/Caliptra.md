@@ -85,10 +85,6 @@ The following acronyms and abbreviations are used throughout this document.
 | <a id="TEE"></a>**TEE**       | Trusted Execution Environment                  |
 | <a id="TRNG"></a>**TRNG**     | True Random Number Generator                   |
 
-# Requirements terminology
-
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [[BCP 14](https://tools.ietf.org/html/bcp14)] [[RFC2119](https://tools.ietf.org/html/rfc2119)] [[RFC8174](https://tools.ietf.org/html/rfc8174)] when, and only when, they appear in all capitals.
-
 # References
 
 1. <a id="ref-1"></a>NIST Special Publication 800-193 Platform Firmware Resiliency Guidelines
