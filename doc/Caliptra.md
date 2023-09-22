@@ -438,7 +438,7 @@ An ideal IDevID has the following properties:
 * Private component cannot be extracted from Caliptra.
 
 Caliptra 1.0 alone does not fully address these properties. For example, a person-in-the-middle supply chain adversary could impersonate Caliptra by submitting its own IDevID Certificate Signing Request (CSR) to the pCA. Vendors should threat model the IDevID generation and endorsement flows for their SoC. Threat actors to consider are the following:
-* Components involved in UDS injection flows: can they inject the same obfuscated UDS to multiple devices, or to devices of different classes? Can they wield the deobfuscation key to leak the UDS?
+* Components involved in UDS injection flows: can they inject the same obfuscated UDS to multiple devices, or to devices of different classes? Can they wield the obfuscation key to leak the UDS?
 * Components servicing the connectivity between the Caliptra instantiation and the HSM applicance performing IDevID endorsement: can they alter or impersonate Caliptra's IDevID CSR?
 * Physical attackers: see [Physical Attack Countermeasures](#physical-attack-countermeasures).
 
@@ -463,7 +463,7 @@ After an owner registers a device's LDevID as part of their device onboarding fl
 
 This approach does not defend against supply-chain attackers that obtain fuse data for devices that enter the supply chain *after* their field entropy has been programmed, such as during RMA flows. The LDevID certificate also does not support revocation because there is no generic Caliptra OCSP service. Owners should either maintain an allowlist of LDevID certificates or revoke any of the upstream certificate authorities.
 
-Owners are not required to program field entropy. Caliptra generates LDevID from the value of the field entropy fuses, which could be all zeroes or ones. Caliptra uses UDS as input to LDevID generation so that LDevID properties are no worse than IDevID. Field entropy is expected to be stored in fuses to achieve an equivalent physical attack barrier to UDS.
+Owners are not required to program field entropy. Caliptra generates LDevID from the value of the field entropy fuses, which could be all zeroes or ones. Caliptra LDevID derivation descends from UDS so that LDevID properties are no worse than IDevID. Field entropy is expected to be stored in fuses to achieve an equivalent physical attack barrier to UDS.
 
 It is the responsibility of the owner or the user to identify the certificate they wish to trust, and to potentially endorse with their own certificate authority: pCA, IDevID, LDevID, or Alias<sub>FMC</sub>.
 
@@ -1031,8 +1031,8 @@ Fuse registers are programmable whenever IP goes through reset (after cptra\_rst
 
 To ensure that the security claims of Caliptra are achieved, specific fuse protection capabilities must be supported:
 
-* Fuses that hold Caliptra secrets shall not be readable by any mutable code in the SoC.
-  * For SoCs that intend to achieve FIPS 140-3 CMVP certification with Caliptra, SoC shall implement a HW state machine for copying the uds_seed, field_entropy, and key_manifest_pk_hash fuses from the fuse controller into Caliptra's fuse shadow registers. Only the fuse controller, this state machine, and Caliptra shall be able to access these fuse values.
+* Fuses that hold Caliptra secrets shall not be readable by any mutable code in the SoC. The intent is to provide defense-in-depth for the UDS.
+  * For SoCs that intend to achieve FIPS 140-3 CMVP certification with Caliptra, SoC shall implement a HW state machine for copying the uds_seed, field_entropy, and key_manifest_pk_hash fuses from the fuse controller into Caliptra's fuse shadow registers. Only the fuse controller, this state machine, and Caliptra shall be able to access these fuse values. The intent is to not include the SoC ROM as part of the cryptographic module boundary.
 * For the production lifecycle state, if JTAG is enabled pre or post SoC reset, then Caliptra's dedicated fuses shall not be accessible (shall not be readable, shall not be writable) by Caliptra or other SoC IP. This restriction shall be applicable to Caliptra's fuse shadow registers as well (see [Physical Attack Countermeasures](#physical-attack-countermeasures)).
 * SoC should ensure that the integrity of each fuse is maintained through the life of the part. The integrity of the fuses can be maintained by fuse redundancy, ECC, or other means determined sufficient by the SoC.
 
@@ -1042,7 +1042,7 @@ All fuse based cryptographic keying material and seeds (for example, UDS Seed) s
 
 SoC shall support in-field programmable fusing. [Fuse Map](#fuse-map) shows which fuses are expected to be in-field programmable. SoCs shall implement authorization for in-field programmable fusing to mitigate denial-of-service attacks. Authorization design is outside the scope of this specification.
 
-SoC shall support a field entropy programming API. The API implementation shall request Caliptra FW for a random 128-bit number and then burn that number into the first available field entropy fuse slot (or fail if no slots are available). Caliptra is expected to be in any security state. The device owner is expected to call this API in a “clean room environment” to minimize risk of attack on the programming process.
+SoC shall support a field entropy programming API. The API shall support retrieving an input value from an external interface. It should cryptographically mix that value with the output of an on-die TRNG to generate the field entropy value. The API implementation shall burn the field entropy value into the first available field entropy fuse slot (or fail if no slots are available). Caliptra is expected to be in any security state. The device owner is expected to call this API in a “clean room environment” to minimize risk of attack on the programming process.
 
 #### Fuse zeroing
 
@@ -1098,7 +1098,7 @@ This section describes Caliptra error reporting and handling.
   * This signal prevents forward progress of the boot process if measurement submission to Caliptra fails. If SoC detects a Caliptra fatal error while the SoC is in steady state, then there is no obligation for the SoC to immediately address that error. If rebooting the SoC for such failures is deemed unacceptable to uptime, the SoC should implement the ability to trigger a Caliptra warm reset independently of the SoC, and may use this mechanism to recover.
   * Error mask registers (writable only by Caliptra microcontroller) may be used to prevent error signal assertion per-event. Mask registers only impact interrupts when they are set prior to the error occurrence.
   * cptra\_error\_fatal remains asserted until Caliptra is reset. Note that, although the HW FATAL ERROR register fields may be cleared at any time, a reset is still required to clear the interrupt.
-* When a fatal error occurs, all volatile assets that are stored in memory (UDS fuses, DEOBF\_KEK, key slots, etc.) are cleared. Note that UDS\_FUSE and DEOBF\_KEK may already be cleared depending on when the fatal error happened.
+* When a fatal error occurs, all volatile assets that are stored in key vault are cleared.
 
 **Non-fatal errors**
 
