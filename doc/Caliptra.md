@@ -1039,24 +1039,6 @@ This section describes Caliptra error reporting and handling.
 | Caliptra runtime firmware invalid | During boot, as described in [Boot Media Integrated](#bmi), [Boot Media Dependent](#bmd), [Secure Boot Flow](#secure-boot-flow) |  |
 | Fuse programming errors |  |  |
 
-[^1]: Caliptra is Spanish for “root cap” and describes the deepest part of the root.
-
-[^2]: This obfuscation secret may be a chip-class secret, or a chip-unique PUF, with the latter preferred.
-
-[^3]: This memory should only be volatile in a power loss event. See details in [HW Section](#reset-flow).
-
-[^4]: When a hitless update occurs, and then following reset, Caliptra shall execute the updated firmware and shall maintain the measurements that it collected during boot. Caliptra shall support the reporting of these measurements with signed attestations. Hitless update of Caliptra’s FMC shall not be supported. Hitless update requires creating a new DICE identity, which would require access to IDevID and LDevID. Retention of IDevID and LDevID (privkeys) during post-boot introduce a security vulnerability.
-
-[^5]: Upon boot, firmware defensively treats existing SRAM contents as potentially malicious, emplaced by prior firmware with a vulnerability.
-
-[^6]: The format of this log is outside the scope of this specification.
-
-[^7]: The format of this blob is outside the scope of this specification.
-
-[^8]: ECDSA is used for firmware verification and SPDM (signing).
-
-[^9]: SHA is used with ECDSA and HMAC, and is also used to generate measurements.
-
 # Terminology
 
 The following acronyms and abbreviations are used throughout this document.
@@ -1137,3 +1119,23 @@ The Caliptra Workgroup acknowledges the following individuals for their contribu
 * Varun Sampath (NVIDIA)
 * Vishal Soni (Microsoft)
 * Steven Bellock (NVIDIA)
+
+# Footnotes
+
+[^1]: Caliptra is Spanish for “root cap” and describes the deepest part of the root.
+
+[^2]: This obfuscation secret may be a chip-class secret, or a chip-unique PUF, with the latter preferred.
+
+[^3]: This memory should only be volatile in a power loss event. See details in [HW Section](#reset-flow).
+
+[^4]: When a hitless update occurs, and then following reset, Caliptra shall execute the updated firmware and shall maintain the measurements that it collected during boot. Caliptra shall support the reporting of these measurements with signed attestations. Hitless update of Caliptra’s FMC shall not be supported. Hitless update requires creating a new DICE identity, which would require access to IDevID and LDevID. Retention of IDevID and LDevID (privkeys) during post-boot introduce a security vulnerability.
+
+[^5]: Upon boot, firmware defensively treats existing SRAM contents as potentially malicious, emplaced by prior firmware with a vulnerability.
+
+[^6]: The format of this log is outside the scope of this specification.
+
+[^7]: The format of this blob is outside the scope of this specification.
+
+[^8]: ECDSA is used for firmware verification and SPDM (signing).
+
+[^9]: SHA is used with ECDSA and HMAC, and is also used to generate measurements.
