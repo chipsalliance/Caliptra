@@ -14,88 +14,8 @@ Caliptra[^1] was originally created as part of the Open Compute Project ([OCP](h
 
 The objective of Caliptra is to define core RoT capabilities that must be implemented in the System on Chip (SoC) or ASIC of any device in a cloud platform. The collection of these RoT capabilities is referred to as the ***Silicon RoT Services (Silicon RoT).***
 
-## Acknowledgments
-
-The Caliptra Workgroup acknowledges the following individuals for their contributions to this specification.
-
-**CONTRIBUTORS**
-
-* Andrés Lagar-Cavilla (Google)
-* Anjana Parthasarathy (Microsoft)
-* Bharat Pillilli (Microsoft)
-* Bryan Kelly (Microsoft)
-* Ishwar Agarwal (Microsoft)
-* James Zhang (NVIDIA)
-* Jeff Andersen (Google)
-* John Traver (AMD)
-* Jordan Hand (Google)
-* Kor Nielsen (Google)
-* Louis Ferraro (AMD)
-* Marius Schilder (Google)
-* Nathan Nadarajah (AMD)
-* Paul Chou (NVIDIA)
-* Piotr Kwidzinski (AMD)
-* Prabhu Jayana (AMD)
-* Rob Strong (AMD)
-* Sudhir Mathane (AMD)
-* Varun Sampath (NVIDIA)
-* Vishal Soni (Microsoft)
-* Steven Bellock (NVIDIA)
-
 <div style="page-break-after: always"></div>
 
-# Acronyms and abbreviations
-
-The following acronyms and abbreviations are used throughout this document.
-
-| Abbreviation | Description |
-|:-------------|:------------|
-| <a id="bmc"></a>**BMC**       | Baseboard Management Controller                |
-| <a id="CA"></a>**CA**         | Certification Authority                        |
-| <a id="CDI"></a>**CDI**       | Compound Device Identifier                     |
-| <a id="CPU"></a>**CPU**       | Central Processing Unit                        |
-| <a id="CRL"></a>**CRL**       | Certificate Revocation List                    |
-| <a id="CSR"></a>**CSR**       | Certificate Signing Request                    |
-| <a id="CSP"></a>**CSP**       | Cloud Service Provider                         |
-| <a id="DICE"></a>**DICE**     | Device Identifier Composition Engine           |
-| <a id="DRBG"></a>**DRBG**     | Deterministic Random Bit Generator             |
-| <a id="ECDSA"></a>**ECDSA**   | Elliptic Curve Digital Signature Algorithm     |
-| <a id="FMC"></a>**FMC**       | First Mutable Code                             |
-| <a id="GPU"></a>**GPU**       | Graphics Processing Unit                       |
-| <a id="IDevId"></a>**IDevId** | Initial Device Identifier                      |
-| <a id="iRoT"></a>**iRoT**     | Internal Root of Trust                         |
-| <a id="KAT"></a>**KAT**       | Known Answer Test                              |
-| <a id="LDevId"></a>**LDevId** | Locally Significant Device Identifier          |
-| <a id="NIC"></a>**NIC**       | Network Interface Card                         |
-| <a id="NIST"></a>**NIST**     | National Institute of Standards and Technology |
-| <a id="OCP"></a>**OCP**       | Open Compute Project                           |
-| <a id="OTP"></a>**OTP**       | One-time programmable                          |
-| <a id="PKI"></a>**PKI**       | Public Key infrastructure                      |
-| <a id="PTRNG"></a>**P-TRNG**  | Parallel True Random Number Generator          |
-| <a id="PUF"></a>**PUF**       | Physically unclonable function                 |
-| <a id="RoT"></a>**RoT**       | Root of Trust                                  |
-| <a id="RTI"></a>**RTI**       | RoT for Identity                               |
-| <a id="RTM"></a>**RTM**       | RoT for Measurement                            |
-| <a id="RTR"></a>**RTR**       | RoT for Reporting                              |
-| <a id="SoC"></a>**SoC**       | System on Chip                                 |
-| <a id="SPDM"></a>**SPDM**     | Security Protocol and Data Model               |
-| <a id="SSD"></a>**SSD**       | Solid State Drive                              |
-| <a id="TCB"></a>**TCB**       | Trusted Computing Base                         |
-| <a id="TCG"></a>**TCG**       | Trusted Computing Group                        |
-| <a id="TEE"></a>**TEE**       | Trusted Execution Environment                  |
-| <a id="TRNG"></a>**TRNG**     | True Random Number Generator                   |
-
-# References
-
-1. <a id="ref-1"></a>NIST Special Publication 800-193 Platform Firmware Resiliency Guidelines
-2. <a id="ref-2"></a>Global Platform Technology Root of Trust Definitions and Requirements Version 1.1 Public
-3. <a id="ref-3"></a>[Open Compute Project Secure Boot Specification](https://www.opencompute.org/documents/secure-boot-2-pdf)
-4. <a id="ref-4"></a>TCG DICE Layering Architecture Version 1.0 Revision 0.19 July 23, 2020
-5. <a id="ref-5"></a>TCG DICE Attestation Architecture Version 1.00 Revision 0.23 March 1, 2021
-6. <a id="ref-6"></a>TCG Hardware Requirements for a Device Identifier Composition Engine Family “2.0” Level
-7. <a id="ref-7"></a>[Side-Channel Attacks: Ten Years After Its Publication and the Impacts on Cryptographic Module Security Testing](https://csrc.nist.gov/csrc/media/events/physical-security-testing-workshop/documents/papers/physecpaper19.pdf)
-8. <a id="ref-8"></a>[Attestation of System Components v1.0 Requirements and Recommendations](https://www.opencompute.org/documents/attestation-v1-0-20201104-pdf)
-9. <a id="ref-9"></a>OCP Security WG: Ownership Transfer
 
 # Background
 
@@ -1136,3 +1056,84 @@ This section describes Caliptra error reporting and handling.
 [^8]: ECDSA is used for firmware verification and SPDM (signing).
 
 [^9]: SHA is used with ECDSA and HMAC, and is also used to generate measurements.
+
+# Terminology
+
+The following acronyms and abbreviations are used throughout this document.
+
+| Abbreviation | Description |
+|:-------------|:------------|
+| <a id="bmc"></a>**BMC**       | Baseboard Management Controller                |
+| <a id="CA"></a>**CA**         | Certification Authority                        |
+| <a id="CDI"></a>**CDI**       | Compound Device Identifier                     |
+| <a id="CPU"></a>**CPU**       | Central Processing Unit                        |
+| <a id="CRL"></a>**CRL**       | Certificate Revocation List                    |
+| <a id="CSR"></a>**CSR**       | Certificate Signing Request                    |
+| <a id="CSP"></a>**CSP**       | Cloud Service Provider                         |
+| <a id="DICE"></a>**DICE**     | Device Identifier Composition Engine           |
+| <a id="DRBG"></a>**DRBG**     | Deterministic Random Bit Generator             |
+| <a id="ECDSA"></a>**ECDSA**   | Elliptic Curve Digital Signature Algorithm     |
+| <a id="FMC"></a>**FMC**       | First Mutable Code                             |
+| <a id="GPU"></a>**GPU**       | Graphics Processing Unit                       |
+| <a id="IDevId"></a>**IDevId** | Initial Device Identifier                      |
+| <a id="iRoT"></a>**iRoT**     | Internal Root of Trust                         |
+| <a id="KAT"></a>**KAT**       | Known Answer Test                              |
+| <a id="LDevId"></a>**LDevId** | Locally Significant Device Identifier          |
+| <a id="NIC"></a>**NIC**       | Network Interface Card                         |
+| <a id="NIST"></a>**NIST**     | National Institute of Standards and Technology |
+| <a id="OCP"></a>**OCP**       | Open Compute Project                           |
+| <a id="OTP"></a>**OTP**       | One-time programmable                          |
+| <a id="PKI"></a>**PKI**       | Public Key infrastructure                      |
+| <a id="PTRNG"></a>**P-TRNG**  | Parallel True Random Number Generator          |
+| <a id="PUF"></a>**PUF**       | Physically unclonable function                 |
+| <a id="RoT"></a>**RoT**       | Root of Trust                                  |
+| <a id="RTI"></a>**RTI**       | RoT for Identity                               |
+| <a id="RTM"></a>**RTM**       | RoT for Measurement                            |
+| <a id="RTR"></a>**RTR**       | RoT for Reporting                              |
+| <a id="SoC"></a>**SoC**       | System on Chip                                 |
+| <a id="SPDM"></a>**SPDM**     | Security Protocol and Data Model               |
+| <a id="SSD"></a>**SSD**       | Solid State Drive                              |
+| <a id="TCB"></a>**TCB**       | Trusted Computing Base                         |
+| <a id="TCG"></a>**TCG**       | Trusted Computing Group                        |
+| <a id="TEE"></a>**TEE**       | Trusted Execution Environment                  |
+| <a id="TRNG"></a>**TRNG**     | True Random Number Generator                   |
+
+# References
+
+1. <a id="ref-1"></a>NIST Special Publication 800-193 Platform Firmware Resiliency Guidelines
+2. <a id="ref-2"></a>Global Platform Technology Root of Trust Definitions and Requirements Version 1.1 Public
+3. <a id="ref-3"></a>[Open Compute Project Secure Boot Specification](https://www.opencompute.org/documents/secure-boot-2-pdf)
+4. <a id="ref-4"></a>TCG DICE Layering Architecture Version 1.0 Revision 0.19 July 23, 2020
+5. <a id="ref-5"></a>TCG DICE Attestation Architecture Version 1.00 Revision 0.23 March 1, 2021
+6. <a id="ref-6"></a>TCG Hardware Requirements for a Device Identifier Composition Engine Family “2.0” Level
+7. <a id="ref-7"></a>[Side-Channel Attacks: Ten Years After Its Publication and the Impacts on Cryptographic Module Security Testing](https://csrc.nist.gov/csrc/media/events/physical-security-testing-workshop/documents/papers/physecpaper19.pdf)
+8. <a id="ref-8"></a>[Attestation of System Components v1.0 Requirements and Recommendations](https://www.opencompute.org/documents/attestation-v1-0-20201104-pdf)
+9. <a id="ref-9"></a>OCP Security WG: Ownership Transfer
+
+# Acknowledgments
+
+The Caliptra Workgroup acknowledges the following individuals for their contributions to this specification.
+
+**CONTRIBUTORS**
+
+* Andrés Lagar-Cavilla (Google)
+* Anjana Parthasarathy (Microsoft)
+* Bharat Pillilli (Microsoft)
+* Bryan Kelly (Microsoft)
+* Ishwar Agarwal (Microsoft)
+* James Zhang (NVIDIA)
+* Jeff Andersen (Google)
+* John Traver (AMD)
+* Jordan Hand (Google)
+* Kor Nielsen (Google)
+* Louis Ferraro (AMD)
+* Marius Schilder (Google)
+* Nathan Nadarajah (AMD)
+* Paul Chou (NVIDIA)
+* Piotr Kwidzinski (AMD)
+* Prabhu Jayana (AMD)
+* Rob Strong (AMD)
+* Sudhir Mathane (AMD)
+* Varun Sampath (NVIDIA)
+* Vishal Soni (Microsoft)
+* Steven Bellock (NVIDIA)
