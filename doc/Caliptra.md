@@ -773,7 +773,7 @@ The following figure describes the Caliptra IP HW boot flow.
 
 ![](./images/Caliptra_boot_flow2.png)
 
-1. As part of the SoC boot flow, SoC may have other infrastructure and entities that boot. That part of the flow is outside the scope of this document. If SoC chooses to bypass Caliptra, then it should have a capability to bypass Caliptra entirely through its proprietary flow. This may be needed for A0 power-on and other early validation.
+1. As part of the SoC boot flow, SoC may have other infrastructure and entities that boot. That part of the flow is outside the scope of this document. If SoC chooses to bypass Caliptra, then it should have a capability to bypass Caliptra entirely through its proprietary flow. This may be needed for initial power-on and other early validation.
 2. Cptra\_pwrgood is asserted to the Caliptra IP block.
 3. Cptra\_rst\_b is deasserted to the Caliptra IP block. See the integration specification for guidelines on the minimum number of cycles between these two signals.
 4. Caliptra IP now evaluates the strap settings driven through various interface wires (for example, BMD vs BMI mode, the security or debug state of the SoC, etc.).
