@@ -29,17 +29,21 @@ marks](CaliptraTrademarkPolicy.md).
 * [FMC](https://github.com/chipsalliance/caliptra-sw/tree/main/fmc#readme)
 * [Firmware](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md)
 
+## Security policy
+
+For information on the Caliptra security policy, how to report a vulerability, and published security advisories, refer to [Caliptra security policy](https://github.com/chipsalliance/caliptra/security/policy).
+
 ## Repositories
 
 The Caliptra code base and documentation are split across five repositories:
 
-| Repo | What |      |
+| Repo | What | Description |
 | ---- | ---- | ---- |
-| [Primary Repo](https://github.com/chipsalliance/caliptra)        | [Issues](https://github.com/chipsalliance/caliptra/issues) [PRs](https://github.com/chipsalliance/caliptra/pulls) |This repo, with admin boilerplate and docs |
-| [Caliptra RTL](https://github.com/chipsalliance/caliptra-rtl)    | [Issues](https://github.com/chipsalliance/caliptra-rtl/issues) [PRs](https://github.com/chipsalliance/caliptra-rtl/pulls) | The primary repository with immutable RTL |
-| [Caliptra SW](https://github.com/chipsalliance/caliptra-sw)      | [Issues](https://github.com/chipsalliance/caliptra-sw/issues) [PRs](https://github.com/chipsalliance/caliptra-sw/pulls) | Caliptra software (ROM, FMC, runtime firmware), and libraries/tools needed to build and test |
-| [Caliptra DPE](https://github.com/chipsalliance/caliptra-dpe)    | [Issues](https://github.com/chipsalliance/caliptra-dpe/issues) [PRs](https://github.com/chipsalliance/caliptra-dpe/pulls) | An implementation of a TCG DICE Protection Environment profile |
-| [Caliptra U-Reg](https://github.com/chipsalliance/caliptra-ureg) | [Issues](https://github.com/chipsalliance/caliptra-ureg/issues) [PRs](https://github.com/chipsalliance/caliptra-ureg/pulls) | General-purpose libraries and tools for manipulating MMIO registers from Rust |
+| [Primary Repo](https://github.com/chipsalliance/caliptra)        | [Issues](https://github.com/chipsalliance/caliptra/issues),      [PRs](https://github.com/chipsalliance/caliptra/pulls),      [Security advisories](https://github.com/chipsalliance/caliptra/security/advisories)      | This repo, with admin boilerplate and docs |
+| [Caliptra RTL](https://github.com/chipsalliance/caliptra-rtl)    | [Issues](https://github.com/chipsalliance/caliptra-rtl/issues),  [PRs](https://github.com/chipsalliance/caliptra-rtl/pulls),  [Security advisories](https://github.com/chipsalliance/caliptra-rtl/security/advisories)  | The primary repository with immutable RTL |
+| [Caliptra SW](https://github.com/chipsalliance/caliptra-sw)      | [Issues](https://github.com/chipsalliance/caliptra-sw/issues),   [PRs](https://github.com/chipsalliance/caliptra-sw/pulls),   [Security advisories](https://github.com/chipsalliance/caliptra-sw/security/advisories)   | Caliptra software (ROM, FMC, runtime firmware), and libraries/tools needed to build and test |
+| [Caliptra DPE](https://github.com/chipsalliance/caliptra-dpe)    | [Issues](https://github.com/chipsalliance/caliptra-dpe/issues),  [PRs](https://github.com/chipsalliance/caliptra-dpe/pulls),  [Security advisories](https://github.com/chipsalliance/caliptra-dpe/security/advisories)  | An implementation of a TCG DICE Protection Environment profile |
+| [Caliptra U-Reg](https://github.com/chipsalliance/caliptra-ureg) | [Issues](https://github.com/chipsalliance/caliptra-ureg/issues), [PRs](https://github.com/chipsalliance/caliptra-ureg/pulls), [Security advisories](https://github.com/chipsalliance/caliptra-ureg/security/advisories) | General-purpose libraries and tools for manipulating MMIO registers from Rust |
 
 The GitHub config parameters for all the branches are documented in a [local
 file](GitHubRules.md).
