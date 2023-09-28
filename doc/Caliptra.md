@@ -1,6 +1,6 @@
 ![OCP Logo](./images/OCP_logo.png)
 
-<p style="text-align: center;">Caliptra: A Datacenter System on a Chip (SOC) Root of Trust (RoT)</p>
+<p style="text-align: center;">Caliptra: A Datacenter System on a Chip (SoC) Root of Trust (RoT)</p>
 
 <p style="text-align: center;">Revision 1.0</p>
 
