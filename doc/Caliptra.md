@@ -752,15 +752,15 @@ The following figure describes the Caliptra Core.
 
 ![](./images/Caliptra_HW_diagram.png)
 
-* SRAM requirements:
+* Memory requirements:
   * 128 KiB of ICCM0
   * 128 KiB for Mailbox as a staged SRAM (for FW staging of impactless updates to do authentication checks on the FW before moving to ICCM)
-  * 128 KiB for DCCM and 32 KiB for ROM
+  * 128 KiB for DCCM and 48 KiB for ROM
 * Cryptography requirements:
-  * SHA256 SHA384, SHA512
-  * ECC Secp384r1 w/ HMAC-DRBG - Key Generation, Sign and Verification
+  * SHA256, SHA384, and SHA512
+  * ECC Secp384r1 with HMAC-DRBG - key generation, signing and verification
   * HMAC SHA384
-  * AES256-ECB, CBC, GCM
+  * AES256-CBC
 * Chips Alliance is used for RISC-V.
 * APB is the choice for the SoC-facing interface.
 * JTAG is exported at the IP interface.
