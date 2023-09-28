@@ -129,32 +129,34 @@ Issues within this bug tracking system will transition through a number of state
 
 ```mermaid
 flowchart TB
-    New --> Triage
-    Triage --> Assigned
-    Triage <--> Rejected
-    Assigned <--> Review
-    Review ---> Rejected
-    Review --> Accepted
-    Accepted --> Public
+    Triage --> Draft_New
+    Draft_New --> Draft_Assigned
+    Draft_New <--> Closed_Rejected
+    Draft_Assigned <--> Draft_Review
+    Draft_Review ---> Closed_Rejected
+    Draft_Review --> Draft_Accepted
+    Draft_Accepted --> Closed_Published
 ```
 
 </center>
 
-- **New:** This state represents new reports that have been entered directly by a reporter. When entered by the response team in response to an
-email, the issue shall be transitioned directly to *Triage*.
+- **Triage:** This state represents new reports that have been entered directly by a reporter. When entered by the security team in response to an
+email, the issue shall be transitioned directly to *Draft_New*.
 
-- **Triage:** This issue is awaiting Triage by the response team. The response team will analyze the issue, determine a responsible entity, assign
-it to that individual, and move the issue to the *Assigned* state. Part of triage will be to set the issue’s priority.
+- **Draft_New:** This issue is awaiting Triage by the security team. The security team will analyze the issue, determine a responsible entity, assign
+it to that individual, and move the issue to the *Draft_Assigned* state. Part of triage will be to set the issue’s priority.
 
-- **Assigned:** The issue has been assigned, and is awaiting a fix by the assignee.
+- **Draft_Assigned:** The issue has been assigned, and is awaiting a fix by the assignee.
 
-- **Review:** Once there is a Caliptra pull request for the issue, the PR link will be added to a comment in the issue, and the issue moved to the
-*Review* state.
+- **Draft_Review:** Once there is a Caliptra pull request for the issue, the PR link will be added to a comment in the issue, and the issue moved to the
+*Draft_Review* state.
 
-- **Accepted:** Indicates that this issue has been merged into the appropriate branch within Caliptra.
+- **Draft_Accepted:** Indicates that this issue has been merged into the appropriate branch within Caliptra.
 
-- **Public:** The embargo period has ended. The issue will be made publicly visible, the associated CVE updated, and the vulnerabilities page in the
+- **Closed_Published:** The embargo period has ended. The issue will be made publicly visible, the associated CVE updated, and the vulnerabilities page in the
 docs updated to include the detailed information.
+
+- **Closed_Rejected:** The Caliptra PSIRT has rejected the reported security vulnerability. It may have been deemed a non-issue, or it may have been converted to a standard Github Issue report.
 
 The security advisories created are kept private, due to the sensitive nature of security reports. The issues are only visible to certain parties:
 
