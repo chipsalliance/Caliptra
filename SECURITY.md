@@ -3,7 +3,7 @@
 ## Security communication
 
 Security information about each release is included in the release notes of each of the
-[<u>Caliptra Releases</u>](https://github.com/chipsalliance/Caliptra/releases) on GitHub.
+[Caliptra Releases](https://github.com/chipsalliance/Caliptra/releases) on GitHub.
 
 A summary of the known security vulnerabilities for Caliptra ingredient repositories are listed at the links below:
 
@@ -23,15 +23,19 @@ Vulnerability notifications pre-release or during embargo periods are available 
 We’re extremely grateful for our silicon integrators, contributors and security researchers that report vulnerabilities to the Caliptra Project
 and raise its assurance bar.
 
+If you believe you have found a security vulnerability in any Caliptra repository, please report it to us through coordinated disclosure.
+
+Please do not report security vulnerabilities through public GitHub issues, discussions, or pull requests.
+
 All reports are thoroughly investigated by the Caliptra Technical Committee (TC) members who form the Caliptra Project Security Incident Response Team (Caliptra
 PSIRT) and may get assigned a Common Vulnerabilities and Exposures number (CVE) if appropriate.
 
-The Caliptra project is a listed [**TODO: fix link after CNA onboarding** <u>CVE Numbering Authority (CNA) with MITRE</u>](https://cve.mitre.org/cve/request_id.html).
+The Caliptra project is a listed [CVE Numbering Authority (CNA) with MITRE](https://cve.mitre.org/cve/request_id.html). **TODO: fix link after CNA onboarding**
 
 Vulnerabities can be reported by the following two approaches:
 
-1. Using [<u>"Report a Vulnerability"</u>](https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability#privately-reporting-a-security-vulnerabilityfeature) capability in GitHub for each repository directly OR
-2. Using email: [<u>Vulnerabilities.caliptra-wg@lists.chipsalliance.org</u>](mailto:Vulnerabilities.caliptra-wg@lists.chipsalliance.org).
+1. Using ["Report a Vulnerability"](https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability#privately-reporting-a-security-vulnerabilityfeature) capability in GitHub for each repository directly OR
+2. Using email: [Vulnerabilities.caliptra-wg@lists.chipsalliance.org](mailto:Vulnerabilities.caliptra-wg@lists.chipsalliance.org).
 
 | Repo           | Report Vulnerability                                                                      | Description                                                                         |
 | -------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
@@ -42,7 +46,7 @@ Vulnerabities can be reported by the following two approaches:
 | Caliptra U-Reg | [Security advisories](https://github.com/chipsalliance/caliptra-ureg/security/advisories) | Report vulnerabilities in Caliptra's general-purpose libraries and tools            |
 
 More details of how vulnerabilities are handled can be found in the section
-[<u>Security vulnerability response</u>](#security-vulnerability-response).
+[Security vulnerability response](#security-vulnerability-response).
 
 ### When should I report a vulnerability?
 
@@ -61,11 +65,11 @@ More details of how vulnerabilities are handled can be found in the section
 
 Issues can be filed at the following locations:
 
-- [<u>Caliptra General Issues</u>](https://github.com/chipsalliance/Caliptra/issues)
-- [<u>Caliptra RTL Issues</u>](https://github.com/chipsalliance/caliptra-rtl/issues)
-- [<u>Caliptra ROM or FW Issues</u>](https://github.com/chipsalliance/caliptra-sw/issues)
-- [<u>Caliptra DPE Issues</u>](https://github.com/chipsalliance/caliptra-dpe/issues)
-- [<u>Caliptra U-Reg Issues</u>](https://github.com/chipsalliance/caliptra-ureg/issues)
+- [Caliptra General Issues](https://github.com/chipsalliance/Caliptra/issues)
+- [Caliptra RTL Issues](https://github.com/chipsalliance/caliptra-rtl/issues)
+- [Caliptra ROM or FW Issues](https://github.com/chipsalliance/caliptra-sw/issues)
+- [Caliptra DPE Issues](https://github.com/chipsalliance/caliptra-dpe/issues)
+- [Caliptra U-Reg Issues](https://github.com/chipsalliance/caliptra-ureg/issues)
 
 ## Security vulnerability response
 
@@ -80,8 +84,8 @@ As the security issue moves from triage, to identified fix, to release planning,
 ## Embargo policy
 
 The information members receive during embargo periods may be received from the Caliptra Vulnerability Alerts mailing list:
-[<u>Vulnerability-Alerts.caliptra-wg@lists.chipsalliance.org</u>](mailto:Vulnerability-Alerts.caliptra-wg@lists.chipsalliance.org). To sign up, visit
-[<u>lists.chipsalliance.org/g/Vulnerability-Alerts.caliptra-wg</u>](https://lists.chipsalliance.org/g/Vulnerability-Alerts.caliptra-wg). Any
+[Vulnerability-Alerts.caliptra-wg@lists.chipsalliance.org](mailto:Vulnerability-Alerts.caliptra-wg@lists.chipsalliance.org). To sign up, visit
+[lists.chipsalliance.org/g/Vulnerability-Alerts.caliptra-wg](https://lists.chipsalliance.org/g/Vulnerability-Alerts.caliptra-wg). Any
 information regarding embargoed vulnerabilities must not be made public, shared, nor even hinted at anywhere beyond the need-to-know within your specific team
 except with the list’s explicit approval. This holds true until the public disclosure date/time that was agreed upon by the list. Members of the list and others
 may not use the information for anything other than getting the issue fixed for your respective product’s users.
@@ -90,20 +94,20 @@ Before any embargoed information from the list is shared with respective members
 only find out information on a need-to-know basis.
 
 In the unfortunate event that a member shares the information beyond what is allowed by this policy, that member ***must*** urgently inform the Caliptra
-workgroup at the [<u>Vulnerabilities.caliptra-wg@lists.chipsalliance.org</u>](mailto:Vulnerabilities.caliptra-wg@lists.chipsalliance.org) mailing list of
+workgroup at the [Vulnerabilities.caliptra-wg@lists.chipsalliance.org](mailto:Vulnerabilities.caliptra-wg@lists.chipsalliance.org) mailing list of
 exactly what information leaked and to whom. A retrospective will take place after the leak so we can assess how to not make the same mistake in the future.
 
 If the member continues to leak information and break this policy, the member will be removed from the list.
 
-More details of how vulnerabilities are handled can be found in our [<u>Security incident management process</u>](#security-incident-management-process)
+More details of how vulnerabilities are handled can be found in our [Security incident management process](#security-incident-management-process)
 section.
 
 ## Product creator notification process
 
 Product creators who are not already members of the Caliptra project may be eligible to participate in the
-[<u>Vulnerability-Alerts.caliptra-wg@lists.chipsalliance.org</u>](mailto:Vulnerability-Alerts.caliptra-wg@lists.chipsalliance.org) mail list and receive
+[Vulnerability-Alerts.caliptra-wg@lists.chipsalliance.org](mailto:Vulnerability-Alerts.caliptra-wg@lists.chipsalliance.org) mail list and receive
 advanced notification of the vulnerabilities and mitigations before public disclosure by applying to participate. For more information, refer to the
-[<u>Vulnerability notification process</u>](#vulnerability-notification-process) section of this document.
+[Vulnerability notification process](#vulnerability-notification-process) section of this document.
 
 Criteria for participation includes:
 
@@ -194,7 +198,7 @@ anonymity.
 The Caliptra project shall maintain a vulnerability-alerts mailing list. This list will be seeded initially with a contact from each project member.
 
 Additional parties can request to join this list by visiting
-[<u>lists.chipsalliance.org/g/Vulnerability-Alerts.caliptra-wg</u>](https://lists.chipsalliance.org/g/Vulnerability-Alerts.caliptra-wg). These parties will be vetted by the Caliptra PSIRT to
+[lists.chipsalliance.org/g/Vulnerability-Alerts.caliptra-wg](https://lists.chipsalliance.org/g/Vulnerability-Alerts.caliptra-wg). These parties will be vetted by the Caliptra PSIRT to
 determine that they have a legitimate interest in knowing about security vulnerabilities during the embargo period.
 
 Periodically, the Caliptra PSIRT will send information to this mailing list describing known embargoed issues and their backport status within the
