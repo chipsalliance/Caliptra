@@ -130,6 +130,7 @@ Issues within this bug tracking system will transition through a number of state
 ```mermaid
 flowchart TB
     Triage --> Draft_New
+    Triage --> Closed_Rejected
     Draft_New --> Draft_Assigned
     Draft_New <--> Closed_Rejected
     Draft_Assigned <--> Draft_Review
@@ -156,7 +157,7 @@ it to that individual, and move the issue to the *Draft_Assigned* state. Part of
 - **Closed_Published:** The embargo period has ended. The issue will be made publicly visible, the associated CVE updated, and the vulnerabilities page in the
 docs updated to include the detailed information.
 
-- **Closed_Rejected:** The Caliptra PSIRT has rejected the reported security vulnerability. It may have been deemed a non-issue, or it may have been converted to a standard Github Issue report.
+- **Closed_Rejected:** The Caliptra PSIRT has rejected the reported security vulnerability. It may have been deemed a non-issue, or it may have been converted to a standard Github Issue report. The PSIRT may also re-open the issue from here.
 
 The security advisories created are kept private, due to the sensitive nature of security reports. The issues are only visible to certain parties:
 
