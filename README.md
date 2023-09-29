@@ -48,7 +48,7 @@ defined in the Caliptra security policy.
 
 The Caliptra code base and documentation are split across five repositories:
 
-| Repository | What | Description |
+| Repository | Areas of interest | Description |
 | ---------- | ---- | ----------- |
 | [Primary repoository](https://github.com/chipsalliance/caliptra)  | [Issues](https://github.com/chipsalliance/caliptra/issues),      [PRs](https://github.com/chipsalliance/caliptra/pulls),      [Security advisories](https://github.com/chipsalliance/caliptra/security/advisories)      | This repoository, with admin boilerplate and docs |
 | [Caliptra RTL](https://github.com/chipsalliance/caliptra-rtl)     | [Issues](https://github.com/chipsalliance/caliptra-rtl/issues),  [PRs](https://github.com/chipsalliance/caliptra-rtl/pulls),  [Security advisories](https://github.com/chipsalliance/caliptra-rtl/security/advisories)  | The primary repository with immutable RTL |
