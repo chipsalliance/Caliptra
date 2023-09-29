@@ -3,19 +3,19 @@
 ## Security communication
 
 Security information about each release is included in the release notes of each of the
-[Caliptra Releases](https://github.com/chipsalliance/Caliptra/releases) on GitHub.
+[Caliptra releases](https://github.com/chipsalliance/Caliptra/releases) on GitHub.
 
 A summary of the known security vulnerabilities for Caliptra ingredient repositories are listed at the links below:
 
-| Repo              | Advisory Page                                                                                                                            |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| Primary Repo      | [https://github.com/chipsalliance/Caliptra/security/advisories](https://github.com/chipsalliance/Caliptra/security/advisories)           |
-| Caliptra RTL      | [https://github.com/chipsalliance/caliptra-rtl/security/advisories](https://github.com/chipsalliance/caliptra-rtl/security/advisories)   |
-| Caliptra Software | [https://github.com/chipsalliance/caliptra-sw/security/advisories](https://github.com/chipsalliance/caliptra-sw/security/advisories)     |
-| Caliptra DPE      | [https://github.com/chipsalliance/caliptra-dpe/security/advisories](https://github.com/chipsalliance/caliptra-dpe/security/advisories)   |
-| Caliptra U-Reg    | [https://github.com/chipsalliance/caliptra-ureg/security/advisories](https://github.com/chipsalliance/caliptra-ureg/security/advisories) |
+| Repository         | Advisory Page                                                                                                                            |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Primary repository | [https://github.com/chipsalliance/Caliptra/security/advisories](https://github.com/chipsalliance/Caliptra/security/advisories)           |
+| Caliptra RTL       | [https://github.com/chipsalliance/caliptra-rtl/security/advisories](https://github.com/chipsalliance/caliptra-rtl/security/advisories)   |
+| Caliptra software  | [https://github.com/chipsalliance/caliptra-sw/security/advisories](https://github.com/chipsalliance/caliptra-sw/security/advisories)     |
+| Caliptra DPE       | [https://github.com/chipsalliance/caliptra-dpe/security/advisories](https://github.com/chipsalliance/caliptra-dpe/security/advisories)   |
+| Caliptra U-Reg     | [https://github.com/chipsalliance/caliptra-ureg/security/advisories](https://github.com/chipsalliance/caliptra-ureg/security/advisories) |
 
-Vulnerability notifications pre-release or during embargo periods are available to Product Creators that have registered through the
+Vulnerability notifications pre-release or during embargo periods are available to product creators that have registered through the
 [Product creator notification process](#product-creator-notification-process).
 
 ## Report a vulnerability
@@ -37,22 +37,22 @@ Vulnerabities can be reported by the following two approaches:
 1. Using ["Report a Vulnerability"](https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability#privately-reporting-a-security-vulnerabilityfeature) capability in GitHub for each repository directly OR
 2. Using email: [Vulnerabilities.caliptra-wg@lists.chipsalliance.org](mailto:Vulnerabilities.caliptra-wg@lists.chipsalliance.org).
 
-| Repo           | Report Vulnerability                                                                      | Description                                                                         |
-| -------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| Primary Repo   | [Security advisories](https://github.com/chipsalliance/caliptra/security/advisories)      | Report general Caliptra vulnerabilities, or vulnerabilities where source is unknown |
-| Caliptra RTL   | [Security advisories](https://github.com/chipsalliance/caliptra-rtl/security/advisories)  | Report vulnerabilities in Caliptra's RTL                                            |
-| Caliptra SW    | [Security advisories](https://github.com/chipsalliance/caliptra-sw/security/advisories)   | Report vulnerabilities in Caliptra's ROM, FMC, runtime firmware                     |
-| Caliptra DPE   | [Security advisories](https://github.com/chipsalliance/caliptra-dpe/security/advisories)  | Report vulnerabilities in Caliptra's TCG DICE Protection Environment profile        |
-| Caliptra U-Reg | [Security advisories](https://github.com/chipsalliance/caliptra-ureg/security/advisories) | Report vulnerabilities in Caliptra's general-purpose libraries and tools            |
+| Repository         | Report Vulnerability                                                                      | Description                                                                         |
+| ------------------ | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Primary repository | [Security advisories](https://github.com/chipsalliance/caliptra/security/advisories)      | Report general Caliptra vulnerabilities, or vulnerabilities where source is unknown |
+| Caliptra RTL       | [Security advisories](https://github.com/chipsalliance/caliptra-rtl/security/advisories)  | Report vulnerabilities in Caliptra's RTL                                            |
+| Caliptra software  | [Security advisories](https://github.com/chipsalliance/caliptra-sw/security/advisories)   | Report vulnerabilities in Caliptra's ROM, FMC, runtime firmware                     |
+| Caliptra DPE       | [Security advisories](https://github.com/chipsalliance/caliptra-dpe/security/advisories)  | Report vulnerabilities in Caliptra's TCG DICE Protection Environment profile        |
+| Caliptra U-Reg     | [Security advisories](https://github.com/chipsalliance/caliptra-ureg/security/advisories) | Report vulnerabilities in Caliptra's general-purpose libraries and tools            |
 
 More details of how vulnerabilities are handled can be found in the section
 [Security vulnerability response](#security-vulnerability-response).
 
 ### When should I report a vulnerability?
 
-- You think you discovered a potential security vulnerability in Caliptra
-- You are unsure how a vulnerability affects Caliptra
-- You think you discovered a vulnerability in another project that Caliptra depends on
+- You think you discovered a potential security vulnerability in Caliptra.
+- You are unsure how a vulnerability affects Caliptra.
+- You think you discovered a vulnerability in another project that Caliptra depends upon.
   - For projects with their own vulnerability reporting and disclosure process, please report it directly there.
 
 ### When should I *NOT* report a vulnerability?
@@ -61,7 +61,7 @@ More details of how vulnerabilities are handled can be found in the section
   - Instead, file an Issue labeled as "feature request".
 - You need help with a previously announced Caliptra Security Advisory.
   - Instead, file an Issue labeled as "question"".
-- Your issue is not security-related. Instead, file an issue as appropriate.
+- Your issue is not security related. Instead, file an issue as appropriate.
 
 Issues can be filed at the following locations:
 
@@ -73,7 +73,7 @@ Issues can be filed at the following locations:
 
 ## Security vulnerability response
 
-Each report is acknowledged and analyzed by Caliptra Project Security Incident Response Team members within 7 working days. This will set off the
+Each report is acknowledged and analyzed by Caliptra Project Security Incident Response Team members within 7 working days. This will trigger the
 [Security incident management process](#security-incident-management-process) outlined below.
 
 Any vulnerability information shared with the Caliptra Technical Committee stays within the Caliptra project and will not be disseminated to other projects
@@ -111,7 +111,7 @@ advanced notification of the vulnerabilities and mitigations before public discl
 
 Criteria for participation includes:
 
-1. Register as a [Product creator](https://github.com/chipsalliance/Caliptra/blob/main/README.md#product-creator-registration)
+1. Register as a [Product creator](https://github.com/chipsalliance/Caliptra/blob/main/README.md#product-creator-registration).
 1. Have a contact who will respond to emails within a week and understands how Caliptra is being used in the product.
 1. Have a publicly listed product based on some release of Caliptra.
 1. Have an actively monitored security email alias.
@@ -119,7 +119,7 @@ Criteria for participation includes:
 
 Removal:
 
-1. If a member stops adhering to these criteria after joining the list then the member will be unsubscribed.
+1. If a member stops adhering to these criteria after joining the list, then the member will be unsubscribed.
 
 ## Security incident management process
 
@@ -141,10 +141,11 @@ flowchart TB
 
 </center>
 
-- **Triage:** This state represents new reports that have been entered directly by a reporter. When entered by the security team in response to an
-email, the issue shall be transitioned directly to *Draft_New*.
+- **Triage:** This state represents new reports that have been entered directly by a reporter. The security team will triage these reports and move them to
+either *Draft_New* or *Closed_Rejected*. When reports are entered by the security team in response to an email, the issue shall be transitioned directly to
+*Draft_New*.
 
-- **Draft_New:** This issue is awaiting Triage by the security team. The security team will analyze the issue, determine a responsible entity, assign
+- **Draft_New:** This issue is awaiting disposition by the security team. The security team will analyze the issue, determine a responsible entity, assign
 it to that individual, and move the issue to the *Draft_Assigned* state. Part of triage will be to set the issue’s priority.
 
 - **Draft_Assigned:** The issue has been assigned, and is awaiting a fix by the assignee.
@@ -157,7 +158,8 @@ it to that individual, and move the issue to the *Draft_Assigned* state. Part of
 - **Closed_Published:** The embargo period has ended. The issue will be made publicly visible, the associated CVE updated, and the vulnerabilities page in the
 docs updated to include the detailed information.
 
-- **Closed_Rejected:** The Caliptra PSIRT has rejected the reported security vulnerability. It may have been deemed a non-issue, or it may have been converted to a standard Github Issue report. The PSIRT may also re-open the issue from here.
+- **Closed_Rejected:** The Caliptra PSIRT has rejected the reported security vulnerability. It may have been deemed a non-issue, or it may have been converted
+to a standard Github Issue report. The PSIRT may also re-open the issue from here.
 
 The security advisories created are kept private, due to the sensitive nature of security reports. The issues are only visible to certain parties:
 
@@ -185,7 +187,7 @@ Fixes to the code shall be made through pull requests (PRs) in the Caliptra proj
 sensitive nature of what is being fixed, and shall not refer to CVE numbers that have been assigned to the issue. The developer instead should
 merely describe what has been fixed.
 
-The Caliptra TC shall maintain information mapping embargoed CVEs to these PRs (this information is within the Github security advisories), and
+The Caliptra TC shall maintain information that maps embargoed CVEs to these PRs (this information is within the Github security advisories), and
 produce regular reports of the state of security issues.
 
 Each issue that is considered a security vulnerability shall be assigned a CVE number. As fixes are created, it may be necessary to allocate
@@ -236,5 +238,5 @@ know. The following parties will need to know details about security vulnerabili
 - Maintainers will have access to all information within their domain area only.
 - The current release manager, and the release manager for historical releases affected by the vulnerability (see backporting above).
 - The Project Security Incident Response Team will have full access to information.
-- The PSIRT is made up of representatives from Caliptra integrators & contributors.
+- The PSIRT is made up of representatives from Caliptra integrators and contributors.
 - As needed, release managers and maintainers may be invited to attend additional security meetings to discuss vulnerabilities.
