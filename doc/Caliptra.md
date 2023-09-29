@@ -326,7 +326,7 @@ The Caliptra subsystem offers a complete RoT subsystem, with open source program
 
 ## Identity
 
-Caliptra must provide its runtime code with a cryptographic identity in accordance with the TCG DICE specification. This identity must be rooted in ROM, and provides an attestation over the security state of the RTM as well as the code that the RTM booted.
+Caliptra must provide its runtime (RT) code with a cryptographic identity in accordance with the TCG DICE specification. This identity must be rooted in ROM, and provides an attestation over the security state of the RTM as well as the code that the RTM booted.
 
 *Figure 6: DICE Cert/Key generation*
 
@@ -1069,6 +1069,7 @@ The following acronyms and abbreviations are used throughout this document.
 | <a id="PTRNG"></a>**P-TRNG**  | Parallel True Random Number Generator          |
 | <a id="PUF"></a>**PUF**       | Physically unclonable function                 |
 | <a id="RoT"></a>**RoT**       | Root of Trust                                  |
+| <a id="RT"></a>**RT**         | Runtime                                        |
 | <a id="RTI"></a>**RTI**       | RoT for Identity                               |
 | <a id="RTM"></a>**RTM**       | RoT for Measurement                            |
 | <a id="RTR"></a>**RTR**       | RoT for Reporting                              |
