@@ -1,5 +1,7 @@
 # Caliptra Project Security Incident Response
 
+***Please note that this policy document is a work in progress. This will continue to be updated and finalized as Caliptra reaches the 1.0 milestone.***
+
 ## Security communication
 
 Security information about each release is included in the release notes of each of the
