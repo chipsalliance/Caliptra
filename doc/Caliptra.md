@@ -84,7 +84,7 @@ In this version of the specification, the desired capabilities address the basic
 
 ### DICE Protection Environment
 
-Caliptra implements the DPE API, allowing it to derive and wield a DICE identity on behalf of other elements within the SoC. Use cases for this API include serving as a signing oracle for a Security Protocol and Data Model (SPDM) responder that is executing in the SoC application processor, as well as authentication to a discrete TPM device.
+Caliptra implements the DICE Protection Environment (DPE) API, allowing it to derive and wield a DICE identity on behalf of other elements within the SoC. Use cases for this API include serving as a signing oracle for a Security Protocol and Data Model (SPDM) responder that is executing in the SoC application processor, as well as authentication to a discrete TPM device.
 
 # Industry standards and specifications
 
@@ -477,7 +477,7 @@ The service surface of Caliptra has multiple vectors. All use cases are control 
 * **Logic IOs:** Required to indicate status of the IP, availability of a message through APB, and to enable or disable certain debug capabilities (like JTAG enable or disable).
 * **Command mailbox**: Caliptra shall offer services to other parts of the SoC. The APIs are documented in the [Caliptra Runtime specification](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md) and summarized below:
   * **Loading firmware**: Caliptra firmware is loaded via the mailbox at cold boot. In addition, Caliptra firmware can be loaded at runtime to support hitless or impactless updates.
-  * **DICE-as-a-Service**: Caliptra shall expose the TCG DICE Protection Environment iRoT Profile API, allowing Caliptra to derive and wield a DICE identity on behalf of other elements within the SoC. For example, Caliptra can sign messages for an SPDM responder.
+  * **DICE Protection Environment**: Caliptra shall expose the TCG DICE Protection Environment iRoT Profile API, allowing Caliptra to derive and wield a DICE identity on behalf of other elements within the SoC. For example, Caliptra can sign messages for an SPDM responder.
   * **Measurement Vault**: Caliptra shall support stashing of measurements for the code and configuration of the SoC. Caliptra can provide these measurements via PCR Quote API or via DPE.
   * **FW Authentication**: Caliptra supports ECDSA verification for SoC firmware beyond its own. The SHA384 block exposes a HW API for hashing firmware. The runtime firmware exposes an ECDSA verification API that uses the hash computed by the SHA384 block.
 
@@ -1053,6 +1053,7 @@ The following acronyms and abbreviations are used throughout this document.
 | <a id="CSR"></a>**CSR**       | Certificate Signing Request                    |
 | <a id="CSP"></a>**CSP**       | Cloud Service Provider                         |
 | <a id="DICE"></a>**DICE**     | Device Identifier Composition Engine           |
+| <a id="DPE"></a>**DPE**       | DICE Protection Environment                    |
 | <a id="DRBG"></a>**DRBG**     | Deterministic Random Bit Generator             |
 | <a id="ECDSA"></a>**ECDSA**   | Elliptic Curve Digital Signature Algorithm     |
 | <a id="FMC"></a>**FMC**       | First Mutable Code                             |
