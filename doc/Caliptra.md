@@ -84,7 +84,7 @@ In this version of the specification, the desired capabilities address the basic
 
 ### DICE Protection Environment
 
-Caliptra implements the DPE API, allowing it to derive and wield a DICE identity on behalf of other elements within the SoC. Use cases for this API include serving as a signing oracle for a Security Protocol and Data Model (SPDM) responder that is executing in the SoC application processor, as well as authentication to a discrete TPM device.
+Caliptra implements the DICE Protection Environment (DPE) API, allowing it to derive and wield a DICE identity on behalf of other elements within the SoC. Use cases for this API include serving as a signing oracle for a Security Protocol and Data Model (SPDM) responder that is executing in the SoC application processor, as well as authentication to a discrete TPM device.
 
 # Industry standards and specifications
 
@@ -1053,6 +1053,7 @@ The following acronyms and abbreviations are used throughout this document.
 | <a id="CSR"></a>**CSR**       | Certificate Signing Request                    |
 | <a id="CSP"></a>**CSP**       | Cloud Service Provider                         |
 | <a id="DICE"></a>**DICE**     | Device Identifier Composition Engine           |
+| <a id="DPE"></a>**DPE**       | DICE Protection Environment                    |
 | <a id="DRBG"></a>**DRBG**     | Deterministic Random Bit Generator             |
 | <a id="ECDSA"></a>**ECDSA**   | Elliptic Curve Digital Signature Algorithm     |
 | <a id="FMC"></a>**FMC**       | First Mutable Code                             |
