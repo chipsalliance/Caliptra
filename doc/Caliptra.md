@@ -16,7 +16,6 @@ The objective of Caliptra is to define core RoT capabilities that must be implem
 
 <div style="page-break-after: always"></div>
 
-
 # Background
 
 The overall security posture of silicon devices depends on establishing a core root of trust (RoT) and chain of trust. The core root of trust and chain of trust must attest to the integrity of configuration and mutable code.
@@ -351,13 +350,16 @@ Caliptra shall support field-programmable entropy, which factors into the device
 Caliptra's field-programmable entropy shall consist of four 32-byte slots. All slots are used to derive LDevID. An owner may decide to program as few or as many slots as they wish. Upon programming new entropy, on the next reset the device begins wielding its fresh LDevID. Owners need to validate the new LDevID by using IDevID.
 
 ### Commentary: threat analysis
+
 An ideal IDevID has the following properties:
+
 * Cannot be altered by entities besides Caliptra in manufacturing security state.
 * Cannot be impersonated by entities that are not a Caliptra instatiation for that device class.
 * Cannot be cloned to additional devices of the same class.
 * Private component cannot be extracted from Caliptra.
 
 Caliptra 1.0 alone does not fully address these properties. For example, a person-in-the-middle supply chain adversary could impersonate Caliptra by submitting its own IDevID Certificate Signing Request (CSR) to the pCA. Vendors should threat model the IDevID generation and endorsement flows for their SoC. Threat actors to consider are the following:
+
 * Components involved in UDS injection flows: can they inject the same obfuscated UDS to multiple devices, or to devices of different classes? Can they wield the obfuscation key to leak the UDS?
 * Components servicing the connectivity between the Caliptra instantiation and the HSM applicance performing IDevID endorsement: can they alter or impersonate Caliptra's IDevID CSR?
 * Physical attackers: see [Physical Attack Countermeasures](#physical-attack-countermeasures).
@@ -640,6 +642,7 @@ Caliptra RT generates the DPE certificate and endorses it with the Alias<sub>RT<
 | 011b                                           | DebugUnlocked and production    | This state is used when debugging of Caliptra is required. When in this state: UDS and other identity critical assets are programmed into fuses. They may not have been written into Caliptra fuse registers if the insecure state entered before Caliptra is out of reset. If the insecure state transition happened after fuses are written to Caliptra, they are cleared when the security state transitions from secure/manufacturing -> insecure.<br> Caliptra state: All security assets are in debug mode (UDS and obfuscation key are in production state).<br> - UDS: Reverts to a ‘well-known’ debug value.<br> - Obfuscation key: Switched to debug key.<br> - Key Vault is also cleared.<br> - Caliptra JTAG is unlocked and allows microcontroller debug.<br> - Caliptra JTAG can access IP internal registers through FW or directly. | Debug unlocked -> debug locked is possible ONLY with a power cycle.            |
 
 **Notes:**
+
 * End-of-life state is owned by SoC. In end-of-life device lifecycle state, Caliptra shall not not be brought out of reset.
 * Other encodings are reserved and always assumed to be in a secure state.
 
@@ -1091,7 +1094,6 @@ The PAUSER field of the APB interface is used to encode device attributes for th
 
 The Caliptra mailbox commands are specified in the [Caliptra runtime firmware specification](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#maibox-commands).
 
-
 ## Caliptra firmware image format
 
 The Caliptra firmware image format is specified in the [Caliptra ROM specification](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md#8-firmware-image-bundle).
@@ -1133,7 +1135,7 @@ Caliptra provides a HW API to do a SHA384 hash calculation. The SoC can access t
 
 ### Architectural registers
 
-These registers are accessible over APB to be read according to the register access permissions. For more information, see the register reference manual at https://ereg.caliptra.org.
+These registers are accessible over APB to be read according to the register access permissions. For more information, see the register reference manual at <https://ereg.caliptra.org>.
 
 ### Fuse requirements
 
@@ -1159,6 +1161,7 @@ SoC shall support a field entropy programming API. The API shall support retriev
 Caliptra assumes that the unfused value in fuses is '0' and the fused value is '1'. With this context, zeroization refers to destroying a secret value by fusing it to all ones.
 
 For SoCs that intend to achieve FIPS 140-3 CMVP certification with Caliptra:
+
 * SoC shall implement zeroization for uds_seed and field_entropy such that the fuse rows holding these secrets contain all ones.
 * SoC shall expose and document an API for a tester to invoke zeroization.
 * SoC shall indicate that zeroization has occurred by statically asserting GENERIC_INPUT_WIRE[0] to Caliptra.
@@ -1167,6 +1170,7 @@ For SoCs that intend to achieve FIPS 140-3 CMVP certification with Caliptra:
 * SoC shall ensure authorization for this API to guard against denial-of-service attacks. The authorization design is left to the vendor.
 
 #### Fuse map
+
 The following table describes Caliptra's fuse map:
 
 *Table 16: Caliptra Fuse Map*
@@ -1196,8 +1200,8 @@ This section describes Caliptra error reporting and handling.
 
 | | Fatal errors | Non-fatal errors |
 | :- | - | - |
-| Hardware | - ICCM, DCCM SRAM ECC<br> - Second watchdog (WD) timer expiry. The first timer expiry triggers an NMI to firmware to correct the issue and clear the interrupt status bit. If the WD expires again, then it is escalated to a FATAL error. | - Mailbox SRAM ECC (except initial firmware load)<br> - Mailbox incorrect protocol or commands. For example, incorrect access ordering or access without Lock. |
-| Firmware | - Boot-time firmware authentication failures<br> - Firmware triggered FATAL errors. Examples: ICCM or DCCM have misaligned access (potentially in the except subroutine); AHB access hangs, triggered through WD timer expiry; AHB access outside of the decoding range; and stack overflow errors. For more information, see the table below. | - Mailbox API failures<br> - First WD timer expiry<br> - Cryptography processing errors |
+| Hardware | - ICCM, DCCM SRAM ECC.<p> </br>-  The second watchdog (WD) timer expiry triggers an NMI, and a FATAL error is signaled to the SoC.</p> | <p>- Mailbox SRAM ECC (except initial firmware load)<br><p>- Mailbox incorrect protocol or commands. For example, incorrect access ordering or access without Lock. |
+| Firmware | - Control Flow Integrity (CFI) errors. <br><p> - KAT errors. <br> - FIPS Self Test errors. <br> - Mailbox commands received after FIPS Shutdown request completes. <br>  - Hand-off errors detected upon transfer of control from ROM to FMC or FMC to Runtime. <br> - Mailbox protocol violations leading the mailbox to an inconsistent state if encountered by ROM during cold reset flow. <br> - Firmware image verification or authentication failures if encountered by ROM during Cold Reset flow. <br> - Non-aligned access to ICCM or DCCM <br> - AHB access hangs, triggered through WD timer expiry <br> - AHB access outside of the decoding range <br> | - Firmware image verification or authentication failures if encountered by ROM during Update Reset flow. <br> - Mailbox protocol violations leading the mailbox to an inconsistent state (if encountered by ROM during Update Reset flow). <br> - Cryptography processing errors. |
 
 **Fatal errors**
 
@@ -1238,6 +1242,7 @@ The following acronyms and abbreviations are used throughout this document.
 | <a id="bmc"></a>**BMC**       | Baseboard Management Controller                |
 | <a id="CA"></a>**CA**         | Certification Authority                        |
 | <a id="CDI"></a>**CDI**       | Compound Device Identifier                     |
+| <a id="CFI"></a>**CFI**       | Control Flow Integrity                         |
 | <a id="CPU"></a>**CPU**       | Central Processing Unit                        |
 | <a id="CRL"></a>**CRL**       | Certificate Revocation List                    |
 | <a id="CSR"></a>**CSR**       | Certificate Signing Request                    |
