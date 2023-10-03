@@ -1004,11 +1004,12 @@ This section describes Caliptra error reporting and handling.
 
 *Table 13: Hardware and firmware error types*
 
-| | Fatal errors | Non-fatal errors |
-| :- | - | - |
-| Hardware | - ICCM, DCCM SRAM ECC<br> - Second watchdog (WD) timer expiry. The first timer expiry triggers an NMI to firmware to correct the issue and clear the interrupt status bit. If the WD expires again, then it is escalated to a FATAL error. | - Mailbox SRAM ECC (except initial firmware load)<br> - Mailbox incorrect protocol or commands. For example, incorrect access ordering or access without Lock. |
-| Firmware | - Boot-time firmware authentication failures<br> - Firmware triggered FATAL errors. Examples: ICCM or DCCM have misaligned access (potentially in the except subroutine); AHB access hangs, triggered through WD timer expiry; AHB access outside of the decoding range; and stack overflow errors. For more information, see the table below. | - Mailbox API failures<br> - First WD timer expiry<br> - Cryptography processing errors |
+*Table 14: HW/FW Error Types*
 
+| | Fatal Errors | Non-fatal Errors |
+| :- | - | - |
+| HW | <p>- ICCM, DCCM SRAM ECC</p><p>- Second WD timer triggers an NMI and a FATAL error is signaled to the SoC.</p> | <p>- Mailbox SRAM ECC (except initial FW load)</p><p>- Mailbox incorrect protocol/commands. E.g. Incorrect access ordering; access without Lock.</p> |
+| FW | <p> - CFI errors. </p> <p> - KAT errors. <p>-FIPS Self Test errors. <p> - Mailbox commands received after FIPS Shutdown request completes. </p> <p> - Hand-off errors detected upon transfer of control from ROM to FMC or FMC to Runtime. </p> <p> - Mailbox protocol violations leading the mailbox to an inconsistent state if encountered by ROM during cold reset flow. </p> <p>- FW image verification/authentication failures if encountered by ROM during Cold Reset flow. </p><p>- FW triggered FATAL errors. Examples: ICCM/DCCM misaligned access (potentially in the except subroutine); AHB access hangs that is triggered through WD timer expiry; AHB access outside the decoding range; stack overflow etc. Refer to the table below</p> | <p>- FW image verification/authentication failures if encountered by ROM during Update Reset flow. <p> - Mailbox protocol violations leading the mailbox to an inconsistent state if encountered by ROM during Update Reset flow. </p><p>- Crypto processing errors</p> |
 **Fatal errors**
 
 * Fatal errors log the FATAL ERROR reasons into an architectural register that is RW from the external world. This register must be sticky (as in, reset is on powergood).
@@ -1048,6 +1049,7 @@ The following acronyms and abbreviations are used throughout this document.
 | <a id="bmc"></a>**BMC**       | Baseboard Management Controller                |
 | <a id="CA"></a>**CA**         | Certification Authority                        |
 | <a id="CDI"></a>**CDI**       | Compound Device Identifier                     |
+| <a id="CFI"></a>**CDI**       | Control Flow Integrity                     |
 | <a id="CPU"></a>**CPU**       | Central Processing Unit                        |
 | <a id="CRL"></a>**CRL**       | Certificate Revocation List                    |
 | <a id="CSR"></a>**CSR**       | Certificate Signing Request                    |
