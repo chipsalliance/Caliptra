@@ -1,4 +1,4 @@
-![Caliptra Logo](doc/images/logo/Caliptra_logo_large.png)
+![Caliptra Logo](https://chipsalliance.github.io/Caliptra/doc/images/logo/Caliptra_logo_large.png)
 
 # Caliptra
 
@@ -19,14 +19,15 @@ Project](https://chipsalliance.org/), a Series of LF Projects, LLC.
 
 ## Governance
 
-The [Caliptra WorkGroup Technical Charter](CaliptraWGTechnicalCharter.md)
+The [Caliptra WorkGroup Technical Charter](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraWGTechnicalCharter.md)
 sets out the charter governing the Caliptra project and [its
-marks](CaliptraTrademarkPolicy.md).
+marks](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkPolicy.md).
 
 ## Specifications
 
-* [Main Caliptra specification](doc/Caliptra.md)
-* [FMC](https://github.com/chipsalliance/caliptra-sw/tree/main/fmc#readme)
+* [Main Caliptra specification](https://github.com/chipsalliance/Caliptra/blob/main/doc/Caliptra.md)
+* [ROM](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md)
+* [FMC](https://github.com/chipsalliance/caliptra-sw/blob/main/fmc/README.md)
 * [Firmware](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md)
 
 ## Security policy
@@ -56,8 +57,8 @@ The Caliptra code base and documentation are split across five repositories:
 | [Caliptra DPE](https://github.com/chipsalliance/caliptra-dpe)     | [Issues](https://github.com/chipsalliance/caliptra-dpe/issues),  [PRs](https://github.com/chipsalliance/caliptra-dpe/pulls),  [Security advisories](https://github.com/chipsalliance/caliptra-dpe/security/advisories)  | An implementation of a TCG DICE Protection Environment profile |
 | [Caliptra U-Reg](https://github.com/chipsalliance/caliptra-ureg)  | [Issues](https://github.com/chipsalliance/caliptra-ureg/issues), [PRs](https://github.com/chipsalliance/caliptra-ureg/pulls), [Security advisories](https://github.com/chipsalliance/caliptra-ureg/security/advisories) | General-purpose libraries and tools for manipulating MMIO registers from Rust |
 
-The GitHub config parameters for all of the branches are documented in a [local
-file](GitHubRules.md).
+The GitHub config parameters for all the branches are documented in a [local
+file](https://github.com/chipsalliance/Caliptra/blob/main/GitHubRules.md).
 
 ### Convenience repoository URLs
 
@@ -96,5 +97,5 @@ affiliated) before participating in these channels.
 ## License
 
 All code written for Caliptra and found in these repositories is licensed under
-the [Apache Source License 2.0](LICENSE). You can find out more by reading our
-document on [how to contribute](CONTRIBUTING.md).
+the [Apache Source License 2.0](https://github.com/chipsalliance/Caliptra/blob/main/LICENSE). You can find out more by reading our
+document on [how to contribute](https://github.com/chipsalliance/Caliptra/blob/main/CONTRIBUTING.md).
