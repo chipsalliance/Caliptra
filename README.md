@@ -57,7 +57,7 @@ The Caliptra code base and documentation are split across five repositories:
 | [Caliptra DPE](https://github.com/chipsalliance/caliptra-dpe)     | [Issues](https://github.com/chipsalliance/caliptra-dpe/issues),  [PRs](https://github.com/chipsalliance/caliptra-dpe/pulls),  [Security advisories](https://github.com/chipsalliance/caliptra-dpe/security/advisories)  | An implementation of a TCG DICE Protection Environment profile |
 | [Caliptra U-Reg](https://github.com/chipsalliance/caliptra-ureg)  | [Issues](https://github.com/chipsalliance/caliptra-ureg/issues), [PRs](https://github.com/chipsalliance/caliptra-ureg/pulls), [Security advisories](https://github.com/chipsalliance/caliptra-ureg/security/advisories) | General-purpose libraries and tools for manipulating MMIO registers from Rust |
 
-The GitHub config parameters for all the branches are documented in a [local
+The GitHub config parameters for all of the branches are documented in a [local
 file](https://github.com/chipsalliance/Caliptra/blob/main/GitHubRules.md).
 
 ### Convenience repoository URLs
