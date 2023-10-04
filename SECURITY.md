@@ -185,9 +185,9 @@ Security sensitive vulnerabilities shall be made public after an embargo period 
 Caliptra project to fix the issues, and 60 days for product creators building products using Caliptra to be able to apply and distribute these
 fixes.
 
-Fixes to the code shall be made through pull requests (PRs) in the Caliptra project GitHub. Developers shall make an attempt to not reveal the
-sensitive nature of what is being fixed, and shall not refer to CVE numbers that have been assigned to the issue. The developer instead should
-merely describe what has been fixed.
+Fixes to the code shall be made through pull requests (PRs) in the Caliptra project GitHub. Developers shall not reveal the sensitive nature of what is being
+fixed, and shall not refer to CVE numbers that have been assigned to the issue. The developer instead should merely describe what has been fixed, without
+revealing how the issue was discovered or its possible impact.
 
 The Caliptra TC shall maintain information that maps embargoed CVEs to these PRs (this information is within the Github security advisories), and
 produce regular reports of the state of security issues.
