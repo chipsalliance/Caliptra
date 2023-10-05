@@ -1,6 +1,8 @@
 # Caliptra Project Security Incident Response
 
+<span style="color:red">
 ***Note that this policy document is a work in progress. We will continue to update this policy document until Caliptra reaches the 1.0 milestone.***
+</span>
 
 ## Security communication
 
@@ -34,10 +36,10 @@ PSIRT) and may get assigned a Common Vulnerabilities and Exposures number (CVE) 
 
 The Caliptra project is a listed [CVE Numbering Authority (CNA) with MITRE](https://cve.mitre.org/cve/request_id.html). **TODO: fix link after CNA onboarding**
 
-Vulnerabities can be reported by the following two approaches:
+Vulnerabities can be reported by either of the following two approaches:
 
-1. Using ["Report a Vulnerability"](https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability#privately-reporting-a-security-vulnerabilityfeature) capability in GitHub for each repository directly OR
-2. Using email: [Vulnerabilities.caliptra-wg@lists.chipsalliance.org](mailto:Vulnerabilities.caliptra-wg@lists.chipsalliance.org).
+1. Using the ["Report a Vulnerability"](https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability#privately-reporting-a-security-vulnerabilityfeature) capability in GitHub for each repository directly OR
+2. Using email: [Vulnerabilities.caliptra-wg@lists.chipsalliance.org](mailto:Vulnerabilities.caliptra-wg@lists.chipsalliance.org). **TODO: document how to encrypt**
 
 | Repository         | Report Vulnerability                                                                      | Description                                                                         |
 | ------------------ | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
@@ -75,7 +77,8 @@ Issues can be filed at the following locations:
 
 ## Security vulnerability response
 
-Each report is acknowledged and analyzed by Caliptra Project Security Incident Response Team members within 7 working days. This will trigger the
+Each report is acknowledged by Caliptra Project Security Incident Response Team members within 2 working days. If the report is accepted, a CVE score will be
+entered, and the issue will be assigned to the Caliptra Technical Committee to begin further debug and analysis within 7 calendar days. This will trigger the
 [Security incident management process](#security-incident-management-process) outlined below.
 
 Any vulnerability information shared with the Caliptra Technical Committee stays within the Caliptra project and will not be disseminated to other projects
@@ -131,14 +134,14 @@ Issues within this bug tracking system will transition through a number of state
 
 ```mermaid
 flowchart TB
-    Triage --> Draft_New
+    Triage -->|2 business days| Draft_New
     Triage --> Closed_Rejected
-    Draft_New --> Draft_Assigned
+    Draft_New -->|7 calendar days| Draft_Assigned
     Draft_New <--> Closed_Rejected
     Draft_Assigned <--> Draft_Review
     Draft_Review ---> Closed_Rejected
     Draft_Review --> Draft_Accepted
-    Draft_Accepted --> Closed_Published
+    Draft_Accepted -->|90 calendar days <br> from initial report| Closed_Published
 ```
 
 </center>
@@ -150,18 +153,21 @@ either *Draft_New* or *Closed_Rejected*. When reports are entered by the securit
 - **Draft_New:** This issue is awaiting disposition by the security team. The security team will analyze the issue, determine a responsible entity, assign
 it to that individual, and move the issue to the *Draft_Assigned* state. Part of triage will be to set the issue’s priority.
 
-- **Draft_Assigned:** The issue has been assigned, and is awaiting a fix by the assignee.
+- **Draft_Assigned:** The issue has been assigned, a CVE score has been entered, and the issue is awaiting a fix by the assignee. At this time, collaborators
+will be designated, and a private fork of the affected repository(s) will be created. The original reporter of the vulnerability will be included as a
+collaborator. Only collaborators will be able to view details of the vulnerability and participate in discussions and code reviews until the final security
+advisory is published publicly.
 
-- **Draft_Review:** Once there is a Caliptra pull request for the issue, the PR link will be added to a comment in the issue, and the issue moved to the
+- **Draft_Review:** Once there is a Github pull request (PR) for the issue, the PR link will be added to a comment in the issue, and the issue moved to the
 *Draft_Review* state.
 
-- **Draft_Accepted:** Indicates that this issue has been merged into the appropriate branch within Caliptra.
+- **Draft_Accepted:** Indicates that this issue has been merged into the appropriate public branch within Caliptra.
 
-- **Closed_Published:** The embargo period has ended. The issue will be made publicly visible, the associated CVE updated, and the vulnerabilities page in the
-docs updated to include the detailed information.
+- **Closed_Published:** The embargo period has ended. The issue will be made publicly visible, the associated CVE updated, and the security advisories page in
+the repository updated to include the detailed information.
 
 - **Closed_Rejected:** The Caliptra PSIRT has rejected the reported security vulnerability. It may have been deemed a non-issue, or it may have been converted
-to a standard Github Issue report. The PSIRT may also re-open the issue from here.
+into a standard Github Issue report. The PSIRT may also re-open the issue from here.
 
 The security advisories created are kept private, due to the sensitive nature of security reports. The issues are only visible to certain parties:
 
@@ -185,9 +191,9 @@ Security sensitive vulnerabilities shall be made public after an embargo period 
 Caliptra project to fix the issues, and 60 days for product creators building products using Caliptra to be able to apply and distribute these
 fixes.
 
-Fixes to the code shall be made through pull requests (PRs) in the Caliptra project GitHub. Developers shall not reveal the sensitive nature of what is being
-fixed, and shall not refer to CVE numbers that have been assigned to the issue. The developer instead should merely describe what has been fixed, without
-revealing how the issue was discovered or its possible impact.
+Fixes to the code shall be made through PRs in the Caliptra project GitHub. Developers must not reveal the sensitive nature of what is being fixed, and shall
+not refer to CVE numbers that have been assigned to the issue. The developer instead should merely describe what has been fixed, without revealing how the issue
+was discovered or its possible impact.
 
 The Caliptra TC shall maintain information that maps embargoed CVEs to these PRs (this information is within the Github security advisories), and
 produce regular reports of the state of security issues.
@@ -230,7 +236,7 @@ Each security issue fixed within Caliptra Firmware shall be backported to the fo
 - The current Long Term Stable (LTS) release.
 - The most recent two releases.
 
-Backports will be tracked on the security advisory.
+Backports will be tracked in the security advisory and will be completed during the 90 day embargo period.
 
 ## Need to know
 
