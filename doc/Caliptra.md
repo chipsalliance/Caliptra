@@ -450,9 +450,9 @@ Caliptra uses certificate templates to avoid implementing fully capable X.509 v3
 All Caliptra certificate serial numbers are generated with the following algorithm. The input is the certificate ECDSA public key in uncompressed form:
 1. Convert to DER format.
 2. Compute SHA256 digest.
-3. AND the least-significant-byte with ~0x80.
-4. OR the least-significant-byte with 0x04.
-5. Use the least-significant 20 bytes as the serial number.
+3. AND the most-significant-byte with ~0x80.
+4. OR the most-significant-byte with 0x04.
+5. Use the most-significant 20 bytes as the serial number.
 
 ### Provisioner CA
 Provisioner CA (pCA) is a set of one or more certificates issued by the vendor. The vendor is responsible for provisioning pCA to the SoC. Caliptra does not consume pCA. See [Reference 5](#ref-5) for guidance on pCA.
