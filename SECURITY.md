@@ -1,8 +1,9 @@
 # Caliptra Project Security Incident Response
 
-<span style="color:red">
-***Note that this policy document is a work in progress. We will continue to update this policy document until Caliptra reaches the 1.0 milestone.***
-</span>
+```diff
+- Note that this policy document is a work in progress.
+- We will continue to update this policy document until Caliptra reaches the 1.0 milestone.
+```
 
 ## Security communication
 
