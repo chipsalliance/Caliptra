@@ -243,7 +243,7 @@ An example of when an owner must protect assets is moving from secure mode to in
 | Caliptra inputs | Security state | Integrity | Proficient | Glitching | Environmental monitoring and protection |
 | Caliptra inputs | Mode selection (Boot Media Integrated and dependent selections) | Integrity | Proficient | Glitching | Environmental monitoring and protection |
 | Caliptra inputs | PAUSER attribute | Integrity | Proficient | Glitching | Environmental monitoring and protection |
-| Caliptra inputs | JTAG debug | Integrity | Proficient | 1. Attempt to manipulate RoT execution via JTAG to flows that are not plan-of-record<br>2. Attempt to retrieve device secrets via JTAG when product is field-deployed<br>3. Attempt to retrieve device secrets via JTAG while the product is being developed and debugged | Implement security mode management within Caliptra |
+| Caliptra inputs | Design-for-Test (DFT) and Design-for-Debug (DFD) | Integrity | Proficient | 1. Attempt to manipulate RoT execution via DFT or DFD flows to flows that are not plan-of-record<br>2. Attempt to retrieve device secrets via DFT or DFD flows when product is field-deployed<br>3. Attempt to retrieve device secrets via DFT or DFD flows while the product is being developed and debugged | Implement scan mode and debug unlock management within Caliptra with the required SoC support |
 
 # High level architecture
 
@@ -397,7 +397,7 @@ For owner certification flows, Caliptra only emits a CSR for Alias<sub>FMC</sub>
 
 ### Security state
 
-Devices may support features like debug unlock or JTAG. These features, when enabled, significantly alter the security state of the device. The configuration of these features shall be captured in the device's DICE identity. The security state shall be captured as an input to the FMC's CDI, and represented within the FMC's alias certificate.
+Devices may support features like debug unlock, DFT, or DFD flows that globally affect SoC state. These features, when enabled, significantly alter the security state of the device. The configuration of these features shall be captured in the device's DICE identity. The security state shall be captured as an input to the FMC's CDI, and represented within the FMC's alias certificate.
 
 ### Owner authorization
 
@@ -554,7 +554,7 @@ Caliptra ROM generates the Alias<sub>FMC</sub> certificate and endorses it with 
 |                                | pathLen      | 3
 | Authority Key Identifier       | -            | First 20 bytes of SHA256 hash of DER-formatted LDevID public key in uncompressed form
 | tcg-dice-Ueid                  | ueid         | UEID specified by IDevID attribute fuses
-| tcg-dice-TcbInfo               | Flags        | NOT_CONFIGURED if lifecycle is unprovisioned
+| tcg-dice-MultiTcbInfo          | Flags        | NOT_CONFIGURED if lifecycle is unprovisioned
 |                                |              | NOT_SECURE if lifecycle is manufacturing
 |                                |              | DEBUG if not debug locked
 |                                | SVN          | concatenation of FMC SVN and FMC fuse SVN
