@@ -916,7 +916,7 @@ As shown in *Table 15: POST/CAST usage*, since the cryptographic algorithms requ
 
 ## FW Signing/Verification algorithms
 
-Caliptra firmware is composed of multiple layers: an FMC and an application firmware image. Each layer is signed individually by ECDSA P384 keys.
+Caliptra firmware is composed of multiple layers: an FMC and an application firmware image. Each layer is signed individually by ECDSA P384 keys, and optionally [LMS Signatures](#post-quantum-cryptography-pqc-requirements) as well.
 
 Each layer is signed by a vendor-controlled key. In addition, each layer may also be signed by an owner-controlled key. The image header contains both the owner public key and the signature using that key.
 
@@ -928,7 +928,13 @@ Caliptra's FW signature generation and verification shall follow the requirement
 
 ### Post-Quantum Cryptography (PQC) requirements
 
-As NIST publishes new standards with PQC resilience, algorithms applicable to Caliptra will be described in this document.
+Recent guidance from the US Government, [CNSA 2.0](https://media.defense.gov/2022/Sep/07/2003071834/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS_.PDF), 
+requests the use of Leighton-Micacli Hash-based Signatures (LMS) by 2025.  Caliptra has an option to require LMS signatures in addition to ECDSA signatures (vendor and owner).
+
+Based on the recommendation in [CNSA 2.0](https://media.defense.gov/2022/Sep/07/2003071834/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS_.PDF) Caliptra uses the SHA256/192 algorithm.
+To provide a balance between the number of signatures allowed, resiliency to HSM failures, and signature size Caliptra uses 32 LMS trees each with a height of 15.  
+
+It is recommended that the LMS trees are created from multiple HSMs that are geographically distributed.
 
 ### Key rotation
 
