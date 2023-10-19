@@ -16,7 +16,6 @@ The objective of Caliptra is to define core RoT capabilities that must be implem
 
 <div style="page-break-after: always"></div>
 
-
 # Background
 
 The overall security posture of silicon devices depends on establishing a core root of trust (RoT) and chain of trust. The core root of trust and chain of trust must attest to the integrity of configuration and mutable code.
@@ -351,13 +350,16 @@ Caliptra shall support field-programmable entropy, which factors into the device
 Caliptra's field-programmable entropy shall consist of four 32-byte slots. All slots are used to derive LDevID. An owner may decide to program as few or as many slots as they wish. Upon programming new entropy, on the next reset the device begins wielding its fresh LDevID. Owners need to validate the new LDevID by using IDevID.
 
 ### Commentary: threat analysis
+
 An ideal IDevID has the following properties:
+
 * Cannot be altered by entities besides Caliptra in manufacturing security state.
 * Cannot be impersonated by entities that are not a Caliptra instatiation for that device class.
 * Cannot be cloned to additional devices of the same class.
 * Private component cannot be extracted from Caliptra.
 
 Caliptra 1.0 alone does not fully address these properties. For example, a person-in-the-middle supply chain adversary could impersonate Caliptra by submitting its own IDevID Certificate Signing Request (CSR) to the pCA. Vendors should threat model the IDevID generation and endorsement flows for their SoC. Threat actors to consider are the following:
+
 * Components involved in UDS injection flows: can they inject the same obfuscated UDS to multiple devices, or to devices of different classes? Can they wield the obfuscation key to leak the UDS?
 * Components servicing the connectivity between the Caliptra instantiation and the HSM applicance performing IDevID endorsement: can they alter or impersonate Caliptra's IDevID CSR?
 * Physical attackers: see [Physical Attack Countermeasures](#physical-attack-countermeasures).
@@ -429,7 +431,9 @@ The owner key, when represented in fuses or in the FMC's alias certificate, is a
 12. Caliptra IP HW opens the Caliptra Mailbox for SoC usages, such as FW loading (if required in some HVM flows). Until this write operation is complete, the SoC does not get a grant/lock of the APB-exposed mailbox interface.
 
 ## Certificate format
+
 Caliptra certificates follow the X.509 v3 format described in RFC 5280. After vendor provisioning, Caliptra's certificate chain contains the following certificates:
+
 1. Provisioner CA (may be one or more certificates)
 2. IDevID
 3. LDevID
@@ -442,12 +446,15 @@ After owner provisioning, an Owner CA may endorse the IDevID, LDevID, or Alias<s
 Caliptra generates the LDevID, Alias<sub>FMC</sub>, Alias<sub>RT</sub>, and DPE certificates. The vendor, and optionally the owner, generate all other certificates.
 
 ### Serial number algorithm ###
+
 Caliptra uses certificate templates to avoid implementing fully capable X.509 v3 parsers and generators. Templates require certificates to be fixed length. This imposes constraints on the certificate serial numbers:
+
 * Positive integer
 * First octet as non-zero
 * 20 octets in length
 
 All Caliptra certificate serial numbers are generated with the following algorithm. The input is the certificate ECDSA public key in uncompressed form:
+
 1. Convert to DER format.
 2. Compute SHA256 digest.
 3. AND the least-significant-byte with ~0x80.
@@ -455,9 +462,11 @@ All Caliptra certificate serial numbers are generated with the following algorit
 5. Perform byte-wise copies of the least-significant 20 bytes into the certificate template.
 
 ### Provisioner CA
+
 Provisioner CA (pCA) is a set of one or more certificates issued by the vendor. The vendor is responsible for provisioning pCA to the SoC. Caliptra does not consume pCA. See [Reference 5](#ref-5) for guidance on pCA.
 
 ### IDevID certificate
+
 The vendor issues the IDevID certificate during SoC manufacturing. As part of [provisioning IDevID during manufacturing](#provisioning-idevid-during-manufacturing), Caliptra uses the UDS to derive the IDevID key pair and generate a CSR. The vendor's pCA uses the CSR to generate and sign the IDevID certificate. The CSR uses the format defined in PKCS#10.
 
 For IDevID to endorse LDevID, Caliptra requires the vendor to implement a X.509 v3 IDevID certificate described in RFC 5280 with the field values specified in *Table 7: IDevID certificate fields*. The vendor shall also populate all extensions from the "Requested Extensions" attribute in the CSR.
@@ -480,12 +489,13 @@ For IDevID to endorse LDevID, Caliptra requires the vendor to implement a X.509 
 | KeyUsage                       | keyCertSign  | 1
 | Basic Constraints              | CA           | TRUE
 |                                | pathLen      | 5
- 
+
 Caliptra does not consume the IDevID certificate. Caliptra needs attributes of the IDevID certificate in order to generate the Authority Key Identifier extension for the LDevID and to populate the TCG Universal Entity ID (UEID) extension for Caliptra-generated certificates. The vendor must fuse these attributes into the IDevID attribute fuses for Caliptra to consume. The encoding of these attribute fuses is as follows:
+
 * Flags (byte 0, bits [1:0]): Key ID algorithm for IDevID Subject Key Identifier.
-** 0 = SHA1 of IDevID public key
+**0 = SHA1 of IDevID public key
 ** 1 = truncated SHA256 of IDevID public key
-** 2 = truncated SHA384 of IDevID public key
+**2 = truncated SHA384 of IDevID public key
 ** 3 = raw
 * Reserved (bytes 1 to 3)
 * Subject Key ID (bytes 4 to 23): if Flags = 3, the IDevID Subject Key Identifier to use as the LDevID Authority Key Identifier.
@@ -494,12 +504,14 @@ Caliptra does not consume the IDevID certificate. Caliptra needs attributes of t
 * Manufacturer Serial Number (bytes 28 to 43): the 128-bit unique serial number of the device to be used for the TCG UEID extension in the Caliptra-generated LDevID, Alias<sub>FMC</sub>, and Alias<sub>RT</sub> certificates.
 
 The IDevID certificate is unique for each device and non-renewable. The SoC must be able to retrieve the IDevID certificate at runtime. To save flash space and aid in recoverability, it is recommended that the vendor define an IDevID certificate template such that the SoC at runtime can reconstruct the same certificate that the pCA endorsed. The SoC is recommended to store the IDevID certificate signature in fuses and the IDevID certificate template in the firmware image. Caliptra runtime firmware provides APIs to aid in reconstructing the certificate:
+
 * GET_IDEV_INFO to return the IDevID public key.
 * GET_IDEV_CERT to return the certificate given a to-be-signed (TBS) payload and the certificate signature from fuses. The TBS is the certificate template already patched with the IDevID public key, Subject Key Identifier, serial number, and any extensions that are unique to the device that the vendor may have included.
 
 Caliptra does not allocate fuses in its fuse map for the IDevID certificate signature. Caliptra allocates "IDEVID MANUF HSM IDENTIFIER" fuses that the vendor can use to aid certificate reconstruction.
 
 ### LDevID certificate
+
 Caliptra ROM generates the LDevID certificate and endorses it with the IDevID private key. The LDevID certificate implements the following field values:
 
 *Table 8: LDevID certificate fields*
@@ -525,10 +537,11 @@ Caliptra ROM generates the LDevID certificate and endorses it with the IDevID pr
 |                                | pathLen      | 4
 | Authority Key Identifier       | -            | specified by IDevID attribute fuses
 | tcg-dice-Ueid                  | ueid         | UEID specified by IDevID attribute fuses
- 
+
 Caliptra does not generate an LDevID CSR. Owners that wish to endorse LDevID must do so with proprietary flows.
 
 ### Alias<sub>FMC</sub> certificate
+
 Caliptra ROM generates the Alias<sub>FMC</sub> certificate and endorses it with the LDevID private key. The Alias<sub>FMC</sub> certificate implements the following field values:
 
 *Table 9: Alias<sub>FMC</sub> certificate fields*
@@ -558,7 +571,7 @@ Caliptra ROM generates the Alias<sub>FMC</sub> certificate and endorses it with 
 |                                |              | NOT_SECURE if lifecycle is manufacturing
 |                                |              | DEBUG if not debug locked
 |                                | SVN          | concatenation of FMC SVN and FMC fuse SVN
-|                                | FWIDs        | [0] SHA384 digest of 
+|                                | FWIDs        | [0] SHA384 digest of
 |                                |              | lifecycle state
 |                                |              | debug locked state
 |                                |              | anti-rollback disable fuse
@@ -569,10 +582,11 @@ Caliptra ROM generates the Alias<sub>FMC</sub> certificate and endorses it with 
 |                                |              | vendor public key hash
 |                                |              | owner public key hash
 |                                |              | [1] SHA384 digest of FMC
- 
+
 Caliptra does not generate an Alias<sub>FMC</sub> CSR. Owners that wish to endorse Alias<sub>FMC</sub> must do so with proprietary flows.
 
 ### Alias<sub>RT</sub> certificate
+
 Caliptra FMC generates the Alias<sub>RT</sub> certificate and endorses it with the Alias<sub>FMC</sub> private key. The Alias<sub>RT</sub> certificate implements the following field values:
 
 *Table 10: Alias<sub>FMC</sub> certificate fields*
@@ -604,6 +618,7 @@ Caliptra FMC generates the Alias<sub>RT</sub> certificate and endorses it with t
 Caliptra does not generate an Alias<sub>RT</sub> CSR. Owners that wish to endorse Alias<sub>RT</sub> must do so with proprietary flows.
 
 ### DPE certificate
+
 Caliptra RT generates the DPE certificate and endorses it with the Alias<sub>RT</sub> private key. The DPE certificate fields are described in the [Caliptra Runtime specification](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md). DPE also supports issuance of CSRs.
 
 ## Caliptra security states
@@ -640,6 +655,7 @@ Caliptra RT generates the DPE certificate and endorses it with the Alias<sub>RT<
 | 011b                                           | DebugUnlocked and production    | This state is used when debugging of Caliptra is required. When in this state: UDS and other identity critical assets are programmed into fuses. They may not have been written into Caliptra fuse registers if the insecure state entered before Caliptra is out of reset. If the insecure state transition happened after fuses are written to Caliptra, they are cleared when the security state transitions from secure/manufacturing -> insecure.<br> Caliptra state: All security assets are in debug mode (UDS and obfuscation key are in production state).<br> - UDS: Reverts to a ‘well-known’ debug value.<br> - Obfuscation key: Switched to debug key.<br> - Key Vault is also cleared.<br> - Caliptra JTAG is unlocked and allows microcontroller debug.<br> - Caliptra JTAG can access IP internal registers through FW or directly. | Debug unlocked -> debug locked is possible ONLY with a power cycle.            |
 
 **Notes:**
+
 * End-of-life state is owned by SoC. In end-of-life device lifecycle state, Caliptra shall not not be brought out of reset.
 * Other encodings are reserved and always assumed to be in a secure state.
 
@@ -722,6 +738,7 @@ Caliptra contains 32 384-bit PCR banks that are extendable by the SHA engine, an
 |PCR31|Cumulative|ROM|Holds measurements extended by STASH_MEASUREMENTS commands (serviced by both ROM and RT).|
 
 For PCR0 and PCR1, ROM issues the following extend operations in order:
+
 1. An array containing the following fields as 8-bit values:
    1. Lifecycle state
    2. Debug locked state
@@ -732,9 +749,9 @@ For PCR0 and PCR1, ROM issues the following extend operations in order:
    7. LMS vendor public key index
    8. LMS verification enable fuse
    9. Boolean indicating whether the owner public key hash is in fuses
-2.  Vendor public key hash
-3.  Owner public key hash
-4.  Digest of FMC
+2. Vendor public key hash
+3. Owner public key hash
+4. Digest of FMC
 
 ### Attestation of Caliptra's update journey
 
@@ -1091,7 +1108,6 @@ The PAUSER field of the APB interface is used to encode device attributes for th
 
 The Caliptra mailbox commands are specified in the [Caliptra runtime firmware specification](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#maibox-commands).
 
-
 ## Caliptra firmware image format
 
 The Caliptra firmware image format is specified in the [Caliptra ROM specification](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md#8-firmware-image-bundle).
@@ -1133,7 +1149,7 @@ Caliptra provides a HW API to do a SHA384 hash calculation. The SoC can access t
 
 ### Architectural registers
 
-These registers are accessible over APB to be read according to the register access permissions. For more information, see the register reference manual at https://ereg.caliptra.org.
+These registers are accessible over APB to be read according to the register access permissions. For more information, see the register reference manual at <https://ereg.caliptra.org>.
 
 ### Fuse requirements
 
@@ -1159,6 +1175,7 @@ SoC shall support a field entropy programming API. The API shall support retriev
 Caliptra assumes that the unfused value in fuses is '0' and the fused value is '1'. With this context, zeroization refers to destroying a secret value by fusing it to all ones.
 
 For SoCs that intend to achieve FIPS 140-3 CMVP certification with Caliptra:
+
 * SoC shall implement zeroization for uds_seed and field_entropy such that the fuse rows holding these secrets contain all ones.
 * SoC shall expose and document an API for a tester to invoke zeroization.
 * SoC shall indicate that zeroization has occurred by statically asserting GENERIC_INPUT_WIRE[0] to Caliptra.
@@ -1167,6 +1184,7 @@ For SoCs that intend to achieve FIPS 140-3 CMVP certification with Caliptra:
 * SoC shall ensure authorization for this API to guard against denial-of-service attacks. The authorization design is left to the vendor.
 
 #### Fuse map
+
 The following table describes Caliptra's fuse map:
 
 *Table 16: Caliptra Fuse Map*
@@ -1196,8 +1214,8 @@ This section describes Caliptra error reporting and handling.
 
 | | Fatal errors | Non-fatal errors |
 | :- | - | - |
-| Hardware | - ICCM, DCCM SRAM ECC<br> - Second watchdog (WD) timer expiry. The first timer expiry triggers an NMI to firmware to correct the issue and clear the interrupt status bit. If the WD expires again, then it is escalated to a FATAL error. | - Mailbox SRAM ECC (except initial firmware load)<br> - Mailbox incorrect protocol or commands. For example, incorrect access ordering or access without Lock. |
-| Firmware | - Boot-time firmware authentication failures<br> - Firmware triggered FATAL errors. Examples: ICCM or DCCM have misaligned access (potentially in the except subroutine); AHB access hangs, triggered through WD timer expiry; AHB access outside of the decoding range; and stack overflow errors. For more information, see the table below. | - Mailbox API failures<br> - First WD timer expiry<br> - Cryptography processing errors |
+| Hardware | - ICCM, DCCM SRAM ECC.<br>-  The second watchdog (WD) timer expiry triggers an NMI, and a FATAL error is signaled to the SoC.<br> | - Mailbox SRAM ECC (except initial firmware load)<br>- Mailbox incorrect protocol or commands. For example, incorrect access ordering or access without Lock. |
+| Firmware | - Control Flow Integrity (CFI) errors. <br> - KAT errors. <br> - FIPS Self Test errors. <br> - Mailbox commands received after FIPS Shutdown request completes. <br>  - Hand-off errors detected upon transfer of control from ROM to FMC or FMC to Runtime. <br> - Mailbox protocol violations leading the mailbox to an inconsistent state if encountered by ROM during cold reset flow. <br> - Firmware image verification or authentication failures if encountered by ROM during Cold Reset flow. <br> - Non-aligned access to ICCM or DCCM <br> - AHB access hangs, triggered through WD timer expiry <br> - AHB access outside of the decoding range <br> | - Firmware image verification or authentication failures if encountered by ROM during Update Reset flow. <br> - Mailbox protocol violations leading the mailbox to an inconsistent state (if encountered by ROM during Update Reset flow). <br> - Cryptography processing errors. |
 
 **Fatal errors**
 
@@ -1220,14 +1238,7 @@ This section describes Caliptra error reporting and handling.
 
 **Firmware errors**
 
-*Table 18: Firmware errors and remedies*
-
-| Condition | When error occurs | Remediation |
-| :-------- | :---------------- | :---------- |
-| SoC FMC verification failure due to invalid digital signature or invalid anti-rollback value) | During boot, as described in [Boot Media Integrated](#bmi), [Boot Media Dependent](#bmd), [Secure Boot Flow](#secure-boot-flow) |  |
-| Caliptra FMC invalid | During boot, as described in [Boot Media Integrated](#bmi), [Boot Media Dependent](#bmd), [Secure Boot Flow](#secure-boot-flow) |  |
-| Caliptra runtime firmware invalid | During boot, as described in [Boot Media Integrated](#bmi), [Boot Media Dependent](#bmd), [Secure Boot Flow](#secure-boot-flow) |  |
-| Fuse programming errors |  |  |
+Please refer to [the Caliptra code base](https://github.com/chipsalliance/caliptra-sw/blob/main/error/src/lib.rs) for a list of the error codes.
 
 # Terminology
 
@@ -1238,6 +1249,7 @@ The following acronyms and abbreviations are used throughout this document.
 | <a id="bmc"></a>**BMC**       | Baseboard Management Controller                |
 | <a id="CA"></a>**CA**         | Certification Authority                        |
 | <a id="CDI"></a>**CDI**       | Compound Device Identifier                     |
+| <a id="CFI"></a>**CFI**       | Control Flow Integrity                         |
 | <a id="CPU"></a>**CPU**       | Central Processing Unit                        |
 | <a id="CRL"></a>**CRL**       | Certificate Revocation List                    |
 | <a id="CSR"></a>**CSR**       | Certificate Signing Request                    |
