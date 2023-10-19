@@ -36,15 +36,6 @@ For information on the Caliptra security policy, how to report a vulerability,
 and published security advisories, refer to
 [Caliptra security policy](https://github.com/chipsalliance/caliptra/security/policy).
 
-### Product creator registration
-
-Companies or individuals building products that integrate Caliptra are
-encouraged to register as Caliptra product creators. Product creators will
-automatically get early notification of embargoed security vulnerabilities, as
-defined in the Caliptra security policy.
-
-* **Registration process to be defined**
-
 ## Repositories
 
 The Caliptra code base and documentation are split across five repositories:

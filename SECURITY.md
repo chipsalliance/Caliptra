@@ -35,12 +35,14 @@ Please do not report security vulnerabilities through public GitHub issues, disc
 All reports are thoroughly investigated by the Caliptra Technical Committee (TC) members who form the Caliptra Project Security Incident Response Team (Caliptra
 PSIRT) and may get assigned a Common Vulnerabilities and Exposures number (CVE) if appropriate.
 
-The Caliptra project is a listed [CVE Numbering Authority (CNA) with MITRE](https://cve.mitre.org/cve/request_id.html). **TODO: fix link after CNA onboarding**
+The Caliptra project is a listed [CVE Numbering Authority (CNA) with MITRE](https://www.cve.org/PartnerInformation/ListofPartners/partner/Caliptra).
 
 Vulnerabities can be reported by either of the following two approaches:
 
 1. Using the ["Report a Vulnerability"](https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability#privately-reporting-a-security-vulnerabilityfeature) capability in GitHub for each repository directly OR
-2. Using email: [Vulnerabilities.caliptra-wg@lists.chipsalliance.org](mailto:Vulnerabilities.caliptra-wg@lists.chipsalliance.org). **TODO: document how to encrypt**
+2. Using email: [Vulnerabilities.caliptra-wg@lists.chipsalliance.org](mailto:Vulnerabilities.caliptra-wg@lists.chipsalliance.org).
+Reports may optionally be encrypted using the
+[Caliptra Vulnerability Reports Public PGP Key](https://github.com/chipsalliance/Caliptra/blob/main/pgp/CaliptraVulnerabilityReports_0xD285AE3F_public.asc).
 
 | Repository         | Report Vulnerability                                                                      | Description                                                                         |
 | ------------------ | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
@@ -108,16 +110,17 @@ If the member continues to leak information and break this policy, the member is
 More details of how vulnerabilities are handled can be found in our [Security incident management process](#security-incident-management-process)
 section.
 
-## Product creator notification process
+## Product integrator notification process
 
-Product creators who are not already members of the Caliptra project may be eligible to participate in the
+Companies or individuals building products that integrate Caliptra and are trademark recipients may be eligible to participate in the
 [Vulnerability-Alerts.caliptra-wg@lists.chipsalliance.org](mailto:Vulnerability-Alerts.caliptra-wg@lists.chipsalliance.org) mail list and receive
 advanced notification of the vulnerabilities and mitigations before public disclosure by applying to participate. For more information, refer to the
 [Vulnerability notification process](#vulnerability-notification-process) section of this document.
 
 Criteria for participation includes:
 
-1. Register as a [Product creator](https://github.com/chipsalliance/Caliptra/blob/main/README.md#product-creator-registration).
+1. Complete the *to be defined* Caliptra trademark license grant process to be recognized as a product integrator.
+1. Register for [Caliptra vulnerability alerts](https://lists.chipsalliance.org/g/Vulnerability-Alerts.caliptra-wg).
 1. Have a contact who will respond to emails within a week and understands how Caliptra is being used in the product.
 1. Have a publicly listed product based on some release of Caliptra.
 1. Have an actively monitored security email alias.
