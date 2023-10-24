@@ -929,7 +929,7 @@ Caliptra's FW signature generation and verification shall follow the requirement
 ### Post-Quantum Cryptography (PQC) requirements
 
 Recent guidance from the US Government, [CNSA 2.0](https://media.defense.gov/2022/Sep/07/2003071834/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS_.PDF), 
-requests the use of Leighton-Micacli Hash-based Signatures (LMS) by 2025.  Caliptra has an option to require LMS signatures in addition to ECDSA signatures (vendor and owner).
+requests the use of Leighton-Micali Hash-based Signatures (LMS) by 2025.  Caliptra has an option to require LMS signatures in addition to ECDSA signatures (vendor and owner).
 
 Based on the recommendation in [CNSA 2.0](https://media.defense.gov/2022/Sep/07/2003071834/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS_.PDF) Caliptra uses the SHA256/192 algorithm.
 To provide a balance between the number of signatures allowed, resiliency to HSM failures, and signature size Caliptra uses 32 LMS trees each with a height of 15.  
