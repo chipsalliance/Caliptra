@@ -252,7 +252,7 @@ The following figure shows the basic high-level blocks of the Caliptra subsystem
 
 ![](./images/Caliptra_HW_diagram.png)
 
-See the [HW Section](#hardware-section) for a detailed discussion.
+See the [HW Section](#hardware) for a detailed discussion.
 
 ## Caliptra profiles
 
@@ -710,7 +710,7 @@ The following table describes the NIST SP 800-193 requirements that Caliptra sha
 
 Caliptra shall follow and implement the secure boot guidelines as described in [Reference 3](#ref-3).
 
-For the detailed flow, see the [HW Section](#hardware-section).
+For the detailed flow, see the [HW Section](#hardware).
 
 ## Hitless update
 
