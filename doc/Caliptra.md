@@ -34,7 +34,7 @@ To drive agility of specification definition and to maximize applicability, the 
 
 Enhancements and advanced use cases and applications are outside the scope of this specification and may be developed in the form of a roadmap for the Silicon RoT and community engagement.
 
-Caliptra defines a design standard for a Silicon internal RoT baseline. This standard satisfies a Root of Trust for Measurement (RTM) role. The open-source implementation of Caliptra drives transparency into the RTM and measurement mechanism that anchor hardware attestation. Caliptra must boot the SoC, measure the mutable code that it loads, and measure and control mutation of non-volatile configuration bits in the SoC. Caliptra reports these measurements with signed attestations rooted in unique per-asset cryptographic entropy. As such, Caliptra serves as a Root of Trust for Identity (RTI) for the SoC.
+Caliptra defines a design standard for a Silicon internal RoT baseline. This standard satisfies a Root of Trust for Measurement (RTM) role. The open-source implementation of Caliptra drives transparency into the RTM and measurement mechanism that anchor hardware attestation. The SoC must measure the code and configuration it boots into Caliptra. Caliptra must store these measurements and report them with signed attestations rooted in unique per-asset cryptographic entropy. As such, Caliptra serves as a Root of Trust for Identity (RTI) for the SoC.
 
 To satisfy these Silicon RoT goals, no other capabilities are part of this specification. This scope decouples platform integrity capabilities that can be enforced and evolve independently through other platform devices or services – such as update, protection, and recovery.
 
@@ -61,6 +61,8 @@ Within this scope, the goals for a Caliptra 1.0 specification include:
     * Other examples include SmartNIC and accelerators
   * Over time, the scope includes further datacenter devices
     * SSD, HDD, BMC, DIMM
+
+Note that Caliptra reference code (including RTL and firmware) is intended to be adopted as-is, without modification.
 
 Explicitly out of scope is how silicon integration into backend work is performed such as:
 
