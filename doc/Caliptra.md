@@ -337,7 +337,7 @@ Caliptra must provide its runtime (RT) code with a cryptographic identity in acc
 
 A combination of mask ROM and HW macros must implement the DICE key derivation and power-on latch, hiding the UDS and only making the CDI-derived signing key visible to firmware.
 
-The Caliptra UDS is stored in fuses, and is encrypted at rest by an obfuscation secret[^2] known only to the Caliptra ROM. Once read by Caliptra ROM at boot, the UDS is then used to derive the IDevID identity.
+The Caliptra UDS is stored as ciphertext in fuses, encrypted at rest by an obfuscation secret[^2] known only to the Caliptra ROM. Once read by Caliptra ROM at boot, the decrypted UDS is then used to derive the IDevID identity.
 
 ### IDevID key
 
