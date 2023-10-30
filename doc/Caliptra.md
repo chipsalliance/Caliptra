@@ -411,7 +411,7 @@ Caliptra shall attest to the value of the owner key, enabling external verifiers
 
 The SoC may support a fuse bank for representing the hash of the owner's public key. If the SoC reports this value to Caliptra, Caliptra refuses to boot firmware unless the firmware was dual-signed by the key reported by SoC ROM's fuse registers.
 
-The owner key, when represented in fuses or in the FMC's alias certificate, is an SHA384 hash of a structure that contains a list of owner public keys. This supports key rotation.
+The owner key, when represented in fuses or in the FMC's alias certificate, is a SHA384 hash of a structure that contains a list of owner public keys. This supports key rotation.
 
 ## Provisioning IDevID during manufacturing
 
@@ -1198,7 +1198,7 @@ The Caliptra mailbox commands are specified in the [Caliptra runtime firmware sp
 
 ### Hash calculation HW API
 
-Caliptra provides a HW API to do an SHA384 hash calculation. The SoC can access the accelerator through this hardware API and stream data to be hashed over the APB interface. The hash is captured into a register for SoC to use or Caliptra FW to be used for the Signature Authentication API.
+Caliptra provides a HW API to do a SHA384 hash calculation. The SoC can access the accelerator through this hardware API and stream data to be hashed over the APB interface. The hash is captured into a register for SoC to use or Caliptra FW to be used for the Signature Authentication API.
 
 ### JTAG/TAP debug
 
