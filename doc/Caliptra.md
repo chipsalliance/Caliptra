@@ -981,7 +981,7 @@ Fields are little endian unless described otherwise.
 | Vendor LMS Public Key 1 | 48 | LMS public key used to verify the Firmware Manifest Header Signature. <br> **tree_type:** LMS Algorithm Type (4 bytes, big endian) Must equal 12. <br> **otstype:** LM-OTS Algorithm Type (4 bytes, big endian) Must equal 7. <br> **id:**  (16 bytes) <br> **digest:**  (24 bytes) |
 | Vendor LMS Public Key 2 | 48 | LMS public key used to verify the Firmware Manifest Header Signature. <br> **tree_type:** LMS Algorithm Type (4 bytes, big endian) Must equal 12. <br> **otstype:** LM-OTS Algorithm Type (4 bytes, big endian) Must equal 7. <br> **id:**  (16 bytes) <br> **digest:**  (24 bytes) |
 | .<br>.<br>|
-| Vendor LMS Public Key 32 |
+| Vendor LMS Public Key 32 | | |
 | ECDSA Public Key Index Hint | 4 | The hint to ROM to indicate which ECDSA public key it should first use.  |
 | LMS Public Key Index Hint | 4 | The hint to ROM to indicate which LMS public key it should first use.  |
 | Vendor ECDSA Signature | 96 | Vendor ECDSA P384 signature of the Firmware Manifest header hashed using SHA384. <br> **R-Coordinate:** Random Point (48 bytes, big endian) <br> **S-Coordinate:** Proof (48 bytes, big endian) |
