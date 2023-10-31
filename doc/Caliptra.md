@@ -254,7 +254,7 @@ The following figure shows the basic high-level blocks of the Caliptra subsystem
 
 ![](./images/Caliptra_HW_diagram.png)
 
-See the [HW Section](#hardware) for a detailed discussion.
+See the [hardware section](#hardware) for a detailed discussion.
 
 ## Caliptra profiles
 
@@ -299,7 +299,7 @@ In the BMD profile, Caliptra coordinates the start of the firmware chain-of-trus
         1. SoC ROM loads the Caliptra firmware into the Caliptra mailbox and issues the Caliptra "firmware load" command.
         2. Caliptra ROM authenticates, measures, and starts the Caliptra firmware.
     2. If the FMC is not Caliptra firmware:
-        1. SoC ROM authenticates and measures that firmware as the SoC FMC, and issues the Caliptra "stash measurement" command prior to executing SoC FMC.
+        1. SoC ROM measures that firmware as the SoC FMC, and issues the Caliptra "stash measurement" command prior to executing SoC FMC.
 4. SoC ROM executes SoC FMC.
 5. As in #6 from the BMI flow, SoC FMC continues the boot process, forming a boot firmware chain-of-trust: each firmware fetches, authenticates, measures, and executes the next firmware needed to establish the device operating environment. Each firmware deposits the next firmware's measurements into Caliptra prior to execution. The exception is Caliptra's firmware: SoC firmware delegates the measurement and execution of Caliptra's firmware to Caliptra ROM.
 6. Upon eventual initialization, Caliptra firmware presents attestation APIs using the deposited measurements.
@@ -411,7 +411,7 @@ Caliptra shall attest to the value of the owner key, enabling external verifiers
 
 The SoC may support a fuse bank for representing the hash of the owner's public key. If the SoC reports this value to Caliptra, Caliptra refuses to boot firmware unless the firmware was dual-signed by the key reported by SoC ROM's fuse registers.
 
-The owner key, when represented in fuses or in the FMC's alias certificate, is a SHA-384 hash of a structure that contains a list of owner public keys. This supports key rotation.
+The owner key, when represented in fuses or in the FMC's alias certificate, is a SHA384 hash of a structure that contains a list of owner public keys. This supports key rotation.
 
 ## Provisioning IDevID during manufacturing
 
@@ -424,12 +424,12 @@ The owner key, when represented in fuses or in the FMC's alias certificate, is a
 3. SoC drives the security state, which indicates that it's a manufacturing flow. See [Caliptra Security States](#caliptra-security-states) for encodings.
 4. SoC (using a GPIO pin or SoC ROM) drives BootFSMBrk (this is also used for debug cases). This can be driven at any time before cptra\_rst\_b is deasserted.
 5. SoC follows the boot flow as defined in Caliptra IP HW boot flow to assert cptra\_pwrgood and deassert cptra\_rst\_b, followed by writing to the fuse registers.
-6. HVM, through JTAG or using the Caliptra SoC interface, writes to “CPTRA\_DBG\_MANUF\_SERVICE\_REG”, requesting a CSR (see the [Caliptra ROM specification](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md) for bit definitions).
+6. HVM, through JTAG or using the Caliptra SoC interface, sets “CPTRA\_DBG\_MANUF\_SERVICE\_REG” bit 0 to request a CSR.
 7. HVM, through JTAG or using the Caliptra SoC interface, writes to “CPTRA\_BOOTFSM\_GO” to allow Caliptra’s internal BootFSM to continue to bring up microcontroller out of reset.
-8. ROM looks at the manufacturing state encoding, “CPTRA\_DBG\_MANUF\_SERVICE\_REG”, and populates the Caliptra internal SRAM \[the mailbox SRAM hardware structure is reused\] with the CSR. It then writes to the Caliptra internal register to indicate the CSR is valid (see the [Caliptra ROM specification](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md) and [Identity](#identity) sections in this document on the ROM steps to generate the CSR).
-9. HVM, through JTAG or using the SoC interface, polls for “requested service\[s\]” bit\[s\] available in “CPTRA\_BOOT\_STATUS” register.
-10. HVM, through JTAG, reads mbox\_status\[3:0\] to check if the data is ready to be read (DATA\_READY encoding).
-11. HVM must write a bit in CPTRA\_DBG\_MANUF\_SERVICE\_REG over JTAG, indicating that it completed reading the CSR.
+8. ROM looks at the manufacturing state encoding, “CPTRA\_DBG\_MANUF\_SERVICE\_REG”, and populates the Caliptra internal SRAM \[the mailbox SRAM hardware structure is reused\] with the CSR.
+9. HVM, through JTAG or using the SoC interface, polls for the “IDevID CSR ready" bit 24 that is set in “CPTRA\_FLOW\_STATUS” register.
+10. HVM reads mbox\_status\[3:0\] to check if the data is ready to be read (DATA\_READY encoding).
+11. HVM must clear bit 0 of CPTRA\_DBG\_MANUF\_SERVICE\_REG, indicating that it completed reading the CSR.
 12. Caliptra IP HW opens the Caliptra Mailbox for SoC usages, such as FW loading (if required in some HVM flows). Until this write operation is complete, the SoC does not get a grant/lock of the APB-exposed mailbox interface.
 
 ## Certificate format
@@ -471,7 +471,7 @@ Provisioner CA (pCA) is a set of one or more certificates issued by the vendor. 
 
 The vendor issues the IDevID certificate during SoC manufacturing. As part of [provisioning IDevID during manufacturing](#provisioning-idevid-during-manufacturing), Caliptra uses the UDS to derive the IDevID key pair and generate a CSR. The vendor's pCA uses the CSR to generate and sign the IDevID certificate. The CSR uses the format defined in PKCS#10.
 
-For IDevID to endorse LDevID, Caliptra requires the vendor to implement a X.509 v3 IDevID certificate described in RFC 5280 with the field values specified in *Table 7: IDevID certificate fields*. The vendor shall also populate all extensions from the "Requested Extensions" attribute in the CSR.
+For IDevID to endorse LDevID, Caliptra requires the vendor to implement an X.509 v3 IDevID certificate described in RFC 5280 with the field values specified in *Table 7: IDevID certificate fields*. The vendor shall also populate all extensions from the "Requested Extensions" attribute in the CSR. It is also recommended that the vendor add the Authority Information Access (AIA) extension to the IDevID certificate and maintain an Online Certificate Status Protocol (OCSP) responder with a URL pointed to by the AIA extension.
 
 *Table 7: IDevID certificate fields*
 
@@ -480,7 +480,7 @@ For IDevID to endorse LDevID, Caliptra requires the vendor to implement a X.509 
 | Version                        | v3           | 2
 | Serial Number                  | -            | Generate with [serial number algorithm](#serial-number-algorithm) using IDevID public key in uncompressed form
 | Validity                       | notAfter     | 99991231235959Z
-| Subject Name                   | CN           | Caliptra IDevID
+| Subject Name                   | CN           | Caliptra 1.0 IDevID
 |                                | serialNumber | Hex-encoded printable string of SHA256 hash of DER-formatted IDevID public key in uncompressed form
 | Subject Public Key Info        | Algorithm    | ecdsa-with-SHA384
 |                                | Parameters   | Named Curve = prime384v1
@@ -491,6 +491,7 @@ For IDevID to endorse LDevID, Caliptra requires the vendor to implement a X.509 
 | KeyUsage                       | keyCertSign  | 1
 | Basic Constraints              | CA           | TRUE
 |                                | pathLen      | 5
+| tcg-dice-Ueid                  | ueid         | UEID specified by IDevID attribute fuses
 
 Caliptra does not consume the IDevID certificate. Caliptra needs attributes of the IDevID certificate in order to generate the Authority Key Identifier extension for the LDevID and to populate the TCG Universal Entity ID (UEID) extension for Caliptra-generated certificates. The vendor must fuse these attributes into the IDevID attribute fuses for Caliptra to consume. The encoding of these attribute fuses is as follows:
 
@@ -522,11 +523,11 @@ Caliptra ROM generates the LDevID certificate and endorses it with the IDevID pr
 | -------------                  | ---------    | ---------
 | Version                        | v3           | 2
 | Serial Number                  | -            | Generate with [serial number algorithm](#serial-number-algorithm) using LDevID public key in uncompressed form
-| Issuer Name                    | CN           | Caliptra IDevID
+| Issuer Name                    | CN           | Caliptra 1.0 IDevID
 |                                | serialNumber | Hex-encoded printable string of SHA256 hash of DER-formatted IDevID public key in uncompressed form
 | Validity                       | notBefore    | 20230101000000Z
 |                                | notAfter     | 99991231235959Z
-| Subject Name                   | CN           | Caliptra LDevID
+| Subject Name                   | CN           | Caliptra 1.0 LDevID
 |                                | serialNumber | Hex-encoded printable string of SHA256 hash of DER-formatted LDevID public key in uncompressed form
 | Subject Public Key Info        | Algorithm    | ecdsa-with-SHA384
 |                                | Parameters   | Named Curve = prime384v1
@@ -552,11 +553,11 @@ Caliptra ROM generates the Alias<sub>FMC</sub> certificate and endorses it with 
 | -------------                  | ---------    | ---------
 | Version                        | v3           | 2
 | Serial Number                  | -            | Generate with [serial number algorithm](#serial-number-algorithm) using FMC Alias public key in uncompressed form
-| Issuer Name                    | CN           | Caliptra LDevID
+| Issuer Name                    | CN           | Caliptra 1.0 LDevID
 |                                | serialNumber | Hex-encoded printable string of SHA256 hash of DER-formatted LDevID public key in uncompressed form
 | Validity                       | notBefore    | notBefore from firmware manifest
 |                                | notAfter     | notAfter from firmware manifest
-| Subject Name                   | CN           | Caliptra FMC Alias
+| Subject Name                   | CN           | Caliptra 1.0 FMC Alias
 |                                | serialNumber | Hex-encoded printable string of SHA256 hash of DER-formatted FMC Alias public key in uncompressed form
 | Subject Public Key Info        | Algorithm    | ecdsa-with-SHA384
 |                                | Parameters   | Named Curve = prime384v1
@@ -597,11 +598,11 @@ Caliptra FMC generates the Alias<sub>RT</sub> certificate and endorses it with t
 | -------------                  | ---------    | ---------
 | Version                        | v3           | 2
 | Serial Number                  | -            | Generate with [serial number algorithm](#serial-number-algorithm) using RT Alias public key in uncompressed form
-| Issuer Name                    | CN           | Caliptra FMC Alias
+| Issuer Name                    | CN           | Caliptra 1.0 FMC Alias
 |                                | serialNumber | Hex-encoded printable string of SHA256 hash of DER-formatted FMC Alias public key in uncompressed form
 | Validity                       | notBefore    | notBefore from firmware manifest
 |                                | notAfter     | notAfter from firmware manifest
-| Subject Name                   | CN           | Caliptra Rt Alias
+| Subject Name                   | CN           | Caliptra 1.0 Rt Alias
 |                                | serialNumber | Hex-encoded printable string of SHA256 hash of DER-formatted RT Alias public key in uncompressed form
 | Subject Public Key Info        | Algorithm    | ecdsa-with-SHA384
 |                                | Parameters   | Named Curve = prime384v1
@@ -712,7 +713,7 @@ The following table describes the NIST SP 800-193 requirements that Caliptra sha
 
 Caliptra shall follow and implement the secure boot guidelines as described in [Reference 3](#ref-3).
 
-For the detailed flow, see the [HW Section](#hardware).
+For the detailed flow, see the [hardware section](#hardware) and [firmware verifcation section](#firmware-verification).
 
 ## Hitless update
 
@@ -754,6 +755,12 @@ For PCR0 and PCR1, ROM issues the following extend operations in order:
 2. Vendor public key hash
 3. Owner public key hash
 4. Digest of FMC
+
+Caliptra ROM fails to boot if the following values do not remain constant across a hitless update:
+* Owner public key hash
+* ECDSA vendor public key index
+* LMS vendor public key index
+* FMC digest
 
 ### Attestation of Caliptra's update journey
 
@@ -830,7 +837,7 @@ The corresponding journey measurement computation is the chained extension of \[
 
 ## Anti-rollback support
 
-Caliptra shall provide fuse banks (refer to *Table 16: Caliptra Fuse Map*) that are used for storing monotonic counters to provide anti-rollback enforcement for Caliptra mutable firmware. Each distinctly signed boot stage shall be associated with its own anti-rollback fuse field. Together with the vendor, Caliptra allows owners to enforce strong anti-rollback requirements, in addition to supporting rollback to a previous firmware version. This is a critical capability for hyper scalar owners.
+Caliptra shall provide fuse banks (refer to *Table 19: Caliptra Fuse Map*) that are used for storing monotonic counters to provide anti-rollback enforcement for Caliptra mutable firmware. Each distinctly signed boot stage shall be associated with its own anti-rollback fuse field. Together with the vendor, Caliptra allows owners to enforce strong anti-rollback requirements, in addition to supporting rollback to a previous firmware version. This is a critical capability for hyper scalar owners.
 
 Every mutable Caliptra boot layer shall include a SVN value in the signed header. If a layer's signed SVN value is less than the current counter value for that layer's fuse bank, Caliptra shall refuse to boot that layer, regardless of whether the signature is valid.
 
@@ -933,27 +940,101 @@ A detailed description of the POST and CAST KATs can be found at csrc.nist.gov.
 
 As shown in *Table 15: POST/CAST usage*, since the cryptographic algorithms required by the Caliptra Boot ROM are considered POSTs, and those same algorithms are used by Caliptra FMC and FW, there is no requirement that FMC and Runtime FW implement CASTs for those algorithms.
 
-## FW Signing/Verification algorithms
+## Firmware image format and verification
 
-Caliptra firmware is composed of multiple layers: an FMC and an application firmware image. Each layer is signed individually by ECDSA P384 keys, and optionally [LMS Signatures](#post-quantum-cryptography-pqc-requirements) as well.
+Caliptra supports verifying firmware with ECDSA P384 signatures and [Leighton-Micali Hash-based Signatures (LMS)](#post-quantum-cryptography-pqc-requirements) in accordance with the requirements described in [Reference 3](#ref-3).
 
-Each layer is signed by a vendor-controlled key. In addition, each layer may also be signed by an owner-controlled key. The image header contains both the owner public key and the signature using that key.
+Caliptra firmware is composed of two images: an FMC image and an application firmware image. A single firmware manifest describes these images. The manifest consists of a preamble (*Table 16*), a header (*Table 17*), and a Table of Contents (TOC) (*Table 18*). The image layout is shown in *Figure 9: firmware image layout*.
 
-During boot, Caliptra ROM shall verify the vendor signature over FMC before allowing that FMC to run.
+![](./images/fw-img-bundle.svg)
 
-See the [Owner authorization](#owner-authorization) section for how the owner key is used.
+*Figure 9: Firmware image layout*
 
-Caliptra's FW signature generation and verification shall follow the requirements described in [Reference 3](#ref-3).
+To verify the firmware, Caliptra ROM performs the following steps:
+1. Calculates the hash of the vendor public keys in the preamble and compares it against the hash in fuses (key_manifest_pk_hash). If the lifecycle is not "unprovisioned" and the hashes do not match, the boot fails.
+2. Calculates the hash of the owner public keys in the preamble and compares it against the hash in fuses (owner_pk_hash). If the owner_pk_hash fuse is not zero (i.e., unprovisioned) and hashes do not match, the boot fails. See the [Owner authorization](#owner-authorization) section.
+3. Ensures the vendor public key(s) selected by the preamble indices are not revoked based on fuse: key_manifest_pk_hash_mask for ECDSA public key, lms_revocation for LMS public key.
+4. Calculates the hash of the first byte through the vendor data field of the header (this includes the TOC digest). This is the vendor firmware digest.
+5. Calculates the hash of the first byte through the owner data field of the header (this includes the TOC digest). This is the owner firmware digest.
+6. Verifies the vendor signature using the vendor firmware digest from step 4 and the vendor key(s) from step 3.
+7. Verifies the owner signature using the owner firmware digest from step 5 and the owner key(s) from step 2.
+8. Verifies the TOC against the TOC digest that was verified in steps 6 and 7. The TOC contains the SVNs and digests for the FMC and runtime images.
+9. Verifies the FMC against the FMC digest in the TOC.
+10. If Caliptra is not in "unprovisioned" lifecycle state or "anti-rollback disable" state, ROM compares the FMC SVN against FMC SVN fuse (fuse_key_manifest_svn).
+11. Verifies the runtime against the runtime digest in the TOC.
+12. If Caliptra is not in "unprovisioned" lifecycle state or "anti-rollback disable" state, ROM compares the runtime digest against the runtime SVN fuse (fuse_runtime_svn).
+
+In addition to cold boot, Caliptra ROM performs firmware verification on hitless updates. See the [hitless update](#hitless-update) section for details.
+
+*Table 16: Firmware manifest preamble*
+
+Fields are little endian unless described otherwise.
+
+| Field | Size (bytes) | Description|
+|-------|--------|------------|
+| Firmware Manifest Marker | 4 | Magic Number marking the start of the package manifest. The value must be 0x434D414E (‘CMAN’ in ASCII)|
+| Firmware Manifest Size | 4 | Size of the full manifest structure |
+| Vendor ECDSA Public Key 1 | 96 | ECDSA P384 public key used to verify the Firmware Manifest Header Signature. <br> **X-Coordinate:** Public Key X-Coordinate (48 bytes, big endian) <br> **Y-Coordinate:** Public Key Y-Coordinate (48 bytes, big endian) |
+| Vendor ECDSA Public Key 2 | 96 | ECDSA P384 public key used to verify the Firmware Manifest Header Signature. <br> **X-Coordinate:** Public Key X-Coordinate (48 bytes, big endian) <br> **Y-Coordinate:** Public Key Y-Coordinate (48 bytes, big endian) |
+| Vendor ECDSA Public Key 3 | 96 | ECDSA P384 public key used to verify the Firmware Manifest Header Signature. <br> **X-Coordinate:** Public Key X-Coordinate (48 bytes, big endian) <br> **Y-Coordinate:** Public Key Y-Coordinate (48 bytes, big endian) |
+| Vendor ECDSA Public Key 4 | 96 | ECDSA P384 public key used to verify the Firmware Manifest Header Signature. <br> **X-Coordinate:** Public Key X-Coordinate (48 bytes, big endian) <br> **Y-Coordinate:** Public Key Y-Coordinate (48 bytes, big endian) |
+| Vendor LMS Public Key 1 | 48 | LMS public key used to verify the Firmware Manifest Header Signature. <br> **tree_type:** LMS Algorithm Type (4 bytes, big endian) Must equal 12. <br> **otstype:** LM-OTS Algorithm Type (4 bytes, big endian) Must equal 7. <br> **id:**  (16 bytes) <br> **digest:**  (24 bytes) |
+| Vendor LMS Public Key 2 | 48 | LMS public key used to verify the Firmware Manifest Header Signature. <br> **tree_type:** LMS Algorithm Type (4 bytes, big endian) Must equal 12. <br> **otstype:** LM-OTS Algorithm Type (4 bytes, big endian) Must equal 7. <br> **id:**  (16 bytes) <br> **digest:**  (24 bytes) |
+| .<br>.<br>|
+| Vendor LMS Public Key 32 | | |
+| ECDSA Public Key Index Hint | 4 | The hint to ROM to indicate which ECDSA public key it should first use.  |
+| LMS Public Key Index Hint | 4 | The hint to ROM to indicate which LMS public key it should first use.  |
+| Vendor ECDSA Signature | 96 | Vendor ECDSA P384 signature of the Firmware Manifest header hashed using SHA384. <br> **R-Coordinate:** Random Point (48 bytes, big endian) <br> **S-Coordinate:** Proof (48 bytes, big endian) |
+| Vendor LMS Signature | 1620 | Vendor LMS signature of the Firmware Manifest header hashed using SHA384. <br> **q:** Leaf of the Merkle tree where the OTS public key appears (4 bytes) <br> **ots:** LM-OTS Signature (1252 bytes) <br> **tree_type:** LMS Algorithm Type (4 bytes, big endian) Must equal 12. <br> **tree_path:** Path through the tree from the leaf associated with the LM-OTS signature to the root. (360 bytes) |
+| Owner ECDSA Public Key | 96 | ECDSA P384 public key used to verify the Firmware Manifest Header Signature. <br> **X-Coordinate:** Public Key X-Coordinate (48 bytes, big endian) <br> **Y-Coordinate:** Public Key Y-Coordinate (48 bytes, big endian)|
+| Owner LMS Public Key | 48 | LMS public key used to verify the Firmware Manifest Header Signature. <br> **tree_type:** LMS Algorithm Type (4 bytes, big endian) Must equal 12. <br> **otstype:** LM-OTS Algorithm Type (4 bytes, big endian) Must equal 7. <br> **id:**  (16 bytes) <br> **digest:**  (24 bytes) |
+| Owner ECDSA Signature | 96 | Vendor ECDSA P384 signature of the Firmware Manifest header hashed using SHA384. <br> **R-Coordinate:** Random Point (48 bytes, big endian) <br> **S-Coordinate:** Proof (48 bytes, big endian) |
+| Owner LMS Signature | 1620 | Owner LMS signature of the Firmware Manifest header hashed using SHA384. <br> **q:** Leaf of the Merkle tree where the OTS public key appears (4 bytes) <br> **ots:** LM-OTS Signature (1252 bytes) <br> **tree_type:** LMS Algorithm Type (4 bytes, big endian) Must equal 12. <br> **tree_path:** Path through the tree from the leaf associated with the LM-OTS signature to the root. (360 bytes) |
+| Reserved | 8 | Reserved 8 bytes |
+<br>
+
+*Table 17: Firmware manifest header*
+
+Fields are little endian unless described otherwise.
+
+| Field | Size (bytes) | Description|
+|-------|--------|------------|
+| Revision | 8 | 8-byte version of the firmware image bundle |
+| Vendor ECDSA public key index | 4 | The hint to ROM to indicate which ECDSA public key it should first use. |
+| Vendor LMS public key index | 4 | The hint to ROM to indicate which LMS public key it should first use. |
+| Flags | 4 | Feature flags. <br> **Bit0:** - Interpret the pl0_pauser field. If not set, all PAUSERs are PL1 <br>**Bit1-Bit31:** Reserved |
+| TOC Entry Count | 4 | Number of entries in TOC. |
+| PL0 PAUSER | 4 | The PAUSER with PL0 privileges. |
+| TOC Digest | 48 | SHA384 Digest of table of contents. |
+| Vendor Data | 40 | Vendor Data. <br> **Not Before:** Vendor Start Date [ASN1 Time Format] for Caliptra-issued certificates (15 bytes) <br> **Not After:** Vendor End Date [ASN1 Time Format] for Caliptra-issued certificates (15 bytes) <br> **Reserved:** (10 bytes) |
+| Owner Data | 40 | Owner Data. <br> **Not Before:** Owner Start Date [ASN1 Time Format] for Caliptra-issued certificate. Takes precedence over vendor start date (15 bytes) <br> **Not After:** Owner End Date [ASN1 Time Format] for Caliptra-issued certificates. Takes precedence over vendor end date (15 bytes) <br> **Reserved:** (10 bytes) |
+
+*Table 18: Table of contents*
+
+Fields are little endian unless described otherwise.
+
+| Field | Size (bytes) | Description|
+|-------|--------|------------|
+| TOC Entry Id | 4 | TOC Entry ID. The fields can have the following values: <br> **0x0000_0001:** FMC  <br> **0x0000_0002:** Runtime |
+| Image Type | 4 | Image Type that defines the format of the image section <br> **0x0000_0001:** Executable |
+| Image Revision | 20 | Git Commit hash of the build |
+| Image Version | 4 | Firmware release number |
+| Image SVN | 4 | Security Version Number for the Image. This field is compared against the fuses (FMC SVN or runtime SVN). |
+| Image Minimum SVN | 4 | Minimum Security Version Number for the Image. This field is compared against the fuses (FMC SVN or runtime SVN). |
+| Image Load Address | 4 | Load address |
+| Image Entry Point | 4 | Entry point to start the execution from  |
+| Image Offset | 4 | Offset from beginning of the image |
+| Image Size | 4 | Image Size |
+| Image Hash | 48 | SHA384 hash of image |
 
 ### Post-Quantum Cryptography (PQC) requirements
 
-Recent guidance from the US Government, [CNSA 2.0](https://media.defense.gov/2022/Sep/07/2003071834/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS_.PDF), 
-requests the use of Leighton-Micali Hash-based Signatures (LMS) by 2025.  Caliptra has an option to require LMS signatures in addition to ECDSA signatures (vendor and owner).
+Recent guidance from the US Government, [CNSA 2.0](https://media.defense.gov/2022/Sep/07/2003071834/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS_.PDF), requests the use of LMS by 2025. Caliptra has an option to require LMS signatures in addition to ECDSA signatures (vendor and owner).
 
-Based on the recommendation in [CNSA 2.0](https://media.defense.gov/2022/Sep/07/2003071834/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS_.PDF) Caliptra uses the SHA256/192 algorithm.
-To provide a balance between the number of signatures allowed, resiliency to HSM failures, and signature size Caliptra uses 32 LMS trees each with a height of 15.  
+Based on the recommendation in [CNSA 2.0](https://media.defense.gov/2022/Sep/07/2003071834/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS_.PDF), Caliptra uses the SHA256/192 algorithm.
+To provide a balance between the number of signatures allowed and signature size, Caliptra uses an LMS tree height of 15. This is referred to in [NIST SP 800-208](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-208.pdf) as the LMOTS_SHA256_N24_W4 and LMS_SHA256_M24_H15 parameter sets.
 
-It is recommended that the LMS trees are created from multiple HSMs that are geographically distributed.
+Caliptra supports 32 LMS trees for the vendor and 1 tree for the owner. The SoC can support multiple trees for the owner via ownership transfer. It is recommended that the LMS trees are created from multiple HSMs that are geographically distributed.
 
 ### Key rotation
 
@@ -963,7 +1044,7 @@ Firmware signing key rotation shall follow the requirements described in [Refere
 
 The following figure describes the Caliptra Core.
 
-*Figure 9: Caliptra Core block diagram*
+*Figure 10: Caliptra Core block diagram*
 
 ![](./images/Caliptra_HW_diagram.png)
 
@@ -973,7 +1054,7 @@ The following figure describes the Caliptra Core.
   * 128 KiB for DCCM and 48 KiB for ROM
 * Cryptography requirements:
   * SHA256, SHA384, and SHA512
-  * ECC Secp384r1 with HMAC-DRBG - key generation, signing and verification
+  * ECDSA Secp384r1 with HMAC-DRBG - key generation, signing and verification
   * HMAC SHA384
   * AES256-CBC
 * Chips Alliance is used for RISC-V.
@@ -984,7 +1065,7 @@ The following figure describes the Caliptra Core.
 
 The following figure describes the Caliptra IP HW boot flow.
 
-*Figure 10: Hardware boot flow*
+*Figure 11: Hardware boot flow*
 
 ![](./images/Caliptra_boot_flow2.png)
 
@@ -1002,7 +1083,7 @@ The following figure describes the Caliptra IP HW boot flow.
 
 ### Caliptra FW push flow
 
-*Figure 11: FW push flow*
+*Figure 12: FW push flow*
 
 ![](./images/Caliptra_boot_flow3.png)
 
@@ -1011,23 +1092,23 @@ The following figure describes the Caliptra IP HW boot flow.
 3. Caliptra ROM asserts READY\_FOR\_FW wire. This is done by writing an internal register. This register is also visible to read on the APB interface. SoC can choose to poll on this bit instead of using the wire (it is the SoC integration choice).
 4. SoC follows the mailbox protocol and pushes Caliptra FW into the mailbox.
 5. Caliptra’s mailbox HW  asserts an interrupt to the microcontroller after the GO is written, per mailbox protocol. See [Mailbox](#mailbox) for specifics.
-6. After Caliptra’s FW is authenticated and loaded into ICCM, microcontroller asserts READY\_FOR\_RTFLOWS wire. See the [Caliptra ROM specification](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md) for specific information on security flows that occur within this step (for example, DICE).
+6. After Caliptra’s FW is authenticated and loaded into ICCM, microcontroller runs the firmware and asserts READY\_FOR\_RTFLOWS wire.
 
 ## Boot Media Integrated
 
 ### Caliptra FW load flow
 
-*Figure 12: FW load flow*
+*Figure 13: FW load flow*
 
 ![](./images/Caliptra_boot_flow4.png)
 
 1. After the Caliptra microcontroller is out of reset, ROM starts executing and triggers the crypto block to run the UDS decrypt flow.
 2. Caliptra ROM uses the internal SPI peripheral to read from the platform's persistent storage and load the FW. Note that SPI is operating in basic functional single-IO mode and at 20 MHz frequency.
-3. After Caliptra’s FW is authenticated and loaded into ICCM, microcontroller asserts READY\_FOR\_RTFLOWS wire. See the [Caliptra ROM specification](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md) for specific information about security flows that happen within this step (for example, DICE).
+3. After Caliptra’s FW is authenticated and loaded into ICCM, microcontroller runs the firmware and asserts READY\_FOR\_RTFLOWS wire.
 
 ### <a id="reset-flow"></a>CPU warm reset or PCIe hot reset flow →  Caliptra IP reset
 
-*Figure 13: Hardware reset flow*
+*Figure 14: Hardware reset flow*
 
 ![](./images/Caliptra_boot_flow5.png)
 
@@ -1079,7 +1160,7 @@ Mailboxes are generic data passing structures, and the Caliptra hardware only en
 **Notes on behavior:**
 After LOCK is granted, the mailbox is locked until that device has concluded its operation. The mailbox is responsible only for accepting writes from the device that requested and locked the mailbox.
 
-*Figure 14: Mailbox sender flow*
+*Figure 15: Mailbox sender flow*
 
 ![](./images/Caliptra_mbox_state.png)
 
@@ -1101,7 +1182,7 @@ Upon receiving an indication that the mailbox is populated, the appropriate devi
     1. If response data was provided, STATUS should be written to DATA\_READY.
     2. Otherwise, STATUS should be written to CMD\_COMPLETE (or CMD\_FAILURE).
 
-*Figure 15: Mailbox receiver flow*
+*Figure 16: Mailbox receiver flow*
 
 ![](./images/Caliptra_mbox_sequence.png)
 
@@ -1116,17 +1197,13 @@ The PAUSER field of the APB interface is used to encode device attributes for th
 
 The Caliptra mailbox commands are specified in the [Caliptra runtime firmware specification](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#maibox-commands).
 
-## Caliptra firmware image format
-
-The Caliptra firmware image format is specified in the [Caliptra ROM specification](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md#8-firmware-image-bundle).
-
 ### Hash calculation HW API
 
 Caliptra provides a HW API to do a SHA384 hash calculation. The SoC can access the accelerator through this hardware API and stream data to be hashed over the APB interface. The hash is captured into a register for SoC to use or Caliptra FW to be used for the Signature Authentication API.
 
 ### JTAG/TAP debug
 
-*Figure 16: Debug flow*
+*Figure 17: Debug flow*
 
 ![](./images/Caliptra_boot_flow6.png)
 
@@ -1195,30 +1272,29 @@ For SoCs that intend to achieve FIPS 140-3 CMVP certification with Caliptra:
 
 The following table describes Caliptra's fuse map:
 
-*Table 16: Caliptra Fuse Map*
+*Table 19: Caliptra Fuse Map*
 
 | **Name**                        | **Size (bits)** | **ACL**         | **Fuse programming time**                       | **Description** |
 | ------------------------------- | --------------- | --------------- | ----------------------------------------------- | --------------- |
 | UDS Seed (obfuscated)           | 384             | ROM             | SoC manufacturing                               | DICE Unique Device Secret Seed. This seed is unique per device. The seed is scrambled using an obfuscation function. |
 | Field Entropy (obfuscated)      | 256             | ROM             | Device owner in-field programmable | Field-programmable by the owner, used to hedge against UDS disclosure in the supply chain. |
-| KEY MANIFEST PK HASH            | 384             | ROM FMC RUNTIME | SoC manufacturing                               | SHA-384 hash of hashes of the Key Manifest Signing the ECC P-384 Public Keys. |
-| KEY MANIFEST PK HASH MASK       | 4               | ROM FMC RUNTIME | In-field programmable                           | One-hot encoded list of revoked Key Manifest PK Hash. |
-| OWNER PK HASH                   | 384             | ROM FMC RUNTIME | In-field programmable                           | SHA-384 hash of hashes of the Owner Key ECC P-384 Public Keys. |
-| OWNER KEY MANIFEST PK HASH MASK | 4               | ROM FMC RUNTIME | In-field programmable                           | One-hot encoded list of revoked Owner Key Manifest PK Hash. |
+| KEY MANIFEST PK HASH            | 384             | ROM FMC RUNTIME | SoC manufacturing                               | SHA384 hash of the Vendor ECDSA P384 and LMS Public Keys. |
+| KEY MANIFEST PK HASH MASK       | 4               | ROM FMC RUNTIME | In-field programmable                           | One-hot encoded list of revoked Vendor ECDSA P384 Public Keys. |
+| OWNER PK HASH                   | 384             | ROM FMC RUNTIME | In-field programmable                           | SHA384 hash of the Owner ECDSA P384 and LMS Public Keys. |
 | FMC KEY MANIFEST SVN            | 32              | ROM FMC RUNTIME | In-field programmable                           | FMC security version number. |
 | RUNTIME SVN                     | 128             | ROM FMC RUNTIME | In-field programmable                           | Runtime firmware security version number. |
 | ANTI-ROLLBACK DISABLE           | 1               | ROM FMC RUNTIME | SoC manufacturing or in-field programmable      | Disables anti-rollback support from Caliptra. (For example, if a Platform RoT is managing FW storage and anti-rollback protection external to the SoC.) |
-| IDEVID CERT IDEVID ATTR.        | 768             | ROM FMC RUNTIME | SoC manufacturing                               | Manufacturer IEEE IDEVID Certificate Generation Attributes. See the ROM specification for details. |
-| IDEVID MANUF HSM IDENTIFIER     | 128             | ROM FMC RUNTIME | SoC manufacturing                               | Manufacturer IDEVID Manufacturer’s HSM identifier (this is used to find the certificate chain from the boot media). See the ROM specification for details. |
+| IDEVID CERT IDEVID ATTR.        | 768             | ROM FMC RUNTIME | SoC manufacturing                               | IDevID Certificate Generation Attributes. See [IDevID certificate section](#idevid-certificate)
+| IDEVID MANUF HSM IDENTIFIER     | 128             | ROM FMC RUNTIME | SoC manufacturing                               | Spare bits for Vendor IDevID provisioner CA identifiers. |
 | Life Cycle Fuses                | 2               | ROM FMC RUNTIME | SoC manufacturing                               | **Caliptra Boot Media Integrated mode usage only**. SoCs that build with a Boot Media Dependent profile don’t have to account for these fuses.<br> - ‘00 - Unprovisioned or manufacturing<br> - ‘01 - Production ‘10 - UNDEF<br> - ‘11 - End Of Life<br> **Reset:** Can only be reset on powergood. |
 | LMS VERIFY                      | 1               | ROM             | In-field programmable                           | - 0 - Verify Caliptra firmware images with ECDSA-only.<br> - 1 - Verify Caliptra firmware images with both ECDSA and LMS.
-| LMS REVOCATION                  | 32              | ROM             | In-field programmable                           | Bits for revoking LMS public keys in the key manifest.
+| LMS REVOCATION                  | 32              | ROM             | In-field programmable                           | One-hot encoded list of revoked Vendor LMS Public Keys.
 
 # Error reporting and handling
 
 This section describes Caliptra error reporting and handling.
 
-*Table 17: Hardware and firmware error types*
+*Table 20: Hardware and firmware error types*
 
 | | Fatal errors | Non-fatal errors |
 | :- | - | - |
@@ -1271,6 +1347,7 @@ The following acronyms and abbreviations are used throughout this document.
 | <a id="IDevId"></a>**IDevId** | Initial Device Identifier                      |
 | <a id="iRoT"></a>**iRoT**     | Internal Root of Trust                         |
 | <a id="KAT"></a>**KAT**       | Known Answer Test                              |
+| <a id="LMS"></a>**LMS**       | Leighton-Micali Hash-Based Signatures          |
 | <a id="LDevId"></a>**LDevId** | Locally Significant Device Identifier          |
 | <a id="NIC"></a>**NIC**       | Network Interface Card                         |
 | <a id="NIST"></a>**NIST**     | National Institute of Standards and Technology |
@@ -1338,7 +1415,7 @@ The Caliptra Workgroup acknowledges the following individuals for their contribu
 
 [^2]: This obfuscation secret may be a chip-class secret, or a chip-unique PUF, with the latter preferred.
 
-[^3]: This memory should only be volatile in a power loss event. See details in [HW Section](#reset-flow).
+[^3]: This memory should only be volatile in a power loss event. See details in the [reset flow section](#reset-flow).
 
 [^4]: When a hitless update occurs, and then following reset, Caliptra shall execute the updated firmware and shall maintain the measurements that it collected during boot. Caliptra shall support the reporting of these measurements with signed attestations. Hitless update of Caliptra’s FMC shall not be supported. Hitless update requires creating a new DICE identity, which would require access to IDevID and LDevID. Retention of IDevID and LDevID (privkeys) during post-boot introduce a security vulnerability.
 
