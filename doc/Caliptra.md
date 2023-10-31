@@ -349,7 +349,7 @@ See [Provisioning IDevID During Manufacturing](#provisioning-idevid-during-manuf
 
 Caliptra shall support field-programmable entropy, which factors into the device's LDevID identity.  The [LDevID certificate](#ldevid-certificate) is endorsed by IDevID and in turn endorses the FMC alias key.
 
-Caliptra's field-programmable entropy shall consist of four 32-byte slots. All slots are used to derive LDevID. An owner may decide to program as few or as many slots as they wish. Upon programming new entropy, on the next reset the device begins wielding its fresh LDevID. Owners need to validate the new LDevID by using IDevID.
+Caliptra's field-programmable entropy shall consist of two 16-byte slots. All slots are used to derive LDevID. An owner may decide to program as few or as many slots as they wish. Upon programming new entropy, on the next reset the device begins wielding its fresh LDevID. Owners need to validate the new LDevID by using IDevID.
 
 ### Commentary: threat analysis
 
@@ -370,7 +370,7 @@ Vendors have incentives to mitigate these threats. The vendor identity chain sec
 
 Ultimately though, IDevID is not renewable. Renewable security, often referred to as trusted computing base recovery, is a base design principle in Caliptra. Therefore, it is a design goal to reduce the operational dependency on IDevID. Field entropy and LDevID satisfy this need.
 
-Field entropy is a limited resource, consisting of only four 32-byte slots of one-time programmable fuses. It is not generally expected that a second-hand purchaser can program all or even any of these slots. Caliptra's DICE identity remains usable even after all field entropy slots are programmed, so this feature does not preclude a circular economy. Field entropy is a feature primarily designed for users who purchase new parts.
+Field entropy is a limited resource, consisting of only two 16-byte slots of one-time programmable fuses. It is not generally expected that a second-hand purchaser can program all or even any of these slots. Caliptra's DICE identity remains usable even after all field entropy slots are programmed, so this feature does not preclude a circular economy. Field entropy is a feature primarily designed for users who purchase new parts.
 
 Field entropy and LDevID are intended to hedge against attackers with the following abilities:
 
