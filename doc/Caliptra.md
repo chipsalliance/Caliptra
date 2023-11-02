@@ -1265,7 +1265,7 @@ Please refer to [the Caliptra code base](https://github.com/chipsalliance/calipt
 
 A future effort is a full security subsystem solution. This solution is a combination of fully open source digital logic and licensable analog components that are technology dependent, such as TRNG analog sources or technology dependent fuse controllers.
 
-* SoC Controller has configurable SRAMs to allow per SoC firmware customization.
+* SoC Controller has configurable SRAMs and reference firmware.
 * SoC reference ROM allows for configurable initialization.
 * Resource handling logic (RHL) brings up subsystem components such as PUF, PLL, Fuse controller, \[P-\]TRNG. etc. RHL processes requests from Caliptra to the outside components (for example, P-TRNG request input to Caliptra’s internal TRNG).
 * Some of the analog components are licensable IPs that are used to build the subsystem (for example, PUF, and PLL).
