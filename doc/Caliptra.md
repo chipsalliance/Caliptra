@@ -1061,7 +1061,7 @@ The following figure describes the Caliptra Core.
 * APB is the choice for the SoC-facing interface.
 * JTAG is exported at the IP interface.
 * TRNG is the digital logic and algorithms that are required for random number generation. It requires a physical entropy source input. See the Caliptra IP specification and [integration specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md) for more information.
-  * For SoCs that want to use their own legacy TRNG, Caliptra provides a HW API to push the random number on the request/response handshake. See the Caliptra IP specification and [integration specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md) for more information.
+  * For SoCs that want to use their own legacy TRNG, Caliptra provides a HW API to push the random number on the request/response handshake. See the Caliptra IP specification and [integration specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md) for more information. **This mode is advised for early development but discouraged for production tape outs due to the lower security assurances of an external RNG**.
 
 The following figure describes the Caliptra IP HW boot flow.
 
