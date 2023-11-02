@@ -274,7 +274,7 @@ See [Error Reporting and Handling](#error-reporting-and-handling) for details ab
 
 *Figure 3: Caliptra boot flow*
 
-![](./images/BMD_Boot_flow.png)
+![](./images/Boot_flow.png)
 
 ## Identity
 
