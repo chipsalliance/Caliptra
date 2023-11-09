@@ -248,7 +248,7 @@ An example of when an owner must protect assets is moving from secure mode to in
 
 # High level architecture
 
-The following figure shows the basic high-level blocks of the Caliptra subsystem.
+The following figure shows the basic high-level blocks of Caliptra.
 
 *Figure 2: Caliptra high level blocks*
 
@@ -256,41 +256,7 @@ The following figure shows the basic high-level blocks of the Caliptra subsystem
 
 See the [hardware section](#hardware) for a detailed discussion.
 
-## Caliptra profiles
-
-Caliptra supports two physical modes of instantiation, the Caliptra Core and the Caliptra subsystem.  Within Caliptra Core there are two modes of integration with different security postures and firmware loading techniques.
-
-1. Boot Media Integrated (BMI) profile: Caliptra loads its firmware directly from SPI boot media. SoC boot cannot proceed through any other boot media.
-2. Boot Media Dependent (BMD) profile: Caliptra receives its firmware from SoC actors with access to the boot media.
-
-In both profiles, Caliptra is among the first uncore microcontrollers taken out of reset by the power-on reset logic. The difference is in the Trusted Computing Base (TCB) for integrity of the Core RTM. In the BMI profile, this TCB is the Caliptra Core. In the BMD profile, this TCB additionally includes the immutable element of the SoC ROM. The BMD profile trades increased TCB for lower integration cost. The BMD profile does not put Caliptra firmware in the performance-critical or recovery-critical code paths of the SoC boot process.
-
-Caliptra 1.0 only supports the BMD profile.
-
-### <a id="bmi"></a>Caliptra Core - Boot Media Integrated (BMI)
-
-In the BMI profile, Caliptra unilaterally starts the firmware chain-of-trust. The boot process is as follows:
-
-1. Hardware executes SoC power-on reset logic. This logic starts the execution of Caliptra ROM.
-2. Caliptra ROM fetches the Caliptra firmware from SPI boot media.
-3. Caliptra ROM authenticates, measures, loads, and executes Caliptra firmware. Refer to [Error Reporting and Handling](#error-reporting-and-handling) for details regarding FMC verification failures.
-4. Caliptra firmware copies the SoC First Mutable Code (FMC) into the Caliptra mailbox and measures it.
-5. Caliptra firmware signals to SoC ROM to continue the boot process by fetching the firmware from Caliptra's mailbox.
-6. SoC FMC continues the boot process, forming a boot firmware chain-of-trust: each firmware fetches, authenticates, measures, and executes the next firmware needed to establish the device operating environment. Each firmware deposits the next firmware's measurements into Caliptra prior to execution.
-7. Caliptra firmware presents attestation APIs using the deposited measurements.
-
-*Figure 3: Boot Media Integrated boot flow*
-
-![](./images/BMI_Boot_flow.png)
-
-In the BMI profile, the Caliptra TCB for integrity of Core RTM is the Caliptra Core.  The verification of measurement includes:
-
-1. The SoC design ingests firmware through Caliptra.
-2. Caliptra IP, Caliptra ROM, and Caliptra Firmware.
-
-### <a id="bmd"></a>Caliptra Core - Boot Media Dependent (BMD)
-
-In the BMD profile, Caliptra coordinates the start of the firmware chain-of-trust with the immutable component of the SoC ROM. After the Caliptra ROM completes initialization, it provides a "stash measurement" API and callback signals for the SoC ROM to proceed with the boot process. Caliptra ROM supports stashing of at most eight measurements prior to the boot of Caliptra firmware. The SoC then may choose to boot Caliptra firmware. Any security-sensitive code or configuration loaded by the SoC prior to Caliptra firmware boot must be stashed within Caliptra. If the SoC exceeds Caliptra ROM's measurement stash capacity, attestation must be disabled until next cold reset. The boot process is as follows:
+Caliptra is among the first uncore microcontrollers taken out of reset by the power-on reset logic. Caliptra coordinates the start of the firmware chain-of-trust with the immutable component of the SoC ROM. After the Caliptra ROM completes initialization, it provides a "stash measurement" API and callback signals for the SoC ROM to proceed with the boot process. Caliptra ROM supports stashing of at most eight measurements prior to the boot of Caliptra firmware. The SoC then may choose to boot Caliptra firmware. Any security-sensitive code or configuration loaded by the SoC prior to Caliptra firmware boot must be stashed within Caliptra. If the SoC exceeds Caliptra ROM's measurement stash capacity, attestation must be disabled until the next cold reset. The boot process is as follows:
 
 1. Hardware executes SoC power-on reset logic. This logic starts the execution of SoC ROM and Caliptra ROM.
 2. SoC ROM waits for the ready_for_fw signal from Caliptra ROM.
@@ -301,35 +267,20 @@ In the BMD profile, Caliptra coordinates the start of the firmware chain-of-trus
     2. If the FMC is not Caliptra firmware:
         1. SoC ROM measures that firmware as the SoC FMC, and issues the Caliptra "stash measurement" command prior to executing SoC FMC.
 4. SoC ROM executes SoC FMC.
-5. As in #6 from the BMI flow, SoC FMC continues the boot process, forming a boot firmware chain-of-trust: each firmware fetches, authenticates, measures, and executes the next firmware needed to establish the device operating environment. Each firmware deposits the next firmware's measurements into Caliptra prior to execution. The exception is Caliptra's firmware: SoC firmware delegates the measurement and execution of Caliptra's firmware to Caliptra ROM.
+5. SoC FMC continues the boot process, forming a boot firmware chain-of-trust: each firmware fetches, authenticates, measures, and executes the next firmware needed to establish the device operating environment. Each firmware deposits the next firmware's measurements into Caliptra prior to execution. The exception is Caliptra's firmware: SoC firmware delegates the measurement and execution of Caliptra's firmware to Caliptra ROM.
 6. Upon eventual initialization, Caliptra firmware presents attestation APIs using the deposited measurements.
 
 See [Error Reporting and Handling](#error-reporting-and-handling) for details about Caliptra and SoC firmware load and verification error handling.
 
-*Figure 4: Boot Media Dependent boot flow*
+*Figure 3: Caliptra boot flow*
 
-![](./images/BMD_Boot_flow.png)
-
-## Caliptra security subsystem
-
-To enable a transparent and reusable security subsystem, the Caliptra specification includes a full security subsystem solution. This solution is a combination of fully open source digital logic and licensable analog components that are technology dependent, such as TRNG analog sources or technology dependent fuse controllers.
-
-* SoC Controller has configurable SRAMs to allow per SoC firmware customization.
-* SoC reference ROM allows for configurable initialization.
-* Resource handling logic (RHL) brings up subsystem components such as PUF, PLL, Fuse controller, \[P-\]TRNG. etc. RHL processes requests from Caliptra to the outside components (for example, P-TRNG request input to Caliptra’s internal TRNG).
-* Some of the analog components are licensable IPs that are used to build the subsystem (for example, PUF, and PLL).
-
-*Figure 5: Caliptra security subsystem*
-
-![](./images/Caliptra_HW_Block_diagram.png)
-
-The Caliptra subsystem offers a complete RoT subsystem, with open source programmable components for customization of SoC boot flows.
+![](./images/Boot_flow.png)
 
 ## Identity
 
 Caliptra must provide its runtime (RT) code with a cryptographic identity in accordance with the TCG DICE specification. This identity must be rooted in ROM, and provides an attestation over the security state of the RTM as well as the code that the RTM booted.
 
-*Figure 6: DICE Cert/Key generation*
+*Figure 4: DICE Cert/Key generation*
 
 ![](./images/Caliptra_cert_creation.png)
 
@@ -407,7 +358,7 @@ Devices may support features like debug unlock, DFT, or DFD flows that globally 
 
 Caliptra firmware shall be signed by the vendor. In addition, this firmware may also be signed by the owner when ownership control is enforced. If a second signature is present for ownership authorization, Caliptra must extract the owner's public key from the firmware image during cold boot, and latch the owner key into Caliptra's RAM for the remainder of its uptime[^3]. Caliptra then uses both the vendor key and owner key to verify hitless firmware updates.
 
-Caliptra shall attest to the value of the owner key, enabling external verifiers to ensure that the correct owner key was provisioned into the device. To perform this attestation, Caliptra includes the owner key as an input to the FMC's CDI (as part of "other attributes" from Figure 6 above), and represents it within the FMC's alias certificate.
+Caliptra shall attest to the value of the owner key, enabling external verifiers to ensure that the correct owner key was provisioned into the device. To perform this attestation, Caliptra includes the owner key as an input to the FMC's CDI (as part of "other attributes" from Figure 4 above), and represents it within the FMC's alias certificate.
 
 The SoC may support a fuse bank for representing the hash of the owner's public key. If the SoC reports this value to Caliptra, Caliptra refuses to boot firmware unless the firmware was dual-signed by the key reported by SoC ROM's fuse registers.
 
@@ -417,7 +368,7 @@ The owner key, when represented in fuses or in the FMC's alias certificate, is a
 
 ![](./images/Caliptra_manuf_flow1.png)
 
-*Figure 7: Device manufacturing identity flow*
+*Figure 5: Device manufacturing identity flow*
 
 1. High Volume Manufacturing (HVM) programs the IDevID certificate attributes fuses. See [IDevID Certificate](#idevid-certificate) for encodings.
 2. HVM programs NIST compliant UDS into fuses using SoC-specific fuse programming flow. Note that this UDS goes through an obfuscation function within Caliptra IP.
@@ -628,7 +579,7 @@ Caliptra RT generates the DPE certificate and endorses it with the Alias<sub>RT<
 
 ![](./images/Caliptra_security_states.png)
 
-*Figure 8: Caliptra security states*
+*Figure 6: Caliptra security states*
 
 **Definitions**
 
@@ -944,11 +895,11 @@ As shown in *Table 15: POST/CAST usage*, since the cryptographic algorithms requ
 
 Caliptra supports verifying firmware with ECDSA P384 signatures and [Leighton-Micali Hash-based Signatures (LMS)](#post-quantum-cryptography-pqc-requirements) in accordance with the requirements described in [Reference 3](#ref-3).
 
-Caliptra firmware is composed of two images: an FMC image and an application firmware image. A single firmware manifest describes these images. The manifest consists of a preamble (*Table 16*), a header (*Table 17*), and a Table of Contents (TOC) (*Table 18*). The image layout is shown in *Figure 9: firmware image layout*.
+Caliptra firmware is composed of two images: an FMC image and an application firmware image. A single firmware manifest describes these images. The manifest consists of a preamble (*Table 16*), a header (*Table 17*), and a Table of Contents (TOC) (*Table 18*). The image layout is shown in *Figure 7: firmware image layout*.
 
 ![](./images/fw-img-bundle.svg)
 
-*Figure 9: Firmware image layout*
+*Figure 7: Firmware image layout*
 
 To verify the firmware, Caliptra ROM performs the following steps:
 1. Calculates the hash of the vendor public keys in the preamble and compares it against the hash in fuses (key_manifest_pk_hash). If the lifecycle is not "unprovisioned" and the hashes do not match, the boot fails.
@@ -1044,7 +995,7 @@ Firmware signing key rotation shall follow the requirements described in [Refere
 
 The following figure describes the Caliptra Core.
 
-*Figure 10: Caliptra Core block diagram*
+*Figure 8: Caliptra Core block diagram*
 
 ![](./images/Caliptra_HW_diagram.png)
 
@@ -1065,25 +1016,23 @@ The following figure describes the Caliptra Core.
 
 The following figure describes the Caliptra IP HW boot flow.
 
-*Figure 11: Hardware boot flow*
+*Figure 9: Hardware boot flow*
 
 ![](./images/Caliptra_boot_flow2.png)
 
 1. As part of the SoC boot flow, SoC may have other infrastructure and entities that boot. That part of the flow is outside the scope of this document. If SoC chooses to bypass Caliptra, then it should have a capability to bypass Caliptra entirely through its proprietary flow. This may be needed for initial power-on and other early validation.
 2. Cptra\_pwrgood is asserted to the Caliptra IP block.
 3. Cptra\_rst\_b is deasserted to the Caliptra IP block. See the integration specification for guidelines on the minimum number of cycles between these two signals.
-4. Caliptra IP now evaluates the strap settings driven through various interface wires (for example, BMD vs BMI mode, the security or debug state of the SoC, etc.).
+4. Caliptra IP now evaluates the strap settings driven through various interface wires (for example, the security or debug state of the SoC).
 5. If SoC is in a debug mode, then security assets are cleared or switched to debug mode.
 6. Caliptra IP asserts Ready\_For\_Fuse wire to the SoC.
 7. The SoC populates the fuse registers, the internal TRNG configuration registers, and the ROM WDT cycle count, then sets the CPTRA\_FUSE\_WR\_DONE bit. Note that Caliptra HW drops writes to any registers that cannot be changed unless there is a power cycle (for example, UDS). So SoC is free to write all the registers.
 8. Caliptra IP deasserts Ready\_for\_Fuse wire as soon as the fuse write done register is written.
 9. Caliptra IP moves security critical assets in fuse registers (for example, UDS) to the key vault.
 
-## Boot Media Dependent flows
+## Caliptra FW push flow
 
-### Caliptra FW push flow
-
-*Figure 12: FW push flow*
+*Figure 10: FW push flow*
 
 ![](./images/Caliptra_boot_flow3.png)
 
@@ -1094,21 +1043,9 @@ The following figure describes the Caliptra IP HW boot flow.
 5. Caliptra’s mailbox HW  asserts an interrupt to the microcontroller after the GO is written, per mailbox protocol. See [Mailbox](#mailbox) for specifics.
 6. After Caliptra’s FW is authenticated and loaded into ICCM, microcontroller runs the firmware and asserts READY\_FOR\_RTFLOWS wire.
 
-## Boot Media Integrated
+## <a id="reset-flow"></a>CPU warm reset or PCIe hot reset flow →  Caliptra IP reset
 
-### Caliptra FW load flow
-
-*Figure 13: FW load flow*
-
-![](./images/Caliptra_boot_flow4.png)
-
-1. After the Caliptra microcontroller is out of reset, ROM starts executing and triggers the crypto block to run the UDS decrypt flow.
-2. Caliptra ROM uses the internal SPI peripheral to read from the platform's persistent storage and load the FW. Note that SPI is operating in basic functional single-IO mode and at 20 MHz frequency.
-3. After Caliptra’s FW is authenticated and loaded into ICCM, microcontroller runs the firmware and asserts READY\_FOR\_RTFLOWS wire.
-
-### <a id="reset-flow"></a>CPU warm reset or PCIe hot reset flow →  Caliptra IP reset
-
-*Figure 14: Hardware reset flow*
+*Figure 11: Hardware reset flow*
 
 ![](./images/Caliptra_boot_flow5.png)
 
@@ -1160,7 +1097,7 @@ Mailboxes are generic data passing structures, and the Caliptra hardware only en
 **Notes on behavior:**
 After LOCK is granted, the mailbox is locked until that device has concluded its operation. The mailbox is responsible only for accepting writes from the device that requested and locked the mailbox.
 
-*Figure 15: Mailbox sender flow*
+*Figure 12: Mailbox sender flow*
 
 ![](./images/Caliptra_mbox_state.png)
 
@@ -1182,7 +1119,7 @@ Upon receiving an indication that the mailbox is populated, the appropriate devi
     1. If response data was provided, STATUS should be written to DATA\_READY.
     2. Otherwise, STATUS should be written to CMD\_COMPLETE (or CMD\_FAILURE).
 
-*Figure 16: Mailbox receiver flow*
+*Figure 13: Mailbox receiver flow*
 
 ![](./images/Caliptra_mbox_sequence.png)
 
@@ -1203,7 +1140,7 @@ Caliptra provides a HW API to do a SHA384 hash calculation. The SoC can access t
 
 ### JTAG/TAP debug
 
-*Figure 17: Debug flow*
+*Figure 14: Debug flow*
 
 ![](./images/Caliptra_boot_flow6.png)
 
@@ -1323,6 +1260,21 @@ This section describes Caliptra error reporting and handling.
 **Firmware errors**
 
 Please refer to [the Caliptra code base](https://github.com/chipsalliance/caliptra-sw/blob/main/error/src/lib.rs) for a list of the error codes.
+
+# Future effort: Caliptra security subsystem
+
+A future effort is a full security subsystem solution. This solution is a combination of fully open source digital logic and licensable analog components that are technology dependent, such as TRNG analog sources or technology dependent fuse controllers.
+
+* SoC Controller has configurable SRAMs and reference firmware.
+* SoC reference ROM allows for configurable initialization.
+* Resource handling logic (RHL) brings up subsystem components such as PUF, PLL, Fuse controller, \[P-\]TRNG. etc. RHL processes requests from Caliptra to the outside components (for example, P-TRNG request input to Caliptra’s internal TRNG).
+* Some of the analog components are licensable IPs that are used to build the subsystem (for example, PUF, and PLL).
+
+*Figure 15: Caliptra security subsystem*
+
+![](./images/Caliptra_HW_Block_diagram.png)
+
+The Caliptra subsystem offers a complete RoT subsystem, with open source programmable components for customization of SoC boot flows.
 
 # Terminology
 
