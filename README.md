@@ -44,7 +44,7 @@ The Caliptra code base and documentation are split across five repositories:
 
 | Repository | Areas of interest | Description |
 | ---------- | ---- | ----------- |
-| [Primary repoository](https://github.com/chipsalliance/caliptra)  | [Issues](https://github.com/chipsalliance/caliptra/issues),      [PRs](https://github.com/chipsalliance/caliptra/pulls),      [Security advisories](https://github.com/chipsalliance/caliptra/security/advisories)      | This repoository, with admin boilerplate and docs |
+| [Primary repository](https://github.com/chipsalliance/caliptra)  | [Issues](https://github.com/chipsalliance/caliptra/issues),      [PRs](https://github.com/chipsalliance/caliptra/pulls),      [Security advisories](https://github.com/chipsalliance/caliptra/security/advisories)      | This repository, with admin boilerplate and docs |
 | [Caliptra RTL](https://github.com/chipsalliance/caliptra-rtl)     | [Issues](https://github.com/chipsalliance/caliptra-rtl/issues),  [PRs](https://github.com/chipsalliance/caliptra-rtl/pulls),  [Security advisories](https://github.com/chipsalliance/caliptra-rtl/security/advisories)  | The primary repository with immutable RTL |
 | [Caliptra Software](https://github.com/chipsalliance/caliptra-sw) | [Issues](https://github.com/chipsalliance/caliptra-sw/issues),   [PRs](https://github.com/chipsalliance/caliptra-sw/pulls),   [Security advisories](https://github.com/chipsalliance/caliptra-sw/security/advisories)   | Caliptra software (ROM, FMC, runtime firmware), and libraries/tools needed to build and test |
 | [Caliptra DPE](https://github.com/chipsalliance/caliptra-dpe)     | [Issues](https://github.com/chipsalliance/caliptra-dpe/issues),  [PRs](https://github.com/chipsalliance/caliptra-dpe/pulls),  [Security advisories](https://github.com/chipsalliance/caliptra-dpe/security/advisories)  | An implementation of a TCG DICE Protection Environment profile |
@@ -53,9 +53,9 @@ The Caliptra code base and documentation are split across five repositories:
 The GitHub config parameters for all of the branches are documented in a [local
 file](https://github.com/chipsalliance/Caliptra/blob/main/GitHubRules.md).
 
-### Convenience repoository URLs
+### Convenience repository URLs
 
-All these URLs redirect into the repoositories above.
+All these URLs redirect into the repositories above.
 
 * [repo.caliptra.io](http://repo.caliptra.io)
 * [spec.caliptra.io](http://spec.caliptra.io)
