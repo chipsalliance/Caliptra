@@ -20,8 +20,8 @@ A summary of the known security vulnerabilities for Caliptra ingredient reposito
 | Caliptra DPE       | [https://github.com/chipsalliance/caliptra-dpe/security/advisories](https://github.com/chipsalliance/caliptra-dpe/security/advisories)   |
 | Caliptra U-Reg     | [https://github.com/chipsalliance/caliptra-ureg/security/advisories](https://github.com/chipsalliance/caliptra-ureg/security/advisories) |
 
-Vulnerability notifications pre-release or during embargo periods are available to product creators that have registered through the
-[Product creator notification process](#product-creator-notification-process).
+Vulnerability notifications pre-release or during embargo periods are available to product creators that have registered for vulnerability alerts. Further
+details can be found in [Embargo policy](#embargo-policy).
 
 ## Report a vulnerability
 
