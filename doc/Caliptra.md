@@ -792,49 +792,9 @@ Caliptra shall provide fuse banks (refer to *Table 19: Caliptra Fuse Map*) that 
 
 Every mutable Caliptra boot layer shall include a SVN value in the signed header. If a layer's signed SVN value is less than the current counter value for that layer's fuse bank, Caliptra shall refuse to boot that layer, regardless of whether the signature is valid.
 
-Each signed boot layer shall also include a MIN\_SVN value in the signed header. Upon successful validation of a signed boot layer, if the layer's signed MIN\_SVN value is greater than the current counter value for that layer's fuse bank, Caliptra shall increment that fuse bank counter until it equals MIN\_SVN.
-
-Vendors shall issue security critical fixes requiring anti-rollback protection in sets of two signed firmware:
-
-* Version number (X+1), which carries the security fix, with an incremented SVN and an unchanged MIN\_SVN, as compared to version (X).
-* Version number (X+2), identical to (X+1), except its MIN\_SVN value has been incremented.
-
-Owners may upgrade their fleet in two stages: first from (X) to (X+1), and then from (X+1) to (X+2).
-
-If an owner does not require the ability to roll back during qualification, they can choose to perform a single upgrade of their fleet, from (X) to (X+2), skipping over the intermediate (X+1).
-
-Each of Caliptra's internal anti-rollback fuse banks shall support a minimum counter value of 64. This feature is expected to be used sparingly.
-
-If a given firmware image's SVN is less than its MIN\_SVN value, that image shall be considered invalid.
-
 Alternatively, platform vendors may prefer to manage firmware storage and rollback protection in a different manner, such as through a dedicated Platform RoT. In such cases, the vendor may wish to disable anti-rollback support from Caliptra entirely. This disable support is available via an OTP/fuse setting.
 
-**Informative comment: Example**
-
-The following is an example of how the anti-rollback mechanism may be used to revoke a signed image while supporting rollback to the prior image. Assuming Caliptra is in the following state:
-
-* Currently running firmware version: 4.2
-* Caliptra firmware's signed SVN value: 1
-* Caliptra firmware's signed MIN\_SVN value: 1
-* Caliptra's firmware anti-rollback fuse bank counter value: 1
-
-A vulnerability is discovered in firmware version 4.2. The vendor issues a fix in firmware version 4.3. However, owners may still wish to roll back to firmware version 4.2, while version 4.3 is being qualified in their fleet. Updating to firmware version 4.3 places Caliptra in the following state:
-
-* Currently running firmware version: 4.3
-* Caliptra firmware's signed SVN value: 2
-* Caliptra firmware's signed MIN\_SVN value: 1
-* Caliptra's firmware anti-rollback fuse bank counter value: 1
-
-In this state, since the anti-rollback fuse bank counter is not yet incremented, Caliptra still allows the firmware to roll back to version 4.2.
-
-After firmware version 4.3 is fully qualified, the owner wishes to revoke version 4.2. The vendor issues a follow-up firmware version 4.4, which places Caliptra in the following state:
-
-* Currently running firmware version: 4.4
-* Caliptra firmware's signed SVN value: 2
-* Caliptra firmware's signed MIN\_SVN value: 2
-* Caliptra's firmware anti-rollback fuse bank counter value: 2
-
-Upon validating firmware version 4.4, Caliptra notes that that firmware's signed MIN\_SVN value is 2, and increments its internal fuse bank counter to match. After a chip receives firmware version 4.4, it is no longer able to roll back to version 4.2. However, it *will* continue to be able to roll back to version 4.3.
+Each of Caliptra's internal anti-rollback fuse banks shall support a minimum counter value of 64. This feature is expected to be used sparingly.
 
 ## Physical attack countermeasures
 
