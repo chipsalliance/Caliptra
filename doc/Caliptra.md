@@ -374,14 +374,14 @@ The owner key, when represented in fuses or in the FMC's alias certificate, is a
 2. HVM programs NIST compliant UDS into fuses using SoC-specific fuse programming flow. Note that this UDS goes through an obfuscation function within Caliptra IP.
 3. SoC drives the security state, which indicates that it's a manufacturing flow. See [Caliptra Security States](#caliptra-security-states) for encodings.
 4. SoC (using a GPIO pin or SoC ROM) drives BootFSMBrk (this is also used for debug cases). This can be driven at any time before cptra\_rst\_b is deasserted.
-5. SoC follows the boot flow as defined in Caliptra IP HW boot flow to assert cptra\_pwrgood and deassert cptra\_rst\_b, followed by writing to the fuse registers.
+5. SoC follows the boot flow as defined in Caliptra IP HW boot flow to assert cptra\_pwrgood and deassert cptra\_rst\_b, followed by writing to the fuse registers. SoC shall not attempt to initiate any mailbox operation or acquire mailbox lock via the APB interface until after the subsequent CSR flow is completed.
 6. HVM, through JTAG or using the Caliptra SoC interface, sets “CPTRA\_DBG\_MANUF\_SERVICE\_REG” bit 0 to request a CSR.
 7. HVM, through JTAG or using the Caliptra SoC interface, writes to “CPTRA\_BOOTFSM\_GO” to allow Caliptra’s internal BootFSM to continue to bring up microcontroller out of reset.
-8. ROM looks at the manufacturing state encoding, “CPTRA\_DBG\_MANUF\_SERVICE\_REG”, and populates the Caliptra internal SRAM \[the mailbox SRAM hardware structure is reused\] with the CSR.
+8. ROM looks at the manufacturing state encoding, “CPTRA\_DBG\_MANUF\_SERVICE\_REG”, acquires the mailbox lock, and populates the Caliptra internal SRAM \[the mailbox SRAM hardware structure is reused\] with the CSR.
 9. HVM, through JTAG or using the SoC interface, polls for the “IDevID CSR ready" bit 24 that is set in “CPTRA\_FLOW\_STATUS” register.
 10. HVM reads mbox\_status\[3:0\] to check if the data is ready to be read (DATA\_READY encoding).
 11. HVM must clear bit 0 of CPTRA\_DBG\_MANUF\_SERVICE\_REG, indicating that it completed reading the CSR.
-12. Caliptra IP HW opens the Caliptra Mailbox for SoC usages, such as FW loading (if required in some HVM flows). Until this write operation is complete, the SoC does not get a grant/lock of the APB-exposed mailbox interface.
+12. Caliptra ROM opens the Caliptra Mailbox for SoC usages, such as FW loading (if required in some HVM flows). The SoC is only allowed to request a lock of the APB-exposed mailbox interface after this write operation is complete.
 
 ## Certificate format
 
