@@ -87,6 +87,14 @@ In this version of the specification, the desired capabilities address the basic
 
 Caliptra implements the DICE Protection Environment (DPE) API, allowing it to derive and wield a DICE identity on behalf of other elements within the SoC. Use cases for this API include serving as a signing oracle for a Security Protocol and Data Model (SPDM) responder that is executing in the SoC application processor, as well as authentication to a discrete TPM device.
 
+### SVN-bound key derivation via hash chains
+
+Caliptra implements a service that supports derivation of keys bound to firmware SVNs, with the property that newer firmware can derive keys bound to older firmware, but not vice versa.
+
+This service allows callers to exercise "stable" key material that is not bound to the exact firmware image that is running. This enables use-cases that require keys that remain stable across firmware updates, such as cryptographic sealing.
+
+This feature is underpinned by a hash chain derived by FMC. The hash chain is seeded from FMC's CDI, and then is hashed (MAX\_SVN - rt\_fw\_svn) times. In Caliptra 1.x, the hash operation is implemented in terms of `HMAC(input, "")`, as the hardware lacks a raw hash accelerator.
+
 # Industry standards and specifications
 
 This specification follows the industry standards and specifications listed in [References](#references).
