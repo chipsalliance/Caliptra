@@ -26,17 +26,17 @@ marks](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkPoli
 ## Specifications
 
 * [Main Caliptra specification](https://github.com/chipsalliance/Caliptra/blob/main/doc/Caliptra.md)
+* [Hardware Specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraHardwareSpecification.md)
 * [Hardware Integration
   Specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md)
 * [ROM](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md)
 * [FMC](https://github.com/chipsalliance/caliptra-sw/blob/main/fmc/README.md)
 * [Firmware](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md)
 
-## Security policy
+## Test Dashboards
 
-For information on the Caliptra security policy, how to report a vulerability,
-and published security advisories, refer to
-[Caliptra security policy](https://github.com/chipsalliance/caliptra/security/policy).
+* [Caliptra Software CI dashboard](https://chipsalliance.github.io/caliptra-sw/)
+  -- includes ROM
 
 ## Repositories
 
@@ -67,6 +67,12 @@ All these URLs redirect into the repositories above.
 * [ureg.caliptra.io](http://ureg.caliptra.io)
 * [ireg\[s\].caliptra.io](http://iregs.caliptra.io)
 * [ereg\[s\].caliptra.io](http://eregs.caliptra.io)
+
+## Security policy
+
+For information on the Caliptra security policy, how to report a vulerability,
+and published security advisories, refer to
+[Caliptra security policy](https://github.com/chipsalliance/caliptra/security/policy).
 
 ## Discussion Channels
 
