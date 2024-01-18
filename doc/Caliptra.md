@@ -87,6 +87,14 @@ In this version of the specification, the desired capabilities address the basic
 
 Caliptra implements the DICE Protection Environment (DPE) API, allowing it to derive and wield a DICE identity on behalf of other elements within the SoC. Use cases for this API include serving as a signing oracle for a Security Protocol and Data Model (SPDM) responder that is executing in the SoC application processor, as well as authentication to a discrete TPM device.
 
+### Stable key derivation via SVNs and hash chains
+
+Caliptra implements a service that supports derivation of keys bound to firmware SVNs, with the property that newer firmware can derive keys bound to older firmware, but not vice versa.
+
+This service allows callers to exercise "stable" key material that is not bound to the exact firmware image that is running. This enables use-cases that require keys that remain stable across firmware updates, such as cryptographic sealing.
+
+This feature is underpinned by a hash chain derived by FMC. The hash chain is seeded from FMC's CDI, and then is hashed (MAX\_SVN - rt\_fw\_svn) times. In Caliptra 1.x, the hash operation is implemented in terms of `HMAC(input, "")`, as the hardware lacks a raw hash accelerator.
+
 # Industry standards and specifications
 
 This specification follows the industry standards and specifications listed in [References](#references).
@@ -625,6 +633,7 @@ The service surface of Caliptra has multiple vectors. All use cases are control 
   * **DICE-as-a-Service**: Caliptra shall expose the TCG DICE Protection Environment iRoT Profile API, allowing Caliptra to derive and wield a DICE identity on behalf of other elements within the SoC. For example, Caliptra can sign messages for an SPDM responder.
   * **Measurement Vault**: Caliptra shall support stashing of measurements for the code and configuration of the SoC. Caliptra can provide these measurements via PCR Quote API or via DPE.
   * **FW Authentication**: Caliptra supports ECDSA verification for SoC firmware beyond its own. The SHA384 block exposes a HW API for hashing firmware. The runtime firmware exposes an ECDSA verification API that uses the hash computed by the SHA384 block.
+  * **Stable key derivation service**: Caliptra shall expose a service for exercising keys bound to stable firmware identifiers such as the SVN and epoch. This enables use-cases such as cryptographic sealing of secrets that remain available across firmware updates.
 
 ## Device resilience
 
