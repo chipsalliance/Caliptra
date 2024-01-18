@@ -20,6 +20,8 @@ GitHub configuration.
 * For other Repositories
   * Require linear history
   * Disallow "merge commits"
+* Set "Actions" / "General" / "Fork pull request workflows from
+  outside collborators" to "Require approval for all outside collaborators"
 
 Will not set
 * Allow force pushes
