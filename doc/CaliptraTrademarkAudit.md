@@ -3,9 +3,11 @@
 
 This document will describe the specific requirements to be reviewed by a 3rd party and attest to Caliptra TAC that the requirements have been met.
 
-List of Topics to review for Trademark Compliance
+The goal of a Caliptra Trademark Audit would be to be compliant with OCP Safe Level 2 requirements using an OCP Safe approved auditor.
 
- * Each of these things will have to be reviewed for an integration to get approval of Trademark Usage
+Currently, this is a list of Topics to review for Trademark Compliance.  Specific testable requirements will need to be spelled out subsequently.
+
+ * Each of these topics will have to be reviewed for an integration to get approval of Trademark Usage
 
 ## Caliptra IP
 
@@ -22,11 +24,11 @@ List of Topics to review for Trademark Compliance
 
 ## Caliptra Wrapper
 
-* Show how the RTL key is provided and ensure that it is not available to any FW.
+* Show how the Obfuscation key is provided and ensure that it is not available to any FW.
 * Describe the noise source for the RNG (indicating if Internal RNG or external RNG)
 * External RNG description should be shown
 * Show error handling integration
-* Show how debugging will be enabled and disable in production
+* Show how debugging will be enabled/disabled in production
 * Show SRAM zeroization
 
 ## HSM Support
@@ -38,10 +40,10 @@ List of Topics to review for Trademark Compliance
 ## Fusing
 
 * Show how the fuses are loaded into the Caliptra IP
-* Show how to Security State is loaded
-* Show the fuse recipe that is expected to fuse
+* Show how the Security State is provided to Caliptra IP
+* Show the fuse recipe that is expected to used for Caliptra
   * Ensure the Public Key Hash is fused
-  * Ensure that the security state is fuses.
+  * Ensure that the security state is fused
 
 ## Manufacturing
 
@@ -56,8 +58,8 @@ List of Topics to review for Trademark Compliance
 
 ## SOC Root of Trust
 
-* Show that SOC RoT is sending SOC FMC measurements to Caliptra before running off-chip FW.
-* Show the design for the SOC ROT Caliptra FW Storage and fetching
+* Show that SOC RoT is sending SOC FMC measurements to Caliptra before running FMC.
+* Show the design for the SOC ROT Storage and fetching of Caliptra FW
 * Describe how Caliptra PA_USER management will be used.
 
 ## SOC Run-Time
