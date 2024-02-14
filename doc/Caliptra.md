@@ -586,8 +586,8 @@ Caliptra RT generates the DPE certificate and endorses it with the Alias<sub>RT<
 * **Unprovisioned:** Blank/unprogrammed fuse part.
 * **Manufacturing:** Device is in the manufacturing flow where HVM Caliptra fuses are programmed.
 * **Production:** All of Caliptra’s HVM fuses are programmed.
-* **Insecure:** Any security state that allows access to Caliptra from an external entity and potential exposure of internal secrets. Includes Unprovisioned and DebugUnlocked configurations.
-* **Secure:** Any security state that restricts access to Caliptra from an external entity and potential exposure of internal secrets. Requires DebugLocked and Manufacturing or Production configuration.
+* **Insecure:** Any security state that allows access to Caliptra from an external entity and carries a risk of exposing internal secrets. Necessitates flushing of Caliptra secrets. Includes Unprovisioned and DebugUnlocked configurations.
+* **Secure:** Any security state that restricts access to Caliptra from an external entity to mitigate potential exposure of internal secrets. Requires DebugLocked and Manufacturing or Production configuration.
 
 **Notes:**
 
