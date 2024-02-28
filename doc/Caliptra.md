@@ -1173,19 +1173,20 @@ The following table describes Caliptra's fuse map:
 
 | **Name**                        | **Size (bits)** | **ACL**         | **Fuse programming time**                       | **Description** |
 | ------------------------------- | --------------- | --------------- | ----------------------------------------------- | --------------- |
-| UDS Seed (obfuscated)           | 384             | ROM             | SoC manufacturing                               | DICE Unique Device Secret Seed. This seed is unique per device. The seed is scrambled using an obfuscation function. |
-| Field Entropy (obfuscated)      | 256             | ROM             | Device owner in-field programmable | Field-programmable by the owner, used to hedge against UDS disclosure in the supply chain. |
+| UDS SEED (obfuscated)           | 384             | ROM             | SoC manufacturing                               | DICE Unique Device Secret Seed. This seed is unique per device. The seed is scrambled using an obfuscation function. |
+| FIELD ENTROPY (obfuscated)      | 256             | ROM             | Device owner in-field programmable | Field-programmable by the owner, used to hedge against UDS disclosure in the supply chain. |
 | KEY MANIFEST PK HASH            | 384             | ROM FMC RUNTIME | SoC manufacturing                               | SHA384 hash of the Vendor ECDSA P384 and LMS Public Keys. |
 | KEY MANIFEST PK HASH MASK       | 4               | ROM FMC RUNTIME | In-field programmable                           | One-hot encoded list of revoked Vendor ECDSA P384 Public Keys. |
 | OWNER PK HASH                   | 384             | ROM FMC RUNTIME | In-field programmable                           | SHA384 hash of the Owner ECDSA P384 and LMS Public Keys. |
 | FMC KEY MANIFEST SVN            | 32              | ROM FMC RUNTIME | In-field programmable                           | FMC security version number. |
 | RUNTIME SVN                     | 128             | ROM FMC RUNTIME | In-field programmable                           | Runtime firmware security version number. |
 | ANTI-ROLLBACK DISABLE           | 1               | ROM FMC RUNTIME | SoC manufacturing or in-field programmable      | Disables anti-rollback support from Caliptra. (For example, if a Platform RoT is managing FW storage and anti-rollback protection external to the SoC.) |
-| IDEVID CERT IDEVID ATTR.        | 768             | ROM FMC RUNTIME | SoC manufacturing                               | IDevID Certificate Generation Attributes. See [IDevID certificate section](#idevid-certificate)
+| IDEVID CERT IDEVID ATTR         | 768             | ROM FMC RUNTIME | SoC manufacturing                               | IDevID Certificate Generation Attributes. See [IDevID certificate section](#idevid-certificate)
 | IDEVID MANUF HSM IDENTIFIER     | 128             | ROM FMC RUNTIME | SoC manufacturing                               | Spare bits for Vendor IDevID provisioner CA identifiers. |
-| Life Cycle Fuses                | 2               | ROM FMC RUNTIME | SoC manufacturing                               | **Caliptra Boot Media Integrated mode usage only**. SoCs that build with a Boot Media Dependent profile don’t have to account for these fuses.<br> - ‘00 - Unprovisioned or manufacturing<br> - ‘01 - Production ‘10 - UNDEF<br> - ‘11 - End Of Life<br> **Reset:** Can only be reset on powergood. |
-| LMS VERIFY                      | 1               | ROM             | In-field programmable                           | - 0 - Verify Caliptra firmware images with ECDSA-only.<br> - 1 - Verify Caliptra firmware images with both ECDSA and LMS.
-| LMS REVOCATION                  | 32              | ROM             | In-field programmable                           | One-hot encoded list of revoked Vendor LMS Public Keys.
+| LIFE CYCLE                      | 2               | ROM FMC RUNTIME | SoC manufacturing                               | **Caliptra Boot Media Integrated mode usage only**. SoCs that build with a Boot Media Dependent profile don’t have to account for these fuses.<br> - ‘00 - Unprovisioned or manufacturing<br> - ‘01 - Production ‘10 - UNDEF<br> - ‘11 - End Of Life<br> **Reset:** Can only be reset on powergood. |
+| LMS VERIFY                      | 1               | ROM             | In-field programmable                           | - 0 - Verify Caliptra firmware images with ECDSA-only.<br> - 1 - Verify Caliptra firmware images with both ECDSA and LMS. |
+| LMS REVOCATION                  | 32              | ROM             | In-field programmable                           | One-hot encoded list of revoked Vendor LMS Public Keys. |
+| SOC STEPPING ID                 | 16              | ROM FMC RUNTIME | SoC manufacturing                               | Identifier assigned by vendor to differentiate silicon steppings. |
 
 # Error reporting and handling
 
