@@ -346,9 +346,7 @@ It is the responsibility of the owner or the user to identify the certificate th
 
 The LDevID CDI is mixed with a hash of FMC, as well as the security state of the device, via a FIPS-compliant HMAC, to produce CDI<sub>FMC</sub>. ROM uses CDI<sub>FMC</sub> to derive the Alias<sub>FMC</sub> keypair. ROM wields LDevID to issue a certificate for Alias. The [Alias<sub>FMC</sub> certificate](#aliasfmc-certificate) includes measurements of the security state and FMC. ROM makes CDI<sub>FMC</sub>, Alias<sub>FMC</sub>, and its certificate, available to FMC.
 
-FMC wields Alias<sub>FMC</sub> to issue a CSR for Alias<sub>FMC</sub>. FMC then mixes CDI<sub>FMC</sub> with a hash of runtime firmware to produce CD<sub>RT</sub>. FMC uses CDI<sub>RT</sub> to derive the Alias<sub>RT</sub> alias keypair. FMC wields Alias<sub>FMC</sub> to issue a certificate for Alias<sub>RT</sub>. This alias certificate includes measurements of runtime firmware. FMC makes CDI<sub>RT</sub>, Alias<sub>RT</sub>, and its certificate, available to application firmware, while withholding CDI<sub>FMC</sub> and Alias<sub>FMC</sub>.
-
-For owner certification flows, Caliptra only emits a CSR for Alias<sub>FMC</sub>.
+FMC mixes CDI<sub>FMC</sub> with a hash of runtime firmware to produce CDI<sub>RT</sub>. FMC uses CDI<sub>RT</sub> to derive the Alias<sub>RT</sub> alias keypair. FMC wields Alias<sub>FMC</sub> to issue a certificate for Alias<sub>RT</sub>. This alias certificate includes measurements of runtime firmware. FMC makes CDI<sub>RT</sub>, Alias<sub>RT</sub>, and its certificate, available to application firmware, while withholding CDI<sub>FMC</sub> and Alias<sub>FMC</sub>.
 
 ### Security state
 
