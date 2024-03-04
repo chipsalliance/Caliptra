@@ -587,7 +587,7 @@ Caliptra RT generates the DPE certificate and endorses it with the Alias<sub>RT<
 * **Manufacturing:** Device is in the manufacturing flow where HVM Caliptra fuses are programmed.
 * **Production:** All of Caliptra’s HVM fuses are programmed.
 * **Secure:** Any security state that restricts access to Caliptra from an external entity and has a known, specified function in the device lifecycle. Requires DebugLocked and either the Manufacturing or Production configuration.
-* **Insecure:** Any security state other than those deemed secure. This includes all undefined states, all states with DebugUnlocked, and the Unprovisioned state. In accordance with the [threat model](#threat-model), these states are considered a potential risk due to attacks via DFT or DFD channels, exploitation of unforeseen logic issues, or undefined behavior. Necessitates flushing of Caliptra secrets.
+* **Insecure:** Any security state other than those deemed secure. This includes all undefined states, all states with DebugUnlocked, and the Unprovisioned state. In accordance with the [threat model](#threat-model), these states are considered a potential risk due to attacks via DFT or DFD channels, exploitation of unforeseen logic issues, or undefined behavior. These insecure states necessitate flushing of Caliptra secrets.
 
 **Notes:**
 
@@ -613,7 +613,7 @@ Caliptra RT generates the DPE certificate and endorses it with the Alias<sub>RT<
 * End-of-life state is owned by SoC. In end-of-life device lifecycle state, Caliptra shall not not be brought out of reset.
 * Other encodings are reserved and always assumed to be in a secure state.
 
-Each of these security states may be mapped to different SoC level debug and security states. SoC’s requirement is that if the SoC enters a debug state, then Caliptra must also be in an unsecured state where all assets are cleared. Caliptra security state is captured by hardware on every warm reset; therefore SoC integrators are responsible for enforcing the security state transition policies described in the previous table for which transitions are restricted to cold boot events.
+Each of these security states may be mapped to different SoC level debug and security states. SoC’s requirement is that if the SoC enters a debug state, then Caliptra must also be in an unsecured state where all assets are cleared. Caliptra security state is captured by hardware on every warm reset; therefore SoC integrators enforce the security state transition policies for cold boot events. These policies are described in the preceding table.
 
 ## Service surface
 
