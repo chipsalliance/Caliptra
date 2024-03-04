@@ -1300,8 +1300,10 @@ The Caliptra Workgroup acknowledges the following individuals for their contribu
 
 **CONTRIBUTORS**
 
+* Alex Tzonkov (AMD)
 * Andrés Lagar-Cavilla (Google)
 * Anjana Parthasarathy (Microsoft)
+* Anthony Rocha (AMD)
 * Bharat Pillilli (Microsoft)
 * Bryan Kelly (Microsoft)
 * Caleb Whitehead (Microsoft)
@@ -1324,10 +1326,10 @@ The Caliptra Workgroup acknowledges the following individuals for their contribu
 * Rob Strong (AMD)
 * Sudhir Mathane (AMD)
 * Stephanie Morton (Google)
+* Steven Bellock (NVIDIA)
 * Varun Sampath (NVIDIA)
 * Vishal Soni (Microsoft)
 * Vishal Mhatre (Microsoft)
-* Steven Bellock (NVIDIA)
 
 # Footnotes
 
