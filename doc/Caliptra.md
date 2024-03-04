@@ -4,7 +4,7 @@
 
 <p style="text-align: center;">Revision 1.0</p>
 
-<p style="text-align: center;">Version 0.7</p>
+<p style="text-align: center;">Version 1.0</p>
 
 <div style="page-break-after: always"></div>
 
@@ -1304,6 +1304,8 @@ The Caliptra Workgroup acknowledges the following individuals for their contribu
 * Anjana Parthasarathy (Microsoft)
 * Bharat Pillilli (Microsoft)
 * Bryan Kelly (Microsoft)
+* Caleb Whitehead (Microsoft)
+* Howard Tran (Google)
 * Ishwar Agarwal (Microsoft)
 * James Zhang (NVIDIA)
 * Jeff Andersen (Google)
@@ -1312,14 +1314,19 @@ The Caliptra Workgroup acknowledges the following individuals for their contribu
 * Kor Nielsen (Google)
 * Louis Ferraro (AMD)
 * Marius Schilder (Google)
+* Matt Cockrell (Google)
+* Michael Norris (Microsoft)
 * Nathan Nadarajah (AMD)
+* Norman Stewart (AMD)
 * Paul Chou (NVIDIA)
 * Piotr Kwidzinski (AMD)
 * Prabhu Jayana (AMD)
 * Rob Strong (AMD)
 * Sudhir Mathane (AMD)
+* Stephanie Morton (Google)
 * Varun Sampath (NVIDIA)
 * Vishal Soni (Microsoft)
+* Vishal Mhatre (Microsoft)
 * Steven Bellock (NVIDIA)
 
 # Footnotes
