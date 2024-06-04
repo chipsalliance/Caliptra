@@ -915,7 +915,7 @@ Fields are little endian unless described otherwise.
 | Vendor LMS public key index | 4 | The hint to ROM to indicate which LMS public key it should first use. |
 | Flags | 4 | Feature flags. <br> **Bit0:** - Interpret the pl0_pauser field. If not set, all PAUSERs are PL1 <br>**Bit1-Bit31:** Reserved |
 | TOC Entry Count | 4 | Number of entries in TOC. |
-| PL0 PAUSER | 4 | The PAUSER with PL0 privileges. This value is used by the RT FW to verify the caller privilege against its PAUSER wired through APB. |
+| PL0 PAUSER | 4 | The PAUSER with PL0 privileges. This value is used by the RT FW to verify the caller privilege against its PAUSER. The PAUSER is wired through APB. |
 | TOC Digest | 48 | SHA384 Digest of table of contents. |
 | Vendor Data | 40 | Vendor Data. <br> **Not Before:** Vendor Start Date [ASN1 Time Format] for Caliptra-issued certificates (15 bytes) <br> **Not After:** Vendor End Date [ASN1 Time Format] for Caliptra-issued certificates (15 bytes) <br> **Reserved:** (10 bytes) |
 | Owner Data | 40 | Owner Data. <br> **Not Before:** Owner Start Date [ASN1 Time Format] for Caliptra-issued certificate. Takes precedence over vendor start date (15 bytes) <br> **Not After:** Owner End Date [ASN1 Time Format] for Caliptra-issued certificates. Takes precedence over vendor end date (15 bytes) <br> **Reserved:** (10 bytes) |
