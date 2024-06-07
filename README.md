@@ -70,7 +70,7 @@ All these URLs redirect into the repositories above.
 
 ## Security policy
 
-For information on the Caliptra security policy, how to report a vulerability,
+For information on the Caliptra security policy, how to report a vulnerability,
 and published security advisories, refer to
 [Caliptra security policy](https://github.com/chipsalliance/caliptra/security/policy).
 
