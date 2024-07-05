@@ -440,15 +440,16 @@ For IDevID to endorse LDevID, Caliptra requires the vendor to implement an X.509
 | KeyUsage                       | keyCertSign  | 1
 | Basic Constraints              | CA           | TRUE
 |                                | pathLen      | 5
+| Subject Key Identifier         | -            | specified by IDevID attribute fuses
 | tcg-dice-Ueid                  | ueid         | UEID specified by IDevID attribute fuses
 
 Caliptra does not consume the IDevID certificate. Caliptra needs attributes of the IDevID certificate in order to generate the Authority Key Identifier extension for the LDevID and to populate the TCG Universal Entity ID (UEID) extension for Caliptra-generated certificates. The vendor must fuse these attributes into the IDevID attribute fuses for Caliptra to consume. The encoding of these attribute fuses is as follows:
 
 * Flags (byte 0, bits [1:0]): Key ID algorithm for IDevID Subject Key Identifier.
-**0 = SHA1 of IDevID public key
-** 1 = truncated SHA256 of IDevID public key
-**2 = truncated SHA384 of IDevID public key
-** 3 = raw
+    * 0 = SHA1 of DER-formatted IDevID public key in uncompressed form
+    * 1 = First 20 bytes of SHA256 of DER-formatted IDevID public key in uncompressed form
+    * 2 = First 20 bytes of SHA384 of DER-formatted IDevID public key in uncompressed form
+    * 3 = raw
 * Reserved (bytes 1 to 3)
 * Subject Key ID (bytes 4 to 23): if Flags = 3, the IDevID Subject Key Identifier to use as the LDevID Authority Key Identifier.
 * UEID type (byte 24): UEID type as defined in [IETF RATS specification](https://www.ietf.org/archive/id/draft-ietf-rats-eat-21.html#section-4.2.1.1). Used for TCG UEID extension.
@@ -487,6 +488,7 @@ Caliptra ROM generates the LDevID certificate and endorses it with the IDevID pr
 | KeyUsage                       | keyCertSign  | 1
 | Basic Constraints              | CA           | True
 |                                | pathLen      | 4
+| Subject Key Identifier         | -            | First 20 bytes of SHA256 hash of DER-formatted LDevID public key in uncompressed form
 | Authority Key Identifier       | -            | specified by IDevID attribute fuses
 | tcg-dice-Ueid                  | ueid         | UEID specified by IDevID attribute fuses
 
@@ -517,6 +519,7 @@ Caliptra ROM generates the Alias<sub>FMC</sub> certificate and endorses it with 
 | KeyUsage                       | keyCertSign  | 1
 | Basic Constraints              | CA           | True
 |                                | pathLen      | 3
+| Subject Key Identifier         | -            | First 20 bytes of SHA256 hash of DER-formatted FMC Alias public key in uncompressed form
 | Authority Key Identifier       | -            | First 20 bytes of SHA256 hash of DER-formatted LDevID public key in uncompressed form
 | tcg-dice-Ueid                  | ueid         | UEID specified by IDevID attribute fuses
 | tcg-dice-MultiTcbInfo          | Flags        | NOT_CONFIGURED if lifecycle is unprovisioned
@@ -541,7 +544,7 @@ Caliptra does not generate an Alias<sub>FMC</sub> CSR. Owners that wish to endor
 
 Caliptra FMC generates the Alias<sub>RT</sub> certificate and endorses it with the Alias<sub>FMC</sub> private key. The Alias<sub>RT</sub> certificate implements the following field values:
 
-*Table 10: Alias<sub>FMC</sub> certificate fields*
+*Table 10: Alias<sub>RT</sub> certificate fields*
 
 | Field                          | Sub field    | Value
 | -------------                  | ---------    | ---------
@@ -562,6 +565,7 @@ Caliptra FMC generates the Alias<sub>RT</sub> certificate and endorses it with t
 | KeyUsage                       | keyCertSign  | 1
 | Basic Constraints              | CA           | True
 |                                | pathLen      | 2
+| Subject Key Identifier         | -            | First 20 bytes of SHA256 hash of DER-formatted RT Alias public key in uncompressed form
 | Authority Key Identifier       | -            | First 20 bytes of SHA256 hash of DER-formatted FMC Alias public key in uncompressed form
 | tcg-dice-Ueid                  | ueid         | UEID specified by IDevID attribute fuses
 | tcg-dice-TcbInfo               | SVN          | RT SVN
