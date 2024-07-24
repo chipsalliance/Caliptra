@@ -10,7 +10,7 @@
 ## RTL Submodule Pointer Update
 
 1. The RTL submodule pointer is compared against the **HEAD of main** of the **caliptra RTL** repo
-    - In case they both point to the same **SHA commit** the rest of the flow is skipped 
+    - In case they both point to the same **SHA commit** the rest of the flow is skipped
 2. A new commit will update the RTL submodule pointer to point to the HEAD of the main branch, and update the registers RDL
 3. A new **nightly release** branch will be created from the HEAD of the **main** branch in the **caliptra-sw** repo
    - Naming of the branch will indicate it is a nightly release and will have a target point release date (ci_rtl_#yyyy#mm#dd_#n)
@@ -69,4 +69,4 @@
 - Once a release is made the **nightly release branch** SHALL be deleted.
 
 <br> *Caliptra Release Flow*
-![Caliptra Release Flow Chart](doc/images/Caliptra_release_flow.svg)
+![Caliptra Release Flow Chart](images/Caliptra_release_flow.svg)
