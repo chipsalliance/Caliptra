@@ -22,7 +22,7 @@
 1. Before finalizing an RTL release, the hardware team will follow the procedure described in [CaliptraReleaseChecklist.md](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraReleaseChecklist.md).
   - Upon finalizing all release checklist items, the hardware team will generate a release tag on the RTL **main** branch, using the following naming convention: `v<major>.<minor>`.
   - When the checklist items are completed, the RTL team will create a new branch following the naming convention `patch_v<major>.<minor>`. This branch will exactly match the contents of the major release tag. Any future fixes that must be applied as patches to this release version will be committed to the `patch_v<major>.<minor>` branch. Branch **main** will continue to receive updated code for the subsequent planned release, and is not guaranteed to contain a valid release except as tagged.
-2. The software team will follow the [submodule update steps](#RTL-Submodule-Pointer-Update) to revise the RTL submodule pointer to consume the code from branch `patch_v<major>.<minor>` instead of from branch **main**. 
+2. The software team will follow the [submodule update steps](#RTL-Submodule-Pointer-Update) to create a `hw/<major>.<minor>/rtl` RTL submodule pointer to consume the code from branch `patch_v<major>.<minor>` and associate that submodule with the release.
 3. The **caliptra-sw** repo will be tagged with a **release** version tag. As a result of the submodule flow, this release will contain a snapshot of the code from the **caliptra-rtl** repo that was already tagged with the release version.
 
 ## Fail Case
