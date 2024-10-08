@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 5804.92 1218.43" width="5804.92" height="1218.43" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
+  <defs>
+    <linearGradient id="linear-gradient" x1="760.77" y1="163.92" x2="1558.55" y2="163.92" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#cee6bf"/>
+      <stop offset="1" stop-color="#00587e"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="378.09" y1="425.28" x2="1175.87" y2="425.28" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ece190"/>
+      <stop offset="0.36" stop-color="#dde4a8"/>
+      <stop offset="0.73" stop-color="#d2e5b9"/>
+      <stop offset="1" stop-color="#cee6bf"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-3" x1="378.09" y1="724.23" x2="1175.87" y2="724.23" xlink:href="#linear-gradient-2"/>
+    <linearGradient id="linear-gradient-4" x1="760.77" y1="1017.4" x2="1558.55" y2="1017.4" xlink:href="#linear-gradient"/>
+    <linearGradient id="linear-gradient-5" y1="570.48" x2="797.79" y2="570.48" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e2c675"/>
+      <stop offset="1" stop-color="#ece190"/>
+    </linearGradient>
+    <style bx:fonts="Albert Sans">@import url(https://fonts.googleapis.com/css2?family=Albert+Sans%3Aital%2Cwght%400%2C100..900%3B1%2C100..900&amp;display=swap);</style>
+  </defs>
+  <g id="_830x271px" data-name="830x271px" transform="matrix(0.9999999999999999, 0, 0, 0.9999999999999999, -1.1368683772161603e-13, 0)">
+    <path d="M1624.29,163.93a82,82,0,1,1,82-82A82,82,0,0,1,1624.29,163.93Z" fill="#00587e"/>
+    <path d="M760.77,44h797.78v69.51H830.26V283.87H760.77Z" fill-rule="evenodd" fill="url(#linear-gradient)"/>
+    <path d="M1241.61,397.94a82,82,0,1,1,82-82A82,82,0,0,1,1241.61,397.94Z" fill="#cee6bf"/>
+    <path d="M378.09,278h797.78v69.51H447.59V572.57h-69.5Z" fill-rule="evenodd" fill="url(#linear-gradient-2)"/>
+    <path d="M1230.55,925.26a82,82,0,1,1,82-82A82,82,0,0,1,1230.55,925.26Z" fill="#cee6bf"/>
+    <path d="M378.09,878.06h797.78V808.55H447.59V570.4h-69.5Z" fill-rule="evenodd" fill="url(#linear-gradient-3)"/>
+    <path d="M1613.24,1218.43a82,82,0,1,1,82-82A82,82,0,0,1,1613.24,1218.43Z" fill="#00587e"/>
+    <path d="M760.77,1171.23h797.78v-69.51H830.26V863.57H760.77Z" fill-rule="evenodd" fill="url(#linear-gradient-4)"/>
+    <path d="M863.52,655.68a82,82,0,1,1,82-82A82,82,0,0,1,863.52,655.68Z" fill="#ece190"/>
+    <path d="M0,535.73H797.79v69.5H0Z" fill-rule="evenodd" fill="url(#linear-gradient-5)"/>
+    <path d="M3195.86,849.29a25.64,25.64,0,1,1-25.64-25.63A25.63,25.63,0,0,1,3195.86,849.29Z" fill="#fff"/>
+    <path d="M3986.94,858.86a25.64,25.64,0,1,1-25.63-25.62A25.63,25.63,0,0,1,3986.94,858.86Z" fill="#fff"/>
+    <path d="M3986.94,563.44a25.64,25.64,0,1,1-25.63-25.63A25.65,25.65,0,0,1,3986.94,563.44Z" fill="#fff"/>
+    <path d="M5742.29,845.61A25.64,25.64,0,1,1,5716.65,820,25.64,25.64,0,0,1,5742.29,845.61Z" fill="#fff"/>
+    <path d="M3986.94,860.09a25.64,25.64,0,1,1-25.63-25.63A25.63,25.63,0,0,1,3986.94,860.09Z" fill="#fff"/>
+    <path d="M3992.4,553.75a25.63,25.63,0,1,1-25.62-25.63A25.62,25.62,0,0,1,3992.4,553.75Z" fill="#fff"/>
+    <text style="white-space: pre; fill: rgb(0, 88, 126); font-size: 15px;" x="4036.401" y="1482.99">L.O.C.K.
+</text>
+  </g>
+  <text style="fill: rgb(0, 88, 126); font-family: 'Albert Sans'; font-size: 1014px; white-space: pre;" x="1885.51" y="977.29" transform="matrix(0.9999999999999999, 0, 0, 0.9999999999999999, -1.1368683772161603e-13, 0)">L.O.C.K.
+</text>
+</svg>
