@@ -1403,9 +1403,10 @@ I3C recovery interface is responsible for the following list of actions:
 3. Asserting / Deasserting “payload_available” & “image_activated” signals
 
 **Recovery interface hardware specifications**
-	
-OCP Recovery Document -> https://docs.google.com/document/d/1Ge_w9i5A6YKG-7nlTp--JhZf6By7I9oB3oW_2_i7JbE/edit?usp=sharing
-Flashless Boot using OCP, PCIe, and DMTF Standards - https://docs.google.com/document/d/1Ge_w9i5A6YKG-7nlTp--JhZf6By7I9oB3oW_2_i7JbE/edit?usp=sharing
+
+[OCP Recovery Document](https://docs.google.com/document/d/1Ge_w9i5A6YKG-7nlTp--JhZf6By7I9oB3oW_2_i7JbE/edit?usp=sharing)
+
+[Flashless Boot using OCP, PCIe, and DMTF Standards](https://docs.google.com/document/d/1Ge_w9i5A6YKG-7nlTp--JhZf6By7I9oB3oW_2_i7JbE/edit?usp=sharing)
 
 **Recovery Interface Hardware**
 
