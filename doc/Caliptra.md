@@ -252,7 +252,7 @@ The following figure shows the basic high-level blocks of Caliptra.
 
 *Figure 2: Caliptra high level blocks*
 
-![](./images/Caliptra_HW_diagram.png)
+![](./images/Caliptra2p0.png)
 
 See the [hardware section](#hardware) for a detailed discussion.
 
@@ -1251,6 +1251,7 @@ Please refer to [the Caliptra code base](https://github.com/chipsalliance/calipt
 # Caliptra Security Subsystem
 The Caliptra subsystem offers a complete RoT subsystem, with open source programmable components for customization of SoC boot flows.
 
+*Figure: Caliptra security subsystem*
 ![](./images/Subsystem.png)
 
 **Caliptra Subsystem Architectural Flows**
@@ -1326,9 +1327,7 @@ The Caliptra subsystem offers a complete RoT subsystem, with open source program
    a. SOC construction outside of MCU SRAM is SOC specific construction and the spec here provides recommendations on using MCU and Caliptra to build such a logic. Please refer to Caliptra subsystem hardware specification for construction specifics (Hint: These functions are integrated into Manufacturer Control Interface [MCI]).
    b. Any logic outside of the Caliptra Subsystem boundary is SoC specific and will be custom to the SoC design. This specification provides recommendations for how Caliptra and MCU may be integrated into the SoC.
 
-*Figure 15: Caliptra security subsystem*
-
-**FIXME:** Add the picture of subsystem and the visio flow
+**FIXME:** Add the visio flow picture
 
 **Subsystem support for Hitless Updates**
 
