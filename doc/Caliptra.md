@@ -309,9 +309,9 @@ Caliptra must provide its runtime (RT) code with a cryptographic identity in acc
 
 ### UDS
 
-A combination of mask ROM and HW macros must implement the DICE key derivation and power-on latch, hiding the UDS and only making the CDI-derived signing public key visible to ROM and private key 'handle' available to ROM.
+A combination of mask ROM and HW macros must implement the DICE key derivation and power-on latch, hiding the UDS seed and only making the CDI-derived signing public key visible to ROM and private key 'handle' available to ROM. Real UDS will only be calculated during the cold boot, used for CDI derivation and immediately gets cleared.
 
-The Caliptra UDS "seed" is stored as ciphertext in fuses, deobfuscated only on cold boot using a secret obfuscation key[^2] known only to the Caliptra Hardware. Once read by Caliptra HW at boot, the unobfuscated UDS is then used to derive the IDevID identity and immediately cleared by hardware.
+The Caliptra UDS seed is stored as ciphertext in fuses, deobfuscated only on cold boot using a obfuscation key[^2] known only to the Caliptra Hardware. Once read by Caliptra HW at boot, the unobfuscated UDS is then used to derive the IDevID identity and immediately cleared by hardware.
 
 ### IDevID key
 
