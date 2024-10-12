@@ -1009,9 +1009,9 @@ Firmware signing key rotation shall follow the requirements described in [Refere
 
 Please refer to Caliptra HW specification -> https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraHardwareSpecification.md 
 
-## Caliptra FW push flow for Passive/Legacy Mode
+## Passive Caliptra FW Load flow
 
-*Figure 10: FW push flow*
+*Figure 10: Passive Caliptra FW load flow*
 
 ![](./images/Caliptra_boot_flow3.png)
 
@@ -1022,7 +1022,7 @@ Please refer to Caliptra HW specification -> https://github.com/chipsalliance/ca
 5. Caliptra’s mailbox HW  asserts an interrupt to the microcontroller after the GO is written, per mailbox protocol. See [Mailbox](#mailbox) for specifics.
 6. After Caliptra’s FW is authenticated and loaded into ICCM, microcontroller runs the firmware and asserts READY\_FOR\_RTFLOWS wire.
 
-## Caliptra FW push flow for Subsystem Mode
+## Subsystem FW Load flow for Subsystem Mode
 
 Please see the subsystem architecture section below.
 
