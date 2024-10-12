@@ -282,7 +282,7 @@ See [Error Reporting and Handling](#error-reporting-and-handling) for details ab
 
 **Subsystem Mode Boot Flow**
 
-MCU (Manufacterer Control Unit), that is holds platform & SOC specific FW and Caliptra are among the first microcontrollers taken out of reset by the power-on reset logic. Caliptra is responsible for the start of the firmware chain-of-trust with the immutable component of the MCU ROM. After the Caliptra ROM completes initialization, it provides a "stash measurement" API and callback signals for MCU ROM (subsystem mode) to proceed with the boot process. Caliptra ROM supports stashing of at most eight measurements prior to the boot of Caliptra RT firmware.  Then Caliptra FW is loaded through OCP streaming boot flow. Any security-sensitive code (eg. PLL programming) or configuration (eg. Fuse based Patching) loaded by the MCU prior to Caliptra firmware boot must be stashed within Caliptra. If the MCU exceeds Caliptra ROM's measurement stash capacity, attestation must be disabled until the next cold reset. 
+MCU (Manufacturer Control Unit), that is holds platform & SOC specific FW and Caliptra are among the first microcontrollers taken out of reset by the power-on reset logic. Caliptra is responsible for the start of the firmware chain-of-trust with the immutable component of the MCU ROM. After the Caliptra ROM completes initialization, it provides a "stash measurement" API and callback signals for MCU ROM (subsystem mode) to proceed with the boot process. Caliptra ROM supports stashing of at most eight measurements prior to the boot of Caliptra RT firmware.  Then Caliptra FW is loaded through OCP streaming boot flow. Any security-sensitive code (eg. PLL programming) or configuration (eg. Fuse based Patching) loaded by the MCU prior to Caliptra firmware boot must be stashed within Caliptra. If the MCU exceeds Caliptra ROM's measurement stash capacity, attestation must be disabled until the next cold reset. 
 
 Note: This is extremely high level flow, please see the Subsystem Mode Section below for next level specifics.
 
@@ -294,7 +294,7 @@ The high level boot process is as follows:
         1. Caliptra ROM authenticates, measures, and activates the Caliptra firmware following OCP streaming boot protocol.
 4. SOC manifest is streamed next using the streaming boot protocol, which Caliptra authenticates & measures
 5. This is followed by MCU RT FW through the streaming boot protocol which Caliptra routes to MCU SRAM, authorizes and activates MCU to execute it.
-6. MCU RT FW will go through MCTP enumeration and fetch the remaining SOC blobs (FW, data etc.) using MCTP PLDM and uses Caliptra to authorize each of them. Note that MCU may also retrieve some non-FW blobs from a NVM while using Caliptra to perform security operations like integrity verification, decryption etc.
+6. MCU RT FW will go through MCTP enumeration and fetch the remaining SOC blobs (FW, data etc.) using DSP0267 PLDM for Firmware Update over MCTP and uses Caliptra to authorize each of them. Note that MCU may also retrieve some non-FW blobs from a NVM while using Caliptra to perform security operations like integrity verification, decryption etc.
 
 **FIXME: ADD a pic** 
 
@@ -1284,7 +1284,7 @@ The Caliptra subsystem offers a complete RoT subsystem, with open source program
 3. BMC or a similar platform component will send the image (code or data) through OCP recovery flow protocol.
    a. Caliptra ROM should implement a recovery capability to allow for BMC to send ‘data’ instead of ‘code’ as a SOC specific configuration OR allow MCU ROM to send some data to be either integrity checked or authenticated. The data flow and code flow over recovery interface is the same from physical interface point of view and follows the recovery spec as implemented in Caliptra subsystem documentation (please see the recovery section).
    b. This need for data flow (from flash or BMC) is indicated by a SOC configuration bit to Caliptra ROM.
-   c. This ‘data’ flow is possible only before SOC infra readiness is set. This is specifically used for scenarios where PUF or other characterization data is coming off-chip (say a flash or BMC)
+   c. This ‘data’ flow is possible only before SOC infra readiness is set. This is specifically used for scenarios where PUF or other characterization data is coming off-chip (say a flash or BMC). **FIXME:** Security and operations impact of this step/flow is being analyzed. This capability/flexibility will be updated or removed once that is finalized.
    d. This data must be hashed into PCR0
    e. To keep the scope limited, only one ‘data’ flow is allowed
 4. If the data was required to be run (is indicated by a SOC configuration bit to Caliptra ROM), Caliptra ROM waits for SOC infrastructure readiness to be set. Once set, it will do the required key derivations.
@@ -1295,11 +1295,11 @@ The Caliptra subsystem offers a complete RoT subsystem, with open source program
 8. Caliptra ROM will derive required keys similar to Caliptra 1.0 flow (while accounting for PQC)
 9. Caliptra ROM will switch to RT image.
 10. Caliptra RT FW will set the RECOVERY INTERFACE (IFC) to allow BMC’s Recovery Agent (RA) to send the next image (which MUST be SOC image manifest).
-    a. BMC RA is required to know the different component of the images using the similar manifestation as MCTP PLDM components.
+    a. BMC RA is required to know the different component of the images using the similar manifestation as DSP0267 PLDM for Firmware Update over MCTP components.
 11. Caliptra RT FW will read the recovery interface registers over AXI manager interface and write the image to its mailbox.
 12. Caliptra RT FW will authenticate SOC manifest using the keys available through Caliptra Image, authenticate the image, capture the measurement and capture the relevant information into DCCM.
 13. Caliptra RT FW will set the RECOVERY INTERFACE (IFC) to allow BMC’s Recovery Agent (RA) to send the next image (which MUST be MCU image manifest).
-    a. BMC RA is required to know the different component of the images using the similar manifestation as MCTP PLDM components.
+    a. BMC RA is required to know the different component of the images using the similar manifestation as DSP0267 PLDM for Firmware Update over MCTP components.
 14. Caliptra RT FW will read the recovery interface registers over AXI manager interface and write the image to MCU SRAM aperture (that is open to Caliptra only by HW construction).
     a. The address of the MCU SRAM is provided to Caliptra’s RT FW through SOC manifest.
     b. Note: From validation front, need to ensure the Caliptra ROM and MCU are aligned in endianness.
@@ -1333,19 +1333,19 @@ The Caliptra subsystem offers a complete RoT subsystem, with open source program
 
 **Caliptra Hitless Update**
 
-1. Payloads of all hitless update come over MCTP PLDM flow to the MCU similar to the boot time flows.
+1. Payloads of all hitless update come over DSP0267 PLDM for Firmware Update over MCTP flow to the MCU similar to the boot time flows.
 2. MCU provides SOC manifest to Caliptra and waits for authentication to be successful. If this wasn’t provided Caliptra will use the latest SOC manifest available.
-   a. If failed, MCU uses MCTP PLDM to report the same to the update agent using PLDM protocol
+   a. If failed, MCU uses DSP0267 PLDM for Firmware Update over MCTP to report the same to the update agent using PLDM protocol
 3. MCU provides the Caliptra FW using Caliptra Mailbox using the hitless update flows documented in the Caliptra specification
 
 **MCU Hitless Update**
 
-1. Payloads of all hitless update come over MCTP PLDM flow to the MCU similar to the boot time flows.
+1. Payloads of all hitless update come over DSP0267 PLDM for Firmware Update over MCTP flow to the MCU similar to the boot time flows.
 2. MCU provides SOC manifest to Caliptra and waits for authentication to be successful. If this wasn’t provided Caliptra will use the latest SOC manifest available.
-   a. If failed, MCU uses MCTP PLDM to report the same to the update agent using PLDM protocol
+   a. If failed, MCU uses DSP0267 PLDM for Firmware Update over MCTP to report the same to the update agent using PLDM protocol
 3. MCU stages the incoming FW payload in an SOC-defined staging SRAM and provides the MMIO address of the staging memory to Caliptra. It is better to keep this as a part of the authenticated SOC manifest (as a configuration) from a security perspective.
 4. Caliptra RT FW will use the Caliptra DMA engine to issue the read and hash the image (note that the length of the image must be part of the SOC manifest)
-5. Caliptra RT FW after verifying/authorizing the image and if it passes, waits for activate command to be issued from MCU. MCU will get this command over MCTP PLDM flow; At this point, Caliptra will reset EXEC/GO bit into the register as specified in the previous command. This register write will also deassert a Caliptra interface wire.
+5. Caliptra RT FW after verifying/authorizing the image and if it passes, waits for activate command to be issued from MCU. MCU will get this command over DSP0267 PLDM for Firmware Update over MCTP flow; At this point, Caliptra will reset EXEC/GO bit into the register as specified in the previous command. This register write will also deassert a Caliptra interface wire.
 6. MCU HW logic will use this indication to initiate MCU uC reset flow
    a. MCU HW logic sends a reset-go-req to MCU uC (an interrupt)
    b. MCU HW logic waits for reset-go-ack from MCU uC (Note that this handshake exists to ensure uController is in an appropriate quiescent state to take the reset)
@@ -1368,8 +1368,8 @@ Further SOCs may require the hitless update without impacting the workloads/VMs 
 
 Caliptra subsystem provides this architectural capability as follows:
 1. MCU provides SOC manifest to Caliptra and waits for authentication to be successful. If this wasn’t provided Caliptra will use the latest SOC manifest available.
-   a. If failed, MCU uses MCTP PLDM to report the same to the update agent using PLDM protocol
-2. MCU stages all the incoming FW payload in an SOC-defined staging memory and provides the MMIO address of the staging SRAM to Caliptra. It is better to keep this as a part of the authenticated SOC manifest (as a configuration) from security perspective.
+   a. If failed, MCU uses DSP0267 PLDM for Firmware Update over MCTP to report the same to the update agent using PLDM protocol
+2. MCU stages all the incoming FW payload in an SOC-defined staging memory and provides the MMIO address of the staging SRAM to Caliptra. It is better to keep this as a part of the authenticated SOC manifest (as a configuration) from security perspective. (**FW Arch requirement:** This SOC-defined staging RAM MMIO offset which can be one for all the images or it could be per image, recommended to keep it the later way, should be defined in the SOC manifest.)
 3. Caliptra RT FW will use the Caliptra DMA engine to issue the read and hash the image (note that the length of the each image must be part of the SOC manifest)
 4. Caliptra RT FW will verify & authorize the images. It will also compare the hash of the images against the “current” hash of each of the image.
 5. MCU will send the ‘activate’ command to Caliptra (which is part of PLDM spec that MCU understands)
@@ -1386,7 +1386,7 @@ This section explain how generic FW Load Flows would function for SOCs with mult
 1. Primary tile uses Caliptra-Active-Mode at its silicon boot time
 2. Secondary tile’s MCU ROM will go through the same common boot flow as the primary tile (except the peripheral could be inter-chiplet link).
 3. Secondary tile’s MCU ROM will wait for inter-chiplet link to be available for use (this would be an indication to MCU ROM)
-4. Primary tile’s MCU RT FW will fetch the secondary tile’s FW using MCTP PLDM T5 flow and ‘stream’ using the same recovery interface protocol to the secondary tile(s).
+4. Primary tile’s MCU RT FW will fetch the secondary tile’s FW using DSP0267 PLDM for Firmware Update over MCTP T5 flow and ‘stream’ using the same recovery interface protocol to the secondary tile(s).
 5. Based on SOC integration, inter-chiplet could be an intelligent peripheral that can DMA or implement data payload registers for Caliptra to read. 
    a. Note that the indication from Caliptra for “next-image” follows the same recovery interface protocol.
    b. Note that to load the remaining images of a secondary tile, SOC can choose to do recovery flow for rest of the remaining images. Depending on the SOC architecture and chiplets, MCU RT FW may coordinate the SOC to boot in such a way that it “broadcasts” the same image to multiple chiplets that require the same image. This is a SOC optimized flow outside of Caliptra or Subsystem Context.
