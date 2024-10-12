@@ -416,7 +416,7 @@ Combine the internal TRNG output with a Manufacturing time provided value to pro
 
 ![](./images/Caliptra_manuf_flow1.png)
 
-*Figure 7: Passive/Legacy Mode: Device manufacturing identity flow*
+*Figure 7: Passive Mode: Device manufacturing identity flow*
 
 1. High Volume Manufacturing (HVM) programs the IDevID certificate attributes fuses. See [IDevID Certificate](#idevid-certificate) for encodings.
 2. HVM programs NIST compliant UDS into fuses using SoC-specific fuse programming flow. Note that this UDS goes through an obfuscation function within Caliptra IP.
@@ -1276,7 +1276,7 @@ The Caliptra subsystem offers a complete RoT subsystem, with open source program
 
 **_If (Caliptra-Passive-Mode)_**
 
-1. SOC Manager goes through legacy flows => loads Caliptra FW using legacy flows, Caliptra sets RT ready and SOC  <-> Caliptra boot flow is done.
+1. SOC Manager goes through Caliptra 1.x flows => loads Caliptra FW using Caliptra 1.x flows, Caliptra sets RT ready and SOC  <-> Caliptra boot flow is done.
    
 **_(Caliptra-Active-Mode)_**
 
