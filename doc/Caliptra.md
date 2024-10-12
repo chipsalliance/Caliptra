@@ -1279,7 +1279,7 @@ The Caliptra subsystem offers a complete RoT subsystem, with open source program
    
 **_(Caliptra-Active-Mode)_**
 
-1. Caliptra ROM waits for SOC infrastructure readiness indication. If this indication is set, Caliptra will do the identity derviationderivation flows. If it is not set, then this flow is run when the SOC infrastructure readiness indication is set.
+1. Caliptra ROM waits for SOC infrastructure readiness indication. If this indication is set, Caliptra will do the identity derviation flows. If it is not set, then this flow is run when the SOC infrastructure readiness indication is set.
 2. Caliptra ROM will follow the recovery interface protocol to load its FW. Please see the specific section for next level specifics; At a high level, Caliptra ROM sets the device ready in the I3C controller and poll I3C for the payloads.
 3. BMC or a similar platform component will send the image (code or data) through OCP recovery flow protocol.
    a. Caliptra ROM should implement a recovery capability to allow for BMC to send ‘data’ instead of ‘code’ as a SOC specific configuration OR allow MCU ROM to send some data to be either integrity checked or authenticated. The data flow and code flow over recovery interface is the same from physical interface point of view and follows the recovery spec as implemented in Caliptra subsystem documentation (please see the recovery section).
