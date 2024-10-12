@@ -385,7 +385,8 @@ The SoC may support a fuse bank for representing the hash of the owner's public 
 
 The owner key, when represented in fuses or in the FMC's alias certificate, is a SHA384 hash of a structure that contains a list of owner public keys. This supports key rotation.
 
-## Provisioning UDS during Manufacturing
+## Provisioning UDS during Manufacturing (Subsystem Mode)
+**Note:** In passive mode, SOC follows the same flows/restrictions as Caliptra 1.x
 
 ![](./images/Manuf-UDS-Flow.png)
 
@@ -1313,6 +1314,9 @@ The Caliptra subsystem offers a complete RoT subsystem, with open source program
 19. BMC or a similar platform component will now do MCTP enumeration flow to MCU over I3C.
 20. MCU RT FW is responsible for responding to all MCTP requests.
 21. MCU RT FW will do the PLDM T5 flow, extract FW or configuration payload, use Caliptra to authenticate and deploy the rest of the images as described in run-time authentication flows.
+
+*Figure: Subsystem Boot Flow*
+![](./images/Subsystem-BootFlow.png)
 
 **Common Run-time Authentication Flows**
 
