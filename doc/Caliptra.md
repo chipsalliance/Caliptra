@@ -887,8 +887,8 @@ In addition to cold boot, Caliptra ROM performs firmware verification on hitless
 | Field | Size (bytes) | Description|
 |-------|--------|------------|
 | Key Descriptor Version | 1 | Version of the Key Descriptor. The value must be 0x1 for Caliptra 2.x |
-| Intent | 1 |  <br> **0x0000_0001:** Vendor  <br> **0x0000_0002:** Owner |
-| Key Type | 1 |  <br> **0x0000_0001:** ECC  <br> **0x0000_0002:** LMS <br> **0x0000_0003:** MLDSA |
+| Intent | 1 | 0x1 - Vendor  <br> 0x2 - Owner |
+| Key Type | 1 | 0x1 - ECC  <br> 0x2 - LMS <br> 0x3 - MLDSA |
 | Key Hash Count | 1 | Number of public key hashes (n) |
 | Public Key Hash(s) | 48 * n | List of SHA2-384 public key hashes |
 
@@ -901,7 +901,7 @@ Fields are little endian unless described otherwise.
 |-------|--------|------------|
 | Firmware Manifest Marker | 4 | Magic Number marking the start of the package manifest. The value must be 0x434D414E (‘CMAN’ in ASCII)|
 | Firmware Manifest Size | 4 | Size of the full manifest structure |
-| Firmware Manifest Type | 4 |  **Byte0:** - Type <br> Type ‘1’ – ECDSA & LMS Keys <br> Type ‘2’ – ECDSA & MLDSA Keys <br> **Byte1-Byte31:** Reserved|
+| Firmware Manifest Type | 4 |  **Byte0:** - Type <br> 0x1 – ECDSA & LMS Keys <br> 0x2 – ECDSA & MLDSA Keys <br> **Byte1-Byte3:** Reserved|
 | Vendor Key Descriptor - 1 | Variable | Public Key Descriptor for ECDSA keys |
 | Vendor Key Descriptor - 2 | Variable | Public Key Descriptor for LMS or MLDSA keys |
 | Active Key Index - 1 | 4 | Public Key Index for the active ECDSA key |
@@ -1192,7 +1192,7 @@ The following table describes Caliptra's fuse map:
 | FIELD ENTROPY (obfuscated)      | 256             | ROM             | Device owner in-field programmable | Field-programmable by the owner, used to hedge against UDS disclosure in the supply chain. |
 | KEY MANIFEST PK HASH            | 384             | ROM FMC RUNTIME | SoC manufacturing                               | SHA384 hash of the Vendor ECDSA P384 and LMS or MLDSA Public Key Descriptors. |
 | KEY MANIFEST PK HASH MASK       | 4               | ROM FMC RUNTIME | In-field programmable                           | One-hot encoded list of revoked Vendor ECDSA P384 Public Keys. |
-| OWNER PK HASH                   | 384             | ROM FMC RUNTIME | In-field programmable                           | SHA384 hash of the Owner ECDSA P384 and LMS or MLDSDA Public Keys. |
+| OWNER PK HASH                   | 384             | ROM FMC RUNTIME | In-field programmable                           | SHA384 hash of the Owner ECDSA P384 and LMS or MLDSA Public Keys. |
 | FMC KEY MANIFEST SVN            | 32              | ROM FMC RUNTIME | In-field programmable                           | FMC security version number. |
 | RUNTIME SVN                     | 128             | ROM FMC RUNTIME | In-field programmable                           | Runtime firmware security version number. |
 | ANTI-ROLLBACK DISABLE           | 1               | ROM FMC RUNTIME | SoC manufacturing or in-field programmable      | Disables anti-rollback support from Caliptra. (For example, if a Platform RoT is managing FW storage and anti-rollback protection external to the SoC.) |
