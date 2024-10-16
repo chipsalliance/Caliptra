@@ -25,7 +25,8 @@ marks](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkPoli
 
 ## Specifications
 
-* [Main Caliptra specification](https://github.com/chipsalliance/Caliptra/blob/main/doc/Caliptra.md)
+* [Main Caliptra specification 1.x](https://github.com/chipsalliance/Caliptra/blob/main/doc/caliptra_1x/Caliptra.md) 
+* [Main Caliptra specification 2.0 - WIP](https://github.com/chipsalliance/Caliptra/blob/main/doc/Caliptra.md)
 * [Hardware Specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraHardwareSpecification.md)
 * [Hardware Integration
   Specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md)

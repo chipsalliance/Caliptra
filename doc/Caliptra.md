@@ -2,9 +2,9 @@
 
 <p style="text-align: center;">Caliptra: A Datacenter System on a Chip (SoC) Root of Trust (RoT)</p>
 
-<p style="text-align: center;">Revision 1.0</p>
+<p style="text-align: center;">Revision 2.0</p>
 
-<p style="text-align: center;">Version 1.0</p>
+<p style="text-align: center;">Version 0.5</p>
 
 <div style="page-break-after: always"></div>
 
@@ -252,11 +252,15 @@ The following figure shows the basic high-level blocks of Caliptra.
 
 *Figure 2: Caliptra high level blocks*
 
-![](./images/Caliptra_HW_diagram.png)
+![](./images/Caliptra2p0.png)
 
 See the [hardware section](#hardware) for a detailed discussion.
 
-Caliptra is among the first uncore microcontrollers taken out of reset by the power-on reset logic. Caliptra coordinates the start of the firmware chain-of-trust with the immutable component of the SoC ROM. After the Caliptra ROM completes initialization, it provides a "stash measurement" API and callback signals for the SoC ROM to proceed with the boot process. Caliptra ROM supports stashing of at most eight measurements prior to the boot of Caliptra firmware. The SoC then may choose to boot Caliptra firmware. Any security-sensitive code or configuration loaded by the SoC prior to Caliptra firmware boot must be stashed within Caliptra. If the SoC exceeds Caliptra ROM's measurement stash capacity, attestation must be disabled until the next cold reset. The boot process is as follows:
+From Caliptra 2.x onwards, Caliptra introduces two modes of operation. **Passive** mode which was supported in 1.x architecture and **Subsystem** mode. Fundamental difference between passive mode and subsystem mode is that in the subsystem mode Caliptra is the RoT for the SOC and provides streaming boot, secure boot and attestation. In Subsystem mode, Caliptra also provides various crypto API services such as encryption/decryption of SOC FWs, Key releases, Key wraps, hashing etc. to name a few. Please see Caliptra subsystem mode Crypto API section for more details (**FIXME**: section name & details).
+
+**Passive Mode High Level Flow**
+
+Caliptra is among the first microcontrollers taken out of reset by the power-on reset logic. Caliptra coordinates the start of the firmware chain-of-trust with the immutable component of the SoC ROM. After the Caliptra ROM completes initialization, it provides a "stash measurement" API and callback signals for the SoC ROM (passive mode) to proceed with the boot process. Caliptra ROM supports stashing of at most eight measurements prior to the boot of Caliptra RT firmware.  The SoC then may choose to boot Caliptra firmware. Any security-sensitive code or configuration loaded by the SoC prior to Caliptra firmware boot must be stashed within Caliptra. If the SoC exceeds Caliptra ROM's measurement stash capacity, attestation must be disabled until the next cold reset. The boot process is as follows:
 
 1. Hardware executes SoC power-on reset logic. This logic starts the execution of SoC ROM and Caliptra ROM.
 2. SoC ROM waits for the ready_for_fw signal from Caliptra ROM.
@@ -272,9 +276,28 @@ Caliptra is among the first uncore microcontrollers taken out of reset by the po
 
 See [Error Reporting and Handling](#error-reporting-and-handling) for details about Caliptra and SoC firmware load and verification error handling.
 
-*Figure 3: Caliptra boot flow*
+*Figure 3: Passive Caliptra boot flow*
 
 ![](./images/Boot_flow.png)
+
+**Subsystem Mode Boot Flow**
+
+MCU (Manufacturer Control Unit), that is holds platform & SOC specific FW and Caliptra are among the first microcontrollers taken out of reset by the power-on reset logic. Caliptra is responsible for the start of the firmware chain-of-trust with the immutable component of the MCU ROM. After the Caliptra ROM completes initialization, it provides a "stash measurement" API and callback signals for MCU ROM (subsystem mode) to proceed with the boot process. Caliptra ROM supports stashing of at most eight measurements prior to the boot of Caliptra RT firmware.  Then Caliptra FW is loaded through OCP streaming boot flow. Any security-sensitive code (eg. PLL programming) or configuration (eg. Fuse based Patching) loaded by the MCU prior to Caliptra firmware boot must be stashed within Caliptra. If the MCU exceeds Caliptra ROM's measurement stash capacity, attestation must be disabled until the next cold reset. 
+
+Note: This is extremely high level flow, please see the Subsystem Mode Section below for next level specifics.
+
+The high level boot process is as follows:
+
+1. Hardware executes SoC power-on reset logic. This logic starts the execution of MCU ROM and Caliptra ROM.
+2. Recovery interface is gated until ready for recovery is written into recovery interface registers from Caliptra ROM. This happens at the same time as passive mode's ready_for_fw signal.
+3. Caliptra firmware is streamed & then pulled into Caliptra MB SRAM through the OCP streaming boot aka recovery interface by a platform component (typically a BMC-like component).
+        1. Caliptra ROM authenticates, measures, and activates the Caliptra firmware following OCP streaming boot protocol.
+4. SOC manifest is streamed next using the streaming boot protocol, which Caliptra authenticates & measures
+5. This is followed by MCU RT FW through the streaming boot protocol which Caliptra routes to MCU SRAM, authorizes and activates MCU to execute it.
+6. MCU RT FW will go through MCTP enumeration and fetch the remaining SOC blobs (FW, data etc.) using DSP0267 PLDM for Firmware Update over MCTP and uses Caliptra to authorize each of them. Note that MCU may also retrieve some non-FW blobs from a NVM while using Caliptra to perform security operations like integrity verification, decryption etc.
+
+**FIXME: ADD a pic** 
+
 
 ## Identity
 
@@ -286,13 +309,13 @@ Caliptra must provide its runtime (RT) code with a cryptographic identity in acc
 
 ### UDS
 
-A combination of mask ROM and HW macros must implement the DICE key derivation and power-on latch, hiding the UDS and only making the CDI-derived signing key visible to firmware.
+A combination of mask ROM and HW macros must implement the DICE key derivation and power-on latch, hiding the UDS seed and only making the CDI-derived signing key 'handle' visible to ROM. Real UDS will only be calculated during the cold boot in hardware, used for CDI derivation and immediately gets cleared.
 
-The Caliptra UDS is stored as ciphertext in fuses, obfuscated at rest by a secret obfuscation key[^2] known only to the Caliptra ROM. Once read by Caliptra ROM at boot, the unobfuscated UDS is then used to derive the IDevID identity.
+The Caliptra UDS seed is stored as ciphertext in fuses, deobfuscated only on cold boot using a obfuscation key[^2] known only to the Caliptra Hardware. Once read by Caliptra HW at boot, the unobfuscated UDS is then used to derive the IDevID identity and immediately cleared by hardware.
 
 ### IDevID key
 
-Caliptra's IDevID key is a hardware identity generated by Caliptra ROM during manufacturing. This key must be solely wielded by Caliptra ROM, and shall never be exposed externally at any phase of the Caliptra lifecycle. IDevID is used to endorse LDevID. The [IDevID certificate](#idevid-certificate) is endorsed by the vendor’s provisioning CA (pCA) that is implemented via a HSM appliance connected to High Volume Manufacturing (HVM) flows (see provisioning CA in [Reference 8](#ref-8)).
+Caliptra's IDevID key is a hardware identity generated by Caliptra ROM during manufacturing. This key "handle" must be solely wielded by Caliptra ROM, and shall never be exposed externally at any phase of the Caliptra lifecycle. IDevID is used to endorse LDevID. The [IDevID certificate](#idevid-certificate) is endorsed by the vendor’s provisioning CA (pCA) that is implemented via a HSM appliance connected to High Volume Manufacturing (HVM) flows (see provisioning CA in [Reference 8](#ref-8)).
 
 See [Provisioning IDevID During Manufacturing](#provisioning-idevid-during-manufacturing) for further details on IDevID provisioning.
 
@@ -362,11 +385,38 @@ The SoC may support a fuse bank for representing the hash of the owner's public 
 
 The owner key, when represented in fuses or in the FMC's alias certificate, is a SHA384 hash of a structure that contains a list of owner public keys. This supports key rotation.
 
+## Provisioning UDS during Manufacturing (Subsystem Mode)
+**Note:** In passive mode, SOC follows the same flows/restrictions as Caliptra 1.x
+
+![](./images/Manuf-UDS-Flow.png)
+
+*Figure 6: Subsystem Mode: UDS manufacturing flow*
+
+There are three ways of generating a UDS_SEED
+Use the internal TRNG to directly generate a 384-bit random number.
+Use an entity external to Caliptra such as an HSM or SOC-specific methodology to produce UDS-seed 384-bit random number that is pushed into the fuse controller (same as Caliptra 1.0).
+Combine the internal TRNG output with a Manufacturing time provided value to produce a 384-bit output.
+
+**UDS Manufacturing – Mode A:**
+1. When SOC life cycle is in MANUFACTURING MODE, manufacturing service register bit [CPTRA_DBG_MANUF_SERVICE_REG[2]] is set to request for UDS seed programming flow.
+2. Caliptra ROM will sample this bit on power up; when this bit is set and Caliptra ROM rechecks that the life cycle state is manufacturing mode, it reads the iTRNG for a 384-bit value.
+3. Caliptra ROM writes the 384-bit value to the address available through a register named UDS_SEED_OFFSET which is strapped by SOC at integration time by using DMA HW assist macro available at ROM’s disposal.
+4. Caliptra ROM sets the corresponding status bit in CPTRA_DBG_MANUF_SERVICE_REG to indicate the flow completion.
+5. Manufacturing flow will poll/read this bit and then do the fuse burning flow as specified by the fuse controller spec and SOC specific VR methodologies (eg. Fuse macro voltage elevation flows etc.).
+
+**UDS Manufacturing – Mode B**
+1. When SOC life cycle is in MANUFACTURING MODE, CPTRA_DBG_MANUF_SERVICE_REG[2] & CPTRA_DBG_MANUF_SERVICE_REG[3] are set to request for UDS seed programming flow.
+2. Caliptra ROM will sample this bit on power up and also waits/consumes the FIPS compliant 384-bit entropy (the “message”) provided at the manufacturing (TBD on the mechanism for this coming over JTAG to ROM);
+3. When both the bits are set, ROM rechecks that the life cycle state is manufacturing mode, it reads the iTRNG for a 384-bit value (the “key”).
+4. Caliptra ROM performs an HMAC-SHA-384 using the message-key pair from steps 2 and 3 above appropriately padded for PRF usage per Caliptra 1.0.
+5. Caliptra ROM writes the final 384-bit value to the address available through a register UDS_SEED_OFFSET (HW/Integration requirement: Need to add this), using DMA HW assist macro available at ROM’s disposal.
+6. Manufacturing flow will poll/read this bit and then do the fuse burning flow as specified by the fuse controller spec and SOC specific methodologies (eg. Fuse macro voltage elevation flows etc.).
+
 ## Provisioning IDevID during manufacturing
 
 ![](./images/Caliptra_manuf_flow1.png)
 
-*Figure 5: Device manufacturing identity flow*
+*Figure 7: Passive Mode: Device manufacturing identity flow*
 
 1. High Volume Manufacturing (HVM) programs the IDevID certificate attributes fuses. See [IDevID Certificate](#idevid-certificate) for encodings.
 2. HVM programs NIST compliant UDS into fuses using SoC-specific fuse programming flow. Note that this UDS goes through an obfuscation function within Caliptra IP.
@@ -957,46 +1007,11 @@ Firmware signing key rotation shall follow the requirements described in [Refere
 
 # Hardware
 
-The following figure describes the Caliptra Core.
+Please refer to Caliptra HW specification -> https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraHardwareSpecification.md 
 
-*Figure 8: Caliptra Core block diagram*
+## Passive Caliptra FW Load flow
 
-![](./images/Caliptra_HW_diagram.png)
-
-* Memory requirements:
-  * 128 KiB of ICCM0
-  * 128 KiB for Mailbox as a staged SRAM (for FW staging of impactless updates to do authentication checks on the FW before moving to ICCM)
-  * 128 KiB for DCCM and 48 KiB for ROM
-* Cryptography requirements:
-  * SHA256, SHA384, and SHA512
-  * ECDSA Secp384r1 with HMAC-DRBG - key generation, signing and verification
-  * HMAC SHA384
-  * AES256-CBC
-* Chips Alliance is used for RISC-V.
-* APB is the choice for the SoC-facing interface.
-* JTAG is exported at the IP interface.
-* TRNG is the digital logic and algorithms that are required for random number generation. It requires a physical entropy source input. See the Caliptra IP specification and [integration specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md) for more information.
-  * For SoCs that want to use their own legacy TRNG, Caliptra provides a HW API to push the random number on the request/response handshake. See the Caliptra IP specification and [integration specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md) for more information. **This mode is advised for early development but discouraged for production tape outs due to the lower security assurances of an external TRNG**.
-
-The following figure describes the Caliptra IP HW boot flow.
-
-*Figure 9: Hardware boot flow*
-
-![](./images/Caliptra_boot_flow2.png)
-
-1. As part of the SoC boot flow, SoC may have other infrastructure and entities that boot. That part of the flow is outside the scope of this document. If SoC chooses to bypass Caliptra, then it should have a capability to bypass Caliptra entirely through its proprietary flow. This may be needed for initial power-on and other early validation.
-2. Cptra\_pwrgood is asserted to the Caliptra IP block.
-3. Cptra\_rst\_b is deasserted to the Caliptra IP block. See the integration specification for guidelines on the minimum number of cycles between these two signals.
-4. Caliptra IP now evaluates the strap settings driven through various interface wires (for example, the security or debug state of the SoC).
-5. If SoC is in a debug mode, then security assets are cleared or switched to debug mode.
-6. Caliptra IP asserts Ready\_For\_Fuse wire to the SoC.
-7. The SoC populates the fuse registers, the internal TRNG configuration registers, and the ROM WDT cycle count, then sets the CPTRA\_FUSE\_WR\_DONE bit. Note that Caliptra HW drops writes to any registers that cannot be changed unless there is a power cycle (for example, UDS). So SoC is free to write all the registers.
-8. Caliptra IP deasserts Ready\_for\_Fuse wire as soon as the fuse write done register is written.
-9. Caliptra IP moves security critical assets in fuse registers (for example, UDS) to the key vault.
-
-## Caliptra FW push flow
-
-*Figure 10: FW push flow*
+*Figure 10: Passive Caliptra FW load flow*
 
 ![](./images/Caliptra_boot_flow3.png)
 
@@ -1006,6 +1021,10 @@ The following figure describes the Caliptra IP HW boot flow.
 4. SoC follows the mailbox protocol and pushes Caliptra FW into the mailbox.
 5. Caliptra’s mailbox HW  asserts an interrupt to the microcontroller after the GO is written, per mailbox protocol. See [Mailbox](#mailbox) for specifics.
 6. After Caliptra’s FW is authenticated and loaded into ICCM, microcontroller runs the firmware and asserts READY\_FOR\_RTFLOWS wire.
+
+## Subsystem FW Load flow for Subsystem Mode
+
+Please see the subsystem architecture section below.
 
 ## <a id="reset-flow"></a>CPU warm reset or PCIe hot reset flow →  Caliptra IP reset
 
@@ -1024,6 +1043,8 @@ The following figure describes the Caliptra IP HW boot flow.
 Because warm reset is a pin input to Caliptra, Caliptra may not be idle when a warm reset occurs. If a warm reset occurs while Caliptra ROM, FMC, or RT initialization code is executing, Caliptra may be inoperable until a subsequent cold reset. If a warm reset occurs while Caliptra runtime is servicing a request, Caliptra shall remain operable but may refuse to wield production assets for subsequent requests.
 
 **Note:** The cold reset flow is not explicitly mentioned but it is the same as the cold boot flow because Caliptra IP has no state through a cold reset.
+**Note:** Subsystem mode's warm reset flow is the same as above, except the warm reset action is triggered/managed by MCU.
+
 
 ## Mailbox
 
@@ -1098,9 +1119,9 @@ The PAUSER field of the APB interface is used to encode device attributes for th
 
 The Caliptra mailbox commands are specified in the [Caliptra runtime firmware specification](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#maibox-commands).
 
-### Hash calculation HW API
+### Hash calculation HW API (Subsystem mode only)
 
-Caliptra provides a HW API to do a SHA384 hash calculation. The SoC can access the accelerator through this hardware API and stream data to be hashed over the APB interface. The hash is captured into a register for SoC to use or Caliptra FW to be used for the Signature Authentication API.
+Caliptra provides a HW API to do a SHA384 hash calculation. The SoC can access the accelerator through the Caliptra FW API only in subsystem mode. Caliptra FW API uses the internal SHA accelerator and its DMA widget be hash the required data and present it back to Calitpra FW. 
 
 ### JTAG/TAP debug
 
@@ -1152,9 +1173,9 @@ To ensure that the security claims of Caliptra are achieved, specific fuse prote
 
 All fuse based cryptographic keying material and seeds (for example, UDS Seed) shall be generated (on-chip or off-chip) per requirements described in [Reference 8](#ref-8).
 
-SoC shall support in-field programmable fusing. [Fuse Map](#fuse-map) shows which fuses are expected to be in-field programmable. SoCs shall implement authorization for in-field programmable fusing to mitigate denial-of-service attacks. Authorization design is outside the scope of this specification.
+SoC shall support in-field programmable fusing. [Fuse Map](#fuse-map) shows which fuses are expected to be in-field programmable. SoCs shall implement authorization for in-field programmable fusing to mitigate denial-of-service attacks. Authorization design is outside the scope of this specification. In Subsystem mode, SOC may use MCU RT FW for these actions.
 
-SoC shall support a field entropy programming API. The API shall support retrieving an input value from an external interface. It should cryptographically mix that value with the output of an on-die TRNG to generate the field entropy value. The API implementation shall burn the field entropy value into the first available field entropy fuse slot (or fail if no slots are available). Caliptra is expected to be in any security state. The device owner is expected to call this API in a “clean room environment” to minimize risk of attack on the programming process.
+SoC shall support a field entropy programming API. The API shall support retrieving an input value from an external interface. It should cryptographically mix that value with the output of an on-die TRNG to generate the field entropy value. The API implementation shall burn the field entropy value into the first available field entropy fuse slot (or fail if no slots are available). Caliptra is expected to be in any security state. The device owner is expected to call this API in a “clean room environment” to minimize risk of attack on the programming process. In Subsystem mode, SOC may use MCU RT FW for these actions.
 
 #### Fuse zeroing
 
@@ -1168,9 +1189,11 @@ For SoCs that intend to achieve FIPS 140-3 CMVP certification with Caliptra:
 * SoC shall set Caliptra’s security state to DebugUnlock by ORing it with the zeroization status signal.
 * SoC shall expose Caliptra architectural registers as API for a tester to read.
 * SoC shall ensure authorization for this API to guard against denial-of-service attacks. The authorization design is left to the vendor.
+* Note: In Subsystem mode, SOC should use MCU RT FW with the corresponding subsystem HW components for these actions.
 
 #### Fuse map
 
+**FIXME:** Needs updates for Caliptra 2p0 & Subsystem
 The following table describes Caliptra's fuse map:
 
 *Table 19: Caliptra Fuse Map*
@@ -1226,20 +1249,202 @@ This section describes Caliptra error reporting and handling.
 
 Please refer to [the Caliptra code base](https://github.com/chipsalliance/caliptra-sw/blob/main/error/src/lib.rs) for a list of the error codes.
 
-# Future effort: Caliptra security subsystem
-
-A future effort is a full security subsystem solution. This solution is a combination of fully open source digital logic and licensable analog components that are technology dependent, such as TRNG analog sources or technology dependent fuse controllers.
-
-* SoC Controller has configurable SRAMs and reference firmware.
-* SoC reference ROM allows for configurable initialization.
-* Resource handling logic (RHL) brings up subsystem components such as PUF, PLL, Fuse controller, \[P-\]TRNG. etc. RHL processes requests from Caliptra to the outside components (for example, P-TRNG request input to Caliptra’s internal TRNG).
-* Some of the analog components are licensable IPs that are used to build the subsystem (for example, PUF, and PLL).
-
-*Figure 15: Caliptra security subsystem*
-
-![](./images/Caliptra_HW_Block_diagram.png)
-
+# Caliptra Security Subsystem
 The Caliptra subsystem offers a complete RoT subsystem, with open source programmable components for customization of SoC boot flows.
+
+*Figure: Caliptra security subsystem*
+![](./images/Subsystem.png)
+
+**Caliptra Subsystem Architectural Flows**
+
+**Subsystem (Pre-FW Load) Boot Flow **
+
+**Note:** Any step done by MCU HW/ROM would have been performed by “SOC Manager” in Caliptra 1p0.
+
+1. SoC (using its HW or MCU ROM) performs pre-steps like bringing up CRO or PLL, MBIST flows on SRAMs, SRAM Init etc.
+2. SOC will assert MCU & Caliptra pwrgood and after 10 cycles MCU
+3. MCU ROM or SOC Manager wrapper will bring up fuse controller and any other SOC specific infrastructure RTL modules (I3C, GPIO programming, Glitch detector programming etc.)
+4. MCU ROM or SOC Manager wrapper will deassert Caliptra reset.
+5. Caliptra HW will read the security centric (secret) fuses.
+6. MCU ROM waits for ready_for_fuses to be asserted.
+7. MCU ROM or SOC Manager will populate the remaining fuses of Caliptra and reads its own fuses (if any). Note that this step is gated behind the completion of security fuse writes to ensure the step has completed.
+8. MCU ROM will write “fuse done” to Caliptra.
+9. Caliptra will go through its boot flow of bringing up uC.
+10. Caliptra ROM starts and executes various KATs flows.
+
+**Subsystem Boot Flow**
+
+**_If (Caliptra-Passive-Mode)_**
+
+1. SOC Manager goes through Caliptra 1.x flows => loads Caliptra FW using Caliptra 1.x flows, Caliptra sets RT ready and SOC  <-> Caliptra boot flow is done.
+   
+**_(Caliptra-Active-Mode)_**
+
+1. Caliptra ROM waits for SOC infrastructure readiness indication. If this indication is set, Caliptra will do the identity derviation flows. If it is not set, then this flow is run when the SOC infrastructure readiness indication is set.
+2. Caliptra ROM will follow the recovery interface protocol to load its FW. Please see the specific section for next level specifics; At a high level, Caliptra ROM sets the device ready in the I3C controller and poll I3C for the payloads.
+3. BMC or a similar platform component will send the image (code or data) through OCP recovery flow protocol.
+   a. Caliptra ROM should implement a recovery capability to allow for BMC to send ‘data’ instead of ‘code’ as a SOC specific configuration OR allow MCU ROM to send some data to be either integrity checked or authenticated. The data flow and code flow over recovery interface is the same from physical interface point of view and follows the recovery spec as implemented in Caliptra subsystem documentation (please see the recovery section).
+   b. This need for data flow (from flash or BMC) is indicated by a SOC configuration bit to Caliptra ROM.
+   c. This ‘data’ flow is possible only before SOC infra readiness is set. This is specifically used for scenarios where PUF or other characterization data is coming off-chip (say a flash or BMC). **FIXME:** Security and operations impact of this step/flow is being analyzed. This capability/flexibility will be updated or removed once that is finalized.
+   d. This data must be hashed into PCR0
+   e. To keep the scope limited, only one ‘data’ flow is allowed
+4. If the data was required to be run (is indicated by a SOC configuration bit to Caliptra ROM), Caliptra ROM waits for SOC infrastructure readiness to be set. Once set, it will do the required key derivations.
+5.  Caliptra ROM will read the recovery interface registers (data payload registers) over AXI manager interface and write into Caliptra MB SRAM. The offset of the recovery interface registers are available through a config register that is set at SOC integration time or by MCU ROM.
+   a. Note that an intelligent I3C peripheral could “stream” the image. This is a future enhancement.
+6. Caliptra ROM will authenticate its image sitting in Caliptra MB SRAM
+7. Caliptra ROM flow will be similar to Caliptra 1.0 flow with PQC FW Authentication.
+8. Caliptra ROM will derive required keys similar to Caliptra 1.0 flow (while accounting for PQC)
+9. Caliptra ROM will switch to RT image.
+10. Caliptra RT FW will set the RECOVERY INTERFACE (IFC) to allow BMC’s Recovery Agent (RA) to send the next image (which MUST be SOC image manifest).
+    a. BMC RA is required to know the different component of the images using the similar manifestation as DSP0267 PLDM for Firmware Update over MCTP components.
+11. Caliptra RT FW will read the recovery interface registers over AXI manager interface and write the image to its mailbox.
+12. Caliptra RT FW will authenticate SOC manifest using the keys available through Caliptra Image, authenticate the image, capture the measurement and capture the relevant information into DCCM.
+13. Caliptra RT FW will set the RECOVERY INTERFACE (IFC) to allow BMC’s Recovery Agent (RA) to send the next image (which MUST be MCU image manifest).
+    a. BMC RA is required to know the different component of the images using the similar manifestation as DSP0267 PLDM for Firmware Update over MCTP components.
+14. Caliptra RT FW will read the recovery interface registers over AXI manager interface and write the image to MCU SRAM aperture (that is open to Caliptra only by HW construction).
+    a. The address of the MCU SRAM is provided to Caliptra’s RT FW through SOC manifest.
+    b. Note: From validation front, need to ensure the Caliptra ROM and MCU are aligned in endianness.
+15. Caliptra RT FW will instruct Caliptra HW to read MCU SRAM and generate the hash (Caliptra HW will use the SHA accelerator and AXI mastering capabilities to do this)
+    a. Open: Should we have a capability to do something like this for decryption too? (Key to be provided by MCU/SOC before running the decryption flow?)
+16. Caliptra RT FW will use this hash and verify it against the hash in the SOC manifest.
+17. Caliptra RT FW after verifying/authorizing the image and if it passes, it will set EXEC/GO bit into the register as specified in the previous command. This register write will also assert a Caliptra interface wire.
+    a. MCU ROM will be polling the breadcrumb that the MCU SRAM has valid content and will jump to the MCU SRAM to execute from it. **NOTE:** This breadcrumb should be one of the status bits available on the MCU interface that is set by Caliptra GO bit wires.
+    b. Until this step MCU SRAM aperture that holds the MCU RT FW and certain recovery interface registers are not accessible to MCU.
+18. MCU RT FW will now set recovery flow is completed.
+19. BMC or a similar platform component will now do MCTP enumeration flow to MCU over I3C.
+20. MCU RT FW is responsible for responding to all MCTP requests.
+21. MCU RT FW will do the PLDM T5 flow, extract FW or configuration payload, use Caliptra to authenticate and deploy the rest of the images as described in run-time authentication flows.
+
+*Figure: Subsystem Boot Flow*
+![](./images/Subsystem-BootFlow.png)
+
+**Common Run-time Authentication Flows**
+
+1. MCU RT FW will do PLDM T5 flow to obtain the FW images for downstream uControllers (or other SOC configuration)
+2. MCU RT FW will send/stream the (FW or config) payload to Caliptra SHA Acc to perform hash measurements as the payload comes through the MCTP transport.
+3. MCU RT FW can either stage the entire image or write to the final destination as a part of the previous step depending on the SOC construction.
+   a. Note: By SOC security/design construction, the FW/payload that is loaded must NOT be allowed to execute or be used until Caliptra authorizes that the FW/payload.
+4. MCU RT FW will issue the imageID & GO-field bit (bit that Caliptra RT FW would set if the image authorization is successful) to Caliptra RT FW to start off the process of image authorization of the image that was hashed.
+5. Caliptra RT FW will obtain this hash from the internal SHA accelerator register that was used to hash in the previous step.
+6. Caliptra RT FW after verifying/authorizing the image and if it passes, it will set EXEC/GO bit into the register as specified in the previous command. This register  write will also assert a Caliptra interface wire.
+7. MCU RT FW has an option of looking at the Mailbox command success or read the register or use the wire that the register will drive to allow the execution of the FW. This wire allows SOCs to construct a hardened logic of allowing executions from ICCM/TCMs only after the wire is set.
+   a. SOC construction outside of MCU SRAM is SOC specific construction and the spec here provides recommendations on using MCU and Caliptra to build such a logic. Please refer to Caliptra subsystem hardware specification for construction specifics (Hint: These functions are integrated into Manufacturer Control Interface [MCI]).
+   b. Any logic outside of the Caliptra Subsystem boundary is SoC specific and will be custom to the SoC design. This specification provides recommendations for how Caliptra and MCU may be integrated into the SoC.
+
+**FIXME:** Add the visio flow picture
+
+**Subsystem support for Hitless Updates**
+
+**Caliptra Hitless Update**
+
+1. Payloads of all hitless update come over DSP0267 PLDM for Firmware Update over MCTP flow to the MCU similar to the boot time flows.
+2. MCU provides SOC manifest to Caliptra and waits for authentication to be successful. If this wasn’t provided Caliptra will use the latest SOC manifest available.
+   a. If failed, MCU uses DSP0267 PLDM for Firmware Update over MCTP to report the same to the update agent using PLDM protocol
+3. MCU provides the Caliptra FW using Caliptra Mailbox using the hitless update flows documented in the Caliptra specification
+
+**MCU Hitless Update**
+
+1. Payloads of all hitless update come over DSP0267 PLDM for Firmware Update over MCTP flow to the MCU similar to the boot time flows.
+2. MCU provides SOC manifest to Caliptra and waits for authentication to be successful. If this wasn’t provided Caliptra will use the latest SOC manifest available.
+   a. If failed, MCU uses DSP0267 PLDM for Firmware Update over MCTP to report the same to the update agent using PLDM protocol
+3. MCU stages the incoming FW payload in an SOC-defined staging SRAM and provides the MMIO address of the staging memory to Caliptra. It is better to keep this as a part of the authenticated SOC manifest (as a configuration) from a security perspective.
+4. Caliptra RT FW will use the Caliptra DMA engine to issue the read and hash the image (note that the length of the image must be part of the SOC manifest)
+5. Caliptra RT FW after verifying/authorizing the image and if it passes, waits for activate command to be issued from MCU. MCU will get this command over DSP0267 PLDM for Firmware Update over MCTP flow; At this point, Caliptra will reset EXEC/GO bit into the register as specified in the previous command. This register write will also deassert a Caliptra interface wire.
+6. MCU HW logic will use this indication to initiate MCU uC reset flow
+   a. MCU HW logic sends a reset-go-req to MCU uC (an interrupt)
+   b. MCU HW logic waits for reset-go-ack from MCU uC (Note that this handshake exists to ensure uController is in an appropriate quiescent state to take the reset)
+   c. MCU HW logic will assert the reset to the MCU uC
+7. Caliptra RT FW will wait for reset assertion and then read the staged SRAM over AXI manager interface and write the image to the MCU SRAM aperture (that is open to Caliptra only by HW construction).
+   a. The address of the MCU SRAM is provided to Caliptra’s RT FW through SOC manifest.
+   b. Note: From the validation front, need to ensure the Caliptra ROM and MCU are aligned in endianness.
+   c. Note: True downtime of MCU is from when its reset is asserted; It is SOC implementation requirement that it handles (eg. through buffering) all transactions to MCU while it is going through a hitless update.
+8. After the MCU SRAM is populated, Caliptra RT FW will set EXEC/GO bit into the register as specified in the previous command. This register write will also assert a Caliptra interface wire.
+9. MCU HW logic will use this indication to deassert the MCU reset.
+10. MCU ROM will look at the breadcrumb that the MCU SRAM has valid content and will start the execution from it directly. **NOTE:** This breadcrumb should be one of the status bits available on the MCU interface that is set by Caliptra GO bit wires.
+
+**SOC-FW Hitless Update**
+
+SOC may have other components that may need to be updated at run-time in a hitless/impactless manner.
+
+The update flow will follow the same sequence as MCU Hitless update except they are executed by the MCU by using Caliptra as the RoT engine for doing all the required authentication/authorization flows.
+
+Further SOCs may require the hitless update without impacting the workloads/VMs running on the host or the VMs using the devices. This essentially means that impactless update must happen without causing any timeouts to the in-flight transactions. While the treatment of those transactions are device dependent, Caliptra subsystem must provide a way to be able to authenticate and activate the FW in the shortest time possible.
+
+Caliptra subsystem provides this architectural capability as follows:
+1. MCU provides SOC manifest to Caliptra and waits for authentication to be successful. If this wasn’t provided Caliptra will use the latest SOC manifest available.
+   a. If failed, MCU uses DSP0267 PLDM for Firmware Update over MCTP to report the same to the update agent using PLDM protocol
+2. MCU stages all the incoming FW payload in an SOC-defined staging memory and provides the MMIO address of the staging SRAM to Caliptra. It is better to keep this as a part of the authenticated SOC manifest (as a configuration) from security perspective. (**FW Arch requirement:** This SOC-defined staging RAM MMIO offset which can be one for all the images or it could be per image, recommended to keep it the later way, should be defined in the SOC manifest.)
+3. Caliptra RT FW will use the Caliptra DMA engine to issue the read and hash the image (note that the length of the each image must be part of the SOC manifest)
+4. Caliptra RT FW will verify & authorize the images. It will also compare the hash of the images against the “current” hash of each of the image.
+5. MCU will send the ‘activate’ command to Caliptra (which is part of PLDM spec that MCU understands)
+6. If MCU FW is updated/new, Caliptra will execute the MCU Hitless update flow.
+7. Caliptra RT FW will then set the GO bits for all the SOC FWs that are updated (vs what was already running)
+8. SOC specific logic & MCU RT FW will use this information to update the remaining FW using SOC specific architectural flows. **Note:** Since this work is mainly distribution of the FW to the destination uCs, SOC should be built to do this flow as fast as possible to meet workload non-interruption/impactless requirements.
+
+**Multi-Chiplet Flows**
+
+This section explain how generic FW Load Flows would function for SOCs with multiple chiplets that are required to have their security controller functions. It is plausible that a SOC is built with a single security controller active on one chiplet and that serves all other chiplets.
+
+**Note:** Additional control signals that MCU would control are SOC specific and are implemented through SOC widget(s).
+
+1. Primary tile uses Caliptra-Active-Mode at its silicon boot time
+2. Secondary tile’s MCU ROM will go through the same common boot flow as the primary tile (except the peripheral could be inter-chiplet link).
+3. Secondary tile’s MCU ROM will wait for inter-chiplet link to be available for use (this would be an indication to MCU ROM)
+4. Primary tile’s MCU RT FW will fetch the secondary tile’s FW using DSP0267 PLDM for Firmware Update over MCTP T5 flow and ‘stream’ using the same recovery interface protocol to the secondary tile(s).
+5. Based on SOC integration, inter-chiplet could be an intelligent peripheral that can DMA or implement data payload registers for Caliptra to read. 
+   a. Note that the indication from Caliptra for “next-image” follows the same recovery interface protocol.
+   b. Note that to load the remaining images of a secondary tile, SOC can choose to do recovery flow for rest of the remaining images. Depending on the SOC architecture and chiplets, MCU RT FW may coordinate the SOC to boot in such a way that it “broadcasts” the same image to multiple chiplets that require the same image. This is a SOC optimized flow outside of Caliptra or Subsystem Context.
+
+**I3C Recovery Interface**
+
+The I3C recovery interface acts as a standalone I3C target device for recovery. It will have a unique address compared to any other I3C endpoint for the device. It will comply with I3C Basic v1.1.1 specification. It will support I3C read and write transfer operations. It must support Max read and write data transfer of 1-260B excluding the command code (1 Byte), length (2 Byte), and PEC (1 Byte), total 4 Byte I3C header. Therefore, max recovery data per transfer will be limited to 256-byte data.
+	
+I3C recovery interface is responsible for the following list of actions: 
+
+1. Responding to command sent by Recovery Agent (RA)
+2. Updating status registers based on interaction of AC-RoT and other devices
+3. Asserting / Deasserting “payload_available” & “image_activated” signals
+
+**Recovery interface hardware specifications**
+
+[OCP Recovery Document](https://docs.google.com/document/d/1Ge_w9i5A6YKG-7nlTp--JhZf6By7I9oB3oW_2_i7JbE/edit?usp=sharing)
+
+[Flashless Boot using OCP, PCIe, and DMTF Standards](https://docs.google.com/document/d/1Ge_w9i5A6YKG-7nlTp--JhZf6By7I9oB3oW_2_i7JbE/edit?usp=sharing)
+
+**Recovery Interface Hardware**
+
+Please refer to Caliptra subsystem Hardware specification.
+
+**Recovery Sequence**
+
+1. **Initialization step:** Caliptra ROM initializes PROT_CAP, DEVICE_ID, DEVICE_STATUS, RECOVERY_STATUS, HW_STATUS, INDIRECT_FIFO_STATUS (remove these two reg from ROM initialization) default values. Note: Any I3C initialization is done b/w MCU ROM, I3C target HW and I3C initiator. This is not part of this document.
+2. MCU Specific SoC init of I3C & Recovery interface.
+   a. MCU ROM can set HW_STATUS register per recovery spec, at any time based on SOC specific conditions.
+   b. MCU ROM will program DEVICE_ID register value based on associated fuse values.
+   c. I3C device must update FIFO size (1-256 Byte), Max transfer size and type of region (tie this to 0x1) to INDIRECT_FIFO_STATUS register, which could be read by BMC firmware to understand the size of the FIFO & max transfer size.
+3. Caliptra ROM will update PROT_CAP register, bit 11 to set to ‘1 “Flashless boot (From RESET)”. Caliptra ROM will set other register bits based on other recovery capabilities. PROT_CAP will also indicate support for FIFO CMS for I3C device by updating byte 10-11, bit 12 with 0x1 “FIFO CMS Support”.
+4. To start recovery or boot, Caliptra ROM will write DEVICE_STATUS register to “RECOVERY_MODE” by writing byte 0, with data 0x3. Caliptra ROM will write DEVICE_STATUS register’s byte 2-3 to set the FSB parameter (0x12).
+5. I3C Recovery HW will set byte 1 based on the DEVICE_STATUS register based on the rules defined for this register. This register status will assist BMC operation.
+6. Caliptra ROM will write via DMA assist to RECOVERY_STATUS register with data of (byte 0, 0x1) and sets the recovery image index to 0x0 
+7. BMC or a similar platform component will update INDIRECT_FIFO_CTRL with Component Memory Space (CMS) byte 0 with 0x0, Reset field byte 1 with 0x1 and Image size byte 2 to 5 field to size of the image.
+8. BMC or a similar platform component writes to INDIRECT_FIFO_DATA register. I3C device shall return a NACK response for any transfer that would cause the Head Pointer to advance to equal the Tail Pointer. BMC can implement flow control through NACK responses or by monitoring the FIFO space remaining via the Head and Tail Pointers.
+9. The I3C device will keep head and tail pointers along with FIFO status up to date into INDIRECT_FIFO_STATUS register. I3C recovery interface HW wait for an update to INDIRECT_DATA_REG with 1-256B data from BMC.
+10. If there is a write to INDIRECT_DATA_FIFO, I3C device will indicate data availability via side channel implemented as wire “payload_available” ( for more details read here) to Caliptra. Caliptra HW will latch this wire into the register for Caliptra firmware to read.
+11. Caliptra ROM arms DMA interface to read INDIRECT_FIFO_CTRL for the image size and programs DMA engine back to read the image data from INDIRECT_FIFO_DATA.
+12. Steps 9 through 11 repeat until all the images are pushed over I3C and it matches the image size initialized into the INDIRECT_FIFO_CTRL register.
+13. After the above steps, Caliptra ROM Firmware will wait for BMC to activate image indicated to Caliptra via side channel.
+14. If the Image is activated, update RECOVERY STATUS to “Booting recovery image” by writing byte0, with data 0x2. If the image is authenticated, then the Caliptra RT FW will update the image index in RECOVERY_STATUS register (0x1 in byte 0, bits 7:4) and then set then update the byte 0, bit 3:0 to “Awaiting for recovery image” (0x1)
+15. BMC or a similar platform component will send the next image as requested in the image index, and Caliptra RT FW and I3C HW go through the same flow as above.
+
+**BMC or a similar platform component requirements for recovery support**
+
+1. It should not send payload to recovery interface (/I3C target)  device if RECOVERY_CTRL register has byte 2 indicating Image Activated. BMC must wait to clear the byte 2. ( Recovery Interface is responsible for clearing this bye by writing 1).
+2. It must send payload to I3C target device in chunks of 256 bytes ( header (4B) + FW bytes(256B) as I3C target transfer ) only unless it is the last write for the image. Before sending the payload, it must read FIFO empty status from INDIRECT_FIFO_STATUS register.
+3. After last write for the image, it must activate the image after reading INDIRECT_FIFO_STATUS register, FIFO empty status.
+
+**Life Cycle Controller & SOC Debug Architecture**
+
+Please refer to Caliptra subsystem hardware specification.
 
 # Terminology
 
@@ -1285,6 +1490,8 @@ The following acronyms and abbreviations are used throughout this document.
 | <a id="TCG"></a>**TCG**       | Trusted Computing Group                        |
 | <a id="TEE"></a>**TEE**       | Trusted Execution Environment                  |
 | <a id="TRNG"></a>**TRNG**     | True Random Number Generator                   |
+| <a id="MCU"></a>**MCU**       | Manufacturer Control Unit                      |
+| <a id="MCI"></a>**MCI**       | Manufacturer Control Interface                 |
 
 # References
 
@@ -1314,7 +1521,6 @@ The Caliptra Workgroup acknowledges the following individuals for their contribu
 * Bryan Kelly (Microsoft)
 * Caleb Whitehead (Microsoft)
 * Howard Tran (Google)
-* Ishwar Agarwal (Microsoft)
 * James Zhang (NVIDIA)
 * Jeff Andersen (Google)
 * John Traver (AMD)
