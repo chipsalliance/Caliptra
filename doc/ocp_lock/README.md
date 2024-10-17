@@ -1,4 +1,4 @@
-![LOCK Logo](./images/lock/LOCK_logo_large.png)
+![LOCK Logo](./images/LOCK_logo_large.png)
 
 # OCP L.O.C.K.
 
@@ -6,30 +6,30 @@ OCP L.O.C.K. (Layered Open-source Cryptographic Key management) is a feature set
 
 ## Contributors
 
-Andrés Lagar-Cavilla (Google) 
-Amber Huffman (Google)
-Charles Kuzman (Google) 
-Jeff Andersen (Google)
-Chris Sabol (Google)
-Srini Narayanamurthy (Google)
-Lee Prewitt (Microsoft)
-Michael Norris (Microsoft)
-Eric Eilertson (Microsoft)
-Bryan Kelly (Microsoft)
-Anjana Parthasarathy (Microsoft)
-Ben Keen (Microsoft)
-Jisoo Kim (Samsung)
-Gwangbae Chio (Samsung)
-Eric Hibbard (Samsung)
-Mike Allison (Samsung)
-Mike Allison (Solidigm)
-Scott Shadley (Solidigm)
-Gamil Cain (Solidigm)
-Festus Hategekimana (Solidigm)
-John Geldman (Kioxia)
-Fred Knight (Kioxia)
-Paul Suhler (Kioxia)
-James Borden (Kioxia)
+- Andrés Lagar-Cavilla (Google) 
+- Amber Huffman (Google)
+- Charles Kuzman (Google) 
+- Jeff Andersen (Google)
+- Chris Sabol (Google)
+- Srini Narayanamurthy (Google)
+- Lee Prewitt (Microsoft)
+- Michael Norris (Microsoft)
+- Eric Eilertson (Microsoft)
+- Bryan Kelly (Microsoft)
+- Anjana Parthasarathy (Microsoft)
+- Ben Keen (Microsoft)
+- Jisoo Kim (Samsung)
+- Gwangbae Chio (Samsung)
+- Eric Hibbard (Samsung)
+- Mike Allison (Samsung)
+- Mike Allison (Solidigm)
+- Scott Shadley (Solidigm)
+- Gamil Cain (Solidigm)
+- Festus Hategekimana (Solidigm)
+- John Geldman (Kioxia)
+- Fred Knight (Kioxia)
+- Paul Suhler (Kioxia)
+- James Borden (Kioxia)
 
 ## Background
 
@@ -104,11 +104,18 @@ In L.O.C.K., Caliptra as the KMB is the only entity that can derive the MEKs whi
 
 The DEK and storage root key do not require any changes to the host APIs for TCG Opal or KPIO.
 
-Additional host APIs are required to fully model storage root key rotation, PMEKs, and injectable host entropy. Such APIs are currently beyond the scope of the present document.
+Additional host APIs are required to fully model storage root key rotation, PMEKs, and injectable host entropy. Such APIs are beyond the scope of the present document.
+
+### Interfaces
+
+OCP L.O.C.K. provides two interfaces:
+
+- The [cryptographic engine interface](./EngineInterface.md) is exposed from vendor-implemented hardware cryptographic engines to KMB, and defines a standard mechanism for programming MEKs and control messages.
+- The [mailbox interface](./MailboxInterface.md) is exposed from KMB to storage controller firmware, and enables the controller to manage MEKs.
 
 ### MEK derivation
 
-![MEK derivation](./images/lock/mek_derivation.png)
+![MEK derivation](./images/mek_derivation.png)
 
 When controller firmware wishes to program an MEK to the hardware cryptographic engine, it performs the following steps:
 
@@ -123,19 +130,19 @@ When controller firmware wishes to program an MEK to the hardware cryptographic 
 
 #### Sequence to initialize the MEK seed
 
-![MEK initialization](./images/lock/mek_derivation_init.png)
+![MEK initialization](./images/mek_derivation_init.png)
 
 #### Sequence to mix a PMEK into the MEK seed
 
-![PMEK mixing](./images/lock/mek_derivation_pmek_mix.png)
+![PMEK mixing](./images/mek_derivation_pmek_mix.png)
 
 #### Sequence to load an MEK
 
-![MEK loading](./images/lock/mek_derivation_load.png)
+![MEK loading](./images/mek_derivation_load.png)
 
 #### Sequence to load Encryption Engine with Key Cache from SFR interface
 
-![MEK programming](./images/lock/mek_derivation_programming.png)
+![MEK programming](./images/mek_derivation_programming.png)
 
 #### Legacy MEK derivation for TCG Opal
 
@@ -148,12 +155,6 @@ When deriving the user's MEK, the controller can pass zero PMEKs in step 2, and 
 MEKs injected with Key Per I/O will be considered as DEKs under L.O.C.K.
 
 When deriving the associated MEK, the controller can pss zero PMEKs in step 2, and the injected DEK in step 3.
-
-### Hardware cryptographic engine interface
-
-OCP L.O.C.K. defines a standard interface for sharing MEKs and control messages from KMB to vendor-implemented hardware cryptographic engines.
-
-TODO: provide a pointer to the interface definition.
 
 ### PMEK lifecycle
 
@@ -254,4 +255,5 @@ It is anticipated that controller firmware will perform its own vendor-specific 
 
 - Get random bytes, using a DRBG as defined in NIST [SP 800-90A](https://csrc.nist.gov/pubs/sp/800/90/a/r1/final)
 - Perform AES-256-GCM encryption or decryption, as defined in NIST [SP 800-38D](https://csrc.nist.gov/pubs/sp/800/38/d/final)
+- Perform AES-256-KeyWrap encryption or decryption, as defined in NIST [SP 800-38F](https://csrc.nist.gov/pubs/sp/800/38/f/final)
 - Perform HMAC-384-KDF key derivation, as defined in NIST [SP 800-108](https://csrc.nist.gov/pubs/sp/800/108/r1/upd1/final)
