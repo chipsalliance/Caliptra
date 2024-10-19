@@ -1292,7 +1292,7 @@ The Caliptra subsystem offers a complete RoT subsystem, with open source program
 
 1. SOC Manager goes through Caliptra 1.x flows => loads Caliptra FW using Caliptra 1.x flows, Caliptra sets RT ready and SOC  <-> Caliptra boot flow is done.
    
-**_(Caliptra-Active-Mode)_**
+**_(Caliptra-Subsystem-Mode)_**
 
 1. Caliptra ROM waits for SOC infrastructure readiness indication. If this indication is set, Caliptra will do the identity derviation flows. If it is not set, then this flow is run when the SOC infrastructure readiness indication is set.
 2. Caliptra ROM will follow the recovery interface protocol to load its FW. Please see the specific section for next level specifics; At a high level, Caliptra ROM sets the device ready in the I3C controller and poll I3C for the payloads.
@@ -1401,7 +1401,7 @@ This section explain how generic FW Load Flows would function for SOCs with mult
 
 **Note:** Additional control signals that MCU would control are SOC specific and are implemented through SOC widget(s).
 
-1. Primary tile uses Caliptra-Active-Mode at its silicon boot time
+1. Primary tile uses Caliptra-Subsystem-Mode at its silicon boot time
 2. Secondary tile’s MCU ROM will go through the same common boot flow as the primary tile (except the peripheral could be inter-chiplet link).
 3. Secondary tile’s MCU ROM will wait for inter-chiplet link to be available for use (this would be an indication to MCU ROM)
 4. Primary tile’s MCU RT FW will fetch the secondary tile’s FW using DSP0267 PLDM for Firmware Update over MCTP T5 flow and ‘stream’ using the same recovery interface protocol to the secondary tile(s).
