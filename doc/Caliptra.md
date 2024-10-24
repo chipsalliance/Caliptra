@@ -87,7 +87,7 @@ In this version of the specification, the desired capabilities address the basic
 
 ### DICE Protection Environment
 
-Caliptra implements the DICE Protection Environment (DPE) API, allowing it to derive and wield a DICE identity on behalf of other elements within the SoC. Use cases for this API include serving as a signing oracle for a Security Protocol and Data Model (SPDM) responder that is executing in a SoC application processor (in passive mode) or in the Manufacturer Control Unit (in subsystem mode), as well as authentication to a discrete TPM device.
+Caliptra implements the DICE Protection Environment (DPE) API, allowing it to derive and wield a DICE identity on behalf of other elements within the SoC. Use cases for this API include serving as a signing oracle for a Security Protocol and Data Model (SPDM) responder that is executing in a SoC application processor (in passive mode) or in the Manufacturer Control Unit (MCU in subsystem mode), as well as authentication to a discrete TPM device.
 
 # Industry standards and specifications
 
@@ -103,18 +103,16 @@ Per [Reference 1](#ref-1), RoT subsystems are required to fulfill three principl
 
 These RoT services can be hosted by a complex RoT as a whole or these services can be spread across one or more components within a platform. This determination has a basis in physical risk. Physical adversaries with reasonable skill can bypass a discrete RoT’s detection capabilities, for example, with SPI interposers.
 
-However, a RoT embedded within a SoC or ASIC represents a much higher detection bar for a physical adversary to defeat. For this reason, Caliptra 2.0 Core, the cryptographic module shall deliver the **Detection** capability for itself while providing **Measurement** and **Identity** services for the rest of the SoC. The **Measurement** and **Identity** services that Caliptra provides can be used by the SoC to create **Detection** capability for the measured firmware and configuration data.
+However, a RoT embedded within a SoC or ASIC represents a much higher detection bar for a physical adversary to defeat. For this reason in Caliptra 2.0 Core, the cryptographic module shall deliver the **Detection** capability for itself while providing **Measurement** and **Identity** services for the rest of the SoC. The **Measurement** and **Identity** services that Caliptra provides can be used by the SoC to create **Detection** capability for the measured firmware and configuration data.
 
-With the objectives of the RoT are minimalistic scope for Silicon RoT and maximizing applicability and adoption of this specification, **Update** and **Recovery** are decoupled from Caliptra Core and are expected to be provided either by Caliptra 2.0 Subsystem or are expected to be provided by an external RoT subsystem, such as a discrete RoT board element on a datacenter platform (passive mode). Because a physical adversary can trivially nullify any recovery or update capabilities, no matter where implemented, decoupling represents no regression in a security posture, while enabling simplicity and applicability for the internal SoC silicon RoT.
+The objectives of Caliptra Core are minimalistic scope and maximum applicability. To that end, **Update** and **Recovery** are decoupled are decoupled from Caliptra Core and are expected to be provided either by Caliptra 2.0 Subsystem or are expected to be provided by an external RoT subsystem, such as a discrete RoT board element on a datacenter platform (passive mode). Because a physical adversary can trivially nullify any recovery or update capabilities, no matter where implemented, decoupling represents no regression in a security posture, while enabling simplicity and applicability for the internal SoC Silicon RoT.
  
-With the objectives of the RoT are minimalistic scope for Silicon RoT and maximizing applicability and adoption of this specification, **Update** and **Recovery** are decoupled from Caliptra and are expected to be provided by an external RoT subsystem, such as a discrete RoT board element on a datacenter platform. Because a physical adversary can trivially nullify any recovery or update capabilities, no matter where implemented, decoupling represents no regression in a security posture, while enabling simplicity and applicability for the internal SoC silicon RoT.
-
 Detection of corrupted critical code and data (configuration) requires strong end to end cryptographic integrity verification. To meet the RTD requirements, Silicon RoT shall:
 
-* Cryptographically verify its code and configuration
+* Cryptographically verify & measure its code and configuration
 * Sign these measurements with a unique attestation key
 * Report measurements to a host or external entity, which can further verify the authenticity and integrity of the device (also known as *attestation*)
-* **Recovery** follows Open Compute Project Secure Recovery flows and Streaming Boot.
+* **Recovery** follows Open Compute Project Secure Recovery flows and Streaming Boot. (FIXME: Add links to released specs; they are in draft mode now)
   
 **Measurements** and **Verification** include **Code** and **Configuration**. Configuration includes invasive capabilities that impact the user service level agreement (SLA) on confidentiality; for example, the enablement of debug capabilities that grant an operator access to raw, unencrypted registers for any tenant context. In order to measure and attest configuration, the Silicon RoT must be in control of the configuration.
 
@@ -1261,11 +1259,11 @@ The Caliptra subsystem offers a complete RoT subsystem, with open source program
 ![](./images/Subsystem.png)
 
 # Caliptra Subsystem Trademark Compliance 
-- Caliptra subsystem trademark compliance shall have Caliptra core 2.0, Life Cycle Controller, Fuse Controller, I3C with recovery interface, MCU and MCI taken as is without change to ensure there is hardware transparency and consistency. 
+- Caliptra subsystem trademark compliance shall have Caliptra Core 2.0, Life Cycle Controller, Fuse Controller, I3C with recovery interface, Manufacture Control Unit (MCU) and Manufacturer Control Interface (MCI) taken as is without change to ensure there is hardware transparency and consistency. 
 - Caliptra subsystem provides life cycle state to the SoC.
  
 # SoC Integration Flexibility
-- SoC may choose to add PLLs (Phase Locked Loop for stable clock generation), SoC specific mailboxes , SoC specific firewalls & address translations, Environmental circuitry as some examples.
+- SoC may choose to add PLLs (Phase Locked Loop for stable clock generation), SoC specific mailboxes, SoC specific firewalls & address translations, environmental circuitry as some examples.
 - Caliptra subsystem provides flexibility to SoC to remap subsystem driven debug levels to SoC specific debug policies.
 - Please see Subsystem hardware and integration specifications for additional details on subsystem configurability (FIXME: Add md versions once available; right now they are uploaded as pdfs in Caliptra-SS repository's doc folder).
 
