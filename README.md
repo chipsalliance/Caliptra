@@ -27,9 +27,10 @@ marks](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkPoli
 
 * [Main Caliptra specification 1.x](https://github.com/chipsalliance/Caliptra/blob/main/doc/caliptra_1x/Caliptra.md) 
 * [Main Caliptra specification 2.0 - WIP](https://github.com/chipsalliance/Caliptra/blob/main/doc/Caliptra.md)
-* [Hardware Specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraHardwareSpecification.md)
-* [Hardware Integration
+* [Caliptra Core Hardware Specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraHardwareSpecification.md)
+* [Caliptra Core Hardware Integration
   Specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md)
+* [Caliptra Subsystem Hardware Specification](https://github.com/chipsalliance/caliptra-ss/blob/main/docs/Caliptra%202.0%20Subsystem%20Specification%201.pdf)
 * [ROM](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md)
 * [FMC](https://github.com/chipsalliance/caliptra-sw/blob/main/fmc/README.md)
 * [Firmware](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md)
