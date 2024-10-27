@@ -866,7 +866,7 @@ Caliptra firmware is composed of two images: an FMC image and an application fir
 *Figure 7: Firmware image layout*
 
 To verify the firmware, Caliptra ROM performs the following steps:
-1. Calculates the hash of the vendor key descriptors in the preamble and compares it against the hash in fuses (key_manifest_pk_hash). If the lifecycle is not "unprovisioned" and the hashes do not match, the boot fails.
+1. Calculates the hash of the vendor [key descriptors](#table-17-public-key-descriptor) in the preamble and compares it against the hash in fuses (key_manifest_pk_hash). If the lifecycle is not "unprovisioned" and the hashes do not match, the boot fails.
 2. Calculates the hashes of the active vendor public keys and compares it against the hashes in the key descriptors identified by the corresponding active key indices.
 3. Calculates the hash of the owner public keys in the preamble and compares it against the hash in fuses (owner_pk_hash). If the owner_pk_hash fuse is not zero (i.e., unprovisioned) and hashes do not match, the boot fails. See the [Owner authorization](#owner-authorization) section.
 4. Ensures the vendor public key(s) selected by the preamble indices are not revoked based on fuse: key_manifest_pk_hash_mask for ECDSA public key, pqc_revocation for LMS or MLDSA public key.
@@ -882,18 +882,7 @@ To verify the firmware, Caliptra ROM performs the following steps:
 
 In addition to cold boot, Caliptra ROM performs firmware verification on hitless updates. See the [hitless update](#hitless-update) section for details.
 
-*Table 16: Public Key Descriptor*
-
-| Field | Size (bytes) | Description|
-|-------|--------|------------|
-| Key Descriptor Version | 1 | Version of the Key Descriptor. The value must be 0x1 for Caliptra 2.x |
-| Intent | 1 | 0x1 - Vendor  <br> 0x2 - Owner |
-| Key Type | 1 | 0x1 - ECC  <br> 0x2 - LMS <br> 0x3 - MLDSA |
-| Key Hash Count | 1 | Number of public key hashes (n) |
-| Public Key Hash(es) | 48 * n | List of SHA2-384 public key hashes |
-
-*Table 17: Firmware manifest preamble*
-
+*Table 16: Firmware manifest preamble*
 
 Fields are little endian unless described otherwise.
 
@@ -902,21 +891,33 @@ Fields are little endian unless described otherwise.
 | Firmware Manifest Marker | 4 | Magic Number marking the start of the package manifest. The value must be 0x434D414E (‘CMAN’ in ASCII)|
 | Firmware Manifest Size | 4 | Size of the full manifest structure |
 | Firmware Manifest Type | 4 |  **Byte0:** - Type <br> 0x1 – ECDSA & LMS Keys <br> 0x2 – ECDSA & MLDSA Keys <br> **Byte1-Byte3:** Reserved|
-| Vendor Key Descriptor - 1 | Variable | Public Key Descriptor for ECDSA keys |
-| Vendor Key Descriptor - 2 | Variable | Public Key Descriptor for LMS or MLDSA keys |
-| Active Key Index - 1 | 4 | Public Key Index for the active ECDSA key |
-| Active Key - 1 | 96 | ECDSA P384 public key used to verify the Firmware Manifest Header Signature <br> **X-Coordinate:** Public Key X-Coordinate (48 bytes, big endian) <br> **Y-Coordinate:** Public Key Y-Coordinate (48 bytes, big endian) |
-| Active Key Index - 2 | 4 | Public Key Index for the active LMS or MLDSA key |
-| Active Key - 2 | 48 or 2592 | LMS public key used to verify the Firmware Manifest Header Signature. <br> **tree_type:** LMS Algorithm Type (4 bytes, big endian) Must equal 12. <br> **otstype:** LM-OTS Algorithm Type (4 bytes, big endian) Must equal 7. <br> **id:**  (16 bytes) <br> **digest:**  (24 bytes) <br><br>**OR**<br><br>MLDSA-87 public key used to verify the Firmware Manifest Header Signature. <br> (2592 bytes)|
+| Vendor ECDSA Key Descriptor | 196 | Public Key Descriptor for ECDSA keys |
+| Vendor LMS or MLDSA Key Descriptor | 1540 | Public Key Descriptor for LMS (1540 bytes) or MLDSA (196 bytes + 1344 unused bytes) keys |
+| Active ECDSA Key Index | 4 | Public Key Index for the active ECDSA key |
+| Active ECDSA Key | 96 | ECDSA P384 public key used to verify the Firmware Manifest Header Signature <br> **X-Coordinate:** Public Key X-Coordinate (48 bytes, big endian) <br> **Y-Coordinate:** Public Key Y-Coordinate (48 bytes, big endian) |
+| Active LMS or MLDSA Key Index | 4 | Public Key Index for the active LMS or MLDSA key |
+| Active LMS or MLDSA Key | 2592 | LMS public key (48 bytes + 2544 unused bytes) used to verify the Firmware Manifest Header Signature. <br> **tree_type:** LMS Algorithm Type (4 bytes, big endian) Must equal 12. <br> **otstype:** LM-OTS Algorithm Type (4 bytes, big endian) Must equal 7. <br> **id:**  (16 bytes) <br> **digest:**  (24 bytes) <br><br>**OR**<br><br>MLDSA-87 public key used to verify the Firmware Manifest Header Signature. <br> (2592 bytes)|
 | Vendor ECDSA Signature | 96 | Vendor ECDSA P384 signature of the Firmware Manifest header hashed using SHA384. <br> **R-Coordinate:** Random Point (48 bytes, big endian) <br> **S-Coordinate:** Proof (48 bytes, big endian) |
-| Vendor LMS or MLDSA Signature | 1620 or 4628 | Vendor LMS signature of the Firmware Manifest header hashed using SHA384. <br> **q:** Leaf of the Merkle tree where the OTS public key appears (4 bytes) <br> **ots:** LM-OTS Signature (1252 bytes) <br> **tree_type:** LMS Algorithm Type (4 bytes, big endian) Must equal 12. <br> **tree_path:** Path through the tree from the leaf associated with the LM-OTS signature to the root. (360 bytes) <br><br>**OR**<br><br> Vendor MLDSA-87 signature of the Firmware Manifest header hashed using SHA512 (4627 bytes + 1 Reserved byte).|
-| Owner Key Descriptor - 1 | Variable | Public Key Descriptor for ECDSA keys |
-| Owner Key Descriptor - 2 | Variable | Public Key Descriptor for LMS or MLDSA keys |
+| Vendor LMS or MLDSA Signature | 4628 | Vendor LMS signature (1620 bytes + 3008 unused bytes) of the Firmware Manifest header hashed using SHA384. <br> **q:** Leaf of the Merkle tree where the OTS public key appears (4 bytes) <br> **ots:** LM-OTS Signature (1252 bytes) <br> **tree_type:** LMS Algorithm Type (4 bytes, big endian) Must equal 12. <br> **tree_path:** Path through the tree from the leaf associated with the LM-OTS signature to the root. (360 bytes) <br><br>**OR**<br><br> Vendor MLDSA-87 signature of the Firmware Manifest header hashed using SHA512 (4627 bytes + 1 Reserved byte).|
+| Owner ECDSA Key Descriptor | 52 | Public Key Descriptor for ECDSA key |
+| Owner LMS or MLDSA Key Descriptor | 52 | Public Key Descriptor for LMS or MLDSA key |
 | Owner ECDSA Public Key | 96 | ECDSA P384 public key used to verify the Firmware Manifest Header Signature. <br> **X-Coordinate:** Public Key X-Coordinate (48 bytes, big endian) <br> **Y-Coordinate:** Public Key Y-Coordinate (48 bytes, big endian)|
-| Owner LMS or MLDSA Public Key | 48 or 2592 | LMS public key used to verify the Firmware Manifest Header Signature. <br> **tree_type:** LMS Algorithm Type (4 bytes, big endian) Must equal 12. <br> **otstype:** LM-OTS Algorithm Type (4 bytes, big endian) Must equal 7. <br> **id:**  (16 bytes) <br> **digest:**  (24 bytes) <br><br>**OR**<br><br>MLDSA-87 public key used to verify the Firmware Manifest Header Signature. <br> (2592 bytes)|
+| Owner LMS or MLDSA Public Key | 2592 | LMS public key (48 bytes + 2544 unused bytes)  used to verify the Firmware Manifest Header Signature. <br> **tree_type:** LMS Algorithm Type (4 bytes, big endian) Must equal 12. <br> **otstype:** LM-OTS Algorithm Type (4 bytes, big endian) Must equal 7. <br> **id:**  (16 bytes) <br> **digest:**  (24 bytes) <br><br>**OR**<br><br>MLDSA-87 public key used to verify the Firmware Manifest Header Signature. <br> (2592 bytes)|
 | Owner ECDSA Signature | 96 | Vendor ECDSA P384 signature of the Firmware Manifest header hashed using SHA384. <br> **R-Coordinate:** Random Point (48 bytes, big endian) <br> **S-Coordinate:** Proof (48 bytes, big endian) |
-| Owner LMS or MLDSA Signature | 1620 or 4628 | Owner LMS signature of the Firmware Manifest header hashed using SHA384. <br> **q:** Leaf of the Merkle tree where the OTS public key appears (4 bytes) <br> **ots:** LM-OTS Signature (1252 bytes) <br> **tree_type:** LMS Algorithm Type (4 bytes, big endian) Must equal 12. <br> **tree_path:** Path through the tree from the leaf associated with the LM-OTS signature to the root. (360 bytes) <br><br>**OR**<br><br> Owner MLDSA-87 signature of the Firmware Manifest header hashed using SHA512 (4627 bytes + 1 Reserved byte).|
+| Owner LMS or MLDSA Signature | 4628 | Owner LMS signature (1620 bytes + 3008 unused bytes) of the Firmware Manifest header hashed using SHA384. <br> **q:** Leaf of the Merkle tree where the OTS public key appears (4 bytes) <br> **ots:** LM-OTS Signature (1252 bytes) <br> **tree_type:** LMS Algorithm Type (4 bytes, big endian) Must equal 12. <br> **tree_path:** Path through the tree from the leaf associated with the LM-OTS signature to the root. (360 bytes) <br><br>**OR**<br><br> Owner MLDSA-87 signature of the Firmware Manifest header hashed using SHA512 (4627 bytes + 1 Reserved byte).|
 | Reserved | 8 | Reserved 8 bytes |
+
+#### *Table 17: Public Key Descriptor*
+
+Fields are little endian unless described otherwise.
+
+| Field | Size (bytes) | Description|
+|-------|--------|------------|
+| Key Descriptor Version | 1 | Version of the Key Descriptor. The value must be 0x1 for Caliptra 2.x |
+| Intent | 1 | Type of the descriptor <br> 0x1 - Vendor  <br> 0x2 - Owner |
+| Key Type | 1 | Type of the key in the descriptor <br> 0x1 - ECC  <br> 0x2 - LMS <br> 0x3 - MLDSA |
+| Key Hash Count | 1 | Number of valid public key hashes  |
+| Public Key Hash(es) | 48 * n | List of valid and invalid (if any) SHA2-384 public key hashes. ECDSA: n = 4, LMS: n = 32, MLDSA: n = 4 |
 <br>
 
 *Table 18: Firmware manifest header*
