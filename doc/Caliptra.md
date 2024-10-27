@@ -872,8 +872,8 @@ To verify the firmware, Caliptra ROM performs the following steps:
 4. Ensures the vendor public key(s) selected by the preamble indices are not revoked based on fuse: key_manifest_pk_hash_mask for ECDSA public key, pqc_revocation for LMS or MLDSA public key.
 5. Calculates the hash of the first byte through the vendor data field of the header (this includes the TOC digest). This is the vendor firmware digest.
 6. Calculates the hash of the first byte through the owner data field of the header (this includes the TOC digest). This is the owner firmware digest.
-7. Verifies the vendor signature using the vendor firmware digest from step 4 and the vendor key(s) from step 3.
-8. Verifies the owner signature using the owner firmware digest from step 5 and the owner key(s) from step 2.
+7. Verifies the vendor signature using the vendor firmware digest from step 5 and the vendor key(s) from step 4.
+8. Verifies the owner signature using the owner firmware digest from step 6 and the owner key(s) from step 3.
 9. Verifies the TOC against the TOC digest that was verified in steps 6 and 7. The TOC contains the SVNs and digests for the FMC and runtime images.
 10. Verifies the FMC against the FMC digest in the TOC.
 11. If Caliptra is not in "unprovisioned" lifecycle state or "anti-rollback disable" state, ROM compares the FMC SVN against FMC SVN fuse (fuse_key_manifest_svn).
