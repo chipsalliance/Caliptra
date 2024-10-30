@@ -1295,7 +1295,7 @@ The Caliptra subsystem offers a complete RoT subsystem, with open source program
 
 1. SoC Manager goes through Caliptra 1.x flows => loads Caliptra FW using Caliptra 1.x flows, Caliptra sets RT ready and SOC  <-> Caliptra boot flow is done.
 
-**_(Caliptra-Active-Mode)_**
+**_(Caliptra-Subsystem-Mode)_**
 
 1. Caliptra ROM waits for SoC infrastructure readiness indication. If this indication is set, Caliptra will do the identity derviation flows. If it is not set, then this flow is run when the SoC infrastructure readiness indication is set.
 2. Caliptra ROM will follow the recovery interface protocol to load its FW. Please see the specific section for next level specifics; At a high level, Caliptra ROM sets the device ready in the I3C controller and poll I3C for the payloads.
