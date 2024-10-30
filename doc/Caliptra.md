@@ -337,7 +337,9 @@ An ideal IDevID has the following properties:
 * Cannot be cloned to additional devices of the same class.
 * Private component cannot be extracted from Caliptra.
 
-Caliptra 1.0 alone does not fully address these properties. For example, a person-in-the-middle supply chain adversary could impersonate Caliptra by submitting its own IDevID Certificate Signing Request (CSR) to the pCA. Vendors should threat model the IDevID generation and endorsement flows for their SoC. Threat actors to consider are the following:
+Caliptra 2.0 provides integrity over IDevID Certificate Signing Requests (CSRs).
+
+Caliptra 1.0 alone does not fully address these properties. For example, a person-in-the-middle supply chain adversary could impersonate Caliptra by submitting its own IDevID CSR to the pCA. Vendors should threat model the IDevID generation and endorsement flows for their SoC. Threat actors to consider are the following:
 
 * Components involved in UDS injection flows: can they inject the same obfuscated UDS to multiple devices, or to devices of different classes? Can they wield the obfuscation key to leak the UDS?
 * Components servicing the connectivity between the Caliptra instantiation and the HSM applicance performing IDevID endorsement: can they alter or impersonate Caliptra's IDevID CSR?
@@ -1008,6 +1010,10 @@ To provide a balance between the number of signatures allowed and signature size
 
 Caliptra supports 32 LMS trees for the vendor and 1 tree for the owner. The SoC can support multiple trees for the owner via ownership transfer. It is recommended that the LMS trees are created from multiple HSMs that are geographically distributed.
 
+Caliptra has an option starting in 2.0 to use ML-DSA-87 signatures in addition to ECDSA to support FIPS 204 and CNSA 2.0 requirements for category 5.
+
+Caliptra provides cryptographic servies to support ML-KEM (in addition to ECDH) key exchanges.
+
 ### Key rotation
 
 Firmware signing key rotation shall follow the requirements described in [Reference 3](#ref-3).
@@ -1125,6 +1131,20 @@ The PAUSER field of the APB interface is used to encode device attributes for th
 ### Mailbox commands
 
 The Caliptra mailbox commands are specified in the [Caliptra runtime firmware specification](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#maibox-commands).
+
+### Cryptographic mailbox commands
+
+Cryptographic mailbox (CM) commands are a flexible set of mailbox commands that provide access to Caliptra's cryptographic cabilities.
+This is meant for key storage and use to support protocols like SPDM and OCP LOCK.
+
+These commands are not meant to be high-performance as they are accessed via mailbox commands.
+
+Key material and data will be stored in an encrypted and authenticated section of DCCM. Keys are used via handles that refer to portions of DCCM.
+
+These mailbox commands extend Caliptra's cryptographic support to include SHA, HMAC, HKDF, AES, ECDH, ML-KEM, and RNG services in addition ECDSA and ML-DSA.
+
+The [runtime firmware specification](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#cryptographic-mailbox-commands-new-in-20) contains further details.
+
 
 ### Hash calculation HW API (Subsystem mode only)
 
