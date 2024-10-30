@@ -208,7 +208,7 @@ Trust levels of Caliptra and the SoC security engine are not hierarchical. These
 
 ### Caliptra interactions
 
-The Caliptra Core blocks consume the Tc and Tcw trust level components. This boundary includes crypto accelerators, hardware key sequencer, key vault, Caliptra microcontroller, ROM, and subsystem interconnects. The Caliptra Core provides deterministic Caliptra behavior. Caliptra interacts with components in the Tse and Trs trust levels.
+The Caliptra Core blocks consume the Tc and Tcw trust level components. This boundary includes crypto accelerators, hardware key sequencer, key vault, Caliptra microcontroller, ROM, and subsystem interconnects. The Caliptra Core provides deterministic Caliptra behavior. Caliptra Core interacts with components in the Tse and Trs trust levels; while Caliptra Subsystem abosrbs the Tse functions.
 
 ### <a id="assets"></a>Caliptra assets and threats
 
