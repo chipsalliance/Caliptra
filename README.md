@@ -25,18 +25,22 @@ marks](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkPoli
 
 ## Specifications
 
-* [Main Caliptra specification 1.x](https://github.com/chipsalliance/Caliptra/blob/main/doc/caliptra_1x/Caliptra.md) 
-* [Main Caliptra specification 2.0 - WIP](https://github.com/chipsalliance/Caliptra/blob/main/doc/Caliptra.md)
-* [Caliptra Core Hardware Specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraHardwareSpecification.md)
-* [Caliptra Core Hardware Integration
-  Specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md)
-* [Caliptra Subsystem Hardware Specification](https://github.com/chipsalliance/caliptra-ss/blob/main/docs/Caliptra%202.0%20Subsystem%20Specification%201.pdf)
-* [ROM 1.x](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md)
-* [ROM 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/rom/dev/README.md)
-* [FMC](https://github.com/chipsalliance/caliptra-sw/blob/main/fmc/README.md)
-* [FMC 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/fmc/README.md)
-* [Runtime](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md)
-* [Runtime 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/runtime/README.md)
+### Caliptra 1.x:
+  * [Main Caliptra specification 1.x](https://github.com/chipsalliance/Caliptra/blob/main/doc/caliptra_1x/Caliptra.md) 
+  * [Caliptra Core Hardware Specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraHardwareSpecification.md)
+  * [Caliptra Core Hardware Integration
+    Specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md)
+  * [ROM 1.x](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md)
+  * [FMC](https://github.com/chipsalliance/caliptra-sw/blob/main/fmc/README.md)
+  * [Runtime](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md)
+
+### Caliptra 2.x:
+  * [Main Caliptra specification 2.0 - Version 0.5](https://github.com/chipsalliance/Caliptra/blob/main/doc/Caliptra.md)
+  * [Caliptra Subsystem Hardware Specification - Version 0.5](https://github.com/chipsalliance/caliptra-ss/blob/main/docs/Caliptra%202.0%20Subsystem%20Specification%201.pdf)
+  * **Note:** Hardware integration specs will be following the RTL Freezes & Releases timelines
+  * [ROM 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/rom/dev/README.md)
+  * [FMC 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/fmc/README.md)
+  * [Runtime 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/runtime/README.md)
 
 ## Test Dashboards
 
