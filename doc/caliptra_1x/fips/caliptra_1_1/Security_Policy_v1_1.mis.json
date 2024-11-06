@@ -1,0 +1,731 @@
+{
+  "schemaVersion": "2.8.4",
+  "vendorInfo": { "vendorName": "Caliptra WG", "addressLine1": "", "addressLine2": "", "addressLine3": "",
+    "city": "", "stateProvince": "", "postalCode": "", "country": "",
+    "website": "", "productLink": "",
+    "contactName1": "", "email1": "john.traver@amd.com", "phone1": "", "fax1": "",
+    "contactName2": "", "email2": "", "phone2": "", "fax2": ""
+  },
+  "labInfo": {"labName": "Dekra", "labCode": "", "labInternalId": "",
+    "title1": "", "signature1": "",
+    "title2": "", "signature2": "",
+    "title3": "", "signature3": "",
+    "tester1Name": "", "tester1Cvp": "",
+    "tester2Name": "", "tester2Cvp": "",
+    "reviewer1Name": "",
+    "reviewer2Name": ""
+  },
+  "moduleInfo": { "name": "Caliptra v1.1 Root of Trust for Measurement (RTM)", "description": "", "type": "Hardware",
+    "embodiment": "SingleChip", "opEnvType": "Limited", "itar": false, "addToMipList": true,
+    "fipsVersion": "FIPS 140-3", "count": 1,
+    "cstlTid": "", "csecTid": "0000",
+    "transmissionCode": "", "explanation": "", "scenario": "", "commentsRound": 0,
+    "certificateCaveat": "", "specialInstructions": "",
+    "pivCertNumber": ""
+  },
+  "securityLevelInfo": {"overallLevel": 1,
+    "secLevels": [
+      { "section": 1,  "level": 1 },
+      { "section": 2,  "level": 1 },
+      { "section": 3,  "level": 1 },
+      { "section": 4,  "level": 1 },
+      { "section": 5,  "level": 1 },
+      { "section": 6,  "level": 0 },
+      { "section": 7,  "level": 1 },
+      { "section": 8,  "level": 0 },
+      { "section": 9,  "level": 1 },
+      { "section": 10, "level": 1 },
+      { "section": 11, "level": 3 },
+      { "section": 12, "level": 1 }
+    ]
+  },
+  "supplementalSettingList": [
+    { "suppId":  1, "name": "Otar", "setting": false },
+    { "suppId":  2, "name": "NonApprovedMode", "setting": false },
+    { "suppId":  3, "name": "Initialization", "setting": null },
+    { "suppId":  4, "name": "ExcludedComponents", "setting": false },
+    { "suppId":  5, "name": "DegradedMode", "setting": false },
+    { "suppId":  6, "name": "PaaPai", "setting": null },
+    { "suppId":  7, "name": "EmbeddedBound", "setting": null },
+    { "suppId":  8, "name": "CriticalFunctions", "setting": false },
+    { "suppId":  9, "name": "SubChip", "setting": true },
+    { "suppId": 10, "name": "NonApprovedinApprovedMode", "setting": false },
+    { "suppId": 11, "name": "ExternalInputDevice", "setting": false },
+    { "suppId": 12, "name": "ExternalOutputDevice", "setting": false },
+    { "suppId": 13, "name": "TrustedChannel", "setting": false },
+    { "suppId": 14, "name": "ConcurrentOperators", "setting": null },
+    { "suppId": 15, "name": "IdentityAuth", "setting": false },
+    { "suppId": 16, "name": "Bypass", "setting": false },
+    { "suppId": 17, "name": "MaintenanceRole", "setting": false },
+    { "suppId": 18, "name": "ChangeRoles", "setting": null },
+    { "suppId": 19, "name": "FirstTimeAuth", "setting": null },
+    { "suppId": 20, "name": "ExternalLoading", "setting": false },
+    { "suppId": 21, "name": "NonReconfigMemory", "setting": null },
+    { "suppId": 22, "name": "OpenSource", "setting": null },
+    { "suppId": 23, "name": "MaintenanceAccess", "setting": false },
+    { "suppId": 24, "name": "Ventilation", "setting": false },
+    { "suppId": 25, "name": "CoversDoors", "setting": false },
+    { "suppId": 26, "name": "TamperSeals", "setting": false },
+    { "suppId": 27, "name": "TamperSealInstall", "setting": false },
+    { "suppId": 28, "name": "EfpEft", "setting": false },
+    { "suppId": 29, "name": "PlaintextOutput", "setting": null },
+    { "suppId": 30, "name": "ManualDirectEntry", "setting": false },
+    { "suppId": 31, "name": "SplitKnowledge", "setting": false },
+    { "suppId": 32, "name": "OptMemory", "setting": false },
+    { "suppId": 33, "name": "RelevantCVEs", "setting": null },
+    { "suppId": 34, "name": "MitigateAttacks", "setting": false },
+    { "suppId": 35, "name": "NonNISTCurves", "setting": false },
+    { "suppId": 36, "name": "EDCUsed", "setting": false },
+    { "suppId": 37, "name": "ImageReplacement", "setting": null },
+    { "suppId": 38, "name": "ControlOutput", "setting": false },
+    { "suppId": 39, "name": "NonCompliantState", "setting": false },
+    { "suppId": 40, "name": "RemotelyTested", "setting": null },
+    { "suppId": 41, "name": "140-3Changes", "setting": null },
+    { "suppId": 42, "name": "RoleAuth", "setting": true },
+    { "suppId": 43, "name": "MultiAuth", "setting": null }
+  ],
+  "cavpCertSet": {
+    "cavpCertList": [
+      { "vendorName": "Caltipra Vendor", "certName": "Aa0001", "implName": "Caliptra SHA2 Acc Engine",
+        "implType": "Hardware", "implVersion": "1.0", "implOrganization": "Caliptra WG",
+        "validationId": 100001
+      },
+      { "vendorName": "Caltipra Vendor", "certName": "Aa0002", "implName": "Caliptra ECC KPDF",
+        "implType": "Hardware", "implVersion": "1.1", "implOrganization": "Caliptra WG",
+        "validationId": 100002
+      },
+      { "vendorName": "Caltipra Vendor", "certName": "Aa0003", "implName": "Caliptra RTM",
+        "implType": "Firmware", "implVersion": "1.1", "implOrganization": "Caliptra WG",
+        "validationId": 100003
+      }
+    ],
+    "cavpOeList": [
+      { "name": "Caliptra Vendor DCSoC OE", "oeId": 88888 }
+    ],
+    "cavpOeAlgoList": [],
+    "cavpImplAlgoList": [
+      { "category": "Digest", "certName": "Aa0001", "algoDisplayName": "SHA2-384", 
+        "canonicalAlgorithmId": 132, "implName": "Caliptra Vendor DCSoC Digest", "validationId": 100001
+      },
+      { "category": "Digest", "certName": "Aa0001", "algoDisplayName": "SHA2-512", 
+        "canonicalAlgorithmId": 133, "implName": "Caliptra Vendor DCSoC Digest", "validationId": 100001
+      },
+      { "category": "ECC KPDF", "certName": "Aa0002", "algoDisplayName": "SHA2-384",
+        "canonicalAlgorithmId": 132, "implName": "Caliptra Vendor DCSoC TBDA", "validationId": 100003
+      },
+      { "category": "ECC KPDF", "certName": "Aa0002", "algoDisplayName": "HMAC-SHA2-384", 
+        "canonicalAlgorithmId": 71, "implName": "Caliptra Vendor DCSoC TBDA", "validationId": 100003
+      },
+      { "category": "ECC KPDF",  "certName": "Aa0002", "algoDisplayName": "HMAC DRBG", 
+        "canonicalAlgorithmId": 67, "implName": "Caliptra Vendor DCSoC TBDA", "validationId": 100003
+      },
+      { "category": "ECC KPDF", "certName": "Aa0002", "algoDisplayName": "ECDSA KeyGen (FIPS186-5)", 
+        "canonicalAlgorithmId": 52, "implName": "Caliptra Vendor DCSoC TBDA", "validationId": 100003
+      },
+      { "category": "ECC KPDF", "certName": "Aa0002", "algoDisplayName": "KDF SP800-108", 
+        "canonicalAlgorithmId": 101, "implName": "Caliptra Vendor DCSoC TBDA", "validationId": 100003
+      },
+      { "category": "Identity and Authentication", "certName": "Aa0003", "algoDisplayName": "SHA-1", 
+        "canonicalAlgorithmId": 129, "implName": "Caliptra Vendor DCSoC TBDB", "validationId": 100003
+      },
+      { "category": "Identity and Authentication", "certName": "Aa0003", "algoDisplayName": "SHA2-256", 
+        "canonicalAlgorithmId": 131, "implName": "Caliptra Vendor DCSoC TBDB", "validationId": 100003
+      },
+      { "category": "Identity and Authentication", "certName": "Aa0003", "algoDisplayName": "Deterministic ECDSA SigGen (FIPS186-5)", 
+        "canonicalAlgorithmId": 37, "implName": "Caliptra Vendor DCSoC TBDB", "validationId": 100003
+      },
+      { "category": "Identity and Authentication", "certName": "Aa0003",  "algoDisplayName": "ECDSA SigVer (FIPS186-5)",
+        "canonicalAlgorithmId": 61, "implName": "Caliptra Vendor DCSoC TBDB", "validationId": 100003
+      },
+      { "category": "Identity and Authentication", "certName": "Aa0003",  "algoDisplayName": "LMS SigVer",
+        "canonicalAlgorithmId": 175, "implName": "Caliptra Vendor DCSoC TBDB", "validationId": 100003
+      }
+    ],
+    "cavpItarAlgoList": []
+  }, 
+  "vendorAffirmedAlgoList": [
+    { "name": "CKG Section 5", "implName": "Caliptra Vendor DCSoC HW", 
+      "reference": "NIST, SP 800-133 Rev. 2", "algoPropList": []
+    }
+  ],
+  "nonApprovedNotAllowedAlgoList": [],
+  "nonApprovedAllowedAlgoNSCList": [
+    {"name": "AES", "caveat": "Not CAVP listed, not self-tested", "useFunction": "Obfuscation."}
+  ],
+  "esvCertList": [],
+  "entropySourceList": [],
+  "esvItarCertList": [],
+  "testedHwList": [
+    { "modelPartNum": "TBD",  "hwVersion": "TBD",  "fwVersion":  "TBD",
+      "processors": "TBD", "features": "TBD"
+    }
+  ],
+  "modeOfOpList": [
+    { "name": "Nominal", "description": "The module's normal operating mode.", 
+      "type": "Approved", "statusIndicator": "fips_status:0"
+    }
+  ],
+  "portInterfaceList": [
+    { "physicalPort": "SoC power", "logicalInterfaceList": ["Power"], "dataPasses": "None"
+    },
+    { "physicalPort": "SoC Control and Status Wireset", "logicalInterfaceList": ["Control Input", "Status Output"], 
+      "dataPasses": "No data; placeholder for control (e.g. CLOCK) and status (e.g. READY) wires."
+    },
+    { "physicalPort": "Mailbox", "logicalInterfaceList": ["Control Input", "Data Input", "Data Output", "Status Output"],
+      "dataPasses": "Caliptra mailbox commands and responses."
+    },
+    { "physicalPort": "SHA Engine", "logicalInterfaceList": ["Control Input", "Data Input", "Data Output", "Status Output"],
+      "dataPasses": "Input message; output digest."
+    },
+    { "physicalPort": "Ctl & Cfg", "logicalInterfaceList": ["Control Input", "Status Output"],
+      "dataPasses": "Memory mapped access to control and configuration registers, status output."
+    }
+  ],
+  "authMethodList": [],
+  "roleList": [
+    { "name": "CO", "operatorType": "CO", "type": "Role","authMethodList": []}
+  ],
+  "secFunImplList": [
+    { "name": "CSR", "description": "Certificate Signing Request generation",
+      "sfTypeList": [{"sfId": 27, "sfAbbrev": "SHA"}],
+      "sfPropList": [],
+      "algorithmList": [
+        { "certName": "Aa0003", "algoDisplayName": "SHA-1", "canonicalAlgorithmId": 129,
+          "implName": "Caliptra Vendor DCSoC TBDB", "validationId": 100003, "algoPropList": []
+        }
+      ]
+    },
+    { "name": "Digest", "description": "External SHA accelerator - digest calculation.",
+      "sfTypeList": [{"sfId": 27, "sfAbbrev": "SHA"}],
+      "sfPropList": [],
+      "algorithmList": [
+        { "certName": "Aa0001", "algoDisplayName": "SHA2-384", "canonicalAlgorithmId": 132,
+          "implName": "Caliptra Vendor DCSoC Digest", "validationId": 100001, "algoPropList": []
+        },
+        { "certName": "Aa0001", "algoDisplayName": "SHA2-512", "canonicalAlgorithmId": 133,
+          "implName": "Caliptra Vendor DCSoC Digest", "validationId": 100001, "algoPropList": []
+        }
+      ]
+    },
+    { "name": "ECC KPDF", "description": "Deterministic ECC Key Generation (NIST CTG Reviewed)",
+      "sfTypeList": [
+        {"sfId": 2, "sfAbbrev": "AsymKeyPair-KeyGen"},
+        {"sfId": 8, "sfAbbrev": "CKG"},
+        {"sfId": 11, "sfAbbrev": "DRBG"}
+      ],
+      "sfPropList": [],
+      "algorithmList": [
+        { "certName": "Aa0002", "algoDisplayName": "SHA2-384", "canonicalAlgorithmId": 132,
+          "implName": "Caliptra Vendor DCSoC TBDA", "validationId": 100002, "algoPropList": []
+        },
+        { "certName": "Aa0002", "algoDisplayName": "HMAC-SHA2-384", "canonicalAlgorithmId": 71,
+          "implName": "Caliptra Vendor DCSoC TBDA", "validationId": 100002, "algoPropList": []
+        },
+        { "certName": "Aa0002", "algoDisplayName": "HMAC DRBG", "canonicalAlgorithmId": 67,
+          "implName": "Caliptra Vendor DCSoC TBDA", "validationId": 100002, "algoPropList": []
+        },
+        { "certName": "Aa0002", "algoDisplayName": "ECDSA KeyGen (FIPS186-5)", "canonicalAlgorithmId": 52,
+          "implName": "Caliptra Vendor DCSoC TBDA", "validationId": 100002, "algoPropList": []
+        },
+        { "certName": "Aa0002", "algoDisplayName": "CKG Section 5", "canonicalAlgorithmId": 0,
+          "implName": "Caliptra Vendor DCSoC TBDA", "validationId": 0, "algoPropList": []
+        }
+      ]
+    },
+    { "name": "KBKDF", "description": "HMAC CTR SP 800-108 KBKDF.",
+      "sfTypeList": [
+        {"sfId": 22, "sfAbbrev": "KBKDF"},
+        {"sfId": 25, "sfAbbrev": "MAC"},
+        {"sfId": 27, "sfAbbrev": "SHA"}
+      ],
+      "sfPropList": [],
+      "algorithmList": [
+        { "certName": "Aa0002", "algoDisplayName": "SHA2-384", "canonicalAlgorithmId": 132,
+          "implName": "Caliptra Vendor DCSoC TBDB", "validationId": 100003, "algoPropList": []
+        },
+        { "certName": "Aa0002", "algoDisplayName": "HMAC-SHA2-384", "canonicalAlgorithmId": 71,
+          "implName": "Caliptra Vendor DCSoC TBDB", "validationId": 100003, "algoPropList": []
+        },
+        { "certName": "Aa0002", "algoDisplayName": "KDF SP800-108", "canonicalAlgorithmId": 101,
+          "implName": "Caliptra Vendor DCSoC TBDB", "validationId": 100003, "algoPropList": []
+        }
+      ]
+    },
+    { "name": "Other-Mfr", "description": "Placeholder for externally generated SSPs",
+      "sfTypeList": [{"sfId": 0, "sfAbbrev": "Other - Externally generated SSPs"}],
+      "sfPropList": [],
+      "algorithmList": [
+        { "certName": "Aa0002", "algoDisplayName": "Other - Externally generated SSPs", "canonicalAlgorithmId": 0,
+          "implName": "Caliptra Vendor DCSoC TBDB", "validationId": 0,  "algoPropList": []
+        }
+      ]
+    },
+    { "name": "SigGen", "description": "Deterministic ECDSA P-384, SHA2-384 signature generation",
+      "sfTypeList": [{"sfId": 9, "sfAbbrev": "DigSig-SigGen"}],
+      "sfPropList": [],
+      "algorithmList": [
+        { "certName": "Aa0003", "algoDisplayName": "Deterministic ECDSA SigGen (FIPS186-5)", "canonicalAlgorithmId": 37,
+          "implName": "Caliptra Vendor DCSoC TBDB", "validationId": 100003, "algoPropList": []
+        },
+        { "certName": "Aa0003", "algoDisplayName": "SHA2-384", "canonicalAlgorithmId": 132,
+          "implName": "Caliptra Vendor DCSoC TBDB", "validationId": 100003, "algoPropList": []
+        }
+      ]
+    },    
+    { "name": "SigVer", "description": "ECC or LMS Signature Verification",
+      "sfTypeList": [
+        {"sfId": 10, "sfAbbrev": "DigSig-SigVer"}
+      ],
+      "sfPropList": [],
+      "algorithmList": [
+        { "certName": "Aa0003", "algoDisplayName": "SHA2-256", "canonicalAlgorithmId": 131,
+          "implName": "Caliptra Vendor DCSoC TBDB", "validationId": 100003, "algoPropList": []
+        },
+        { "certName": "Aa0002", "algoDisplayName": "SHA2-384", "canonicalAlgorithmId": 132,
+          "implName": "Caliptra Vendor DCSoC TBDA", "validationId": 100002, "algoPropList": []
+        },
+        { "certName": "Aa0003", "algoDisplayName": "ECDSA SigVer (FIPS186-5)", "canonicalAlgorithmId": 61,
+          "implName": "Caliptra Vendor DCSoC TBDB", "validationId": 100003, "algoPropList": []
+        },
+        { "certName": "Aa0003",  "algoDisplayName": "LMS SigVer", "canonicalAlgorithmId": 173, 
+          "implName": "Caliptra Vendor DCSoC TBDB", "validationId": 100003, "algoPropList": []
+        }
+      ]
+    }
+  ],
+  "approvedServiceList": [
+    { "name": "Digest", "description": "Calculate a digest using external SHA accelerator", "indicator": "sha_csr_status:0",
+      "inputs": "SHA CSR inputs", "outputs": "SHA CSR outputs",
+      "secFunImplList": ["Digest"],
+      "roleSspAccessList": []
+    },
+    { "name": "Firmware Load", "description": "Load and authenticate Caliptra FW image", "indicator": "fips_status:0",
+      "inputs": "Mailbox command frame", "outputs": "Mailbox response frame",
+      "secFunImplList": ["SigVer"],
+      "roleSspAccessList": [
+        { "roleName": "CO", "sspAccessList": [
+            {"sspName": "FW_AK_ECC", "accessType": ["E"]},
+            {"sspName": "FW_AK_LMS", "accessType": ["E"]}
+          ]
+        }
+      ]
+    },
+    { "name": "Identity Management", "description": "Reconstruct or obtain device identities in certificate or key formats. ", "indicator": "fips_status:0",
+      "inputs": "Mailbox command frame", "outputs": "Mailbox response frame",
+      "secFunImplList": ["CSR", "ECC KPDF", "KBKDF", "Other-Mfr", "SigGen", "SigVer"],
+      "roleSspAccessList": [
+        { "roleName": "CO", "sspAccessList": [
+            {"sspName": "UDS", "accessType": ["E"]},
+            {"sspName": "FE", "accessType": ["E"]},
+            {"sspName": "IDEVID_Priv", "accessType": ["G", "E"]},
+            {"sspName": "IDEVID_Pub", "accessType": ["G", "R", "W"]},
+            {"sspName": "CDI_n", "accessType": ["G", "E"]},
+            {"sspName": "LDEVID_Priv", "accessType": ["G", "E"]},
+            {"sspName": "LDEVID_Pub", "accessType": ["G", "W"]},
+            {"sspName": "ALIASn_Priv", "accessType": ["G", "E"]},
+            {"sspName": "ALIASn_Pub", "accessType": ["G", "W"]}
+          ]
+        }
+      ]
+    },
+    { "name": "Measurement", "description": "Manage device measurements.", "indicator": "fips_status:0",
+      "inputs": "Mailbox command frame", "outputs": "Mailbox response frame",
+      "secFunImplList": ["Digest", "SigGen", "SigVer"],
+      "roleSspAccessList":  [
+        { "roleName": "CO", "sspAccessList": [
+            {"sspName": "CDI_n", "accessType": ["G", "E"]},
+            {"sspName": "ALIASn_Priv", "accessType": ["G", "E"]},
+            {"sspName": "ALIASn_Pub", "accessType": ["G", "W"]}
+          ]
+        }
+      ]
+    },
+    { "name": "Sanitize", "description": "Sanitize Caliptra SSPs", "indicator": "fips_status:0",
+      "inputs": "Mailbox command frame", "outputs": "Mailbox response frame",
+      "secFunImplList": [],
+      "roleSspAccessList": [
+        { "roleName": "CO", "sspAccessList": [
+            {"sspName": "UDS", "accessType": ["Z"]},
+            {"sspName": "MFG_n_CA_Pub", "accessType": ["Z"]}
+          ]
+        }
+      ]
+    },
+    { "name": "Self-test", "description": "Pre-operational self-test via module HMI", "indicator": "fips_status:0",
+      "inputs": "Mailbox command frame", "outputs": "Mailbox response frame",
+      "secFunImplList": ["Digest", "SigVer"],
+      "roleSspAccessList": [
+        { "roleName": "CO", "sspAccessList": [
+            {"sspName": "FW_AK_ECC", "accessType": ["E"]},
+            {"sspName": "FW_AK_LMS", "accessType": ["E"]}
+          ]
+        }
+      ]
+    },
+    { "name": "Show Status", "description": "Report module name, version and status", "indicator": "fips_status:0",
+      "inputs": "Mailbox command frame", "outputs": "Mailbox response frame",
+      "secFunImplList": [],
+      "roleSspAccessList": []
+    },
+    { "name": "Show Version", "description": "Report module name, version and status", "indicator": "fips_status:0",
+      "inputs": "Mailbox command frame", "outputs": "Mailbox response frame",
+      "secFunImplList": [],
+      "roleSspAccessList": []
+    },
+    { "name": "Shutdown", "description": "Zeroize Caliptra SSPs", "indicator": "fips_status:0",
+      "inputs": "Mailbox command frame", "outputs": "Mailbox response frame",
+      "secFunImplList": [],
+      "roleSspAccessList": [
+        { "roleName": "CO", "sspAccessList": [
+            {"sspName": "ALIASn_Priv", "accessType": ["Z"]},
+            {"sspName": "ALIASn_Pub", "accessType": ["Z"]},
+            {"sspName": "CDI_n", "accessType": ["Z"]},
+            {"sspName": "ECC_KPDF_DRBG_Key", "accessType": ["Z"]},
+            {"sspName": "ECC_KPDF_DRBG_V", "accessType": ["Z"]},
+            {"sspName": "IDEVID_Pub", "accessType": ["Z"]},
+            {"sspName": "IDEVID_Pub", "accessType": ["Z"]},
+            {"sspName": "LDEVID_Priv", "accessType": ["Z"]},
+            {"sspName": "LDEVID_Pub", "accessType": ["Z"]}
+          ]
+        }
+      ]
+    },
+    { "name": "Utility", "description": "Information retrieval and administrative commands", "indicator": "fips_status:0",
+      "inputs": "Mailbox command frame", "outputs": "Mailbox response frame",
+      "secFunImplList": [],
+      "roleSspAccessList": []
+    },
+    { "name": "Verify", "description": "Verify a digital signature", "indicator": "fips_status:0",
+      "inputs": "Mailbox command frame", "outputs": "Mailbox response frame",
+      "secFunImplList": ["Digest", "SigVer"],
+      "roleSspAccessList":  [
+        { "roleName": "CO", "sspAccessList": [
+            {"sspName": "ALIASn_Pub", "accessType": ["E"]},
+            {"sspName": "IDEVID_Pub", "accessType": ["E"]},
+            {"sspName": "LDEVID_Pub", "accessType": ["E"]}
+          ]
+        }
+      ]
+    }
+  ],
+  "nonApprovedServiceList": [],
+  "storageAreaList": [
+    { "name": "C", "description": "Code image", "persistenceType": "Dynamic" },
+    { "name": "D", "description": "DER certificate", "persistenceType": "Dynamic" },
+    { "name": "F", "description": "Fuse memory", "persistenceType": "Static" },
+    { "name": "H", "description": "Hardware structure", "persistenceType": "Dynamic" },
+    { "name": "R", "description": "RAM", "persistenceType": "Dynamic" }
+  ],
+  "sspInputOutputList": [
+    { "name": "C", "from": "Code image provider", "to": "Code image storage", "formatType": "Plaintext", "relatedSFI": "",
+      "distributionType": "Automated", "entryType": "Electronic"
+    },
+    { "name": "I", "from": "Calling process", "to": "Mailbox command input", "formatType": "Plaintext", "relatedSFI": "",
+      "distributionType": "Automated", "entryType": "Electronic"
+    },
+    { "name": "M", "from": "Entry at manufacture (TBD)", "to": "OTP", "formatType": "Plaintext", "relatedSFI": "",
+      "distributionType": "Automated", "entryType": "Electronic"
+    },
+    { "name": "O", "from": "Mailbox command output", "to": "Calling process", "formatType": "Plaintext", "relatedSFI": "",
+      "distributionType": "Automated", "entryType": "Electronic"
+    }
+  ],
+  "sspZeroizationList": [
+    { "method": "F", "description": "Fuse memory sanitization (overwrite with ones)", 
+      "rationale": "Fuse sanitization", "operatorInitiation": "Shutdown command" 
+    },
+    { "method": "S", "description": "Shutdown (zeroization) service", 
+      "rationale": "Shutdown zeroization", "operatorInitiation": "Shutdown command" 
+    },
+    { "method": "Z", "description": "Zeroized on context change", 
+      "rationale": "Context change zeroization", "operatorInitiation": "Command that changes context or layer" 
+    }
+  ],
+  "sspList": [
+    { "name": "ALIASn_Priv", "description": "ALIASn (FMC, RT) ECC Key Pair (private)", "category": "CSP",
+      "type": "P-384", "size": "384", "strength": "192",
+      "storageDuration": "Layer uptime (max)",
+      "storageItemList": [{"areaName": "R", "format": "Plaintext", "algorithmName": ""}],
+      "inputOutputList": ["I"], "zeroizationList": ["S"],
+      "generatedByList": ["ECC KPDF"], "establishedByList": [], "usedByList": ["SigGen"],
+      "relatedSspList": [
+        {"sspName": "ALIASn_Pub", "relationship": "Paired With"}
+      ]
+    },
+    { "name": "ALIASn_Pub", "description": "LDEVID ECC Key Pair (public)", "category": "PSP",
+      "type": "P-384", "size": "384", "strength": "192",
+      "storageDuration": "Device uptime (max)",
+      "storageItemList": [{"areaName": "R", "format": "Plaintext", "algorithmName": ""}],
+      "inputOutputList": ["I", "O"], "zeroizationList": ["S"],
+      "generatedByList": ["ECC KPDF"], "establishedByList": [], "usedByList": ["SigGen", "SigVer"],
+      "relatedSspList": [
+        {"sspName": "ALIASn_Priv", "relationship": "Paired With"}
+      ]
+    },
+    { "name": "CDI_n", "description": "Device Compound Identifier (LDEVID, FMC, RT chain)", "category": "CSP",
+      "type": "DECC_SEED", "size": "384", "strength": "256",
+      "storageDuration": "Device uptime (max)",
+      "storageItemList": [{"areaName": "R", "format": "Plaintext", "algorithmName": ""}],
+      "inputOutputList": [], "zeroizationList": ["Z"],
+      "generatedByList": ["KBKDF"], "establishedByList": [], "usedByList": ["KBKDF", "ECC KPDF"],
+      "relatedSspList": [
+        {"sspName": "UDS", "relationship": "CDI_LDEVID Derived from"},
+        {"sspName": "CDI_n", "relationship": "CDI_LDEVID Derives CDI_FMC"},
+        {"sspName": "CDI_n", "relationship": "CDI_FMC Derives CDI_RTn"}
+      ]
+    },
+    { "name": "ECC_KPDF_DRBG_Key", "description": "ECC KPDF HMAC DRBG working state: Key.", "category": "CSP",
+      "type": "HMAC_DRBG_Key", "size": "384", "strength": "256",
+      "generatedByList": ["ECC KPDF"], "establishedByList": [], "usedByList": ["ECC KPDF"],
+      "inputOutputList": [], "zeroizationList": ["Z"],
+      "storageItemList": [{"areaName": "H", "format": "Plaintext", "algorithmName": ""}],
+      "storageDuration": "Device uptime (max)",
+      "relatedSspList": [
+        {"sspName": "ECC_KPDF_DRBG_V", "relationship": "Used With"},
+        {"sspName": "UDS", "relationship": "Derived From"},
+        {"sspName": "CDI_n", "relationship": "Derived From"}
+      ]
+    },
+    { "name": "ECC_KPDF_DRBG_V", "description": "ECC_KPDF_HMAC DRBG working state: V.", "category": "CSP",
+      "type": "HMAC_DRBG_V", "size": "384", "strength": "256",
+      "generatedByList": ["ECC KPDF"], "establishedByList": [], "usedByList": ["ECC KPDF"],
+      "inputOutputList": [], "zeroizationList": ["S"],
+      "storageItemList": [{"areaName": "H", "format": "Plaintext", "algorithmName": ""}],
+      "storageDuration": "Device uptime (max)",
+      "relatedSspList": [
+        {"sspName": "ECC_KPDF_DRBG_Key","relationship": "Used With"},
+        {"sspName": "ECC_KPDF_DRBG_Seed", "relationship": "Generated From"}
+      ]
+    },
+    { "name": "FE", "description": "Field Entropy", "category": "CSP",
+      "type": "DECC_SEED", "size": "384", "strength": "256",
+      "storageDuration": "Device lifetime",
+      "storageItemList": [
+        {"areaName": "F", "format": "Obfuscated", "algorithmName": ""},
+        {"areaName": "R", "format": "Obfuscated", "algorithmName": "SHA2-384"}
+      ],
+      "inputOutputList": ["M"], "zeroizationList": ["F"],
+      "generatedByList": ["Other-Mfr"], "establishedByList": [], "usedByList": ["KBKDF", "ECC KPDF"],
+      "relatedSspList": [
+        {"sspName": "CDI_n", "relationship": "Derives"},
+        {"sspName": "LDevId", "relationship": "Derives"}
+      ]
+    },
+    { "name": "FW_AK_ECC", "description": "ECC Firmware authentication (signature verification) key.", "category": "PSP",
+      "type": "P-384", "size": "384", "strength": "192",
+      "generatedByList": ["Other-Mfr"], "establishedByList": [], "usedByList": ["SigVer"],
+      "inputOutputList": ["C"], "zeroizationList": ["F"],
+      "storageItemList": [{"areaName": "C","format": "Plaintext","algorithmName": ""}],
+      "storageDuration": "Device lifetime",
+      "relatedSspList": []
+    },
+    { "name": "FW_AK_LMS", "description": "LMS Firmware authentication (signature verification) key.", "category": "PSP",
+      "type": "LMS_tbd", "size": "tbd", "strength": "256",
+      "generatedByList": ["Other-Mfr"], "establishedByList": [], "usedByList": ["SigVer"],
+      "inputOutputList": ["C"], "zeroizationList": ["F"],
+      "storageItemList": [{"areaName": "C","format": "Plaintext","algorithmName": ""}],
+      "storageDuration": "Device lifetime",
+      "relatedSspList": []
+    },
+    { "name": "IDEVID_Priv", "description": "IDEVID ECC Key Pair (private)", "category": "CSP",
+      "type": "P-384", "size": "384", "strength": "192",
+      "storageDuration": "Layer lifetime",
+      "storageItemList": [{"areaName": "H", "format": "Plaintext", "algorithmName": ""}],
+      "inputOutputList": [], "zeroizationList": ["S"],
+      "generatedByList": ["ECC KPDF"], "establishedByList": [], "usedByList": ["SigGen"],
+      "relatedSspList": [
+        {"sspName": "IDEVID_Pub", "relationship": "Paired With"}
+      ]
+    },
+    { "name": "IDEVID_Pub", "description": "IDEVID ECC Key Pair (public)", "category": "PSP",
+      "type": "P-384", "size": "384", "strength": "192",
+      "storageDuration": "Device lifetime",
+      "storageItemList": [{"areaName": "R", "format": "Plaintext", "algorithmName": ""}],
+      "inputOutputList": ["O"], "zeroizationList": ["Z"],
+      "generatedByList": ["ECC KPDF"], "establishedByList": [], "usedByList": ["SigGen"],
+      "relatedSspList": [
+        {"sspName": "IDEVID_Pub", "relationship": "Paired With"}
+      ]
+    },
+    { "name": "LDEVID_Priv", "description": "LDEVID ECC Key Pair (private)", "category": "CSP",
+      "type": "P-384", "size": "384", "strength": "192",
+      "storageDuration": "Layer lifetime",
+      "storageItemList": [{"areaName": "H", "format": "Plaintext", "algorithmName": ""}],
+      "inputOutputList": [], "zeroizationList": ["S"],
+      "generatedByList": ["ECC KPDF"], "establishedByList": [], "usedByList": ["SigGen"],
+      "relatedSspList": [
+        {"sspName": "LDEVID_Pub", "relationship": "Paired With"}
+      ]
+    },
+    { "name": "LDEVID_Pub", "description": "LDEVID ECC Key Pair (public)", "category": "PSP",
+      "type": "P-384", "size": "384", "strength": "192",
+      "storageDuration": "Device lifetime",
+      "storageItemList": [{"areaName": "R", "format": "Plaintext", "algorithmName": ""}],
+      "inputOutputList": ["O"], "zeroizationList": ["Z"],
+      "generatedByList": ["ECC KPDF"], "establishedByList": [], "usedByList": ["SigGen"],
+      "relatedSspList": [
+        {"sspName": "LDEVID_Pub", "relationship": "Paired With"}
+      ]
+    },
+    { "name": "MFG_n_CA_Pub", "description": "Manufacturing certificate (ROOT, SUB) public key", "category": "PSP",
+      "type": "P-384", "size": "384", "strength": "192",
+      "storageDuration": "Device lifetime",
+      "storageItemList": [{"areaName": "F", "format": "Plaintext", "algorithmName": ""}],
+      "inputOutputList": ["M"], "zeroizationList": ["F"],
+      "generatedByList": ["Other-Mfr"], "establishedByList": [], "usedByList": ["SigVer"],
+      "relatedSspList": [
+        {"sspName": "MFG_n_CA_Pub", "relationship": "SUB Verified By ROOT"},
+        {"sspName": "MFG_n_CA_Pub", "relationship": "ROOT Verifies SUB"},
+        {"sspName": "IDEVID_Pub", "relationship": "Verifies"}
+      ]
+    },
+    { "name": "UDS", "description": "Unique Device Secret", "category": "CSP",
+      "type": "DECC_SEED", "size": "384", "strength": "256",
+      "storageDuration": "Device lifetime",
+      "storageItemList": [
+        {"areaName": "F", "format": "Obfuscated", "algorithmName": ""},
+        {"areaName": "R", "format": "Obfuscated", "algorithmName": "SHA2-384"}
+      ],
+      "inputOutputList": ["M"], "zeroizationList": ["F"],
+      "generatedByList": ["Other-Mfr"], "establishedByList": [], "usedByList": ["KBKDF", "ECC KPDF"],
+      "relatedSspList": [
+        {"sspName": "CDI_n", "relationship": "Derives"},
+        {"sspName": "IDevId", "relationship": "Derives"}
+      ]
+    }
+  ],
+  "preOpSelfTestList": [
+    { "algorithmOrTest": "ROM Integrity", "testProps": "",  "testMethod": "SHA2-256", "type": "SW/FW Integrity",
+      "indicator": "fips_status:0", "details": "", 
+      "period": "Each use", "periodicMethod": "Power cycle"
+    }
+  ],
+  "condSelfTestList": [
+    { "algorithmOrTest": "ECC KPDF", "type": "CAST", "testMethod": "KAT", "testProps": "P-384",
+      "details": "Encrypt", "conditions": "At power-on or reset", "indicator": "fips_status:0",
+      "coverage": [
+        { "certName": "Aa0002", "algoDisplayName": "ECDSA KeyGen (FIPS186-5)", "canonicalAlgorithmId": 52,
+          "implName": "Caliptra", "validationId": 100002, "algoPropList": []
+        },
+        { "certName": "Aa0002", "algoDisplayName": "HMAC DRBG", "canonicalAlgorithmId": 67,
+          "implName": "Caliptra", "validationId": 100002, "algoPropList": []
+        },
+        { "certName": "Aa0002", "algoDisplayName": "HMAC-SHA2-384", "canonicalAlgorithmId": 71,
+          "implName": "Caliptra", "validationId": 100002, "algoPropList": []
+        },
+        { "certName": "Aa0002", "algoDisplayName": "KDF SP800-108", "canonicalAlgorithmId": 101,
+          "implName": "Caliptra", "validationId": 100002, "algoPropList": []
+        },
+        { "certName": "Aa0002", "algoDisplayName": "SHA2-384", "canonicalAlgorithmId": 132,
+          "implName": "Caliptra", "validationId": 100002, "algoPropList": []
+        }
+      ],
+      "coverageNotes": "No guidance in IG 10.3.A for ECC KPDF", 
+      "period": "Each boot", "periodicMethod": "Reset or power-cycle"
+    },
+    { "algorithmOrTest": "Deterministic ECDSA SigGen", "type": "CAST", "testMethod": "KAT", "testProps": "P-384, SHA2-384",
+      "details": "Generate", "conditions": "At power-on or reset", "indicator": "fips_status:0",
+      "coverage": [
+        { "certName": "Aa0003", "algoDisplayName": "Deterministic ECDSA SigGen (FIPS186-5)", "canonicalAlgorithmId": 37,
+          "implName": "Caliptra", "validationId": 100003, "algoPropList": []
+        },
+        { "certName": "Aa0003", "algoDisplayName": "SHA2-384", "canonicalAlgorithmId": 132,
+          "implName": "Caliptra", "validationId": 100003, "algoPropList": []
+        }
+      ],
+      "coverageNotes": "IG 10.3.A Resolution 11", 
+      "period": "Each boot", "periodicMethod": "Reset or power-cycle"
+    },
+    { "algorithmOrTest": "ECDSA SigVer", "type": "CAST", "testMethod": "KAT", "testProps": "P-384, SHA2-384",
+      "details": "Verify", "conditions": "Code says driver performs verify", "indicator": "fips_status:0",
+      "coverage": [
+        { "certName": "Aa0003", "algoDisplayName": "ECDSA SigVer (FIPS186-5)", "canonicalAlgorithmId": 61,
+          "implName": "Caliptra", "validationId": 100003, "algoPropList": []
+        },
+        { "certName": "Aa0003", "algoDisplayName": "SHA2-384", "canonicalAlgorithmId": 132,
+          "implName": "Caliptra", "validationId": 100003, "algoPropList": []
+        }
+      ],
+      "coverageNotes": "IG 10.3.A Resolution 11", 
+      "period": "Each boot", "periodicMethod": "Reset or power-cycle"
+    },
+    { "algorithmOrTest": "LMS SigVer", "type": "CAST", "testMethod": "KAT", "testProps": "SHA2-256",
+      "details": "Verify", "conditions": "Code says driver performs verify", "indicator": "fips_status:0",
+      "coverage": [
+        { "certName": "Aa0003", "algoDisplayName": "ECDSA SigVer (FIPS186-5)", "canonicalAlgorithmId": 61,
+          "implName": "Caliptra", "validationId": 100003, "algoPropList": []
+        },
+        { "certName": "Aa0003", "algoDisplayName": "SHA2-384", "canonicalAlgorithmId": 132,
+          "implName": "Caliptra", "validationId": 100003, "algoPropList": []
+        }
+      ],
+      "coverageNotes": "IG 10.3.A Resolution 11", 
+      "period": "Each boot", "periodicMethod": "Reset or power-cycle"
+    },  
+    { "algorithmOrTest": "FW Load", "type": "SW/FW Load", 
+      "testMethod": "SigVer", "testProps": "P-384, SHA2-384",
+      "details": "Encrypt", "conditions": "On FW LOAD command", "indicator": "fips_status:0",
+      "coverage": [],
+      "coverageNotes": "IG 10.3.A does not cover FW load test", 
+      "period": "Each boot", "periodicMethod": "Reset or power-cycle"
+    },
+    { "algorithmOrTest": "SHA1", "type": "CAST", "testMethod": "KAT", "testProps": "SHA-1",
+      "details": "Generate digest", "conditions": "CONFIRM: At power-on or reset", "indicator": "fips_status:0",
+      "coverage": [
+        { "certName": "Aa0002", "algoDisplayName": "SHA-1", "canonicalAlgorithmId": 129,
+          "implName": "Caliptra", "validationId": 100002, "algoPropList": []
+        }
+      ],
+      "coverageNotes": "IG 10.3.A Resolution 2 bullet 1", 
+      "period": "Each boot", "periodicMethod": "Reset or power-cycle"
+    },
+    { "algorithmOrTest": "SHA2-256", "type": "CAST", "testMethod": "KAT", "testProps": "SHA2-256",
+      "details": "Generate digest", "conditions": "CONFIRM: At power-on or reset", "indicator": "fips_status:0",
+      "coverage": [
+        { "certName": "Aa0002", "algoDisplayName": "SHA2-256", "canonicalAlgorithmId": 131,
+          "implName": "Caliptra", "validationId": 100002, "algoPropList": []
+        }
+      ],
+      "coverageNotes": "IG 10.3.A Resolution 2 bullet 2", 
+      "period": "Each boot", "periodicMethod": "Reset or power-cycle"
+    },
+    { "algorithmOrTest": "SHA2-384", "type": "CAST", "testMethod": "KAT", "testProps": "SHA2-384",
+      "details": "Generate digest", "conditions": "CONFIRM: At power-on or reset", "indicator": "fips_status:0",
+      "coverage": [
+        { "certName": "Aa0002", "algoDisplayName": "SHA2-384", "canonicalAlgorithmId": 132,
+          "implName": "Caliptra", "validationId": 100002, "algoPropList": []
+        }
+      ],
+      "coverageNotes": "IG 10.3.A Resolution 2 bullet 6", 
+      "period": "Each boot", "periodicMethod": "Reset or power-cycle"
+    },
+    { "algorithmOrTest": "SHA2-384-ACC", "type": "CAST", "testMethod": "KAT", "testProps": "SHA2-384",
+      "details": "Generate digest", "conditions": "CONFIRM: At power-on or reset", "indicator": "fips_status:0",
+      "coverage": [
+        { "certName": "Aa0003", "algoDisplayName": "SHA2-384", "canonicalAlgorithmId": 132,
+          "implName": "Caliptra", "validationId": 100003, "algoPropList": []
+        }
+      ],
+      "coverageNotes": "IG 10.3.A Resolution 2 bullet 6", 
+      "period": "Each boot", "periodicMethod": "Reset or power-cycle"
+    }
+  ],
+  "errorStateList": [
+    { "name": "fips_failure", "description": "TBD", "indicator": "fips_status:~0",
+      "conditions": [], "recoveryMethod": "Power cycle"
+    }
+  ],
+  "phSecMechanismList": [
+    { "mechanism": "Vendor specific",  "inspectFreq": "Vendor specific", "inspectGuidance": "Vendor specific"}
+  ],
+  
+  "referenceList": [],
+
+  "opEnvSwFwHyTestedList": [],
+  "testedSwFwHyList": [],
+  "opEnvSwFwHyVAList": [],
+  "testedHyHwList": [],
+  "nonApprovedAllowedAlgoList": [],
+  "hardnessTestTempList": [],
+  "efpEftInfoList": []
+}
