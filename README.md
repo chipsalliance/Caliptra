@@ -43,6 +43,54 @@ marks](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkPoli
   * [Runtime 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/runtime/README.md)
   * [MCU Firmware and SDK specification - WIP](https://chipsalliance.github.io/caliptra-mcu-sw/)
 
+## Versioning
+
+Caliptra is released in independently versioned components: RTL, ROM, FMC and Runtime FW. They are all represented by 3 values: major.minor.patch (such as 1.0.2). The first 2 values, major.minor, correspond to a set of features caliptra supports. The patch value is incremented as new releases are made with bug fixes.
+
+Not all components necessarily need to be of the same major.minor version to be compatible. Details are below:
+
+
+### Caliptra 1.0
+| RTL | ROM | Runtime FMC/FW |
+| --- | --- | --- | 
+| 1.0.x | 1.0.x | 1.0.x |
+
+### Caliptra 1.1
+
+Additional Features
+  - ECC HW performance enhancements*
+  - LMS HW acceleration*
+  - New Runtime commands
+    - LMS_SIGNATURE_VERIFY <link>
+    - ADD_SUBJECT_ALT_NAME <link>
+    - CERTIFY_KEY_EXTENDED <link>
+  - Expanded PL0 contexts to 16
+
+\* Requires 1.1+ RTL
+
+| RTL | ROM | Runtime FMC/FW |
+| --- | --- | --- |
+| 1.1.x | 1.1.x | 1.1.x |
+| 1.0.x | 1.0.x | 1.1.x | 
+
+
+### Caliptra 1.2
+
+Additional Features
+  - Manifest-based Authorization
+    - SET_AUTH_MANIFEST
+    - AUTHORIZE_AND_STASH
+  - Deferred retrieval of IDEV CSR**
+    - GET_IDEVID_CSR
+
+\*\* Requires 1.2+ ROM
+
+| RTL | ROM | Runtime FMC/FW |
+| --- | --- | --- |
+| 1.1.x | 1.2.x | 1.2.x |
+| 1.1.x | 1.1.x | 1.2.x | 
+| 1.0.x | 1.0.x | 1.2.x | 
+
 ## Test Dashboards
 
 * [Caliptra Software CI dashboard](https://chipsalliance.github.io/caliptra-sw/)
