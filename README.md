@@ -81,7 +81,7 @@ Additional Features
     - SET_AUTH_MANIFEST
     - AUTHORIZE_AND_STASH
   - Deferred retrieval of IDEV CSR**
-    - GET_IDEVID_CSR
+    - GET_IDEV_CSR
 
 \*\* Requires 1.2+ ROM
 
