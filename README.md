@@ -26,7 +26,7 @@ marks](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkPoli
 ## Specifications
 
 ### Caliptra 1.x:
-  * [Main Caliptra specification 1.x](https://github.com/chipsalliance/Caliptra/blob/main/doc/caliptra_1x/Caliptra.md) 
+  * [Main Caliptra specification 1.x](https://github.com/chipsalliance/Caliptra/blob/main/doc/caliptra_1x/Caliptra.md)
   * [Caliptra Core Hardware Specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraHardwareSpecification.md)
   * [Caliptra Core Hardware Integration
     Specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md)
@@ -41,6 +41,7 @@ marks](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkPoli
   * [ROM 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/rom/dev/README.md)
   * [FMC 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/fmc/README.md)
   * [Runtime 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/runtime/README.md)
+  * [MCU Firmware and SDK specification - WIP](https://chipsalliance.github.io/caliptra-mcu-sw/)
 
 ## Test Dashboards
 
