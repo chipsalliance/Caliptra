@@ -26,7 +26,7 @@ marks](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkPoli
 ## Specifications
 
 ### Caliptra 1.x:
-  * [Main Caliptra specification 1.x](https://github.com/chipsalliance/Caliptra/blob/main/doc/caliptra_1x/Caliptra.md) 
+  * [Main Caliptra specification 1.x](https://github.com/chipsalliance/Caliptra/blob/main/doc/caliptra_1x/Caliptra.md)
   * [Caliptra Core Hardware Specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraHardwareSpecification.md)
   * [Caliptra Core Hardware Integration
     Specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md)
@@ -41,6 +41,7 @@ marks](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkPoli
   * [ROM 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/rom/dev/README.md)
   * [FMC 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/fmc/README.md)
   * [Runtime 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/runtime/README.md)
+  * [MCU Firmware and SDK specification - WIP](https://chipsalliance.github.io/caliptra-mcu-sw/)
 
 ## Test Dashboards
 
@@ -61,6 +62,7 @@ The Caliptra code base and documentation are split across five repositories:
 | [Caliptra DPE](https://github.com/chipsalliance/caliptra-dpe)     | [Issues](https://github.com/chipsalliance/caliptra-dpe/issues),  [PRs](https://github.com/chipsalliance/caliptra-dpe/pulls),  [Security advisories](https://github.com/chipsalliance/caliptra-dpe/security/advisories)  | An implementation of a TCG DICE Protection Environment profile |
 | [Caliptra U-Reg](https://github.com/chipsalliance/caliptra-ureg)  | [Issues](https://github.com/chipsalliance/caliptra-ureg/issues), [PRs](https://github.com/chipsalliance/caliptra-ureg/pulls), [Security advisories](https://github.com/chipsalliance/caliptra-ureg/security/advisories) | General-purpose libraries and tools for manipulating MMIO registers from Rust |
 | [Caliptra Subsystem](https://github.com/chipsalliance/caliptra-ss)| [Issues](https://github.com/chipsalliance/caliptra-ss/issues), [PRs](https://github.com/chipsalliance/caliptra-ss/pulls), [Security advisories](https://github.com/chipsalliance/caliptra-ss/security/advisories) | Caliptra Subsystem including Manufacturer Control Unit (MCU) and peripherals |
+| [Caliptra MCU Software](https://github.com/chipsalliance/caliptra-mcu-sw)| [Issues](https://github.com/chipsalliance/caliptra-mcu-sw/issues), [PRs](https://github.com/chipsalliance/caliptra-mcu-sw/pulls), [Security advisories](https://github.com/chipsalliance/caliptra-mcu-sw/security/advisories) | Caliptra MCU Firmware and SDK and specification |
 
 The GitHub config parameters for all of the branches are documented in a [local
 file](https://github.com/chipsalliance/Caliptra/blob/main/GitHubRules.md).
