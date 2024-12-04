@@ -49,8 +49,8 @@ Caliptra is released in independently versioned components: RTL, ROM, FMC and Ru
 
 Not all components necessarily need to be of the same major.minor version to be compatible. Details are below:
 
-
 ### Caliptra 1.0
+Compatible Configurations:
 | RTL | ROM | Runtime FMC/FW |
 | --- | --- | --- | 
 | 1.0.x | 1.0.x | 1.0.x |
@@ -66,8 +66,9 @@ Additional Features
     - CERTIFY_KEY_EXTENDED <link>
   - Expanded PL0 contexts to 16
 
-\* Requires 1.1+ RTL
+\* Requires 1.1 RTL
 
+Compatible Configurations:
 | RTL | ROM | Runtime FMC/FW |
 | --- | --- | --- |
 | 1.1.x | 1.1.x | 1.1.x |
@@ -83,8 +84,9 @@ Additional Features
   - Deferred retrieval of IDEV CSR**
     - GET_IDEV_CSR
 
-\*\* Requires 1.2+ ROM
+\*\* Requires 1.2 ROM
 
+Compatible Configurations:
 | RTL | ROM | Runtime FMC/FW |
 | --- | --- | --- |
 | 1.1.x | 1.2.x | 1.2.x |
