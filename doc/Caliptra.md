@@ -667,7 +667,7 @@ Caliptra RT generates the DPE certificate and endorses it with the Alias<sub>RT<
 * End-of-life state is owned by SoC. In end-of-life device lifecycle state, Caliptra shall not not be brought out of reset.
 * Other encodings are reserved and always assumed to be in a secure state.
 
-Each of these security states may be mapped to different SoC level debug and security states. SoC’s requirement is that if the SoC enters a debug state, then Caliptra must also be in an unsecured state where all assets are cleared. Caliptra security state is captured by hardware on every warm reset; therefore SoC integrators enforce the security state transition policies for cold boot events. These policies are described in the preceding table.
+Each of these security states may be mapped to different SoC level debug and security states. SoC’s requirement is that if the SoC enters an insecure state, then Caliptra must also be in an insecure state where all assets are cleared. Caliptra security state is captured by hardware on every warm reset; therefore SoC integrators enforce the security state transition policies for cold boot events. These policies are described in the preceding table.
 
 ## Service surface
 
