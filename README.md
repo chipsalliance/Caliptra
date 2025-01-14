@@ -47,6 +47,8 @@ marks](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkPoli
 
 * [Caliptra Software CI dashboard](https://chipsalliance.github.io/caliptra-sw/)
   -- includes ROM
+* [Caliptra CPU DV coverage
+  dashboard](https://chipsalliance.github.io/Cores-VeeR-EL2/html/main/coverage_dashboard/all/index.html)
 
 ## Repositories
 
