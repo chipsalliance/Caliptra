@@ -1235,8 +1235,8 @@ The following table describes Caliptra's fuse map:
 | ------------------------------- | --------------- | --------------- | ----------------------------------------------- | --------------- |
 | UDS SEED (obfuscated)           | 512             | ROM             | SoC manufacturing                               | DICE Unique Device Secret Seed. This seed is unique per device. The seed is scrambled using an obfuscation function. |
 | FIELD ENTROPY (obfuscated)      | 256             | ROM             | Device owner in-field programmable | Field-programmable by the owner, used to hedge against UDS disclosure in the supply chain. |
-| KEY MANIFEST PK HASH            | 384             | ROM FMC RUNTIME | SoC manufacturing                               | SHA384 hash of the Vendor ECDSA P384 and LMS or MLDSA Public Key Descriptors. |
-| ECC REVOCATION (KEY MANIFEST PK HASH MASK)       | 4               | ROM FMC RUNTIME | In-field programmable                           | One-hot encoded list of revoked Vendor ECDSA P384 Public Keys (up to 4 keys). |
+| VENDOR PK HASH                  | 384             | ROM FMC RUNTIME | SoC manufacturing                               | SHA384 hash of the Vendor ECDSA P384 and LMS or MLDSA Public Key Descriptors. |
+| ECC REVOCATION                  | 4               | ROM FMC RUNTIME | In-field programmable                           | One-hot encoded list of revoked Vendor ECDSA P384 Public Keys (up to 4 keys). |
 | OWNER PK HASH                   | 384             | ROM FMC RUNTIME | In-field programmable                           | SHA384 hash of the Owner ECDSA P384 and LMS or MLDSA Public Keys. |
 | FMC KEY MANIFEST SVN            | 32              | ROM FMC RUNTIME | In-field programmable                           | FMC security version number. |
 | RUNTIME SVN                     | 128             | ROM FMC RUNTIME | In-field programmable                           | Runtime firmware security version number. |
@@ -1248,6 +1248,10 @@ The following table describes Caliptra's fuse map:
 | MLDSA REVOCATION                | 4               | ROM             | In-field programmable                           | One-hot encoded list of revoked Vendor MLDSA Public Keys (up to 4 keys). |
 | SOC STEPPING ID                 | 16              | ROM FMC RUNTIME | SoC manufacturing                               | Identifier assigned by vendor to differentiate silicon steppings. |
 | MANUF_DEBUG_UNLOCK_TOKEN        | 128             | ROM             | SoC manufacturing                               | Secret value for manufacturing debug unlock authorization. |
+| PQC Key Type                    | 2               | ROM FMC RUNTIME | In-field programmable                           | One-hot encoded selection of PQC key type for firmware validation. <br> - **Bit 0** - MLDSA <br> - **Bit 1** - LMS<br>|
+| SOC MANIFEST SVN                | 128             | ROM FMC RUNTIME | In-field programmable                           | One-hot encoded value for the SOC authorization manifest minimum supported SVN. |
+| SOC MANIFEST MAX SVN            | 8               | ROM FMC RUNTIME | In-field programmable                           | Maximum value for the SOC authorization manifest SVN. |
+
 
 # Error reporting and handling
 
