@@ -385,7 +385,7 @@ Devices may support features like debug unlock, DFT, or DFD flows that globally 
 
 ### Owner authorization
 
-Caliptra firmware shall be signed by the vendor. In addition, this firmware may also be signed by the owner when ownership control is enforced. If a second signature is present for ownership authorization, Caliptra must extract the owner's public key from the firmware image during cold boot, and latch the owner key into Caliptra's RAM for the remainder of its uptime[^3]. Caliptra then uses both the vendor key and owner key to verify hitless firmware updates.
+Caliptra firmware shall be signed by the vendor. In addition, this firmware shall also be signed by an owner key. Caliptra must extract the owner's public key from the firmware image during cold boot, and latch the owner key into Caliptra's RAM for the remainder of its uptime[^3]. Caliptra then uses both the vendor key and owner key to verify hitless firmware updates.
 
 Caliptra shall attest to the value of the owner key, enabling external verifiers to ensure that the correct owner key was provisioned into the device. To perform this attestation, Caliptra includes the owner key as an input to the FMC's CDI (as part of "other attributes" from Figure 4 above), and represents it within the FMC's alias certificate.
 
