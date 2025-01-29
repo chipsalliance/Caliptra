@@ -575,7 +575,8 @@ Caliptra ROM generates the Alias<sub>FMC</sub> certificate and endorses it with 
 | tcg-dice-MultiTcbInfo          | Flags        | NOT_CONFIGURED if lifecycle is unprovisioned
 |                                |              | NOT_SECURE if lifecycle is manufacturing
 |                                |              | DEBUG if not debug locked
-|                                | SVN          | concatenation of FMC SVN and FMC fuse SVN
+|                                | SVN          | [0] fuse SVN
+|                                |              | [1] firmware SVN
 |                                | FWIDs        | [0] SHA384 digest of
 |                                |              | lifecycle state
 |                                |              | debug locked state
@@ -618,7 +619,7 @@ Caliptra FMC generates the Alias<sub>RT</sub> certificate and endorses it with t
 | Subject Key Identifier         | -            | First 20 bytes of SHA256 hash of DER-formatted RT Alias public key in uncompressed form
 | Authority Key Identifier       | -            | First 20 bytes of SHA256 hash of DER-formatted FMC Alias public key in uncompressed form
 | tcg-dice-Ueid                  | ueid         | UEID specified by IDevID attribute fuses
-| tcg-dice-TcbInfo               | SVN          | RT SVN
+| tcg-dice-TcbInfo               | SVN          | Firmware SVN
 |                                | FWIDs        | [0] SHA384 digest of RT
 
 Caliptra does not generate an Alias<sub>RT</sub> CSR. Owners that wish to endorse Alias<sub>RT</sub> must do so with proprietary flows.
@@ -753,7 +754,7 @@ For PCR0 and PCR1, ROM issues the following extend operations in order:
    3. Anti-rollback disable fuse
    4. ECDSA vendor public key index
    5. MLDSA-87 vendor public key index
-   6. FMC SVN
+   6. Cold-boot firmware SVN
    7. Effective Fuse SVN (i.e., 0 if anti-rollback disable is set)
    8. LMS vendor public key index
    9. LMS verification enable fuse
@@ -846,7 +847,7 @@ The corresponding journey measurement computation is the chained extension of \[
 
 Caliptra shall provide fuse banks (refer to *Table 20: Caliptra Fuse Map*) that are used for storing monotonic counters to provide anti-rollback enforcement for Caliptra mutable firmware. Each distinctly signed boot stage shall be associated with its own anti-rollback fuse field. Together with the vendor, Caliptra allows owners to enforce strong anti-rollback requirements, in addition to supporting rollback to a previous firmware version. This is a critical capability for hyper scalar owners.
 
-Every mutable Caliptra boot layer shall include a SVN value in the signed header. If a layer's signed SVN value is less than the current counter value for that layer's fuse bank, Caliptra shall refuse to boot that layer, regardless of whether the signature is valid.
+Caliptra firmware shall include an SVN value in the signed header. If the firmware's SVN value is less than the current counter value in the fuse bank, Caliptra shall refuse to boot that firmware, regardless of whether the signature is valid.
 
 Alternatively, platform vendors may prefer to manage firmware storage and rollback protection in a different manner, such as through a dedicated Platform RoT. In such cases, the vendor may wish to disable anti-rollback support from Caliptra entirely. This disable support is available via an OTP/fuse setting.
 
@@ -927,11 +928,10 @@ To verify the firmware, Caliptra ROM performs the following steps:
 6. Calculates the hash of the first byte through the owner data field of the header (this includes the TOC digest). This is the owner firmware digest.
 7. Verifies the vendor signature using the vendor firmware digest from step 5 and the vendor key(s) from step 4.
 8. Verifies the owner signature using the owner firmware digest from step 6 and the owner key(s) from step 3.
-9. Verifies the TOC against the TOC digest that was verified in steps 6 and 7. The TOC contains the SVNs and digests for the FMC and runtime images.
+9. Verifies the TOC against the TOC digest that was verified in steps 6 and 7. The TOC contains the SVN and digests for the FMC and runtime images.
 10. Verifies the FMC against the FMC digest in the TOC.
-11. If Caliptra is not in "unprovisioned" lifecycle state or "anti-rollback disable" state, ROM compares the FMC SVN against FMC SVN fuse (fuse_key_manifest_svn).
-12. Verifies the runtime against the runtime digest in the TOC.
-13. If Caliptra is not in "unprovisioned" lifecycle state or "anti-rollback disable" state, ROM compares the runtime digest against the runtime SVN fuse (fuse_runtime_svn).
+11. Verifies the runtime against the runtime digest in the TOC.
+12. If Caliptra is not in "unprovisioned" lifecycle state or "anti-rollback disable" state, ROM compares the firmware's SVN against the SVN fuse (fuse_firmware_svn).
 
 In addition to cold boot, Caliptra ROM performs firmware verification on hitless updates. See the [hitless update](#hitless-update) section for details.
 
@@ -986,6 +986,7 @@ Fields are little endian unless described otherwise.
 | TOC Entry Count | 4 | Number of entries in TOC. |
 | PL0 PAUSER | 4 | The PAUSER with PL0 privileges. This value is used by the RT FW to verify the caller privilege against its PAUSER. The PAUSER is wired through APB. |
 | TOC Digest | 48 | SHA384 Digest of table of contents. |
+| SVN | 4 | Security Version Number for the firmware, checked against the SVN fuses. |
 | Vendor Data | 40 | Vendor Data. <br> **Not Before:** Vendor Start Date [ASN1 Time Format] for Caliptra-issued certificates (15 bytes) <br> **Not After:** Vendor End Date [ASN1 Time Format] for Caliptra-issued certificates (15 bytes) <br> **Reserved:** (10 bytes) |
 | Owner Data | 40 | Owner Data. <br> **Not Before:** Owner Start Date [ASN1 Time Format] for Caliptra-issued certificate. Takes precedence over vendor start date (15 bytes) <br> **Not After:** Owner End Date [ASN1 Time Format] for Caliptra-issued certificates. Takes precedence over vendor end date (15 bytes) <br> **Reserved:** (10 bytes) |
 
@@ -999,8 +1000,6 @@ Fields are little endian unless described otherwise.
 | Image Type | 4 | Image Type that defines the format of the image section <br> **0x0000_0001:** Executable |
 | Image Revision | 20 | Git Commit hash of the build |
 | Image Version | 4 | Firmware release number |
-| Image SVN | 4 | Security Version Number for the Image. This field is compared against the fuses (FMC SVN or runtime SVN). |
-| Image Minimum SVN | 4 | Minimum Security Version Number for the Image. This field is compared against the fuses (FMC SVN or runtime SVN). |
 | Image Load Address | 4 | Load address |
 | Image Entry Point | 4 | Entry point to start the execution from  |
 | Image Offset | 4 | Offset from beginning of the image |
@@ -1238,8 +1237,8 @@ The following table describes Caliptra's fuse map:
 | VENDOR PK HASH                  | 384             | ROM FMC RUNTIME | SoC manufacturing                               | SHA384 hash of the Vendor ECDSA P384 and LMS or MLDSA Public Key Descriptors. |
 | ECC REVOCATION                  | 4               | ROM FMC RUNTIME | In-field programmable                           | One-hot encoded list of revoked Vendor ECDSA P384 Public Keys (up to 4 keys). |
 | OWNER PK HASH                   | 384             | ROM FMC RUNTIME | In-field programmable                           | SHA384 hash of the Owner ECDSA P384 and LMS or MLDSA Public Keys. |
-| FMC KEY MANIFEST SVN            | 32              | ROM FMC RUNTIME | In-field programmable                           | FMC security version number. |
-| RUNTIME SVN                     | 128             | ROM FMC RUNTIME | In-field programmable                           | Runtime firmware security version number. |
+| FMC KEY MANIFEST SVN            | 32              | ROM FMC RUNTIME | In-field programmable                           | FMC security version number. (Deprecated in 2.0, will be removed in a future RTL revision.) |
+| RUNTIME SVN                     | 128             | ROM FMC RUNTIME | In-field programmable                           | Firmware security version number. |
 | ANTI-ROLLBACK DISABLE           | 1               | ROM FMC RUNTIME | SoC manufacturing or in-field programmable      | Disables anti-rollback support from Caliptra. (For example, if a Platform RoT is managing FW storage and anti-rollback protection external to the SoC.) |
 | IDEVID CERT IDEVID ATTR         | 768, 352 used   | ROM FMC RUNTIME | SoC manufacturing                               | IDevID Certificate Generation Attributes. See [IDevID certificate section](#idevid-certificate). Caliptra only uses 352 bits. Integrator is not required to back the remaining 416 bits with physical fuses.
 | IDEVID MANUF HSM IDENTIFIER     | 128, 0 used     | ROM FMC RUNTIME | SoC manufacturing                               | Spare bits for Vendor IDevID provisioner CA identifiers. Caliptra does not use these bits. Integrator is not required to back these with physical fuses. |
