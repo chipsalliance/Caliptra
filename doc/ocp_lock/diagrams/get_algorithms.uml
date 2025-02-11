@@ -1,0 +1,71 @@
+'
+' OCP Lock: GET_ALGORITHMS API sequence diagram showing Caliptra FW/HW interactions
+'
+'
+@startuml
+
+!include ocp_lock_utils.inc
+
+!$show_all = %true()
+'!$show_all = %false()
+
+!if ($show_all)
+    !$show_precond = %true()
+    !$show_title = %true()
+    !$show_api = %true()
+    !$show_msg_parsing = %true()
+    !$show_done = %true()
+!else
+    !$show_precond = %false()
+    !$show_title = %false()
+    !$show_api = %false()
+    !$show_msg_parsing = %false()
+    !$show_done = %true()
+!endif
+
+
+!if ($show_title)
+    Title "GET_ALGORITHMS command sequence"
+!endif
+
+fw $async mb++ : GET_ALGORITHMS
+
+!if ($show_api)
+    note right mb
+        | <b>Field | <b>Size | <b>Definition |
+        | chksum   | u32     | Checksum over other input arguments, computed by the caller. Little endian. |
+    end note
+!endif
+
+mb $async cfw++ : Command
+
+!if ($show_msg_parsing)
+    cfw $sync mb : Get command
+    mb--
+    $self("cfw", "Determine command")
+!else
+    mb--
+!endif
+
+$self("cfw", "Fill the set of algorithms supported ")
+note over cfw
+   <font color=red>Jeff Andersen to provide the Caliptra 2.1 list of algorithms.
+end note
+
+cfw $sync mb : Command\nResponse/nSet of algorithms supported
+& mb $async fw++ : Command\nComplete
+cfw--
+!if ($show_api)
+    ||5||
+    note right mb
+        | <b>Field               | <b>Size | <b>Definition |
+        | chksum                 | u32     | Checksum over other output arguments, computed by Caliptra. Little endian. |
+        | endorsement_algorithms | u32     | Identifies the supported endorsement algorithms\n    * Byte 0 bit 0: ecdsa_secp384r1_sha384 |
+        | kem_algorithms         | u32     | Identifies the supported KEM algorithms\n    * Byte 0 bit 0: ecdh_secp384r1_aes256_gcm |
+        | pmek_algorithms        | u32     | Indicates the size of PMEKs.\n    * Byte 0 bit 0: 256 bits |
+        | access_key_algorithm   | u32     | Indicates the size of access keys.\n    * Byte 0 bit 0: 256 bits |
+        | Reserved               | u32[4]  | Reserved |
+    end note
+!endif
+
+@enduml
