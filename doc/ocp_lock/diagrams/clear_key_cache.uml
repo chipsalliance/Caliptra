@@ -1,0 +1,113 @@
+'
+' OCP Lock: CLEAR_KEY_CACHE API sequence diagram showing Caliptra FW/HW interactions
+'
+'
+@startuml
+
+!include ocp_lock_utils.inc
+
+!$show_all = %true()
+'!$show_all = %false()
+
+!if ($show_all)
+    !$show_precond = %true()
+    !$show_title = %true()
+    !$show_api = %true()
+    !$show_msg_parsing = %true()
+    !$show_done = %true()
+!else
+    !$show_precond = %false()
+    !$show_title = %false()
+    !$show_api = %false()
+    !$show_msg_parsing = %false()
+    !$show_done = %false()
+!endif
+
+!if ($show_title)
+    Title "Clear the key cache in the Encryption Engine"
+!endif
+
+!if ($show_precond)
+    note across
+        <b>Preconditions:</b>
+        * Keys may or may not be loaded in the Key Cache of the Encryption Engine
+
+        <b>Notes:</b>
+        * This sequence diagram is not showing any error reporting due to timeouts or errors reported by the Encryption Engine
+    end note
+!endif
+
+' Pre-existing state
+
+
+' API call
+fw $async mb++ : CLEAR_KEY_CACHE
+
+!if ($show_api)
+    note right mb
+        | <b>Field    | <b>Size | <b>Definition |
+        | chksum      | u32     | Checksum over other input arguments, computed by the caller. Little endian. |
+        | rdy_timeout | u32     | Timeout in ms for encryption engine to become ready for a new command |
+        | cmd_timeout | u32     | Timeout in ms for command to crypto engine to complete |
+    end note
+!endif
+
+mb $async cfw++ : Command
+
+!if ($show_msg_parsing)
+    cfw $sync mb : Get command
+    mb--
+    $self("cfw", "Determine command")
+!else
+    mb--
+!endif
+
+alt Encryption Engin has become ready
+
+    cfw $sync sfr : Read Control Reg
+
+    alt (DN == 1b || ERR == 1b || EXE == 1b)
+        cfw $sync sfr : Write Control Reg (DN = 1b)
+
+        cfw $sync cfw : Start timeout
+        cfw $sync sfr : Read Control Reg
+        group loop until (rdy_timeout or (DN == 0b && ERR == 0b && EXE == 0b)
+
+            cfw $sync sfr : Read Control Reg
+        end
+    end
+
+    cfw $sync sfr : Write Control Reg (CMD = Sanitize, DN = 0b, EXE = 1b)
+    & sfr $async ee++
+
+    ee $sync kc : Purge
+
+    cfw $sync cfw : Start timeout
+
+    cfw $sync sfr : Read Control Reg
+    group loop until (cmd_timeout or DN == 1b)
+
+        cfw $sync sfr : Read Control Reg
+
+        ee $sync sfr-- : Write Control Reg\n(Done = 1b,\n Error = 0,\n EXE = 0)
+    end
+    sfr--
+
+    cfw $sync sfr : Write Control Reg (DN = 1b)
+    note right: Reset the SFR interface for next operation - not waiting for response
+
+end
+
+cfw $sync mb : Command\nResponse
+& mb $async fw++ : Command\nComplete
+cfw--
+!if ($show_api)
+    ||5||
+    note right mb
+        | <b>Field   | <b>Size | <b>Definition |
+        | chksum      | u32     | Checksum over other output arguments, computed by Caliptra. Little endian. |
+        | fips_status | u32     | Indicates if the command is FIPS approved or an error |
+    end note
+!endif
+
+@enduml

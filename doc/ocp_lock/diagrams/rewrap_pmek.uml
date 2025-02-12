@@ -1,0 +1,203 @@
+'
+' OCP Lock: REWRAP_PMEK API sequence diagram showing Caliptra FW/HW interactions
+'
+'
+@startuml
+
+!include ocp_lock_utils.inc
+
+!$show_all = %true()
+'!$show_all = %false()
+
+!if ($show_all)
+    !$show_precond = %true()
+    !$show_title = %true()
+    !$show_api = %true()
+    !$show_msg_parsing = %true()
+    !$show_done = %true()
+!else
+    !$show_precond = %false()
+    !$show_title = %false()
+    !$show_api = %false()
+    !$show_msg_parsing = %false()
+    !$show_done = %false()
+!endif
+
+!if ($show_title)
+    Title "Rewrap PMEK"
+!endif
+
+!if ($show_precond)
+    note across
+        <b>Preconditions:</b>
+        * Access Shared Secret already availble in a slot in KV
+        * unlocking key already in a slot and generated on each reset
+    end note
+!endif
+
+srk++ $BUFFER_ACTIVATION
+kemg++ $BUFFER_ACTIVATION
+
+
+fw $async mb++ : REWRAP_PMEK
+
+!if ($show_api)
+    note right mb
+        | <b>Field                 | <b>Size                | <b>Definition |
+        | chksum                   | u32                    | Little endian |
+        | wrapped_access_key_1     | WrappedAccessKey       | KEM-wrapped access key\n   * access_key_algorithm\n   * kem_handle (X)\n   * kem_algorithm\n   * kem_ciphertext\n   * encrypted_access_key |
+        | wrapped_enc_access_key_2 | DoubleWrappedAccessKey | KEM-wrapped (access_key_2 encrypted to access_key_1)\n   * double_encrypted_access_key |
+        | old_locked_pmek          | EncryptedPmek          | PMEK encrypted to access_key_1 |
+    end note
+!endif
+
+mb $async cfw++ : Command
+
+!if ($show_msg_parsing)
+    cfw $sync mb : Get command
+    mb--
+    $self("cfw", "Determine command")
+!else
+    mb--
+!endif
+
+alt Storage Root Key exists
+
+    == Get Access Key 1 ==
+    cfw $sync kv++: Decaps(KEM Pair : kem_handle (g),\n            KEM ciphertext : kem_ciphertext from wrapped_access_key_1\n            Destination : Slot Y)
+    kv $sync kemg: Get KEM Keypair
+    kv $sync kv: Decap KEM Ciphertext with Keypair
+    kv $sync tempy: Put Shared Secret
+    tempy++ $BUFFER_ACTIVATION
+    !if ($show_done)
+        kv $sync cfw-- : done
+    !else
+        kv--
+    !endif
+
+
+    cfw $sync kv++: Unwrap(Key : Slot Y\n            Key Data : wrapped_access_key_1,\n            Destination : Slot Z)
+    kv $sync tempy: Get Shared Secret
+    kv $sync kv: Unwrap wrapped_access_key_1
+    kv $sync tempz: Put Access Key 1
+    tempz++ $BUFFER_ACTIVATION
+    !if ($show_done)
+        kv $sync cfw-- : done
+    !else
+        kv--
+    !endif
+
+    == Get Access Key 2 ==
+    cfw $sync kv++: Unwrap(Key : Slot Y,\n            Key Data: double_encrypted_access_key,\n            Destination Memory: <font color=red>Put in memory as not a key)
+    kv $sync tempy: Get Shared Secret
+    kv $sync kv: Unwrap double_encrypted_access_key\nwith Slot Y
+    kv $sync tempmem: Encrypted Access Key 2
+'    note left
+'      <font color=red>We are encrypting the access key 2 twice, first
+'      <font color=red>with the access key 1 and then second with the
+'      <font color=red>shared secret. If we limit our access key encryption
+'      <font color=red>algorihtm to AEAD, such as AES-GCM, we can replace
+'      <font color=red>it by a single encryption with the shared secret as
+'      <font color=red>key and the access key 1 as associated data.
+'    end note
+    tempmem++ $BUFFER_ACTIVATION
+    !if ($show_done)
+        kv $sync cfw-- : done
+    !else
+        kv--
+    !endif
+
+    cfw $sync kv++: Unwrap(Key : Slot Z\n            Key Data : Temp Memory,\n            Destination : Slot Y)
+    kv $sync tempz: Get Access Key 1
+    kv $sync tempmem: Get encrypted_access_key
+    kv $sync kv: Unwrap encrypted access key 2
+    kv $sync tempy: Put Access Key 2
+    !if ($show_done)
+        kv $sync cfw-- : done
+    !else
+        kv--
+    !endif
+
+
+    == Create PMEK wrapping/unwrapping Keys ==
+    cfw $sync kv++: HMAC512_Slots(Key : Slot A,\n                         Data Key : Slot Z\n                         Destination : Slot W)
+    kv $sync srk: Get Storage Root Key
+    kv $sync tempz: Get Access Key 1
+    kv $sync kv: HMAC512 slot A and Slot Z
+    kv $sync tempw: HMAC512 result Encryption Key for old PMEK
+    tempw++ $BUFFER_ACTIVATION
+    !if ($show_done)
+        kv $sync cfw-- : done
+    !else
+        kv--
+    !endif
+
+    cfw $sync kv++: HMAC512_Slots(Key : Slot A,\n                         Data Key : Slot Y\n                         Destination : Slot Z)
+    kv $sync srk: Get System Root Key
+    kv $sync tempy: Get Access Key 2
+    kv $sync kv: HMAC512 slot A and Slot Y
+    kv $sync tempz: HMAC512 result New Encryption Key for PMEK
+    !if ($show_done)
+        kv $sync cfw-- : done
+    !else
+        kv--
+    !endif
+
+    == Get PMEK ==
+    cfw $sync kv++: Unwrap(Key : Slot W,\n            Key Data: locked_pmek\n            Destination : Slot Y)
+    kv $sync tempw: Encryption Key for old PMEK
+    kv $sync kv: Unwrap locked_pmek
+    kv $sync tempy: PMEK
+    !if ($show_done)
+        kv $sync cfw-- : done
+    !else
+        kv--
+    !endif
+
+
+    == Create the locked PMEK ==
+    cfw $sync kv++: Wrap(Key: Slot Z,\n             Data Key : Slot Y\n             Destination : new_locked_pmek)
+    kv $sync tempz: Get New Encryption Key
+    kv $sync tempy: Get PMEK
+    kv $sync kv: Wrap slot Y with Slot Z to\ngenerate new_encrypted_pmek
+    !if ($show_done)
+        kv $sync cfw-- : new_encrypted_pmek
+    !else
+        kv--
+    !endif
+
+    cfw $sync kv++: Purge_key(Key: Slot W,\n                Key : Slot Y,\n                Key : Slot Z)
+    kv $sync tempw !! : Purge
+    & kv $sync tempy !!
+    & kv $sync tempz !!
+    !if ($show_done)
+        kv $sync cfw-- : done
+    !else
+        kv--
+    !endif
+end
+
+note left tempmem
+    <font color=red>Did not purge temp memory
+    <font color=red>as it contains encrypted object
+    purge
+end note
+
+
+cfw $sync mb : Command response\nnew_encrypted_pmek
+& mb $async fw++ : Command\ncomplete
+
+!if ($show_api)
+    note right mb
+        | <b>Field           | <b>Size       | <b>Definition |
+        | chksum             | u32           | Little endian |
+        | fips_status        | u32           | Indicates if the command is FIPS approved or an error |
+        | new_encrypted_pmek | EncryptedPmek | PMEK encrypted to access_key_2 |
+    end note
+!endif
+cfw--
+
+
+
+
+@enduml

@@ -1,0 +1,262 @@
+'
+' OCP Lock: UNLOCK_PMEK API sequence diagram showing Caliptra FW/HW interactions
+'
+@startuml
+
+!include ocp_lock_utils.inc
+
+!$show_all = %true()
+'!$show_all = %false()
+
+!if ($show_all)
+    !$show_precond = %true()
+    !$show_title = %true()
+    !$show_api = %true()
+    !$show_msg_parsing = %true()
+    !$show_done = %true()
+!else
+    !$show_precond = %false()
+    !$show_title = %false()
+    !$show_api = %false()
+    !$show_msg_parsing = %false()
+    !$show_done = %false()
+!endif
+
+!if ($show_title)
+    Title "Unlock PMEK"
+!endif
+
+!if ($show_precond)
+    note across
+        <b>Preconditions:</b>
+        * Access Shared Secret already availble in a slot in KV
+        * unlocking key already in a slot and generated on each reset
+        <font color=red>Is there a separate Shared Secret per Admin User?</font>
+    end note
+!endif
+
+srk++ $BUFFER_ACTIVATION
+kemg++ $BUFFER_ACTIVATION
+pmeks++ $BUFFER_ACTIVATION
+
+fw $async mb++ : UNLOCK_PMEK
+
+!if ($show_api)
+    note right mb
+        | <b>Field            | <b>Size          | <b>Definition |
+        | chksum              | u32              | Little endian |
+        | wrapped_access_key  | WrappedAccessKey | KEM-wrapped access keyn* kem_handle\n*kem_algorithm\n*kem_ciphertext\n* encrypted_access_key  |
+        | locked_pmek         | EncryptedPmek    | PMEK encrypted to storage root key and access key |
+    end note
+!endif
+
+mb $async cfw++ : Command
+
+!if ($show_msg_parsing)
+    cfw $sync mb : Get command
+    mb--
+    $self("cfw", "Determine command")
+!else
+    mb--
+!endif
+cfw $sync cfw: Determine rate of unlocking
+
+alt Storage Root Key exists
+    alt Unlocking rate below threshold
+
+        == Get the Access Key ==
+        alt kem_id = 0x0011 (DHKEM(P-384, HKDF-SHA384))
+            cfw $sync kv++: ECDH(KEM Pair : kem_handle (G),\n            KEM ciphertext : kem_ciphertext\n            Destination : memory)
+            kv $sync kemg: Get KEM Keypair
+            kv $sync kv: ECDH KEM Ciphertext with Keypair
+            kv $sync cfw: Put DH result
+            !if ($show_done)
+                kv $sync cfw-- : done
+            !else
+                kv--
+            !endif
+            
+            cfw $sync kv++: ECC_GetPubKey(KEM Pair : kem_handle (G))
+            kv $sync kemg: Get KEM Keypair
+            kv $sync kv: ECC derive public key
+            kv $sync cfw: Put kem_pub
+            !if ($show_done)
+                kv $sync cfw-- : done
+            !else
+                kv--
+            !endif
+            
+            note right cfw
+                The next steps come from RFC 9180, section 4.1, Decap function
+            end note
+            
+            == Derive HPKE pseudo-random key material (PRK) ==
+
+            cfw $sync kv++: HMAC384(Key : empty,\n                         Key Data : "HPKE-v1" | "KEM" | 0x0011 (kem_id) | "eae_prk" | DH result\n                         Destination Slot: Y)
+            kv $sync kv: HMAC384 operation
+            kv $sync tempy: HMAC384 result PRK
+            tempy++ $BUFFER_ACTIVATION
+            !if ($show_done)
+                kv $sync cfw-- : done
+            !else
+                kv--
+            !endif
+            
+            == Derive HPKE shared secret ==
+
+            cfw $sync kv++: HMAC384(Key : Slot Y,\n                         Data : 0x0030 (big-endian 48) | "HPKE-v1" | "KEM" | 0x0011 (kem_id) | "shared_secret" | kem_ciphertext | kem_pub | 0x01 (HKDF block number)\n                         Destination Slot: Y)
+            kv $sync tempy: Get HPKE PRK
+            kv $sync kv: HMAC384 slot Y with data
+            kv $sync tempy: HMAC384 result shared secret
+            !if ($show_done)
+                kv $sync cfw-- : done
+            !else
+                kv--
+            !endif
+        end
+        
+        alt kem_id = 0x0011 (DHKEM(P-384, HKDF-SHA384)), kdf_id = 0x0002 (HKDF-SHA384), aead_id = 0x0002 (AES-256-GCM)
+            note right cfw
+                The next steps come from RFC 9180, sections 5.1 and 5.2, KeyScheduleBase and ContextR.Open functions respectively
+            end note
+            
+            == Derive HPKE psk_id_hash and store in memory ==
+            
+            cfw $sync kv++: HMAC384(Key : empty,\n                         Data : "HPKE-v1" | "HPKE" | 0x0011 (kem_id) | 0x0002 (kdf_id) | 0x0002 (aead_id) | "psk_id_hash" | "" (no PSK ID)\n                         Destination : memory)
+            kv $sync kv: HMAC384 operation
+            kv $sync cfw: HMAC384 result psk_id_hash
+            !if ($show_done)
+                kv $sync cfw-- : done
+            !else
+                kv--
+            !endif
+            
+            == Derive HPKE info_hash and store in memory ==
+            
+            cfw $sync kv++: HMAC384(Key : empty,\n                         Data : "HPKE-v1" | "HPKE" | 0x0011 (kem_id) | 0x0002 (kdf_id) | 0x0002 (aead_id) | "info_hash" | "enable_access"\n                         Destination: memory)
+            kv $sync kv: HMAC384 operation
+            kv $sync cfw: HMAC384 result info_hash
+            !if ($show_done)
+                kv $sync cfw-- : done
+            !else
+                kv--
+            !endif
+            
+            == Derive HPKE secret and store in KV slot ==
+            
+            cfw $sync kv++: HMAC384(Key : Slot Y,\n                         Data : "HPKE-v1" | "HPKE" | 0x0011 (kem_id) | 0x0002 (kdf_id) | 0x0002 (aead_id) | "secret" | "" (no PSK)\n                         Destination Slot: Y)
+            kv $sync tempy: Get HPKE shared secret
+            kv $sync kv: HMAC384 slot Y with data
+            kv $sync tempy: HMAC384 result secret
+            !if ($show_done)
+                kv $sync cfw-- : done
+            !else
+                kv--
+            !endif
+            
+            == Derive HPKE base_nonce and store in memory ==
+            
+            cfw $sync kv++: HMAC384(Key : Slot Y,\n                         Data : 0x000C (big-endian 12) | "HPKE-v1" | "HPKE" | 0x0011 (kem_id) | 0x0002 (kdf_id) | 0x0002 (aead_id) | "base_nonce" | 0x00 (HPKE mode) | psk_id_hash | info_hash\n                         Destination: memory)
+            kv $sync tempy: Get HPKE secret
+            kv $sync kv: HMAC384 slot Y with data
+            kv $sync cfw: HMAC384 result base_nonce
+            note right kv
+                The base_nonce is truncated to 12 bytes
+            end note
+            !if ($show_done)
+                kv $sync cfw-- : done
+            !else
+                kv--
+            !endif
+            
+            == Derive HPKE key and store in KV slot ==
+            
+            cfw $sync kv++: HMAC384(Key : Slot Y,\n                         Data : 0x0020 (big-endian 32) | "HPKE-v1" | "HPKE" | 0x0011 (kem_id) | 0x0002 (kdf_id) | 0x0002 (aead_id) | "key" | 0x00 (HPKE mode) | psk_id_hash | info_hash\n                         Destination Slot: Y)
+            kv $sync tempy: Get HPKE secret
+            kv $sync kv: HMAC384 slot Y with data
+            kv $sync tempy: HMAC384 result key
+            note right kv
+                The key is truncated to 32 bytes for use as an AES-256-GCM key
+            end note
+            !if ($show_done)
+                kv $sync cfw-- : done
+            !else
+                kv--
+            !endif
+            
+            == Decrypt access key and store in KV Slot ==
+            
+            cfw $sync kv++: AES-256-GCM(Key : Slot Y,\n            IV : base_nonce,\n            Ciphertext : encrypted_access_key_ciphertext,\n            Tag : encrypted_access_key_tag,\n            AAD : "",\n            Destination : Slot Z)
+            kv $sync tempy: Get HPKE key
+            kv $sync kv: AES-256-GCM decrypt access key
+            kv $sync tempz: Put access key
+            tempz++ $BUFFER_ACTIVATION
+            !if ($show_done)
+                kv $sync cfw-- : done
+            !else
+                kv--
+            !endif
+        end
+
+        == Create the Encryption Key ==
+
+        cfw $sync kv++: HMAC512_Slots(Key : Slot A,\n                         Data Key : Slot Z\n                         Destination Slot: Y)
+        kv $sync srk: Get Storage Root Key
+        kv $sync tempz: Get Access Key
+        kv $sync kv: HMAC512 Slot A with Slot Z
+        kv $sync tempy: HMAC512 result PMEK
+        !if ($show_done)
+            kv $sync cfw-- : done
+        !else
+            kv--
+        !endif
+
+        == Extract PMEK with Encryption Key ==
+
+        cfw $sync kv++: Unwrap(Key : Slot Y,\n            Data: locked_pmek\n            Destination :  Slot Z)
+        kv $sync tempy: Get Encryption Key
+        kv $sync kv: Decrypt locked_pmek
+        kv $sync tempz: PMEK
+        !if ($show_done)
+            kv $sync cfw-- : done
+        !else
+            kv--
+        !endif
+
+        == Encrypt PMEK with unlocked Encryption Key ==
+
+        cfw $sync kv++: Wrap(Key: Slot B,\n         Data Key : Slot Z\n         Destination : unlocked_pmek)
+        kv $sync pmeks: Get Encryption Key
+        kv $sync tempz: Get PMEK
+        kv $sync kv: Encrypt slot Z using Slot B
+        !if ($show_done)
+            kv $sync cfw-- : Unocked PMEK
+        !else
+            kv--
+        !endif
+
+        cfw $sync kv++: Purge_key(Key: Slot Y,\n                Key : Slot Z)
+        kv $sync tempy !! : Purge
+        & kv $sync tempz !!
+        !if ($show_done)
+            kv $sync cfw-- : done
+        !else
+            kv--
+        !endif
+
+        cfw $sync mb : Command response\nUnlocked_PMEK
+        & mb $async fw++ : Command\ncomplete
+    end
+end
+
+!if ($show_api)
+    note right mb
+        | <b>Field      | <b>Size       | <b>Definition |
+        | chksum        | u32           | Little endian |
+        | fips_status   | u32           | Indicates if the command is FIPS approved or an error |
+        | unlocked_pmek | EncryptedPmek | PMEK encrypted to an export secret that is rotated  on reset |
+    end note
+!endif
+cfw--
+
+@enduml
