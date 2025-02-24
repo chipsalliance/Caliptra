@@ -845,7 +845,7 @@ The corresponding journey measurement computation is the chained extension of \[
 
 ## Anti-rollback support
 
-Caliptra shall provide fuse banks (refer to *Table 21: Caliptra Fuse Map*) that are used for storing monotonic counters to provide anti-rollback enforcement for Caliptra mutable firmware. Each distinctly signed boot stage shall be associated with its own anti-rollback fuse field. Together with the vendor, Caliptra allows owners to enforce strong anti-rollback requirements, in addition to supporting rollback to a previous firmware version. This is a critical capability for hyper scalar owners.
+Caliptra shall provide fuse banks (refer to *Table 21: Caliptra Fuse Map*) that are used for storing monotonic counters to provide anti-rollback enforcement for Caliptra mutable firmware. Each distinctly signed boot stage shall be associated with its own anti-rollback fuse field. Together with the vendor, Caliptra allows owners to enforce strong anti-rollback requirements, in addition to supporting rollback to a previous firmware version. This is a critical capability for hyperscalers.
 
 Caliptra firmware shall include an SVN value in the signed header. If the firmware's SVN value is less than the current counter value in the fuse bank, Caliptra shall refuse to boot that firmware, regardless of whether the signature is valid.
 
