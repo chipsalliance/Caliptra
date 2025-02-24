@@ -845,7 +845,7 @@ The corresponding journey measurement computation is the chained extension of \[
 
 ## Anti-rollback support
 
-Caliptra shall provide fuse banks (refer to *Table 20: Caliptra Fuse Map*) that are used for storing monotonic counters to provide anti-rollback enforcement for Caliptra mutable firmware. Each distinctly signed boot stage shall be associated with its own anti-rollback fuse field. Together with the vendor, Caliptra allows owners to enforce strong anti-rollback requirements, in addition to supporting rollback to a previous firmware version. This is a critical capability for hyper scalar owners.
+Caliptra shall provide fuse banks (refer to *Table 21: Caliptra Fuse Map*) that are used for storing monotonic counters to provide anti-rollback enforcement for Caliptra mutable firmware. Each distinctly signed boot stage shall be associated with its own anti-rollback fuse field. Together with the vendor, Caliptra allows owners to enforce strong anti-rollback requirements, in addition to supporting rollback to a previous firmware version. This is a critical capability for hyper scalar owners.
 
 Caliptra firmware shall include an SVN value in the signed header. If the firmware's SVN value is less than the current counter value in the fuse bank, Caliptra shall refuse to boot that firmware, regardless of whether the signature is valid.
 
@@ -1168,16 +1168,47 @@ Caliptra provides a HW API to do a SHA384 hash calculation. The SoC can access t
 5. HVM, through JTAG, can also inject microcontroller TAP commands at this point following the [VeeR Specification](https://github.com/chipsalliance/Cores-VeeR-EL2).
 6. HVM, through JTAG or through the Caliptra SoC interface, writes to “CPTRA\_BOOTFSM\_GO” to allow Caliptra’s internal BootFSM to continue to bring up microcontroller out of reset.
 7. Microcontroller executes the appropriate debug service.
-8. Specific SoC interface registers (MBOX\_DLEN, MBOX\_DOUT, MBOX\_STATUS, CPTRA\_BOOT\_STATUS, CPTRA\_HW\_ERRROR\_ENC, CPTRA\_FW\_ERRROR\_ENC, BOOTFSM\_GO, CPTRA\_DBG\_MANUF\_SERVICE\_REG) are accessible over the JTAG interface in debug (or manufacturing mode). The following are the JTAG register addresses for these registers:
-    1. DMI\_REG\_MBOX\_DLEN = 7'h50; (Read-only)
-    2. DMI\_REG\_MBOX\_DOUT = 7'h51; (Read-only)
-    3. DMI\_REG\_MBOX\_STATUS = 7'h52; (Read-only)
-    4. DMI\_REG\_BOOT\_STATUS = 7'h53; (Read-only)
-    5. DMI\_REG\_CPTRA\_HW\_ERRROR\_ENC = 7'h54; (Read-only)
-    6. DMI\_REG\_CPTRA\_FW\_ERROR\_ENC = 7'h55; (Read-only)
-    7. DMI\_REG\_CPTRA\_DBG\_MANUF\_SERVICE\_REG = 7'h60; (Read-Write)
-    8. DMI\_REG\_BOOTFSM\_GO = 7'h61; (Read-Write)
-    9. Note: These are injected as TAP register read/write commands as defined in the [VeeR Specification](https://github.com/chipsalliance/Cores-VeeR-EL2).
+8. Specific SoC interface registers are accessible over the JTAG interface in debug (or manufacturing mode). The following are the JTAG register addresses for these registers.
+
+*Table 20: JTAG accessible registers*
+
+| Register name | JTAG address | Accessibility |
+|---------------|--------------|---------------|
+| MBOX_DLEN | 7'h50 | RO |
+| MBOX_DOUT | 7'h51 | RO |
+| MBOX_STATUS | 7'h52 | RO |
+| BOOT_STATUS | 7'h53 | RO |
+| CPTRA_HW_ERRROR_ENC | 7'h54 | RO |
+| CPTRA_FW_ERROR_ENC | 7'h55 | RO |
+| SS_UDS_SEED_BASE_ADDR_L | 7'h56 | RO |
+| SS_UDS_SEED_BASE_ADDR_H | 7'h57 | RO |
+| HW_FATAL_ERROR | 7'h58 | RO |
+| FW_FATAL_ERROR | 7'h59 | RO |
+| HW_NON_FATAL_ERROR | 7'h5a | RO |
+| FW_NON_FATAL_ERROR | 7'h5b | RO |
+| CPTRA_DBG_MANUF_SERVICE_REG | 7'h60 | RW |
+| BOOTFSM_GO | 7'h61 | RW |
+| MBOX_DIN | 7'h62 | RW |
+| SS_DEBUG_INTENT | 7'h63 | RW |
+| SS_CALIPTRA_BASE_ADDR_L | 7'h64 | RW |
+| SS_CALIPTRA_BASE_ADDR_H | 7'h65 | RW |
+| SS_MCI_BASE_ADDR_L | 7'h66 | RW |
+| SS_MCI_BASE_ADDR_H | 7'h67 | RW |
+| SS_RECOVERY_IFC_BASE_ADDR_L | 7'h68 | RW |
+| SS_RECOVERY_IFC_BASE_ADDR_H | 7'h69 | RW |
+| SS_OTP_FC_BASE_ADDR_L | 7'h6A | RW |
+| SS_OTP_FC_BASE_ADDR_H | 7'h6B | RW |
+| SS_STRAP_GENERIC_0 | 7'h6C | RW |
+| SS_STRAP_GENERIC_1 | 7'h6D | RW |
+| SS_STRAP_GENERIC_2 | 7'h6E | RW |
+| SS_STRAP_GENERIC_3 | 7'h6F | RW |
+| SS_DBG_MANUF_SERVICE_REG_REQ | 7'h70 | RW |
+| SS_DBG_MANUF_SERVICE_REG_RSP | 7'h71 | RW |
+| SS_DBG_UNLOCK_LEVEL0 | 7'h72 | RW |
+| SS_DBG_UNLOCK_LEVEL1 | 7'h73 | RW |
+| SS_STRAP_CALIPTRA_DMA_AXI_USER | 7'h74 | RW |
+
+Note: These are injected as TAP register read/write commands as defined in the [VeeR Specification](https://github.com/chipsalliance/Cores-VeeR-EL2).
 
 **Notes:**
 
@@ -1228,7 +1259,7 @@ For SoCs that intend to achieve FIPS 140-3 CMVP certification with Caliptra:
 **FIXME:** Needs updates for Caliptra 2p0 & Subsystem
 The following table describes Caliptra's fuse map:
 
-*Table 20: Caliptra Fuse Map*
+*Table 21: Caliptra Fuse Map*
 
 | **Name**                        | **Size (bits)** | **ACL**         | **Fuse programming time**                       | **Description** |
 | ------------------------------- | --------------- | --------------- | ----------------------------------------------- | --------------- |
@@ -1256,7 +1287,7 @@ The following table describes Caliptra's fuse map:
 
 This section describes Caliptra error reporting and handling.
 
-*Table 21: Hardware and firmware error types*
+*Table 22: Hardware and firmware error types*
 
 | | Fatal errors | Non-fatal errors |
 | :- | - | - |
