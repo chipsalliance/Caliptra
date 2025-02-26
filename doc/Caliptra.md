@@ -1174,7 +1174,7 @@ Caliptra provides a HW API to do a SHA384 hash calculation. The SoC can access t
 
 | Register name | JTAG address | Accessibility |
 |---------------|--------------|---------------|
-| MBOX_LOCK | 7'h75 | RW |
+| MBOX_LOCK | 7'h75 | RO |
 | MBOX_CMD | 7'h76 | RW |
 | MBOX_DLEN | 7'h50 | RW |
 | MBOX_DOUT | 7'h51 | RO |
