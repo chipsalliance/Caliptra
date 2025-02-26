@@ -1174,11 +1174,13 @@ Caliptra provides a HW API to do a SHA384 hash calculation. The SoC can access t
 
 | Register name | JTAG address | Accessibility |
 |---------------|--------------|---------------|
-| MBOX_DLEN | 7'h50 | RO or RW (mailbox in EXECUTE_TAP state) |
+| MBOX_LOCK | 7'h75 | RW |
+| MBOX_CMD | 7'h76 | RW |
+| MBOX_DLEN | 7'h50 | RW |
 | MBOX_DOUT | 7'h51 | RO |
-| MBOX_STATUS | 7'h52 | RO or RW (mailbox in EXECUTE_TAP state) |
-| MBOX_CMD | 7'h75 | RO or RW (mailbox in EXECUTE_TAP state) |
-| MBOX_DIN | 7'h62 | WO (mailbox in EXECUTE_TAP state) |
+| MBOX_DIN | 7'h62 | WO |
+| MBOX_STATUS | 7'h52 | RW |
+| MBOX_EXECUTE | 7'h77 | WO |
 | BOOT_STATUS | 7'h53 | RO |
 | CPTRA_HW_ERRROR_ENC | 7'h54 | RO |
 | CPTRA_FW_ERROR_ENC | 7'h55 | RO |
