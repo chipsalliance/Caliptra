@@ -1246,7 +1246,7 @@ The following table describes Caliptra's fuse map:
 | LMS REVOCATION                  | 32              | ROM             | In-field programmable                           | One-hot encoded list of revoked Vendor LMS Public Keys (up to 32 keys). |
 | MLDSA REVOCATION                | 4               | ROM             | In-field programmable                           | One-hot encoded list of revoked Vendor MLDSA Public Keys (up to 4 keys). |
 | SOC STEPPING ID                 | 16              | ROM FMC RUNTIME | SoC manufacturing                               | Identifier assigned by vendor to differentiate silicon steppings. |
-| MANUF_DEBUG_UNLOCK_TOKEN        | 512             | ROM             | SoC manufacturing                               | Hash value for manufacturing debug unlock token secret value for authorization. |
+| MANUF_DEBUG_UNLOCK_TOKEN        | 512             | ROM             | SoC manufacturing                               | Digest value for manufacturing debug unlock token secret value for authorization. |
 | PQC Key Type                    | 2               | ROM FMC RUNTIME | In-field programmable                           | One-hot encoded selection of PQC key type for firmware validation. <br> - **Bit 0** - MLDSA <br> - **Bit 1** - LMS<br>|
 | SOC MANIFEST SVN                | 128             | ROM FMC RUNTIME | In-field programmable                           | One-hot encoded value for the SOC authorization manifest minimum supported SVN. |
 | SOC MANIFEST MAX SVN            | 8               | ROM FMC RUNTIME | In-field programmable                           | Maximum value for the SOC authorization manifest SVN. |
