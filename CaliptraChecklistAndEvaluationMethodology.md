@@ -2,38 +2,6 @@
 
 **Version 0.2**
 
-# Contents  
-
-[Introduction](#introduction)
-
-[Checklist Summary](#checklist-summary)
-
-[Checklist Areas](#checklist-areas)
-
-[Assets](#assets)
-
-[UDS Seed & Field Entropy](#uds-seed-&-field-entropy)
-
-[FW Authentication Keys](#fw-authentication-keys)
-
-[IDEVID Generation and Endorsement Flow](#idevid-generation-and-endorsement-flow)
-
-[Obfuscation Key](#obfuscation-key)
-
-[Fuses](#fuses)
-
-[Interfaces](#interfaces)
-
-[SoC Root of Trust (RoT)](#soc-root-of-trust-\(rot\))
-
-[Specific Functionality](#specific-functionality)
-
-[Secure Processes](#secure-processes)
-
-[Development Process](#development-process)
-
-[Production Process](#production-process)
-
 # Introduction {#introduction}
 
 The **Caliptra Checklist and Evaluation Methodology** document serves as a comprehensive guide for ensuring the secure and correct integration of the Caliptra intellectual property (IP) into a system-on-chip (SoC). Caliptra is a hardware root-of-trust (RoT) IP designed to provide foundational security services within a computing system. Proper integration of Caliptra is crucial to maintaining the overall security posture of the final product.

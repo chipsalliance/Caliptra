@@ -6,34 +6,12 @@
 
 **2025/01/21**
 
-| Authors: | Anders Möller DEKRA Juan Jurado DEKRA John Traver AMD  |
-| :---- | :---- |
-
 **Document history**
 
 | Version | Date | Changes |
 | :---- | :---- | :---- |
 | 0.1 | 2024/09/30 | First draft of the report |
 | 0.2 | 2025/01/21 | Additional Changes after Feedback |
-
-Content  
-[Introduction	4](#introduction)
-
-[Current document status	4](#current-document-status)
-
-[Caliptra Trademark Auditing Process	5](#caliptra-trademark-auditing-process)
-
-[Suggestion	5](#suggestion)
-
-[Roles	5](#roles)
-
-[Properties of the scheme	5](#properties-of-the-scheme)
-
-[Overview of example scheme	6](#overview-of-example-scheme)
-
-[Specific questions for the scheme rules	7](#specific-questions-for-the-scheme-rules)
-
-[Typical process for obtaining the Caliptra Trademark	8](#typical-process-for-obtaining-the-caliptra-trademark)
 
 # Introduction {#introduction}
 
@@ -48,12 +26,6 @@ The main objective of the Checklist document is to ensure the secure integration
 * Provide an interface for storing additional measurements.  
 * **Report measurements** to a host and/or external entity, which can further verify the authenticity & integrity of the device (a.k.a Attestation)  
 * Furthermore, Caliptra offers **DICE hardware identity service**.
-
-# Current document status {#current-document-status}
-
-This is a draft document used to discuss questions in order to later provide final deliveries in a different format.
-
-The scope of this document is interpreted as outside of the original task, but in the discussions, it has been identified that this area is interesting to explore. Hence a final delivery defining a whole scheme in this area is also not interpreted within the scope.
 
 # Caliptra Trademark Auditing Process {#caliptra-trademark-auditing-process}
 
@@ -166,10 +138,9 @@ This section considers some specific questions and suggestions for discussion on
 1. The manufacturer contacts a licensed laboratory.  
 2. The laboratory and manufacturer agree on terms and sign a contract to help respond to the documentation required within the checklist and methodology document.  
 3. The laboratory and manufacturer communicate and jointly, when aligned, provides an application for Caliptra Trademark Usage for a TOE to Caliptra Trademark Owner TAC, signed by both laboratory and manufacturer.  
-4. The Caliptra TAC accepts or denies the application based on the recommendation from the lab to provide the final Trademark.  
-5. The manufacturer is responsible of providing a self-assessment of why the checklist requirements are fulfilled, together with other necessary information for the laboratory.  
-6. The laboratory evaluates and assesses the TOE using the provided filled-in checklist and the evaluation methodology. Iterations with the manufacturer are expected until all issues are resolved, as judged by the laboratory.  
-7. The laboratory produces an evaluation technical report, using an evaluation technical report template, and sends this to the Caliptra Trademark Owner.  
-8. The Caliptra Trademark Owner TAC assesses the submitted evaluation technical report, and, if needed, communicates with the laboratory for any questions and comments.  
-9. The Caliptra Trademark Owner determines to grant or deny the usage of the Caliptra Trademark for the TOE.  
-10. Caliptra Trademark Owner publishes the granted Caliptra Trademark Usage for the TOE, together with other previously accepted TOEs.
+4. The manufacturer is responsible of providing a self-assessment of why the checklist requirements are fulfilled, together with other necessary information for the laboratory.  
+5. The laboratory evaluates and assesses the TOE using the provided filled-in checklist and the evaluation methodology. Iterations with the manufacturer are expected until all issues are resolved, as judged by the laboratory.  
+6. The laboratory produces an evaluation technical report, using an evaluation technical report template, and sends this to the Caliptra Trademark Owner.  
+7. The Caliptra Trademark Owner TAC assesses the submitted evaluation technical report, and, if needed, communicates with the laboratory for any questions and comments.  
+8. The Caliptra Trademark Owner determines to grant or deny the usage of the Caliptra Trademark for the TOE.  
+9. Caliptra Trademark Owner publishes the granted Caliptra Trademark Usage for the TOE, together with other previously accepted TOEs.
