@@ -23,6 +23,10 @@ The [Caliptra WorkGroup Technical Charter](https://github.com/chipsalliance/Cali
 sets out the charter governing the Caliptra project and [its
 marks](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkPolicy.md).
 
+## Trademark
+* [Caliptra Trademark Process definition](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkAuditProcess.md)
+* [Caliptra Trademark Checklist and Evaluation Methodology](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraChecklistAndEvaluationMethodology.md)
+
 ## Specifications
 
 ### Caliptra 1.x:
