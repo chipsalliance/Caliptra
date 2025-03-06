@@ -96,11 +96,11 @@ The following is a consolidated list of all requirements to ensure comprehensive
 ### FW Authentication Keys {#fw-authentication-keys}
 
 * **Checklist Item:**  
-  * **Requirement:** Firmware authentication keys MUST be generated using an ESV certified entropy source, and key derivation functions specified by NIST SP 800-208 and FIPS 186-4.
+  * **Requirement:** Firmware authentication keys MUST be generated using an [ESV](https://csrc.nist.rip/Projects/cryptographic-module-validation-program/entropy-validations/esv) certified entropy source, and key derivation functions specified by [NIST SP 800-208](https://csrc.nist.gov/pubs/sp/800/208/final) and [FIPS 186-4](https://csrc.nist.gov/pubs/fips/186-4/final).
   * **Requirement:** Firmware authentication keys MUST NOT allow unauthorized users to perform signing operations.
   * **Requirement:** Firmware authentication keys MUST be stored in a manner that prevents disclosure of private key material, and does not permit keys to be exported or copied to systems that do not enforce the same controls on usage and disclosure of the key.
   * **Requirement:** Signing operations performed using the firmware authentication key MUST be logged.
-  * **Requirement:** Firmware authentication keys SHOULD be created and stored in a FIPS 140-3 certified Hardware Security Module (HSM).
+  * **Requirement:** Firmware authentication keys SHOULD be created and stored in a [FIPS 140-3](https://csrc.nist.gov/pubs/fips/140-3/final) certified Hardware Security Module (HSM).
   * **Requirement:** Firmware authentication keys SHOULD require multi-party authentication to perform signing operations.
   * **Evaluation Methodology:** Manufacturers MUST describe their key management practices, including storage solutions, access controls, and procedures to prevent unauthorized access.
 
@@ -123,7 +123,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Generation and Handling*
 
 * **Checklist Item:**  
-  * **Requirement:** The obfuscation key MUST be generated using a method that ensures sufficient entropy, such as an ESV certified HSM or an on-die Physically Unclonable Function (PUF) compliant with industry standards.  
+  * **Requirement:** The obfuscation key MUST be generated using a method that ensures sufficient entropy, such as an [ESV](https://csrc.nist.rip/Projects/cryptographic-module-validation-program/entropy-validations/esv) certified entropy source or an on-die Physically Unclonable Function (PUF) compliant with industry standards.  
   * **Evaluation Methodology:** Manufacturers MUST provide documentation on the obfuscation key generation method, including entropy measurements and compliance with relevant standards if applicable.  
 * **Checklist Item:**  
   * **Requirement:** The obfuscation key MUST NOT be accessible (readable or modifiable) to firmware or any on-chip non-caliptra entities, including preventing oracle attacks.  
@@ -213,7 +213,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 
 * **Checklist Item:**  
   * **Requirement:** If an RNG is included in the Caliptra Wrapper, it MUST be securely implemented, and its design MUST meet applicable cryptographic standards. The source of entropy (internal or external) MUST be specified.  
-  * **Evaluation Methodology:** Manufacturers MUST provide specifications of the RNG, including entropy sources, compliance with standards like NIST SP 800-90A/B/C, and any test results validating its performance.
+  * **Evaluation Methodology:** Manufacturers MUST provide specifications of the RNG, including entropy sources, compliance with standards like [NIST SP 800-90A](https://csrc.nist.gov/pubs/sp/800/90/a/r1/final), [SP 800-90B](https://csrc.nist.gov/pubs/sp/800/90/b/final), [SP 800-90C](https://csrc.nist.gov/pubs/sp/800/90/c/4pd), and test results validating its performance.
 
 #### *SRAM Zeroization Process*
 
