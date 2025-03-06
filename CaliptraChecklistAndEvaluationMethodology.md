@@ -95,16 +95,13 @@ The following is a consolidated list of all requirements to ensure comprehensive
 
 ### FW Authentication Keys {#fw-authentication-keys}
 
-#### *Generation and Handling*
-
 * **Checklist Item:**  
-  * **Requirement:** Firmware authentication keys MUST be generated using a secure process, preferably utilizing a Hardware Security Module (HSM) certified under standards like FIPS 140-3.  
-  * **Evaluation Methodology:** Manufacturers MUST provide documentation of the key generation process, including details about the HSM used, its certification status, and how it ensures sufficient entropy and key integrity. If non-HSM solutions are used, they must meet equivalent security requirements.
-
-#### *Private Key Security*
-
-* **Checklist Item:**  
-  * **Requirement:** The private keys used for firmware authentication MUST be securely stored and handled, with access limited to authorized personnel and systems. An HSM or equivalent secure storage MUST be used.  
+  * **Requirement:** Firmware authentication keys MUST be generated using an ESV certified entropy source, and key derivation functions specified by NIST SP 800-208 and FIPS 186-4.
+  * **Requirement:** Firmware authentication keys MUST NOT allow unauthorized users to perform signing operations.
+  * **Requirement:** Firmware authentication keys MUST be stored in a manner that prevents disclosure of private key material, and does not permit keys to be exported or copied to systems that do not enforce the same controls on usage and disclosure of the key.
+  * **Requirement:** Signing operations performed using the firmware authentication key MUST be logged.
+  * **Requirement:** Firmware authentication keys SHOULD be created and stored in a FIPS 140-3 certified Hardware Security Module (HSM).
+  * **Requirement:** Firmware authentication keys SHOULD require multi-party authentication to perform signing operations.
   * **Evaluation Methodology:** Manufacturers MUST describe their key management practices, including storage solutions, access controls, and procedures to prevent unauthorized access.
 
 ### IDEVID Generation and Endorsement Flow {#idevid-generation-and-endorsement-flow}
