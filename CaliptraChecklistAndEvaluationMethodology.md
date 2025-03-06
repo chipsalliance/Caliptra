@@ -126,7 +126,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Generation and Handling*
 
 * **Checklist Item:**  
-  * **Requirement:** The obfuscation key MUST be generated using a secure method that ensures sufficient entropy, such as an ESV certified HSM or an on-die Physically Unclonable Function (PUF) compliant with industry standards.  
+  * **Requirement:** The obfuscation key MUST be generated using a method that ensures sufficient entropy, such as an ESV certified HSM or an on-die Physically Unclonable Function (PUF) compliant with industry standards.  
   * **Evaluation Methodology:** Manufacturers MUST provide documentation on the obfuscation key generation method, including entropy measurements and compliance with relevant standards if applicable.  
 * **Checklist Item:**  
   * **Requirement:** The obfuscation key MUST NOT be accessible (readable or modifiable) to firmware or any on-chip non-caliptra entities, including preventing oracle attacks.  
@@ -209,8 +209,8 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Caliptra PA\_USER Management*
 
 * **Checklist Item:**  
-  * **Requirement:** The management of Caliptra's PA\_USER MUST be clearly defined and securely implemented to ensure isolation and protection of privileged operations.  
-  * **Evaluation Methodology:** Manufacturers MUST detail how PA\_USER is mapped in hardware and the mechanisms in place to isolate privileged operations from unprivileged ones, ensuring that unprivileged users cannot modify Caliptra measurements or access privileged functions.
+  * **Requirement:** The management of Caliptra's PA\_USER MUST ensure isolation and protection of privileged operations, preventing unprivileged users form forging measurements or accessing privileged functions.
+  * **Evaluation Methodology:** Manufacturers MUST detail how PA\_USER is mapped in hardware and the mechanisms in place to isolate privileged operations from unprivileged ones.
 
 #### *Random Number Generator (RNG) Implementation*
 
@@ -235,9 +235,8 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Caliptra Mode Selection and State Handling*
 
 * **Checklist Item:**  
-  * **Requirement:** The SoC MUST securely manage Caliptra's operational modes (e.g., unprovisioned, manufacturing, production), ensuring that mode transitions are properly controlled and that Caliptra's state aligns correctly with the SoC's state.
   * **Requirement:** Where SoC behavior necessary to meet other requirements in this document is conditioned on SoC lifecycle state, the SoC MUST ensure that its own lifecycle is in a state that meets the requirements here prior to transitioning Caliptra's operational mode from unprovisioned to manufacturing or production.  
-  * **Evaluation Methodology:** Manufacturers MUST provide a state machine diagram or equivalent documentation showing how Caliptra's mode transitions are managed and synchronized with the SoC's states. ~~This includes ensuring that when the SoC enters debug mode, Caliptra reflects this state appropriately.~~
+  * **Evaluation Methodology:** Manufacturers MUST provide a state machine diagram or equivalent documentation showing how Caliptra's mode transitions are managed and synchronized with the SoC's states.
 
 #### *Error Handling*
 
