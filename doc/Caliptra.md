@@ -1133,6 +1133,7 @@ The PAUSER field of the APB interface is used to encode device attributes for th
 
 * Ensuring the device that was granted the LOCK is the one that accesses the MBOX, DLEN, COMMAND, and STATUS registers.
 * Prioritizing who is next granted the LOCK.
+* Mailbox user 0xFFFF_FFFF is reserved for Caliptra internal use. Caliptra firmware will fail any SoC requests from this user.
 
 ### Mailbox commands
 
