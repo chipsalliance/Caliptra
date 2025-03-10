@@ -43,6 +43,60 @@ marks](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkPoli
   * [Runtime 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/runtime/README.md)
   * [MCU Firmware and SDK specification - WIP](https://chipsalliance.github.io/caliptra-mcu-sw/)
 
+## Versioning
+
+Caliptra is released in independently versioned components: RTL, ROM, FMC and Runtime FW. They are all represented by 3 values: major.minor.patch (such as 1.0.2). The first 2 values, major.minor, correspond to a set of features caliptra supports. The patch value is incremented as new releases are made with bug fixes.
+
+Not all components necessarily need to be of the same major.minor version to be compatible. Details are below:
+
+### Caliptra 1.0
+Compatible Configurations:
+| RTL | ROM | Runtime FMC/FW |
+| --- | --- | --- |
+| 1.0.x | 1.0.x | 1.0.x |
+
+### Caliptra 1.1
+
+Additional Features
+  - ECC HW performance enhancements*
+  - LMS HW acceleration*
+  - New Runtime commands
+    - [LMS_SIGNATURE_VERIFY](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.1/runtime/README.md#lms_signature_verify)
+    - [ADD_SUBJECT_ALT_NAME](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.1/runtime/README.md#add_subject_alt_name)
+    - [CERTIFY_KEY_EXTENDED](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.1/runtime/README.md#certify_key_extended)
+  - Expanded PL0 contexts to 16
+
+\* Requires 1.1 RTL
+
+Compatible Configurations:
+| RTL | ROM | Runtime FMC/FW |
+| --- | --- | --- |
+| 1.1.x | 1.1.x | 1.1.x |
+| 1.0.x | 1.0.x | 1.1.x |
+
+
+### Caliptra 1.2
+
+Additional Features
+  - [Manifest-based Authorization](https://github.com/chipsalliance/caliptra-sw/blob/main/auth-manifest/README.md)
+    - [SET_AUTH_MANIFEST](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#set_auth_manifest)
+    - [AUTHORIZE_AND_STASH](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#authorize_and_stash)
+  - Deferred retrieval of IDEV CSR**
+    - [GET_IDEVID_CSR](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#get_idevid_csr)
+  - Self-signed FMC Alias CSR
+    - [GET_FMC_ALIAS_CSR](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#get_fmc_alias_csr)
+  - DPE export of CDI
+    - SIGN_WITH_EXPORTED - WIP
+
+\*\* Requires 1.2 ROM
+
+Compatible Configurations:
+| RTL | ROM | Runtime FMC/FW |
+| --- | --- | --- |
+| 1.1.x | 1.2.x | 1.2.x |
+| 1.1.x | 1.1.x | 1.2.x |
+| 1.0.x | 1.0.x | 1.2.x |
+
 ## Test Dashboards
 
 * [Caliptra Software CI dashboard](https://chipsalliance.github.io/caliptra-sw/)
