@@ -1,10 +1,13 @@
-![LOCK Logo](./images/LOCK_logo_large.png)
+![OCP Logo](./images/ocp_page_1.jpg#center)
 
-# OCP L.O.C.K.
+**<p style="text-align: center;">**OCP Layered Open-Source Cryptographic Key-management (L.O.C.K.)</p>**
+**<p style="text-align: center;">**NVMe™ Key Management Block**</p>**
+**<p style="text-align: center;">**Revision 0.7**</p>**
+**<p style="text-align: center;">**Version 0.7**</p>**
 
-OCP L.O.C.K. (Layered Open-source Cryptographic Key management) is a feature set conditionally compiled into Caliptra, which provides secure key management for data-at-rest protection in self-encrypting storage devices.
+<div style="page-break-after: always"></div>
 
-## Contributors
+**Contributors**
 
 - Andrés Lagar-Cavilla (Google) 
 - Amber Huffman (Google)
@@ -22,7 +25,6 @@ OCP L.O.C.K. (Layered Open-source Cryptographic Key management) is a feature set
 - Gwangbae Chio (Samsung)
 - Eric Hibbard (Samsung)
 - Mike Allison (Samsung)
-- Mike Allison (Solidigm)
 - Scott Shadley (Solidigm)
 - Gamil Cain (Solidigm)
 - Festus Hategekimana (Solidigm)
@@ -31,15 +33,88 @@ OCP L.O.C.K. (Layered Open-source Cryptographic Key management) is a feature set
 - Paul Suhler (Kioxia)
 - James Borden (Kioxia)
 
-## Background
+<div style="page-break-after: always"></div>
 
-OCP L.O.C.K is being defined to improve drive security. The life of a storage device in a datacenter is that the device leaves the supplier, a customer writes user data to the device, and then the device is decommissioned. Customer data is not allowed to leave the data center. There needs to be a high confidence that the storage device leaving the datacenter is erased. The simplest cloud service provider (CSP) policy to ensure this level of security is to destroy the drive. This produces significant e-waste and prevents any re-use/recycling. Other policies may exist that leverage drive capabilities (e.g., Sanitize), but CSPs require high confidence that these capabilities are securely implemented. 
+**License**
+
+**Open Web Foundation (OWF) CLA**
+
+Contributions to this Specification are made under the terms and conditions set forth in Open Web Foundation Modified Contributor License Agreement (“OWF CLA 1.0”) (“Contribution License”) by:
+
+**Google, Microsoft, Samsung, Solidigm, Kioxia**
+
+Usage of this Specification is governed by the terms and conditions set forth in **Open Web Foundation Modified Final Specification Agreement (“OWFa 1.0”) (“Specification License”)**.
+
+You can review the applicable OWFa1.0 Specification License(s) referenced above by the contributors to this Specification on the OCP website at. For actual executed copies of either agreement, please contact OCP directly.
+
+**Notes:**
+1) The above license does not apply to the Appendix or Appendices. The information in the Appendix or Appendices is for reference only and non-normative in nature.
+
+NOTWITHSTANDING THE FOREGOING LICENSES, THIS SPECIFICATION IS PROVIDED BY OCP "AS IS" AND OCP EXPRESSLY DISCLAIMS ANY WARRANTIES (EXPRESS, IMPLIED, OR OTHERWISE), INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY, NON-INFRINGEMENT, FITNESS FOR A PARTICULAR PURPOSE, OR TITLE, RELATED TO THE SPECIFICATION. NOTICE IS HEREBY GIVEN, THAT OTHER RIGHTS NOT GRANTED AS SET FORTH ABOVE, INCLUDING WITHOUT LIMITATION, RIGHTS OF THIRD PARTIES WHO DID NOT EXECUTE THE ABOVE LICENSES, MAY BE IMPLICATED BY THE IMPLEMENTATION OF OR COMPLIANCE WITH THIS SPECIFICATION. OCP IS NOT RESPONSIBLE FOR IDENTIFYING RIGHTS FOR WHICH A LICENSE MAY BE REQUIRED IN ORDER TO IMPLEMENT THIS SPECIFICATION. THE ENTIRE RISK AS TO IMPLEMENTING OR OTHERWISE USING THE SPECIFICATION IS ASSUMED BY YOU. IN NO EVENT WILL OCP BE LIABLE TO YOU FOR ANY MONETARY DAMAGES WITH RESPECT TO ANY CLAIMS RELATED TO, OR ARISING OUT OF YOUR USE OF THIS SPECIFICATION, INCLUDING BUT NOT LIMITED TO ANY LIABILITY FOR LOST PROFITS OR ANY CONSEQUENTIAL, INCIDENTAL, INDIRECT, SPECIAL OR PUNITIVE DAMAGES OF ANY CHARACTER FROM ANY CAUSES OF ACTION OF ANY KIND WITH RESPECT TO THIS SPECIFICATION, WHETHER BASED ON BREACH OF CONTRACT, TORT (INCLUDING NEGLIGENCE), OR OTHERWISE, AND EVEN IF OCP HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+**Acknowledgements**
+
+The Contributors of this Specification would like to acknowledge the following companies for their feedback:
+
+<div style="page-break-after: always"></div>
+
+**Compliance with OCP Tenets**
+
+Please describe how this Specification complies to the following OCP tenets. Compliance is required for at least three of the four tenets. The ideals behind open sourcing stipulate that everyone benefits when we share and work together. Any open source project is designed to promote sharing of design elements with peers and to help them understand and adopt those contributions. There is no purpose in sharing if all parties aren't aligned with that philosophy. The IC will look beyond the contribution for evidence that the contributor is aligned with this philosophy. The contributor actions, past and present, are evidence of alignment and conviction to all the tenets.
+
+**Openness**
+
+OCP L.O.C.K source for RTL and firmware will be licensed using the Apache 2.0 license. The specific mechanics and hosting of the code are work in progress due to CHIPS alliance timelines. Future versions of this spec will point to the relevant resources.
+
+**Efficiency**
+
+OCP L.O.C.K. is used generate and load keys for use of encrypting user data prior to storing data at rest and decrypting stored user data at rest when read. So, it cannot yield a measurable impact on system efficiency.
+
+**Impact**
+
+OCP L.O.C.K. enables consistency and transparency to a foundational area of security of media encryption keys such that no firmware in the device ever has access to a media encryption key. Furthermore, no decrypted media encryption key exists in the device when power is removed from the device.
+
+**Scale**
+
+OCP L.O.C.K. is a committed intercept for Cloud silicon for Google and Microsoft. This scale covers both a significant portion of the Cloud market in hyperscale and enterprise.
+
+**Sustainability**
+
+The goal of OCP L.O.C.K. is to eliminate the need to destroy storage devices (e.g., SSDs) in the Cloud market by providing a mechanism that increases the confidence that a media encryption key within the device is deleted in a crypto-erase. This enables repurposing the device and or components on the device at end of use or end of life. Given the size of the Cloud market this provides a significant reduction of e-waste.
+
+<div style="page-break-after: always"></div>
+
+# Introduction
+
+OCP L.O.C.K. (Layered Open-source Cryptographic Key management) is a feature set conditionally compiled into Caliptra, which provides secure key management for Data-At-Rest protection in self-encrypting storage devices.
+
+OCP L.O.C.K. was originally created as part of the Open Compute Project (OCP). The major revisions of the OCP L.O.C.K. specifications are published as part of Caliptra at OCP as OCP L.O.C.K. is an optional extension to Caliptra. The evolving source code and documentation for Caliptra are in the repository within the CHIPS Alliance Project, a Series of LF Projects, LLC.
+
+# Background
+
+OCP L.O.C.K is being defined to improve drive security. The life of a storage device in a datacenter is that the device leaves the supplier, a customer writes user data to the device, and then the device is decommissioned. The problem is that customer data is not allowed to leave the data center. There needs to be a high confidence that and storage device leaving the datacenter is secure. The current default cloud service provider (CSP) policy to ensure this level of security is to destroy the drive. Other policies may exist that leverage drive capabilities (e.g., Sanitize), but are deemed insufficient by these CSPs . This produces significant e-waste and inhibits any re-use/recycling.
+
+OCP L.O.C.K. is solving this security issue with data encryption by defining entropy used to create a media encryption key that is able to encrypt all data on the storage device. If that entropy is deleted, then the media encryption key is unable to be generated to decrypt the data on that storage device (i.e., no access to the plaintext behind the ciphertext). 
 
 OCP L.O.C.K. is addressing these issues by:
 
-- Preventing leakage of media keys via firmware vulnerabilities or side channels;
-- Binding media keys to a set of securely-provisioned access keys; and
-- Enabling attestable “hard” purge via erasure of fuse secrets.
+* Preventing leakage of media keys via firmware vulnerabilities or side channels;
+* Binding media keys to a set of securely-provisioned access keys; and
+* Enabling attestable “hard” purge via erasure of fuse secrets.
+
+## OCP L.O.C.K. Goals
+
+The goal of OCP L.O.C.K. is to define a Key Management Block (KMB) that:
+
+*	Isolates storage keys to a trusted hardware block
+*	Binds storage keys to a given set of externally-supplied access keys
+*	Provides replay-resistant transport security for these access keys
+*	Allows access key injection into KMB without trusting the host
+*	able to be used in conjunction with the storage device support Opal and Key per I/O
+
+
+
+
 
 ## Overview
 
