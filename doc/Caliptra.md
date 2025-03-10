@@ -285,17 +285,18 @@ See [Error Reporting and Handling](#error-reporting-and-handling) for details ab
 
 **Subsystem Mode Boot Flow**
 
-MCU (Manufacturer Control Unit), that is holds platform & SoC specific FW and Caliptra are among the first microcontrollers taken out of reset by the power-on reset logic. Caliptra is responsible for the start of the firmware chain-of-trust with the immutable component of the MCU ROM. After the Caliptra ROM completes initialization, it provides a "stash measurement" API and callback signals for MCU ROM (subsystem mode) to proceed with the boot process. Caliptra ROM supports stashing of at most eight measurements prior to the boot of Caliptra RT firmware.  Then Caliptra FW is loaded through OCP streaming boot flow. Any security-sensitive code (eg. PLL programming) or configuration (eg. Fuse based Patching) loaded by the MCU prior to Caliptra firmware boot must be stashed within Caliptra. If the MCU exceeds Caliptra ROM's measurement stash capacity, attestation must be disabled until the next cold reset.
+MCU (Manufacturer Control Unit), that is holds platform & SoC specific FW and Caliptra are among the first microcontrollers taken out of reset by the power-on reset logic. Caliptra is responsible for the start of the firmware chain-of-trust with the immutable component of the MCU ROM. After the Caliptra ROM completes initialization, it provides a "stash measurement" API and callback signals for MCU ROM (subsystem mode) to proceed with the boot process. Caliptra ROM supports stashing of at most eight measurements prior to the boot of Caliptra RT firmware.  Then Caliptra FW is loaded through OCP streaming boot flow. The OCP streaming boot flow uses an I3C controller with commands defined by the OCP Recovery specification. This controller constitutes the streaming boot interface in the boot flow below. Any security-sensitive code (eg. PLL programming) or configuration (eg. Fuse based Patching) loaded by the MCU prior to Caliptra firmware boot must be stashed within Caliptra. If the MCU exceeds Caliptra ROM's measurement stash capacity, attestation must be disabled until the next cold reset.
+
 
 Note: This is extremely high level flow, please see the Subsystem Mode Section below for next level specifics.
 
 The high level boot process is as follows:
 
 1. Hardware executes SoC power-on reset logic. This logic starts the execution of MCU ROM and Caliptra ROM.
-2. Recovery interface is gated until ready for recovery is written into recovery interface registers from Caliptra ROM. This happens at the same time as passive mode's ready_for_fw signal.
-3. Caliptra firmware is streamed & then pulled into Caliptra MB SRAM through the OCP streaming boot aka recovery interface by a platform component (typically a BMC-like component).
-        1. Caliptra ROM authenticates, measures, and activates the Caliptra firmware following OCP streaming boot protocol.
-4. SoC manifest is streamed next using the streaming boot protocol, which Caliptra authenticates & measures
+2. Streaming boot interface is gated until ready for recovery is written into streaming boot interface registers from Caliptra ROM. This happens at the same time as passive mode's ready_for_fw signal.
+3. Caliptra firmware is streamed & then pulled into Caliptra MB SRAM through the OCP streaming boot interface by a platform component (typically a BMC-like component).
+        1. Caliptra ROM authenticates, measures, and activates the Caliptra firmware.
+4. SoC manifest is streamed next via the streaming boot interface, which Caliptra authenticates & measures
 5. This is followed by MCU RT FW through the streaming boot protocol which Caliptra routes to MCU SRAM, authorizes and activates MCU to execute it.
 6. MCU RT FW will go through MCTP enumeration and fetch the remaining SoC blobs (FW, data etc.) using DSP0267 PLDM for Firmware Update over MCTP and uses Caliptra to authorize each of them. Note that MCU may also retrieve some non-FW blobs from a NVM while using Caliptra to perform security operations like integrity verification, decryption etc.
 
@@ -1327,7 +1328,7 @@ The Caliptra subsystem offers a complete RoT subsystem, with open source program
 ![](./images/Subsystem.png)
 
 # Caliptra Subsystem Trademark Compliance
-- Caliptra subsystem trademark compliance shall have Caliptra Core 2.0, Life Cycle Controller, Fuse Controller, I3C with recovery interface, Manufacture Control Unit (MCU) and Manufacturer Control Interface (MCI) taken as is without change to ensure there is hardware transparency and consistency.
+- Caliptra subsystem trademark compliance shall have Caliptra Core 2.0, Life Cycle Controller, Fuse Controller, I3C with OCP streaming boot interface, Manufacture Control Unit (MCU) and Manufacturer Control Interface (MCI) taken as is without change to ensure there is hardware transparency and consistency.
 - Caliptra subsystem provides life cycle state to the SoC.
 
 # SoC Integration Flexibility
@@ -1361,27 +1362,27 @@ The Caliptra subsystem offers a complete RoT subsystem, with open source program
 **_(Caliptra-Subsystem-Mode)_**
 
 1. Caliptra ROM waits for SoC infrastructure readiness indication. If this indication is set, Caliptra will do the identity derviation flows. If it is not set, then this flow is run when the SoC infrastructure readiness indication is set.
-2. Caliptra ROM will follow the recovery interface protocol to load its FW. Please see the specific section for next level specifics; At a high level, Caliptra ROM sets the device ready in the I3C controller and poll I3C for the payloads.
-3. BMC or a similar platform component will send the image (code or data) through OCP recovery flow protocol.
-   1. Caliptra ROM should implement a recovery capability to allow for BMC to send ‘data’ instead of ‘code’ as a SOC specific configuration OR allow MCU ROM to send some data to be either integrity checked or authenticated. The data flow and code flow over recovery interface is the same from physical interface point of view and follows the recovery spec as implemented in Caliptra subsystem documentation (please see the recovery section).
+2. Caliptra ROM uses the streaming boot interface to load its firmware. Please see the specific section for next level specifics; At a high level, Caliptra ROM sets the device ready in the I3C controller and poll I3C for the payloads.
+3. BMC or a similar platform component will send the image (code or data) through OCP streaming boot interface.
+   1.Caliptra ROM uses the streaming boot interface to receive 'data' from the BMC or MCU. Examples include SoC specific configuration. Caliptra ROM operation of the streaming boot interface will be identical for receiving either 'code' or 'data'. The data flow and code flow over streaming boot interface is the same from physical interface point of view and follows the OCP recovery spec for streaming boot support as implemented in Caliptra subsystem documentation (please see the recovery section).
    2. This need for data flow (from flash or BMC) is indicated by a SOC configuration bit to Caliptra ROM.
    3. This ‘data’ flow is possible only before SOC infra readiness is set. This is specifically used for scenarios where PUF or other characterization data is coming off-chip (say a flash or BMC). **FIXME:** Security and operations impact of this step/flow is being analyzed. This capability/flexibility will be updated or removed once that is finalized.
    4. This data must be hashed into PCR0
    5. To keep the scope limited, only one ‘data’ flow is allowed
 4. If the data was required to be run (is indicated by a SOC configuration bit to Caliptra ROM), Caliptra ROM waits for SOC infrastructure readiness to be set. Once set, it will do the required key derivations.
-5.  Caliptra ROM will read the recovery interface registers (data payload registers) over AXI manager interface and write into Caliptra MB SRAM. The offset of the recovery interface registers are available through a config register that is set at SOC integration time or by MCU ROM.
+5.  Caliptra ROM will read the streaming boot interface registers (data payload registers) over AXI manager interface and write into Caliptra MB SRAM. The offset of the streaming boot interface registers are available through a config register that is set at SOC integration time or by MCU ROM.
     1. Note that an intelligent I3C peripheral could “stream” the image. This is a future enhancement.
 6. Caliptra ROM will authenticate its image sitting in Caliptra MB SRAM
 7. Caliptra ROM flow will be similar to Caliptra 1.0 flow with PQC FW Authentication.
 8. Caliptra ROM will derive required keys similar to Caliptra 1.0 flow (while accounting for PQC)
 9. Caliptra ROM will switch to RT image.
-10. Caliptra RT FW will set the RECOVERY INTERFACE (IFC) to allow BMC’s Recovery Agent (RA) to send the next image (which MUST be SOC image manifest).
+10. Caliptra RT FW will set the Streaming boot interface to allow BMC’s Recovery Agent (RA) to send the next image (which MUST be SOC image manifest).
     1. BMC RA is required to know the different component of the images using the similar manifestation as DSP0267 PLDM for Firmware Update over MCTP components.
-11. Caliptra RT FW will read the recovery interface registers over AXI manager interface and write the image to its mailbox.
+11. Caliptra RT FW will read the Streaming boot interface registers over AXI manager interface and write the image to its mailbox.
 12. Caliptra RT FW will authenticate SoC manifest using the keys available through Caliptra Image, authenticate the image, capture the measurement and capture the relevant information into DCCM.
-13. Caliptra RT FW will set the RECOVERY INTERFACE (IFC) to allow BMC’s Recovery Agent (RA) to send the next image (which MUST be MCU image manifest).
+13. Caliptra RT FW will set the Streaming boot interface to allow BMC’s Recovery Agent (RA) to send the next image (which MUST be MCU image manifest).
     1. BMC RA is required to know the different component of the images using the similar manifestation as DSP0267 PLDM for Firmware Update over MCTP components.
-14. Caliptra RT FW will read the recovery interface registers over AXI manager interface and write the image to MCU SRAM aperture (that is open to Caliptra only by HW construction).
+14. Caliptra RT FW will read the Streaming boot interface registers over AXI manager interface and write the image to MCU SRAM aperture (that is open to Caliptra only by HW construction).
     1. The address of the MCU SRAM is provided to Caliptra’s RT FW through SOC manifest.
     2. Note: From validation front, need to ensure the Caliptra ROM and MCU are aligned in endianness.
 15. Caliptra RT FW will instruct Caliptra HW to read MCU SRAM and generate the hash (Caliptra HW will use the SHA accelerator and AXI mastering capabilities to do this)
@@ -1389,8 +1390,8 @@ The Caliptra subsystem offers a complete RoT subsystem, with open source program
 16. Caliptra RT FW will use this hash and verify it against the hash in the SOC manifest.
 17. Caliptra RT FW after verifying/authorizing the image and if it passes, it will set EXEC/GO bit into the register as specified in the previous command. This register write will also assert a Caliptra interface wire.
     1. MCU ROM will be polling the breadcrumb that the MCU SRAM has valid content and will jump to the MCU SRAM to execute from it. **NOTE:** This breadcrumb should be one of the status bits available on the MCU interface that is set by Caliptra GO bit wires.
-    2. Until this step MCU SRAM aperture that holds the MCU RT FW and certain recovery interface registers are not accessible to MCU.
-18. MCU RT FW will now set recovery flow is completed.
+    2. Until this step MCU SRAM aperture that holds the MCU RT FW and certain Streaming boot interface registers are not accessible to MCU.
+18. MCU RT FW will now set Streaming boot flow is completed.
 19. BMC or a similar platform component will now do MCTP enumeration flow to MCU over I3C.
 20. MCU RT FW is responsible for responding to all MCTP requests.
 21. MCU RT FW will do the PLDM T5 flow, extract FW or configuration payload, use Caliptra to authenticate and deploy the rest of the images as described in run-time authentication flows.
@@ -1470,16 +1471,16 @@ This section explain how generic FW Load Flows would function for SoCs with mult
 1. Primary tile uses Caliptra-Subsystem-Mode at its silicon boot time
 2. Secondary tile’s MCU ROM will go through the same common boot flow as the primary tile (except the peripheral could be inter-chiplet link).
 3. Secondary tile’s MCU ROM will wait for inter-chiplet link to be available for use (this would be an indication to MCU ROM)
-4. Primary tile’s MCU RT FW will fetch the secondary tile’s FW using DSP0267 PLDM for Firmware Update over MCTP T5 flow and ‘stream’ using the same recovery interface protocol to the secondary tile(s).
+4. Primary tile’s MCU RT FW will fetch the secondary tile’s FW using DSP0267 PLDM for Firmware Update over MCTP T5 flow and ‘stream’ using the streaming boot interface protocol to the secondary tile(s).
 5. Based on SOC integration, inter-chiplet could be an intelligent peripheral that can DMA or implement data payload registers for Caliptra to read.
-    1. Note that the indication from Caliptra for “next-image” follows the same recovery interface protocol.
-    2. Note that to load the remaining images of a secondary tile, SOC can choose to do recovery flow for rest of the remaining images. Depending on the SOC architecture and chiplets, MCU RT FW may coordinate the SOC to boot in such a way that it “broadcasts” the same image to multiple chiplets that require the same image. This is a SOC optimized flow outside of Caliptra or Subsystem Context.
+    1. Note that the indication from Caliptra for “next-image” follows the same streaming boot interface protocol.
+    2. Note that to load the remaining images of a secondary tile, SOC can choose to do streaming boot flow for rest of the remaining images. Depending on the SOC architecture and chiplets, MCU RT FW may coordinate the SOC to boot in such a way that it “broadcasts” the same image to multiple chiplets that require the same image. This is a SOC optimized flow outside of Caliptra or Subsystem Context.
 
-# Caliptra Subsystem I3C Recovery Interface
+# Caliptra Subsystem I3C Streaming Boot Interface
 
-The I3C recovery interface acts as a standalone I3C target device for recovery. It will have a unique address compared to any other I3C endpoint for the device. It will comply with I3C Basic v1.1.1 specification. It will support I3C read and write transfer operations. It must support Max read and write data transfer of 1-260B excluding the command code (1 Byte), length (2 Byte), and PEC (1 Byte), total 4 Byte I3C header. Therefore, max recovery data per transfer will be limited to 256-byte data.
+The streaming boot interface is implemented as an I3C target with commands defined by the OCP Recovery specification. It will have a unique address compared to any other I3C endpoint for the device. It will comply with I3C Basic v1.1.1 specification. It will support I3C read and write transfer operations. It must support Max read and write data transfer of 1-260B excluding the command code (1 Byte), length (2 Byte), and PEC (1 Byte), total 4 Byte I3C header. Therefore, max streaming boot data per transfer will be limited to 256-byte data.
 
-I3C recovery interface is responsible for the following list of actions:
+I3C streaming boot interface is responsible for the following list of actions:
 
 1. Responding to command sent by Recovery Agent (RA)
 2. Updating status registers based on interaction of AC-RoT and other devices
@@ -1491,24 +1492,24 @@ I3C recovery interface is responsible for the following list of actions:
 
 [Flashless Boot using OCP, PCIe, and DMTF Standards](https://docs.google.com/document/d/1Ge_w9i5A6YKG-7nlTp--JhZf6By7I9oB3oW_2_i7JbE/edit?usp=sharing)
 
-# Caliptra Subsystem Recovery Interface Hardware
+# Caliptra Subsystem Streaming Boot Interface Hardware
 
 Please refer to Caliptra subsystem Hardware specification.
 
-# Caliptra Subsystem Recovery Sequence
+# Caliptra Subsystem Streaming Boot Sequence
 
 1. **Initialization step:** Caliptra ROM initializes PROT_CAP, DEVICE_ID, DEVICE_STATUS, RECOVERY_STATUS, HW_STATUS, INDIRECT_FIFO_STATUS (remove these two reg from ROM initialization) default values. Note: Any I3C initialization is done b/w MCU ROM, I3C target HW and I3C initiator. This is not part of this document.
-2. MCU Specific SoC init of I3C & Recovery interface.
+2. MCU Specific SoC init of I3C & streaming boot interface.
     1. MCU ROM can set HW_STATUS register per recovery spec, at any time based on SOC specific conditions.
     2. MCU ROM will program DEVICE_ID register value based on associated fuse values.
     3. I3C device must update FIFO size (1-256 Byte), Max transfer size and type of region (tie this to 0x1) to INDIRECT_FIFO_STATUS register, which could be read by BMC firmware to understand the size of the FIFO & max transfer size.
 3. Caliptra ROM will update PROT_CAP register, bit 11 to set to ‘1 “Flashless boot (From RESET)”. Caliptra ROM will set other register bits based on other recovery capabilities. PROT_CAP will also indicate support for FIFO CMS for I3C device by updating byte 10-11, bit 12 with 0x1 “FIFO CMS Support”.
-4. To start recovery or boot, Caliptra ROM will write DEVICE_STATUS register to “RECOVERY_MODE” by writing byte 0, with data 0x3. Caliptra ROM will write DEVICE_STATUS register’s byte 2-3 to set the FSB parameter (0x12).
-5. I3C Recovery HW will set byte 1 based on the DEVICE_STATUS register based on the rules defined for this register. This register status will assist BMC operation.
-6. Caliptra ROM will write via DMA assist to RECOVERY_STATUS register with data of (byte 0, 0x1) and sets the recovery image index to 0x0
+4. To start streaming boot, Caliptra ROM will write DEVICE_STATUS register to “RECOVERY_MODE” by writing byte 0, with data 0x3. Caliptra ROM will write DEVICE_STATUS register’s byte 2-3 to set the FSB parameter (0x12).
+5. I3C streaming boot HW will set byte 1 based on the DEVICE_STATUS register based on the rules defined for this register. This register status will assist BMC operation.
+6. Caliptra ROM will write via DMA assist to RECOVERY_STATUS register with data of (byte 0, 0x1) and sets the streaming boot image index to 0x0
 7. BMC or a similar platform component will update INDIRECT_FIFO_CTRL with Component Memory Space (CMS) byte 0 with 0x0, Reset field byte 1 with 0x1 and Image size byte 2 to 5 field to size of the image.
 8. BMC or a similar platform component writes to INDIRECT_FIFO_DATA register. I3C device shall return a NACK response for any transfer that would cause the Head Pointer to advance to equal the Tail Pointer. BMC can implement flow control through NACK responses or by monitoring the FIFO space remaining via the Head and Tail Pointers.
-9. The I3C device will keep head and tail pointers along with FIFO status up to date into INDIRECT_FIFO_STATUS register. I3C recovery interface HW wait for an update to INDIRECT_DATA_REG with 1-256B data from BMC.
+9. The I3C device will keep head and tail pointers along with FIFO status up to date into INDIRECT_FIFO_STATUS register. I3C streaming boot interface HW wait for an update to INDIRECT_DATA_REG with 1-256B data from BMC.
 10. If there is a write to INDIRECT_DATA_FIFO, I3C device will indicate data availability via side channel implemented as wire “payload_available” ( for more details read here) to Caliptra. Caliptra HW will latch this wire into the register for Caliptra firmware to read.
 11. Caliptra ROM arms DMA interface to read INDIRECT_FIFO_CTRL for the image size and programs DMA engine back to read the image data from INDIRECT_FIFO_DATA.
 12. Steps 9 through 11 repeat until all the images are pushed over I3C and it matches the image size initialized into the INDIRECT_FIFO_CTRL register.
@@ -1518,7 +1519,7 @@ Please refer to Caliptra subsystem Hardware specification.
 
 **BMC or a similar platform component requirements for recovery support**
 
-1. It should not send payload to recovery interface (/I3C target)  device if RECOVERY_CTRL register has byte 2 indicating Image Activated. BMC must wait to clear the byte 2. ( Recovery Interface is responsible for clearing this bye by writing 1).
+1. It should not send payload to streaming boot interface (/I3C target)  device if RECOVERY_CTRL register has byte 2 indicating Image Activated. BMC must wait to clear the byte 2. (Streaming boot Interface is responsible for clearing this bye by writing 1).
 2. It must send payload to I3C target device in chunks of 256 bytes ( header (4B) + FW bytes(256B) as I3C target transfer ) only unless it is the last write for the image. Before sending the payload, it must read FIFO empty status from INDIRECT_FIFO_STATUS register.
 3. After last write for the image, it must activate the image after reading INDIRECT_FIFO_STATUS register, FIFO empty status.
 
