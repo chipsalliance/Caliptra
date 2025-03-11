@@ -2,8 +2,8 @@
 
 **<p style="text-align: center;">**OCP Layered Open-Source Cryptographic Key-management (L.O.C.K.)</p>**
 **<p style="text-align: center;">**NVMe™ Key Management Block**</p>**
-**<p style="text-align: center;">**Revision 0.7**</p>**
-**<p style="text-align: center;">**Version 0.7**</p>**
+**<p style="text-align: center;">**Revision 0.8**</p>**
+**<p style="text-align: center;">**Version 0.8**</p>**
 
 <div style="page-break-after: always"></div>
 
@@ -34,6 +34,13 @@
 - James Borden (Kioxia)
 
 <div style="page-break-after: always"></div>
+
+**REviosn Table**
+
+|     Date | Revision # | Author | Description |
+| :--------------: | :---: | :-------------------: | :-----|
+|  September 2024  |  0.5 |   Authoring Companies  | Initial proposal draft based on work from the list of contributors |
+|    April 2025    |  0.8 |   Authoring Companies  | Updates that include updates APIs, UNL Sequence digrams, and rachetting with fuses |
 
 **License**
 
@@ -84,6 +91,8 @@ The goal of OCP L.O.C.K. is to eliminate the need to destroy storage devices (e.
 
 <div style="page-break-after: always"></div>
 
+Add TOC link
+
 # Introduction
 
 OCP L.O.C.K. (Layered Open-source Cryptographic Key management) is a feature set conditionally compiled into Caliptra, which provides secure key management for Data-At-Rest protection in self-encrypting storage devices.
@@ -92,7 +101,7 @@ OCP L.O.C.K. was originally created as part of the Open Compute Project (OCP). T
 
 # Background
 
-OCP L.O.C.K is being defined to improve drive security. The life of a storage device in a datacenter is that the device leaves the supplier, a customer writes user data to the device, and then the device is decommissioned. The problem is that customer data is not allowed to leave the data center. There needs to be a high confidence that and storage device leaving the datacenter is secure. The current default cloud service provider (CSP) policy to ensure this level of security is to destroy the drive. Other policies may exist that leverage drive capabilities (e.g., Sanitize), but are deemed insufficient by these CSPs . This produces significant e-waste and inhibits any re-use/recycling.
+OCP L.O.C.K is being defined to improve drive security. The life of a storage device in a datacenter is that the device leaves the supplier, a customer writes user data to the device, and then the device is decommissioned. The problem is that customer data is not allowed to leave the data center. There needs to be a high confidence that and storage device leaving the datacenter is secure. The current default cloud service provider (CSP) policy to ensure this level of security is to destroy the drive. Other policies may exist that leverage drive capabilities (e.g., Sanitize), but are deemed insufficient by these CSPs[^1] . This produces significant e-waste and inhibits any re-use/recycling.
 
 OCP L.O.C.K. is solving this security issue with data encryption by defining entropy used to create a media encryption key that is able to encrypt all data on the storage device. If that entropy is deleted, then the media encryption key is unable to be generated to decrypt the data on that storage device (i.e., no access to the plaintext behind the ciphertext). 
 
@@ -112,10 +121,6 @@ The goal of OCP L.O.C.K. is to define a Key Management Block (KMB) that:
 *	Allows access key injection into KMB without trusting the host
 *	able to be used in conjunction with the storage device support Opal and Key per I/O
 
-
-
-
-
 ## Overview
 
 Self-encrypting drives (SEDs) store data encrypted to media encryption keys (MEKs). SEDs include the following building blocks:
@@ -130,7 +135,7 @@ MEKs, or other keys from which MEKs are derived, may be injected into the drive 
 
 MEKs may be securely erased, to effectively erase all data which was encrypted to the MEK. To erase an MEK, it is sufficient for the controller to erase the MEK itself or a key from which it was derived.
 
-In an SED that takes Caliptra with L.O.C.K. features enabled, Caliptra will act as a Key Management Block (KMB). The KMB will be the only entity that can read MEKs and program them into the SED's cryptographic engine. The KMB will expose services to controller firmware which will allow the controller to transparently manage each MEK's lifecycle, without being able to access the raw MEK itself.
+In an SED that takes Caliptra with OCP L.O.C.K. features enabled, Caliptra will act as a Key Management Block (KMB). The KMB will be the only entity that can read MEKs and program them into the SED's cryptographic engine. The KMB will expose services to controller firmware which will allow the controller to transparently manage each MEK's lifecycle, without being able to access the raw MEK itself.
 
 ## Threat model
 
@@ -157,19 +162,15 @@ Given the above adversary profile, the following are a list of vulnerabilities t
 - MEKs are bound to user credentials which are compromised by a vulnerable host.
 - Cryptographic erasure was not performed properly due to a buggy host.
 
-## Goals
-
-The goal of OCP L.O.C.K. is to define a KMB that:
-
-- Isolates storage keys to a trusted hardware block
-- Binds storage keys to a given set of externally-supplied access keys
-- Provides replay-resistant transport security for these access keys
-- Allows access key injection into KMB without trusting the host
-- Is able to be used in conjunction with the storage device to support TCG Opal and Key Per I/O
-
 ## Architecture
 
-In L.O.C.K., Caliptra as the KMB is the only entity that can derive the MEKs which protect user data. The KMB derives MEKs using the following keys:
+The following figure shows the basic high-level blocks of OCP L.O.C.K.
+
+*Figure 1: OCP L.O.C.K high level blocks*
+
+![OCP Logo](./images/ocp_page_1.jpg#center)
+
+Caliptra that includes OCP L.O.C.K. has a Key Management Block (KMB) that is the only entity that can derive the MEKs which protect user data. The KMB derives MEKs using the following keys:
 
 - A controller-supplied data encryption key (DEK). The DEK is the mechanism by which the controller enforces privilege separation between user credentials under TCG Opal, as well as the mechanism used to model injected MEKs under KPIO.
 
@@ -332,3 +333,6 @@ It is anticipated that controller firmware will perform its own vendor-specific 
 - Perform AES-256-GCM encryption or decryption, as defined in NIST [SP 800-38D](https://csrc.nist.gov/pubs/sp/800/38/d/final)
 - Perform AES-256-KeyWrap encryption or decryption, as defined in NIST [SP 800-38F](https://csrc.nist.gov/pubs/sp/800/38/f/final)
 - Perform HMAC-384-KDF key derivation, as defined in NIST [SP 800-108](https://csrc.nist.gov/pubs/sp/800/108/r1/upd1/final)
+
+# References
+1. <a id="ref-1"></a>Refer to the [Self-encrypting deception: weaknesses in the encryption of solid state drives](https://www.cs.ru.nl/~cmeijer/publications/Self_Encrypting_Deception_Weaknesses_in_the_Encryption_of_Solid_State_Drives.pdf) by Carlo Meijer and Bernard van Gastel
