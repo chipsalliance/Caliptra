@@ -217,28 +217,24 @@ OCP L.O.C.K. provides two interfaces:
 
 When controller firmware wishes to program an MEK to the hardware cryptographic engine, the controller firmware performs the following steps:
 
-1. Provides zero or more PMEKs to the KMB.
-  - KMB initializes the MEK seed buffer with the System Root Key and then extends that MEK seed buffer using each given PMEK.
+1. Provides zero or more unlocked PMEKs to the KMB.
+  - KMB initializes the MEK seed buffer with the System Root Key and then extends that MEK seed buffer using each given unlocked PMEK.
 2. Provide a DEK to the KMB.
   - KMB derives the MEK using the given DEK and the contents of the MEK seed buffer.
 3. Provide MEK metadata to KMB, such as the MEK's associated namespace and logical block address range.
   - KMB programs the derived MEK and its metadata to the hardware cryptographic engine.
 
-#### Sequence to initialize the MEK seed
-
-![MEK initialization](./images/mek_derivation_init.png)
-
 #### Sequence to mix a PMEK into the MEK seed
 
-![PMEK mixing](./images/mek_derivation_pmek_mix.png)
+![PMEK mixing](./images/include_pmek.svg)
 
 #### Sequence to load an MEK
 
-![MEK loading](./images/mek_derivation_load.png)
+![MEK loading](./images/load_mek.svg)
 
 #### Sequence to load Encryption Engine with Key Cache from SFR interface
 
-![MEK programming](./images/mek_derivation_programming.png)
+![MEK programming](./images/load_mek_into_ee.svg)
 
 #### Legacy MEK derivation for TCG Opal
 
@@ -253,6 +249,8 @@ MEKs injected with Key Per I/O will be considered as DEKs under L.O.C.K.
 When deriving the associated MEK, the controller can pss zero PMEKs in step 2, and the injected DEK in step 3.
 
 ### PMEK lifecycle
+
+to be filled in
 
 #### PMEK generation
 
