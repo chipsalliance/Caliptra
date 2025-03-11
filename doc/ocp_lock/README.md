@@ -349,6 +349,27 @@ OCP L.O.C.K. will support the following KEM algorithms:
 - P384 ECDH
 - Hybridized ML-KEM with P384 ECDH
 
+##### Sequence to obtain the supported Algorithms
+
+![Supported_Algorithm](./diagrams/get_algorithms.svg)
+
+### Helper Functions
+
+OCP L.O.C.K. has the following helper function to assist with determining the supported capabilities and the status
+
+- Report the supported capabilities
+- Get the current status
+
+##### Sequence to obtain the Supported Capabilities
+
+![Supported_Algorithm](./diagrams/get_algorithms.svg)
+
+##### Sequence to obtain the current status of OCP L.O.C.K.
+
+![Get_Algorithm](./diagrams/get_algorithms.svg)
+
+
+
 ### Storage root key rotation
 
 As the storage root key is held in fuses, it can only be rotated a limited number of times.
