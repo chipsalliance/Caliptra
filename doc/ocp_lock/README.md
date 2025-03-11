@@ -78,11 +78,11 @@ OCP L.O.C.K source for RTL and firmware will be licensed using the Apache 2.0 li
 
 **Efficiency**
 
-OCP L.O.C.K. is used generate and load keys for use of encrypting user data prior to storing data at rest and decrypting stored user data at rest when read. So, it cannot yield a measurable impact on system efficiency.
+OCP  is used generate and load keys for use of encrypting user data prior to storing data at rest and decrypting stored user data at rest when read. So, it cannot yield a measurable impact on system efficiency.
 
 **Impact**
 
-OCP L.O.C.K. enables consistency and transparency to a foundational area of security of media encryption keys such that no firmware in the device ever has access to a media encryption key. Furthermore, no decrypted media encryption key exists in the device when power is removed from the device.
+OCP  enables consistency and transparency to a foundational area of security of media encryption keys such that no firmware in the device ever has access to a media encryption key. Furthermore, no decrypted media encryption key exists in the device when power is removed from the device.
 
 **Scale**
 
@@ -124,7 +124,7 @@ The goal of OCP L.O.C.K. is to define a Key Management Block (KMB) that:
 *	Allows access key injection into KMB without trusting the host
 *	able to be used in conjunction with the storage device support Opal and Key per I/O
 
-## Overview
+# Overview
 
 Self-encrypting drives (SEDs) store data encrypted to media encryption keys (MEKs). SEDs include the following building blocks:
 
@@ -140,7 +140,7 @@ MEKs may be securely erased, to effectively erase all data which was encrypted t
 
 In an SED that takes Caliptra with OCP L.O.C.K. features enabled, Caliptra will act as a Key Management Block (KMB). The KMB will be the only entity that can read MEKs and program them into the SED's cryptographic engine. The KMB will expose services to controller firmware which will allow the controller to transparently manage each MEK's lifecycle, without being able to access the raw MEK itself.
 
-## Threat model
+# Threat model
 
 The protected asset is the user data stored at rest on the drive. The adversary profile extends up to nation-states in terms of capabilities.
 
@@ -232,25 +232,31 @@ When controller firmware wishes to program an MEK to the hardware cryptographic 
 
 ![MEK loading](./diagrams/load_mek.svg)
 
-#### Sequence to load Encryption Engine with Key Cache from SFR interface
+#### Sequence to load MEK into the Encryption Engine Key Cache
 
-![MEK programming](./diagrams/load_mek_into_ee.svg)
+![Load_MEK](./diagrams/load_mek_into_ee.svg)
+
+#### Sequence unload a MEK from the Encryption Engine Key Cache
+
+![Unload_MEK](./diagrams/unload_mek.svg)
+
+#### Sequence unload all MEKs (i.e., purge) from the Encryption Engine Key Cache
+
+![Unload_All_MEKs](./diagrams/clear_key_cache.svg)
 
 #### Legacy MEK derivation for TCG Opal
 
-The controller can maintain a DEK that represents a given user's media encryption key. That DEK can be encrypted at rest by the user's C\_PIN.
+The controller is allowed to maintain a DEK that represents a given user's media encryption key. That DEK can be encrypted at rest by the user's C\_PIN.
 
 When deriving the user's MEK, the controller can pass zero PMEKs in step 2, and the user's decrypted DEK in step 3.
 
 #### Legacy MEK derivation for Key Per I/O
 
-MEKs injected with Key Per I/O will be considered as DEKs under L.O.C.K.
+MEKs injected with Key Per I/O will be considered as DEKs under OCP L.O.C.K.
 
 When deriving the associated MEK, the controller can pss zero PMEKs in step 2, and the injected DEK in step 3.
 
 ### PMEK lifecycle
-
-to be filled in
 
 #### PMEK generation
 
@@ -263,6 +269,10 @@ Controller firmware may request that KMB generate a random PMEK, bound to a give
 5. Return the encrypted PMEK to the controller firmware.
 
 Controller firmware may then store the encrypted PMEK in persistent storage.
+
+##### Sequence to Generate a PMEK
+
+![PMEK_generation](./diagrams/generate_pmek.svg)
 
 #### PMEK unlock
 
@@ -278,6 +288,10 @@ To unlock a PMEK, KMB performs the following steps:
 
 Controller firmware may then stash the encrypted unlocked PMEK in volatile storage, and later provide it to the KMB when deriving an MEK, as described [above](#mek-derivation).
 
+##### Sequence to Unlock a PMEK
+
+![PMEK_unlock](./diagrams/unlock_pmek.svg)
+
 #### PMEK access key rotation
 
 The access key to which a PMEK is bound may be rotated. The user must prove that they have knowledge of both the old and new access key before a rotation is allowed. KMB performs the following steps:
@@ -291,9 +305,13 @@ The access key to which a PMEK is bound may be rotated. The user must prove that
 
 Controller firmware then erases the old encrypted PMEK and stores the new encrypted PMEK in persistent storage.
 
-### Transport encryption for PMEK access keys
+##### Sequence to Rotate Access Key to a PMEK
 
-In L.O.C.K., the KMB maintains a set of key-encapsulation-mechanism (KEM) keypairs, one per algorithm that L.O.C.K. supports. Each KEM public key is endorsed with a certificate that is generated by Caliptra and signed by Caliptra's DICE identity. KEM keypairs are randomly generated on KMB startup, may be periodically rotated, and are lost when the drive resets.
+![PMEK_rewrap](./diagrams/rewrap_pmek.svg)
+
+#### Transport encryption for PMEK access keys
+
+In OCP L.O.C.K., the KMB maintains a set of key-encapsulation-mechanism (KEM) keypairs, one per algorithm that OCP L.O.C.K. supports. Each KEM public key is endorsed with a certificate that is generated by Caliptra and signed by Caliptra's DICE identity. KEM keypairs are randomly generated on KMB startup, may be periodically rotated, and are lost when the drive resets.
 
 When a user wishes to unlock a PMEK (which is required prior to deriving any MEKs bound to that PMEK), the user performs the following steps:
 
@@ -310,15 +328,23 @@ Upon receipt, KMB will perform the following steps:
 
 Upon drive reset, the KEMs are regenerated, and any access keys for PMEKs that had been unlocked prior to the reset will need to be re-provisioned.
 
+##### Sequence to Endorse Encapsulation Public Key
+
+![Endorse_Pub_Key](./diagrams/endorse_encapsulation_pub_key.svg)
+
 #### Access key rotation flows
 
 As noted [above](#pmek-access-key-rotation), during access key rotation the user must prove knowledge of both the old and new access keys. This is accomplished using a slight variation on the encaps-decaps flow. When a new access key is provided to KMB during a rotation, the new access key is double-encrypted: first to the old access key, and then to the shared secret obtained from the `Encaps` operation.
 
 The KMB then performs a double decryption when unwrapping the new access key, proving that the provisioner of the new access key also knows the old access key.
 
+##### Sequence to Rotate Encapsulation Key
+
+![Rotate_Encap_Key](./diagrams/rotate_encapsulation_key.svg)
+
 #### Algorithm support
 
-L.O.C.K. will support the following KEM algorithms:
+OCP L.O.C.K. will support the following KEM algorithms:
 
 - P384 ECDH
 - Hybridized ML-KEM with P384 ECDH
@@ -333,7 +359,7 @@ This section will be fleshed out with additional details as they become availabl
 
 A key use-case around cryptographic erasure of user data is confirmation that erasure occurred. This allows third parties to verify cleanliness state, and mitigates risk of bugs in host software that drives cryptographic erasure.
 
-L.O.C.K. will enable reporting of whether a drive is clean following a storage root key rotation.
+OCP L.O.C.K. will enable reporting of whether a drive is clean following a storage root key rotation.
 
 This section will be fleshed out with additional details as they become available.
 
@@ -342,6 +368,11 @@ This section will be fleshed out with additional details as they become availabl
 The KMB relies on randomness to generate PMEKs and KEM keypairs. Storage devices feature their own source of randomness. For end users that prefer not to solely trust device-level randomness sources, KMB allows the host to sample entropy from its own randomness source and inject it into the KMB. Injected randomness is used to permute DRBG state that is held in volatile memory within the KMB.
 
 Note: this does not invalidate any requirements around integration of entropy sources with Caliptra.
+
+![Inject_entropy](./diagrams/mix_external_entropy.svg)
+
+### OCP L.O.C.K 
+
 
 ### Cryptography helper commands
 
@@ -352,5 +383,9 @@ It is anticipated that controller firmware will perform its own vendor-specific 
 - Perform AES-256-KeyWrap encryption or decryption, as defined in NIST [SP 800-38F](https://csrc.nist.gov/pubs/sp/800/38/f/final)
 - Perform HMAC-384-KDF key derivation, as defined in NIST [SP 800-108](https://csrc.nist.gov/pubs/sp/800/108/r1/upd1/final)
 
+#### Sequence for Getting a Randon Number
+
+![Get_random](./diagrams/get_random.svg)
+ 
 # References
 1. <a id="ref-1"></a>Refer to the [Self-encrypting deception: weaknesses in the encryption of solid state drives](https://www.cs.ru.nl/~cmeijer/publications/Self_Encrypting_Deception_Weaknesses_in_the_Encryption_of_Solid_State_Drives.pdf) by Carlo Meijer and Bernard van Gastel
