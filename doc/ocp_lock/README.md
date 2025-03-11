@@ -1,9 +1,12 @@
 ![OCP Logo](./images/ocp_page_1.jpg#center)
 
-**<p style="text-align: center;">**OCP Layered Open-Source Cryptographic Key-management (L.O.C.K.)</p>**
-**<p style="text-align: center;">**NVMe™ Key Management Block**</p>**
-**<p style="text-align: center;">**Revision 0.8**</p>**
-**<p style="text-align: center;">**Version 0.8**</p>**
+**<center>OCP Layered Open-Source Cryptographic Key-management (L.O.C.K.)</center>**
+
+**<center>NVMe™ Key Management Block</center>**
+
+**<center>Revision 0.8</center>**
+
+**<center>Version 0.8</p>**
 
 <div style="page-break-after: always"></div>
 
@@ -166,11 +169,11 @@ Given the above adversary profile, the following are a list of vulnerabilities t
 
 The following figure shows the basic high-level blocks of OCP L.O.C.K.
 
-*Figure 1: OCP L.O.C.K high level blocks*
+*<p style="text-align: center;">Figure 1: OCP L.O.C.K high level blocks</p>*
 
-![OCP Logo](./images/ocp_page_1.jpg#center)
+![Architecture Diagram](./images/architecture_diagram.jpg#center)
 
-Caliptra that includes OCP L.O.C.K. has a Key Management Block (KMB) that is the only entity that can derive the MEKs which protect user data. The KMB derives MEKs using the following keys:
+Caliptra that includes the optional OCP L.O.C.K. has a Key Management Block (KMB) that is the only entity that can derive the MEKs which protect user data and load the MEKs into the Key Cache of the Encryption Engine. The KMB derives MEKs using the following keys:
 
 - A controller-supplied data encryption key (DEK). The DEK is the mechanism by which the controller enforces privilege separation between user credentials under TCG Opal, as well as the mechanism used to model injected MEKs under KPIO.
 
