@@ -183,28 +183,45 @@ Caliptra that includes the optional OCP L.O.C.K. has a Key Management Block (KMB
 
 The DEK and storage root key do not require any changes to the host APIs for TCG Opal or KPIO.
 
-Additional host APIs are required to fully model storage root key rotation, PMEKs, and injectable host entropy. Such APIs are beyond the scope of the present document.
+Additional host APIs (i.e., Remote Key Mnagement Services) are required to fully model storage root key rotation, PMEKs, and injectable host entropy. Such APIs are beyond the scope of the present document.
+
+MEKs are never visible to any firmware. To load a MEK into the Key Cache of the Encryption Engine, Firmware interfaces to the Key Management Block to generate or retrieve a previously generated MEK that is created using thosekeys and then cause hardware to load the MEK into the Encryption Engine. Each MEK has associated metadata, to identify the namespace, LBA range, and how to load the MEK in the Encryption Engine.
+
+The Remote Key Management Service is utilized by the host to allow the host access to information for the PMEKs. OPAL or Key per I/O are example Remote Key Management Services. Each PMEK is encrypted as rest using an externally-injected access key where that access key is not stored persistently on the storage device. If there is more than one PMEK used to generate a MEK, then it requires multiple authorities to unlock a given range of user data.
+
+Each MEK is bound for its lifetime to the Storage Root Key, the list of PMEKs, and the DEK. To generate a MEK, the access key for each PMEK must be provided. All MEKs are removed from the Encryption Engine on a power cycle or during sanitization on the storage device. 
+
+The DEK may be derived from or decrypted by a users C-pin to support legacy OPAL. The DEK may be the imported key associated with a Key per I/O key tag.
+KMB generates Key Encapsulation Mechanism (KEM) keypairs and stores them in internal volatile memory using a KEM algorithm such as ECDH or MLKEM/Kyber. KMB can issue endorsements of KEM public keys allowing a Remote Key Management Services to ensure they only release access keys to authentic devices. PMEK access keys are encrypted in transit using these KEM keypairs. Upon drive reset, the access key must be re-encrypted to a new KEM for its associated PMEK to be usable.
+
+KMB can maintain multiple active KEM keypairs. Nominally, one for each supported algorithm. KMB will automatically initialize a KEM for each supported algorithm and this may be done lazily. KMB will allow the controller to trigger KEM rotation. This can be done as part of zeroization.
+
+KMB supports PMEK access key rotation where the storage controller must replace an old encrypted PMEK with a new encrypted PMEK. The end user must prove to KMB that they control both old and new access key. This is done by encrypting the new access key with the old access key. The new access key is therefore double-encrypted when provided to KMB with the old access key and with an ephemeral transport encryption key.
+
+KMB is able to generate two kinds of keys: KEMs (used for access key transport encryption) and PMEKs (used for MEK derivation). A host is able to external inject entropy into KMB where it is held in internal volatile memory. Subsequent keys are randomly generated using both KMB's TRNG and the host's entropy as shown in figure 2.
+
+*<p style="text-align: center;">Figure 2: KEM and PMEK Key Generation</p>*
+
+![KEM Diagram](./images/KEM_diagram.jpg#center)
 
 ### Interfaces
 
 OCP L.O.C.K. provides two interfaces:
 
-- The [cryptographic engine interface](./EngineInterface.md) is exposed from vendor-implemented hardware cryptographic engines to KMB, and defines a standard mechanism for programming MEKs and control messages.
-- The [mailbox interface](./MailboxInterface.md) is exposed from KMB to storage controller firmware, and enables the controller to manage MEKs.
+- The cryptographic engine interface is exposed from vendor-implemented hardware cryptographic engines to KMB, and defines a standard mechanism for programming MEKs and control messages.
+- The mailbox interface is exposed from KMB to storage controller firmware, and enables the controller to manage MEKs.
 
 ### MEK derivation
 
 ![MEK derivation](./images/mek_derivation.png)
 
-When controller firmware wishes to program an MEK to the hardware cryptographic engine, it performs the following steps:
+When controller firmware wishes to program an MEK to the hardware cryptographic engine, the controller firmware performs the following steps:
 
-1. Instruct KMB to initialize its MEK seed buffer.
-  - KMB initializes the buffer using a value derived from the storage root key.
-2. Provide zero or more PMEKs to the KMB.
-  - KMB extends the MEK seed buffer using each given PMEK.
-3. Provide a DEK to the KMB.
+1. Provides zero or more PMEKs to the KMB.
+  - KMB initializes the MEK seed buffer with the System Root Key and then extends that MEK seed buffer using each given PMEK.
+2. Provide a DEK to the KMB.
   - KMB derives the MEK using the given DEK and the contents of the MEK seed buffer.
-4. Provide MEK metadata to KMB, such as the MEK's associated namespace and logical block address range.
+3. Provide MEK metadata to KMB, such as the MEK's associated namespace and logical block address range.
   - KMB programs the derived MEK and its metadata to the hardware cryptographic engine.
 
 #### Sequence to initialize the MEK seed
