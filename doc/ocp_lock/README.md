@@ -226,15 +226,15 @@ When controller firmware wishes to program an MEK to the hardware cryptographic 
 
 #### Sequence to mix a PMEK into the MEK seed
 
-![PMEK mixing](./images/include_pmek.svg)
+![PMEK mixing](./diagrams/include_pmek.svg)
 
 #### Sequence to load an MEK
 
-![MEK loading](./images/load_mek.svg)
+![MEK loading](./diagrams/load_mek.svg)
 
 #### Sequence to load Encryption Engine with Key Cache from SFR interface
 
-![MEK programming](./images/load_mek_into_ee.svg)
+![MEK programming](./diagrams/load_mek_into_ee.svg)
 
 #### Legacy MEK derivation for TCG Opal
 
