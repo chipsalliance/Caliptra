@@ -123,10 +123,10 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Generation and Handling*
 
 * **Checklist Item:**  
-  * **Requirement:** The obfuscation key MUST be generated using a method that ensures sufficient entropy, such as an [ESV](https://csrc.nist.rip/Projects/cryptographic-module-validation-program/entropy-validations/esv) certified entropy source or an on-die Physically Unclonable Function (PUF) compliant with industry standards.  
+  * **Requirement:** The obfuscation key MUST be generated using a method that ensures sufficient entropy, such as an [ESV](https://csrc.nist.rip/Projects/cryptographic-module-validation-program/entropy-validations/esv) certified entropy source or an on-die Physically Unclonable Function (PUF) that is compliant with industry standards. 
   * **Evaluation Methodology:** Manufacturers MUST provide documentation on the obfuscation key generation method, including entropy measurements and compliance with relevant standards if applicable.  
 * **Checklist Item:**  
-  * **Requirement:** The obfuscation key MUST NOT be accessible (readable or modifiable) to firmware or any on-chip non-caliptra entities, including preventing oracle attacks.  
+  * **Requirement:** The obfuscation key MUST NOT be accessible (readable or modifiable) to firmware or any on-chip non-Caliptra entities, including preventing oracle attacks.  
   * **Evaluation Methodology:** Manufacturers MUST demonstrate, through architectural documentation and security analyses, that the obfuscation key is inaccessible to firmware and other unauthorized components.
 
 ### Fuses {#fuses}
@@ -153,7 +153,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 
 * **Checklist Item:**  
   * **Requirement:** Authorization mechanisms SHOULD be implemented for in-field programmable fuses to prevent unauthorized updates that could lead to denial-of-service or other attacks.  
-  * **Evaluation Methodology:** Manufacturers SHOULD detail the authorization processes required to program fuses in the field, including cryptographic protections or authentication steps.
+  * **Evaluation Methodology:** Manufacturers SHOULD document the authorization processes required to program fuses in the field, including cryptographic protections or authentication steps.
 
 #### *Key Revoke Bits Handling*
 
@@ -172,13 +172,13 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Mailbox Interface Compliance*
 
 * **Checklist Item:**  
-  * **Requirement:** The SoC Manager SHOULD implement the mailbox interface according to the Caliptra specification, ensuring proper handling of commands and status registers. Using the Caliptra Library’s (RUST and C version) provided by the Caliptra WG release is recommended as a reference codebase.  
+  * **Requirement:** The SoC Manager SHOULD implement the mailbox interface according to the Caliptra specification, ensuring proper handling of commands and status registers. Using the Caliptra Libraries (RUST and C version) provided by the Caliptra WG release is recommended as a reference codebase.  
   * **Evaluation Methodology:** Manufacturers SHOULD provide evidence, such as interface specifications or test results, demonstrating compliance with the mailbox interface requirements.
 
 #### *Secure Mailbox Access*
 
 * **Checklist Item:**  
-  * **Requirement:** Access to the mailbox MUST be securely managed to prevent unauthorized entities from initiating communication with Caliptra. Only authenticated and authorized components should interact with the mailbox.  
+  * **Requirement:** Access to the mailbox MUST be securely managed to prevent unauthorized entities from initiating communication with Caliptra. Only authenticated and authorized components may interact with the mailbox.  
   * **Evaluation Methodology:** Manufacturers MUST describe access control mechanisms for the mailbox, including any authentication methods and policies enforcing proper usage.
 
 #### *Debug Interface Management*
@@ -198,7 +198,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Boot and Initialization Process*
 
 * **Checklist Item:**  
-  * **Requirement:** Measurements of firmware and configuration MUST be submitted to Caliptra prior any execution of the firmware or usage of the configuration data. Measurements MUST be submitted to Caliptra by the same entity that collected the measurement (eg: SOC FMC cannot hand measurements over to SOC FW for submission to the Caliptra mailbox).   
+  * **Requirement:** Measurements of firmware and configuration MUST be submitted to Caliptra before execution of the firmware, or usage of the configuration data. Measurements MUST be submitted to Caliptra by the same entity that collected the measurement (e.g. SOC FMC cannot pass measurements to SOC FW for submission to the Caliptra mailbox).   
   * **Evaluation Methodology:** Manufacturers MUST provide a detailed description of how measurements are communicated to Caliptra.  
 * **Checklist Item:**  
   * **Requirement:** TBD, minimum set of measurements that MUST be taken
@@ -206,7 +206,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Caliptra PA\_USER Management*
 
 * **Checklist Item:**  
-  * **Requirement:** The management of Caliptra's PA\_USER MUST ensure isolation and protection of privileged operations, preventing unprivileged users form forging measurements or accessing privileged functions.
+  * **Requirement:** The management of Caliptra's PA\_USER MUST ensure isolation and protection of privileged operations, preventing unprivileged users from forging measurements or accessing privileged functions.
   * **Evaluation Methodology:** Manufacturers MUST document how PA\_USER is mapped in hardware and the mechanisms in place to isolate privileged operations from unprivileged ones.
 
 #### *Random Number Generator (RNG) Implementation*
