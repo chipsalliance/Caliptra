@@ -550,14 +550,66 @@ Instead of generating a random and unique identifier within the KMB while genera
 1. A vendor does not need to implement an additional algorithm to map between identifiers in its own system and in the KMB
 2. A vendor-unique key-retrieval algorithm can easily be leveraged into a <b>METD</b>-generation algorithm
 
-In order to reduce ambiguity, two examples of METD field will be given: Logical Block Addressing (LBA) range-based metadata; and key-tag based metadata.
+In order to reduce ambiguity, two examples of <b>METD</b> field will be given: Logical Block Addressing (LBA) range-based metadata; and key-tag based metadata.
 
 When an SSD stores data with address-based encryption, an MEK can be uniquely identified by a (LBA range, Namespace ID) pair. Then, the (LBA range, Namespace ID) pair can be leveraged into METD as on Figure 12.
 
 *<p style="text-align: center;">Figure 12: LBA Range Based Metadata Format</p>*
 
+![lba_nsid](./images/lba_nsid_info.jpg#center)
 
+Address-based encryption is not however the only encryption mechanism in SSDs. For example, in the TCG Key per I/O […], an MEK is selected by a key tag, which is hard to be mapped with an address. Figure 123 shows an example of <b>METD</b> in such cases.
 
+*<p style="text-align: center;">Figure 13: Key Tag Based Metadata Format</p>*
+
+![lba_nsid](./images/key_tag_info.jpg#center)
+
+The above examples are not the only possible values of <b>METD</b>. Vendors are encouraged to design and use their own <b>METD</b> if it fits better to their system.
+
+##### Auxiliary Data Register (Offset SFR_Base + 0h)
+
+Figure 14 defines the Auxiliary Data register.
+
+*<p style="text-align: center;">Figure 14: Offset SFR_Base + 20h: AUX – Auxiliary Data</p>*
+
+| Bytes | Type | Reset | Description |
+| :---- | :--: | :---: | :---------: |
+| 19:00 | RW   |  0h   | <b>Auxiliary Data (AUX):</b> This field specifies auxiliary data associated to the MEK. |
+
+At first glance, the usage of <b>AUX</b> might not be straightforward. The intuition behind introducing the <b>AUX</b> field is to support vendor-specific features on MEKs. The KMB itself is only supporting fundamental functionalities in order to minimize attack surfaces on MEKs. Moreover, vendors are not restricted to design and implement their own MEK-related functionalities on the Encryption Engine unless they can be used to exfiltrate MEKs. In order to support these functionalities, some data may be associated and stored with an MEK and the <b>AUX</b> field is introduced to store such data with each MEK.
+
+When the Controller Firmware requests the KMB to generate a new MEK, the Controller Firmware is expected to provide an <b>AUX</b> value. Similar to the <b>METD</b> field, the KMB will write the <b>AUX</b> value into the Auxiliary Data register without any modification.
+
+One of simple use cases of <b>AUX</b> field is to store an offset of initialization vector or nonce. It can also be used in a more complicate use case. Here is an example. Suppose that there exists a vendor who wants to design a system which supports several mode of operations through the Encryption Engine while using the KMB. Then, a structure of <b>AUX</b> value as on Figure 15 can be used.
+
+*<p style="text-align: center;">Figure 15: Auxiliary Data Format Example</p>*
+
+![aux_info](./images/aux_info.jpg#center)
+
+When the Controller Firmware requests an MEK generation to the KMB, the Controller Firmware can use the <b>AUX</b> value to specify which mode of operation should be used and which value should be used as an initialization vector or a nonce with the generated MEK.
+
+##### Media Encryption Key (MEK) Register (Offset SFR_Base + 50h)
+
+Figure 16 defines the MEK register.
+
+*<p style="text-align: center;">Figure 16: Offset SFR_Base + 40h: MEK – Media Encryption Key</p>*
+
+| Bytes | Type | Reset | Description |
+| :--:  | :--: | :--:  | :------ |
+| 31:00 |  WO  |   0h  | <b>Secret Encryption Key (SEK):</b> This field specifies a 256-bit Encryption Key |
+| 63:32 |  WO  |   0h  | <b>Tweakable Key (TWK):</b> This is the 256-bit AES-XTS tweakable key. |
+
+Since the AES-XTS is one of the most popular algorithms for data encryption, the MEK register is also designed with the key format of AES-XTS. The layout of the MEK register is however designed to help understanding the structure. The Encryption Engine is not restricted to only support the AES-XTS. The choice of encryption algorithm is solely dependent on vendors. When a vendor decides to use a different encryption algorithm, an MEK can be seen as a 64-byte random value rather than a (secret key, tweak key) pair and how to slice the 64-byte random value into an encryption key will be left to the vendor.
+
+As a part of Caliptra, KMB protects MEK as secure as any secret key in Caliptra. MEK is stored in the Caliptra Key Vault, so that it can be protected against any firmware-level attacks. When KMB needs to write an MEK into the MEK register, it will be accomplished by using the DMA engine. Given an index and a destination identifier, the DMA engine copies the key value stored in the key vault of given index to the destination address to which the DMA engine translates the destination identifier. 
+
+### KMB Command Sequence
+
+Figure 17 shows a sample command execution. This is an expected sequence when the Controller Firmware requests the KMB to generate a new MEK. The behavior of Encryption Engine can be seen as one of possible mechanisms, and it can be different by vendors.
+
+*<p style="text-align: center;">Figure 17: Command Execution Example</p>*
+
+![cmd_exe](./images/cmd_exe_example.jpg#center)
 
 
 
