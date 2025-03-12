@@ -357,18 +357,11 @@ OCP L.O.C.K. will support the following KEM algorithms:
 
 OCP L.O.C.K. has the following helper function to assist with determining the supported capabilities and the status
 
-- Report the supported capabilities
 - Get the current status
-
-##### Sequence to obtain the Supported Capabilities
-
-![Supported_Algorithm](./diagrams/get_algorithms.svg)
 
 ##### Sequence to obtain the current status of OCP L.O.C.K.
 
 ![Get_Algorithm](./diagrams/get_algorithms.svg)
-
-
 
 ### Storage root key rotation
 
@@ -701,30 +694,6 @@ Table: GET_STATUS output arguments
 | fips_status  | u32     | Indicates if the command is FIPS approved or an error |
 | engine_ready | u32     | Ready status of the storage device crypto engine:\n  * Btye 0 Bit 0: 1 = Ready 0 = Not ready |
 | reserved     | u32[4]  | Reserved|
-
-### GET_CAPABILITIES
-
-Exposes a command that allows the SoC to determine if OCP L.O.C.K. is supported on Caliptra and any specific OCP L.O.C.K. capabilities. 
-
-Command Code: 0x4743_4150 (“GCAP”)
-
-Table: GET_CAPABILITIES input arguments
-
-| Name | Type | Description |
-| :------: | :--: | :------- |
-| chksum   | u32  | Checksum over other input arguments, computed by the caller. Little endian. | 
-
-Table: GET_CAPABILITIES output arguments
-
-<table>
-<tr><th>Name</th><th>Type</th><th>Description</th></tr>
-<tr><td>chksum</td><td>u32</td><td>Checksum over other output arguments, computed by Caliptra. Little endian.</th></tr>       
-<tr><td>capabilities</td><td>u8[16]</td>
-<td>Capabilities:
-<ul>
-<li>Byte 0 bit 0: base LOCK capabilities</li>
-<li>All other bytes are reserved</li></ul></td></tr>
-</table>
 
 ### GET_ALGORITHMS
 
@@ -1061,6 +1030,114 @@ Table: ENUMERATE_KEM_HANDLES output arguments
 | fips_status   | u32           | Indicates if the command is FIPS approved or an error |
 | kem_handle_count | u32          | Number of KEM handles (N) |
 | kem_handles      | KEMHandle[N] | List of (KEM handle value, KEM algorithm) tuples |
+
+### ERASE_CURRENT_ROOT_KEY
+
+This command program all un-programmed bits in the current root key slot, so all bits are programmed. May resume a previously-failed erase operation.
+
+Command Code: 0x4543_524B (“ECRK”)
+
+Table: ERASE_CURRENT_ROOT_KEY input arguments
+
+| Name | Type | Description |
+| :----------: | :-----: | :------- |
+| chksum     | u32     | Checksum over other input arguments, computed by the caller. Little endian |
+
+Table: ERASE_CURRENT_ROOT_KEY output arguments
+
+| Name | Type | Description |
+| :----------: | :-----: | :------- |
+| chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian |
+| fips_status   | u32           | Indicates if the command is FIPS approved or an error |
+
+### PROGRAM_NEXT_ROOT_KEY
+
+This command generates a random key and program it into the next-available root key slot. May resume a previously-failed program operation, if HW supports that.
+
+Command Code: 504E_524B (“PNRK”)
+
+Table: PROGRAM_NEXT_ROOT_KEY input arguments
+
+| Name | Type | Description |
+| :----------: | :-----: | :------- |
+| chksum     | u32     | Checksum over other input arguments, computed by the caller. Little endian |
+
+Table: PROGRAM_NEXT_ROOT_KEY output arguments
+
+| Name | Type | Description |
+| :----------: | :-----: | :------- |
+| chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian |
+| fips_status   | u32           | Indicates if the command is FIPS approved or an error |
+
+### ENABLE_PERMA_DIRTY_STATE
+
+This command enables a perma-dirty state where I/O is permitted, but no root key slots are left to program.
+
+Command Code: 4550_4443 (“EPDS”)
+
+Table: ENABLE_PERMA_DIRTY_STATE input arguments
+
+| Name | Type | Description |
+| :----------: | :-----: | :------- |
+| chksum     | u32     | Checksum over other input arguments, computed by the caller. Little endian |
+
+Table: ENABLE_PERMA_DIRTY_STATE output arguments
+
+| Name | Type | Description |
+| :----------: | :-----: | :------- |
+| chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian |
+| fips_status   | u32           | Indicates if the command is FIPS approved or an error |
+
+### REPORT_ROOT_KEY_STATE
+
+This command reports the state tof the System Rook Key.
+
+Command Code: 5252_4B53 (“RRKS”)
+
+Table: REPORT_ROOT_KEY_STATE input arguments
+
+| Name | Type | Description |
+| :----------: | :-----: | :------- |
+| chksum     | u32     | Checksum over other input arguments, computed by the caller. Little endian |
+| nonce      | u8[16]  | Freshness nonce |
+
+
+Table: REPORT_ROOT_KEY_STATE output arguments
+
+<table>
+<tr><th>Name</th><th>Type</th><th>Description</th></tr>
+<tr><td>chksum</td><td>u32</td><td>Checksum over other output arguments, computed by Caliptra. Little endian.</td></tr>                
+<tr><td>fips_status</td><td>u32</td><td>Indicates if the command is FIPS approved or an error</td></tr>           
+<tr><td>total_slots</td><td>u16</td><td>Total number of root-key slots</td></tr>
+<tr><td>active_slot</td><td>u16</td><td>Currently-active root-key slots</td></tr>
+<tr><td>slot_state</td><td>SlotState (u16)</td>
+	<td>State of the currently-active slot
+
+| Value | Description |
+| :--:  | :---- |
+| 0h    | EMPTY (Able to load MEKs) |
+| 1h    | PARTIALLY_PROGRAMMED (Not to load MEKs) |
+| 2h    | PROGRAMMED (Able to load MEKs)  |
+| 3h    | PARTIALLY_ERASED (Not to load MEKs)  |
+| 4h    | ERASED (Not to load MEKs)  |
+| 5h    | PERMA_DIRTY_STATE (Able to load MEKs) |
+| 6h to FFFFh | Reserved |
+
+</td></tr>
+<tr><td>next_action</td><td>NextAction (u16)</td>
+	<td>Next action that can be taken on the active slot
+
+| Value | Description |
+| :--:  | :---- |
+| 0h    | NONE |
+| 1h    | PROGRAM  |
+| 2h    | ERASE   |
+| 3h    | ENABLE_PERMA_DIRTY_STATE |
+| 4h to FFFFh | Reserved |
+</td></tr>
+<tr><td>eat_len</td><td>u16</td><td>Total length of the IETF EAT</td></tr>
+<tr><td>eat</td><td>u8[eat_len]</td><td>CBOR-encoded and signed IETF EATs</td></tr>
+</table>
 
 ### GET_RANDOM
 
