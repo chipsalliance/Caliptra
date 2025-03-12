@@ -226,7 +226,7 @@ When controller firmware wishes to program an MEK to the hardware cryptographic 
 
 #### Sequence to mix a PMEK into the MEK seed
 
-![PMEK mixing](./diagrams/include_pmek.svg)
+![PMEK mixing](./diagrams/include_pmec.svg)
 
 #### Sequence to load an MEK
 
