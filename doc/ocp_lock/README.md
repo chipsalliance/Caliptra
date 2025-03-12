@@ -742,23 +742,27 @@ Table: GET_ALGORITHMS output arguments
 
 <table>
 <tr><th>Name</th><th>Type</th><th>Description</th></tr>
-<tr><td>chksum</td><td>u32</td><td>Checksum over other output arguments, computed by Caliptra. Little endian. |                 
+<tr><td>chksum</td><td>u32</td><td>Checksum over other output arguments, computed by Caliptra. Little endian.</td></tr>                
 <tr><td>endorsement_algorithms</td><td>u32</td>
-<td>Identifies the supported endorsement algorithms:
-<ul>
-<li>Byte 0 bit 0: ecdsa_secp384r1_sha384[^2]</li></ul></td></tr>
+	<td>Identifies the supported endorsement algorithms:
+		<ul>
+		<li>Byte 0 bit 0: ecdsa_secp384r1_sha384[^2]</li>
+	</ul></td></tr>
 <tr><td>kem_algorithms</td><td>u32</td>
-<td>Identifies the supported KEM algorithms:
-<ul>
-<li>Byte 0 bit 0: ecdh_secp384r1_aes256_gcm[^3]</li></ul></td></tr> 
+	<td>Identifies the supported KEM algorithms:
+		<ul>
+			<li>Byte 0 bit 0: ecdh_secp384r1_aes256_gcm[^3]</li>
+		</ul></td></tr> 
 <tr><td>pmek_algorithms</td><td>u32</td>
-<td>Indicates the size of PMEKs:
-<ul>
-<li>Byte 0 bit 0: 256 bits</li></ul></td></tr>
+	<td>Indicates the size of PMEKs:
+		<ul>
+			<li>Byte 0 bit 0: 256 bits</li>
+		</ul></td></tr>
 <tr><td>access_key_algorithm</td><td>u32</td>
-<td>Indicates the size of access keys:
-<ul>
-<li>Byte 0 bit 0: 256 bits</li></ul></td></tr>
+	<td>Indicates the size of access keys:
+		<ul>
+			<li>Byte 0 bit 0: 256 bits</li>
+		</ul></td></tr>
 <tr><td>Reserved</td><td>u32[4]</td><td>Reserved</td></tr>
 </table>
 
@@ -782,6 +786,181 @@ Table: CLEAR_KEY_CACHE output arguments
 | :----------: | :-----: | :------- |
 | chksum      | u32     | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status | u32     | Indicates if the command is FIPS approved or an error |
+
+### MIX_EXTERNAL_ENTROPY
+
+This command mixes external entropy into a DRBG for subsequent KEM and PMEK generation.
+
+Command Code: 0x4D45_454E (“MEEN”)
+
+Table: MIX_EXTERNAL_ENTROPY input arguments
+
+| Name | Type | Description |
+| :----------: | :-----: | :------- |
+| chksum   | u32     | Checksum over other input arguments, computed by the caller. Little endian |
+| entropy  | u8[32]  | Additional entropy |
+
+Table: MIX_EXTERNAL_ENTROPY output arguments
+
+| Name | Type | Description |
+| :----------: | :-----: | :------- |
+| chksum      | u32     | Checksum over other output arguments, computed by Caliptra. Little endian |
+| fips_status | u32     | Indicates if the command is FIPS approved or an error |
+
+### ENDORSE_ENCAPSULATION_PUB_KEY
+
+This command generates a signed certificate for the specified KEM using the specified endorsement algorithm.
+
+Command Code: 0x4E45_505B (“EEPK”)
+
+Table: ENDORSE_ENCAPSULATION_PUB_KEY input arguments
+
+| Name | Type | Description |
+| :----------: | :-----: | :------- |
+| chksum                | u32    | Checksum over other input arguments, computed by the caller. Little endian |
+| kem_handle            | u32    | Handle for KEM keypair held in KMB memory|
+| endorsement_algorithm | u32    | Endorsement algorithm identifier. If 0h, then return public key |
+
+Table: ENDORSE_ENCAPSULATION_PUB_KEY output arguments
+
+| Name | Type | Description |
+| :----------: | :-----: | :------- |
+| chksum          | u32       | Checksum over other output arguments, computed by Caliptra. Little endian |
+| fips_status     | u32       | Indicates if the command is FIPS approved or an error |
+| pub_key         | KemPubKey | KEM public key |
+| endorsement_len | u32       | Length of endorsement data (N) |
+| endorsement     | u8[N]     | DER-encoded X.509 certificate (includes nonce as extension) |
+
+### ROTATE_ENCAPSULATION_KEY
+
+This command rotates the KEM keypair indicated by the specified handle and stores the new KEM keypair in volatile memory iwithin KMB.
+
+Command Code: 0x5245_4E4B (“RENK”)
+
+Table: ROTATE_ENCAPSULATION_KEY input arguments
+
+| Name | Type | Description |
+| :----------: | :-----: | :------- |
+| chksum     | u32     | Checksum over other input arguments, computed by the caller. Little endian |
+| kem_handle | u32     | Handle for old KEM keypair held in KMB memory|
+
+Table: ROTATE_ENCAPSULATION_KEY output arguments
+
+| Name | Type | Description |
+| :----------: | :-----: | :------- |
+| chksum     | u32     | Checksum over other output arguments, computed by Caliptra. Little endian |
+| fips_status| u32     | Indicates if the command is FIPS approved or an error |
+| kem_handle | u32     | Handle for new KEM keypair held in KMB memory |
+
+GENERATE_PMEK
+
+This command unwraps the specified access key, generates a random PMEK, then uses the Storage Root Key and access key to encrypt the PMEK which is returned for the Storage Controller to persistently store.
+
+Command Code: 0x5245_4E4B (“RENK”)
+
+Table: GENERATE_PMEK input arguments
+
+<table>
+<tr><th>Name</th><th>Type</th><th>Description</th></tr>
+<tr><td>chksum</td><td>u32</td><td>Checksum over other input arguments, computed by the caller. Little endian.</td></tr>                
+<tr><td>pmek_algorithms</td><td>u32</td>
+<td>ndicates the size of PMEKs. Only one bit shall be reported:
+	<ul>
+		<li>Byte 0 bit 0: 256 bits</li>
+	</ul>
+</td></tr>
+<tr><td>wrapped_access_key</td><td>WrappedAccessKey</td>
+<td>KEM-wrapped access key:
+	<ul>
+		<li>access_key_algorithm</li>
+		<li>kem_handle</li>
+		<li>kem_algorithm</li>
+		<li>kem_ciphertext</li>
+		<li>kem_ciphertext</li>
+	</ul>
+</td></tr></table>
+
+Table: GENERATE_PMEK output arguments
+
+| Name | Type | Description |
+| :----------: | :-----: | :------- |
+| chksum             | u32           | Checksum over other output arguments, computed by Caliptra. Little endian |
+| fips_status        | u32           | Indicates if the command is FIPS approved or an error |
+| new_encrypted_pmek | EncryptedPmek | PMEK encrypted to access_key_2 |
+
+REWRAP_PMEK
+
+This command Unwraps access_key_1 and enc_access_key_2. Then access_key_1 is used to decrypt enc_access_key_2. The specified PMEK is decrypted using KDF(Storage root key, "PMEK", access_key_1). A new PMEK is encrypted with the output of KDF(Storage root key, "PMEK", access_key_2). The new encrypted PMEK is returned.
+
+The Storage Controller stores the returned new encrypted PMEK. The Storage Controller may attempt to do a decryption the new PMEK without an error before deleting old PMEK. Controller FW erases the old encrypted PMEK
+
+Command Code: 0x5245_5750 (“REWP”)
+
+Table: REWRAP_PMEK input arguments
+
+<table>
+<tr><th>Name</th><th>Type</th><th>Description</th></tr>
+<tr><td>chksum</td><td>u32</td><td>Checksum over other input arguments, computed by the caller. Little endian.</td></tr>                
+<tr><td>wrapped_access_key_1</td><td>WrappedAccessKey</td>
+	<td>KEM-wrapped access key:
+		<ul>
+			<li>access_key_algorithm</li>
+			<li>kem_handle (X)m</li>
+			<li>kem_algorith</li>
+			<li>kem_ciphertext</li>
+			<li>encrypted_access_key</li>
+		</ul></td></tr>
+<tr><td>wrapped_enc_access_key_2</td><td>DoubleWrappedAccessKey</td>
+	<td>KEM-wrapped (access_key_2 encrypted to access_key_1):
+		<ul>
+			<li>double_encrypted_access_key</li>
+		</ul></td></tr>
+<tr><td>old_locked_pmek</td><td>EncryptedPmek</td><td>PMEK encrypted to access_key_1</td></tr>
+</table>
+
+Table: REWRAP_PMEK output arguments
+
+| Name | Type | Description |
+| :----------: | :-----: | :------- |
+| chksum             | u32           | Checksum over other output arguments, computed by Caliptra. Little endian |
+| fips_status        | u32           | Indicates if the command is FIPS approved or an error |
+| new_encrypted_pmek | EncryptedPmek | PMEK encrypted to access_key_2 |
+
+### UNLOCK_PMEK
+
+This command Unwraps access_key_1 and enc_access_key_2. Then access_key_1 is used to decrypt enc_access_key_2. The specified PMEK is decrypted using KDF(Storage root key, "PMEK", access_key_1). A new PMEK is encrypted with the output of KDF(Storage root key, "PMEK", access_key_2). The new encrypted PMEK is returned.
+
+The Storage Controller stores the returned new encrypted PMEK. The Storage Controller may attempt to do a decryption the new PMEK without an error before deleting old PMEK. Controller FW erases the old encrypted PMEK
+
+Command Code: 0x5245_5750 (“REWP”)
+
+Table: UNLOCK_PMEK input arguments
+
+<table>
+<tr><th>Name</th><th>Type</th><th>Description</th></tr>
+<tr><td>chksum</td><td>u32</td><td>Checksum over other input arguments, computed by the caller. Little endian.</td></tr>                
+<tr><td>wrapped_access_key</td><td>WrappedAccessKey</td>
+	<td>KEM-wrapped access keyn:
+		<ul>
+			<li>kem_handle</li>
+			<li>kem_algorithm</li>
+			<li>kem_ciphertext</li>
+			<li>encrypted_access_key</li>
+		</ul></td></tr>
+<tr><td>locked_pmek</td><td>EncryptedPmek</td><td>PMEK encrypted to storage root key and access key</td></tr>
+</table>
+
+Table: UNLOCK_PMEK output arguments
+
+| Name | Type | Description |
+| :----------: | :-----: | :------- |
+| chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian |
+| fips_status   | u32           | Indicates if the command is FIPS approved or an error |
+| unlocked_pmek | EncryptedPmek | PMEK encrypted to an export secret that is rotated  on reset |
+
+
+
+
 
 
 
