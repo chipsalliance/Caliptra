@@ -432,13 +432,36 @@ This section defines the interface between the Key Management Block (KMB) and an
 
 The Encryption Engine uses a stored MEKs to encryption and decryption use data. For the purposes of this specification, the entity within the Encryption Engine used to store the MEKs is called Key Cache. Each encryption and description of user data is coupled to a specific MEK which is stored in Key Cache bound to a unique identifier, called metadata. Each (metadata, MEK) pair is also associated with additional information, called aux, which is used neither as MEK nor an identifier, but has some additional information about the pair. Therefore, the Key Cache as an entity which stores (metadata, aux, MEK) tuples.
 
-In order to achieve the security goals for KMB, KMB is limited to be the unique component which loads unload a (metadata, aux, MEK) tuple into the Key Cache and unloads a tuple within the device, so that MEKs can only be exposed to KMB and Encryption Engine. Controller Firmware arbitrates all operations in the KMB to Encryption Engine interface, therefore Controller FW is responsible for managing which MEK is loaded in Key Cache. Controller Firmware has full control on metadata and optional aux. Figure 8 is an illustration of the KMB to Encryption Engine interface that shows:
+In order to achieve the security goals for KMB, KMB is limited to be the unique component which loads unload a (metadata, aux, MEK) tuple into the Key Cache and unloads a tuple within the device, so that MEKs can only be exposed to KMB and Encryption Engine. Controller Firmware arbitrates all operations in the KMB to Encryption Engine interface, therefore Controller FW is responsible for managing which MEK is loaded in Key Cache. Controller Firmware has full control on metadata and optional aux. Figure 9 is an illustration of the KMB to Encryption Engine interface that shows:
 
 -	the tuple for loading a MEK;
 -	the Metadata for unloading a MEK; and 
 -	an example of a Key Cache within the Encryption Engine.
 
 *<p style="text-align: center;">Figure 9: KMB to Encryption SFR Interface</p>*
+
+![ee_diagram](./images/encryption_engine.jpg#center)
+
+KMB uses Special Function Registers (SFRs) to communicate with Encryption Engine which are descripts in the following sections.
+
+#### Special Function Registers (SFRs)
+
+KMB uses Special Function Registers (SFRs) to communicate with Encryption Engine as shown in Table 1 and each of the following subsections describe the registers.
+
+*<p style="text-align: center;">Table 1: KBM to Encryption Engine SFRs</p>*
+
+| Register | Address | 	Byte Size	| Description |
+| :-------: | :------------: | :--: | :---------------------------|
+| Control                    | SFR_BASE + 0h  | 4h   | Register to handle commands |
+| Metadata                   | SFR_BASE + 10h | 14h  | Register to provide metadata |
+| Auxiliary Data (AUX)       | SFR_BASE + 30h | 20h  | Register to provide auxiliary values |
+| Media Encryption Key (MEK) | SFR_BASE + 50h | 40h  | Register to provide MEK |
+
+SFR_BASE is an address that is configured on KMB. The integrator should make sure that KMB can access these SFRs through these addresses.
+
+Control Register (Offset SFR_Base + 0h)
+
+
 
 
 
