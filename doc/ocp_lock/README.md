@@ -679,7 +679,109 @@ Table 2: OCP L.O.CK. mailbox command result codes
 |LOCK_PMEK_DECRYPT      | 0x4C50_4445<br>(“LPDE”)  | Error during PMEK decryption |
 |LOCK_DECRYPT_FAILED    | 0x4C44_4546<br>(“LDEF”)  | Error during raw AES GCM decryption |
 
+The following sections define the additional Caliptra mailbox commands due to supporting OCP L.O.C.K.
 
+### GET_STATUS
+
+Exposes a command that allows the SoC to determine if the Encryption Engine is ready to process commands as well vendor-defined drive crypto engine status data. 
+
+Command Code: 0x4753_5441 (“GSTA”)
+
+Table: GET_STATUS input arguments
+
+| Name | Type | Description |
+| :---: | :---: | :--- |
+|chksum	u32	Checksum over other input arguments, computed by the caller. Little endian.
+
+Table: GET_STATUS output arguments
+
+| Name | Type | Description |
+| :----------: | :-----: | :------- |
+| chksum       | u32     | Checksum over other output arguments, computed by Caliptra. Little endian. |
+| fips_status  | u32     | Indicates if the command is FIPS approved or an error |
+| engine_ready | u32     | Ready status of the storage device crypto engine:\n  * Btye 0 Bit 0: 1 = Ready 0 = Not ready |
+| reserved     | u32[4]  | Reserved|
+
+### GET_CAPABILITIES
+
+Exposes a command that allows the SoC to determine if OCP L.O.C.K. is supported on Caliptra and any specific OCP L.O.C.K. capabilities. 
+
+Command Code: 0x4743_4150 (“GCAP”)
+
+Table: GET_CAPABILITIES input arguments
+
+| Name | Type | Description |
+| :------: | :--: | :------- |
+| chksum   | u32  | Checksum over other input arguments, computed by the caller. Little endian. | 
+
+Table: GET_CAPABILITIES output arguments
+
+<table>
+<tr><th>Name</th><th>Type</th><th>Description</th></tr>
+<tr><td>chksum</td><td>u32</td><td>Checksum over other output arguments, computed by Caliptra. Little endian.</th></tr>       
+<tr><td>capabilities</td><td>u8[16]</td>
+<td>Capabilities:
+<ul>
+<li>Byte 0 bit 0: base LOCK capabilities</li>
+<li>All other bytes are reserved</li></ul></td></tr>
+</table>
+
+### GET_ALGORITHMS
+
+Exposes a command that allows the SoC to determine the types of algorithms supported by KBM for endorsement, KEM, PMEK, and access key generation. 
+
+Command Code: 0x4743_4150 (“GCAP”)
+
+Table: GET_ALGORITHMS input arguments
+
+| Name | Type | Description |
+| :----------: | :-----: | :------- |
+| chksum   | u32     | Checksum over other input arguments, computed by the caller. Little endian. |
+
+Table: GET_ALGORITHMS output arguments
+
+<table>
+<tr><th>Name</th><th>Type</th><th>Description</th></tr>
+<tr><td>chksum</td><td>u32</td><td>Checksum over other output arguments, computed by Caliptra. Little endian. |                 
+<tr><td>endorsement_algorithms</td><td>u32</td>
+<td>Identifies the supported endorsement algorithms:
+<ul>
+<li>Byte 0 bit 0: ecdsa_secp384r1_sha384[^2]</li></ul></td></tr>
+<tr><td>kem_algorithms</td><td>u32</td>
+<td>Identifies the supported KEM algorithms:
+<ul>
+<li>Byte 0 bit 0: ecdh_secp384r1_aes256_gcm[^3]</li></ul></td></tr> 
+<tr><td>pmek_algorithms</td><td>u32</td>
+<td>Indicates the size of PMEKs:
+<ul>
+<li>Byte 0 bit 0: 256 bits</li></ul></td></tr>
+<tr><td>access_key_algorithm</td><td>u32</td>
+<td>Indicates the size of access keys:
+<ul>
+<li>Byte 0 bit 0: 256 bits</li></ul></td></tr>
+<tr><td>Reserved</td><td>u32[4]</td><td>Reserved</td></tr>
+</table>
+
+### CLEAR_KEY_CACHE
+
+This command unloads all MEKs in the Encryption Engine and deletes all keys in KMB.
+
+Command Code: 0x4353_4543 (“CSEC”)?????
+
+Table: CLEAR_KEY_CACHE input arguments
+
+| Name | Type | Description |
+| :----------: | :-----: | :------- |
+| chksum      | u32  | Checksum over other input arguments, computed by the caller. Little endian. |
+| rdy_timeout | u32  | Timeout in ms for encryption engine to become ready for a new command |
+| cmd_timeout | u32  | Timeout in ms for command to crypto engine to complete |
+
+Table: CLEAR_KEY_CACHE output arguments
+
+| Name | Type | Description |
+| :----------: | :-----: | :------- |
+| chksum      | u32     | Checksum over other output arguments, computed by Caliptra. Little endian. |
+| fips_status | u32     | Indicates if the command is FIPS approved or an error |
 
 
 
@@ -688,3 +790,5 @@ Table 2: OCP L.O.CK. mailbox command result codes
  
 # References
 1. <a id="ref-1"></a>Refer to the [Self-encrypting deception: weaknesses in the encryption of solid state drives](https://www.cs.ru.nl/~cmeijer/publications/Self_Encrypting_Deception_Weaknesses_in_the_Encryption_of_Solid_State_Drives.pdf) by Carlo Meijer and Bernard van Gastel
+2. <a id="ref-2"></a>Refer to the [RFC 8446](https://datatracker.ietf.org/doc/html/rfc8446)
+3. <a id="ref-3"></a>Refer to the [?????](https://datatracker.ietf.org/doc/html/rfc8446) 
