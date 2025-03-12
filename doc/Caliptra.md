@@ -1524,7 +1524,7 @@ Please refer to Caliptra subsystem Hardware specification.
    - 0xe: Error entering Recovery mode (might be administratively disabled)
    - 0xf: Invalid component address space
 16. If the image consumption fails for any reason (for example, image authentication failure), Caliptra ROM/firmware must update `DEVICE_STATUS` to 0xE: Boot Failure (Recover Reason Code populated) & populate, Byte 2-3 with one of the Recovery Reason Codes from Recovery Reason Codes in OCP recovery Spec.
-17. BMC or a similar platform component will send the next image as requested in the image index, and Caliptra RT FW and I3C HW go through the same flow as above.
+17. BMC or a similar platform component will send the next image as requested in the image index, up on observing “Awaiting for recovery image” in `RECOVERY_STATUS` register and Caliptra RT FW and I3C HW go through the same flow as above.
 
 ## Notes / Assumptions / Outside Streaming Boot Spec Scope 
 
@@ -1558,7 +1558,7 @@ Please refer to Caliptra subsystem Hardware specification.
 - **Destination**: Caliptra core
 
 ### Assertion
-- The `payload_available` signal must assert if recovery FIFO indicates full (256B) or image activation status is asserted (essentially indicating the last transfer is complete).
+- The `payload_available` signal must assert if recovery FIFO indicates full (256B) or image activation status is asserted (which indicates the last transfer is complete).
 
 ### De-assertion
 - The `payload_available` signal must reset if recovery FIFO indicates empty.
@@ -1579,6 +1579,7 @@ Please refer to Caliptra subsystem Hardware specification.
 
 1. It should not send payload to streaming boot interface (/I3C target) device if `RECOVERY_CTRL` register has byte 2 indicating Image Activated. BMC must wait to clear the byte 2. (Streaming boot Interface is responsible for clearing this byte by writing 1).
 2. After the last write for the image, it must activate the image after reading `INDIRECT_FIFO_STATUS` register, FIFO empty status.
+
 
 
 
