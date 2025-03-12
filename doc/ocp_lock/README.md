@@ -611,6 +611,77 @@ Figure 17 shows a sample command execution. This is an expected sequence when th
 
 ![cmd_exe](./images/cmd_exe_example.jpg#center)
 
+### Encryption Engine Requirements
+
+This section will be fleshed out with additional details as they become available.
+
+## Storage Root Key Fuse requirements
+
+This section will be fleshed out with additional details as they become available.
+
+### Storage Root Key Fuse programming
+
+This section will be fleshed out with additional details as they become available.
+
+## Error reporting and handling
+
+This section describes OCP L.O.C.K error reporting and handling.
+
+This section will be fleshed out with additional details as they become available.
+
+### Fatal errors
+
+This section will be fleshed out with additional details as they become available.
+
+### Non-fatal errors
+
+This section will be fleshed out with additional details as they become available.
+
+# Runtime Firmware environment
+
+This section provides an extension to the Runtime Firmware environment defined for OCP Caliptra Runtime Firmware specification due to the support of OCP L.O.C.K.
+
+## Boot and initialization
+
+The section defined additional boot and initialization needed to support OCP L.O.C.K.
+
+The Runtime Firmware main function SHALL cause the generation of Storage Root Key and store this into volatile memory within KMB. The Storage Root key is generated from the Storage Root Key fuses.
+
+## Fault handling
+
+A mailbox command can fail to complete in the following ways due to OCP L.O.C.K.:
+
+-	An ill-formed command
+-	Encryption Engine timeout
+-	Encryption Engine reported error
+	
+In all of these cases, the error is reported in the command returned status.
+
+Depending on the type of fault, the SoC may to resubmit the mailbox command
+
+For each Mailbox command that causes a command to execute on the Encryption Engine includes a timeout value is specified by the command. Caliptra aborts the command executing on the Encryption Engine if the Encryption Engine does not complete the command within the specified timeout and reports a LOCK_ENGINE_TIMEOUT result code.
+
+Table 3 defines the additional Caliptra result codes due to supporting OCP L.O.C.K.
+
+*<p style="text-align: center;">Table 3: OCP L.O.CK. mailbox command result codes</p>*
+
+Table 2: OCP L.O.CK. mailbox command result codes
+
+| Name                  |      Value    |   Description |
+| :------------------:  | :-----------: | :--------------- |
+|LOCK_ENGINE_TIMEOUT    | 0x4C45_544F<br>(“LETO”)  | Timeout occurred when communicating with the drive crypto engine to execute a command | 
+|LOCK_ENGINE_CODE + u16 | 0x4443_xxxx<br>(“ECxx”)	 | Vendor-specific error code in the low 16 bits |
+|LOCK_BAD_ALGORITHM     | 0x4C42_414C<br>(“LBAL”)  | Unsupported algorithm, or algorithm does not match the given handle |
+|LOCK_BAD_HANDLE        | 0x4C42_4841<br>(“LBHA”)  | Unknown handle |
+|LOCK_NO_HANDLES        | 0x 4C4E_4841<br>(“LNHA”) | Too many extant handles exist |
+|LOCK_KEM_DECAPSULATION | 0x4C4B_4445<br>(“LKDE”)  | Error during KEM decapsulation |
+|LOCK_ACCESS_KEY_UNWRAP | 0x4C41_4B55<br>(“LAKU”)  | Error during access key decryption |
+|LOCK_PMEK_DECRYPT      | 0x4C50_4445<br>(“LPDE”)  | Error during PMEK decryption |
+|LOCK_DECRYPT_FAILED    | 0x4C44_4546<br>(“LDEF”)  | Error during raw AES GCM decryption |
+
+
+
+
 
 
 
