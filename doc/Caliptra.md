@@ -1529,7 +1529,7 @@ Please refer to Caliptra subsystem Hardware specification.
 ## Notes / Assumptions / Outside Streaming Boot Spec Scope 
 
 - ROM will refer to I3C registers by offset, and any change to the offset will result in ROM failure or unexpected behavior.
-- SoC will be responsible for booting the I3C Core with the following registers:
+- SoC will be responsible for booting the I3C Core by configuring clock frequency/sampling rate with the following registers and any other requirements specified in I3C core specifications([here](https://github.com/chipsalliance/i3c-core)).
   - Values must be confirmed against latest I3C core specification for up-to-date settings. 
     - `SOC_I3CCSR_I3C_EC_SOCMGMTIF_T_R_REG = 0x00000002;`
     - `SOC_I3CCSR_I3C_EC_SOCMGMTIF_T_HD_DAT_REG = 0x0000000A;`
