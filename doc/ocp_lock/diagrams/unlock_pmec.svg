@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="2211px" preserveAspectRatio="none" style="width:1658px;height:2211px;background:#FFFFFF;" version="1.1" viewBox="0 0 1658 2211" width="1658px" zoomAndPan="magnify"><defs><filter height="300%" id="f1jj7r371pirm0" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><rect fill="#DDDDDD" height="2132.9141" style="stroke:#A80036;stroke-width:1.0;" width="1369" x="198" y="55.2188"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="50" x="857.5" y="68.7139">Caliptra</text><text fill="#888888" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="44" x="1607" y="15.3809">Version 1</text><text fill="#000000" font-family="sans-serif" font-size="18" lengthAdjust="spacing" textLength="111" x="791.5" y="43.2637">Unlock PMEK</text><rect fill="#FFFFFF" filter="url(#f1jj7r371pirm0)" height="1423.875" style="stroke:#000000;stroke-width:2.0;" width="1596" x="8" y="569.0234"/><rect fill="#FFFFFF" filter="url(#f1jj7r371pirm0)" height="1377.5234" style="stroke:#000000;stroke-width:2.0;" width="1552" x="27" y="601.375"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:5.0,5.0;" x1="77" x2="77" y1="147.3984" y2="2110.3047"/><rect fill="#FFFFFF" filter="url(#f1jj7r371pirm0)" height="139.4063" style="stroke:#A80036;stroke-width:1.0;" width="10" x="72" y="1970.8984"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:5.0,5.0;" x1="237" x2="237" y1="147.3984" y2="2110.3047"/><rect fill="#FFFFFF" filter="url(#f1jj7r371pirm0)" height="203.1641" style="stroke:#A80036;stroke-width:1.0;" width="10" x="232" y="267.1563"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:5.0,5.0;" x1="415" x2="415" y1="147.3984" y2="2110.3047"/><rect fill="#FFFFFF" filter="url(#f1jj7r371pirm0)" height="1665.3359" style="stroke:#A80036;stroke-width:1.0;" width="10" x="410" y="439.9688"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:5.0,5.0;" x1="722" x2="722" y1="147.3984" y2="2110.3047"/><rect fill="#FFFFFF" filter="url(#f1jj7r371pirm0)" height="134.4063" style="stroke:#A80036;stroke-width:1.0;" width="10" x="717" y="729.1328"/><rect fill="#FFFFFF" filter="url(#f1jj7r371pirm0)" height="134.4063" style="stroke:#A80036;stroke-width:1.0;" width="10" x="717" y="926.5938"/><rect fill="#FFFFFF" filter="url(#f1jj7r371pirm0)" height="164.7578" style="stroke:#A80036;stroke-width:1.0;" width="10" x="717" y="1168.4063"/><rect fill="#FFFFFF" filter="url(#f1jj7r371pirm0)" height="134.4063" style="stroke:#A80036;stroke-width:1.0;" width="10" x="717" y="1440.5703"/><rect fill="#FFFFFF" filter="url(#f1jj7r371pirm0)" height="134.4063" style="stroke:#A80036;stroke-width:1.0;" width="10" x="717" y="1682.3828"/><rect fill="#FFFFFF" filter="url(#f1jj7r371pirm0)" height="60.7031" style="stroke:#A80036;stroke-width:1.0;" width="10" x="717" y="1863.4922"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:5.0,5.0;" x1="1039" x2="1039" y1="147.3984" y2="2110.3047"/><rect fill="#ADD8E6" filter="url(#f1jj7r371pirm0)" height="1865.5" style="stroke:#A80036;stroke-width:1.0;" width="10" x="1034" y="244.8047"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:5.0,5.0;" x1="1174.5" x2="1174.5" y1="147.3984" y2="2110.3047"/><rect fill="#ADD8E6" filter="url(#f1jj7r371pirm0)" height="1865.5" style="stroke:#A80036;stroke-width:1.0;" width="10" x="1169.5" y="244.8047"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:5.0,5.0;" x1="1294.5" x2="1294.5" y1="147.3984" y2="2110.3047"/><rect fill="#ADD8E6" filter="url(#f1jj7r371pirm0)" height="1865.5" style="stroke:#A80036;stroke-width:1.0;" width="10" x="1289.5" y="244.8047"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:5.0,5.0;" x1="1407.5" x2="1407.5" y1="147.3984" y2="2110.3047"/><rect fill="#ADD8E6" filter="url(#f1jj7r371pirm0)" height="1060.6563" style="stroke:#A80036;stroke-width:1.0;" width="10" x="1402.5" y="833.1875"/><line style="stroke:#A80036;stroke-width:2.0;" x1="1398.5" x2="1416.5" y1="1884.8438" y2="1902.8438"/><line style="stroke:#A80036;stroke-width:2.0;" x1="1398.5" x2="1416.5" y1="1902.8438" y2="1884.8438"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:5.0,5.0;" x1="1514.5" x2="1514.5" y1="147.3984" y2="2110.3047"/><rect fill="#ADD8E6" filter="url(#f1jj7r371pirm0)" height="863.1953" style="stroke:#A80036;stroke-width:1.0;" width="10" x="1509.5" y="1030.6484"/><line style="stroke:#A80036;stroke-width:2.0;" x1="1505.5" x2="1523.5" y1="1884.8438" y2="1902.8438"/><line style="stroke:#A80036;stroke-width:2.0;" x1="1505.5" x2="1523.5" y1="1902.8438" y2="1884.8438"/><rect fill="#FEFECE" filter="url(#f1jj7r371pirm0)" height="66.8281" style="stroke:#A80036;stroke-width:1.5;" width="64" x="43" y="75.5703"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="50" x="50" y="97.1035">Storage</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="43" x="53.5" y="114.7129">Device</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="22" x="64" y="132.3223">FW</text><rect fill="#FEFECE" filter="url(#f1jj7r371pirm0)" height="31.6094" style="stroke:#A80036;stroke-width:1.5;" width="66" x="202" y="110.7891"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="52" x="209" y="132.3223">Mail Box</text><rect fill="#FEFECE" filter="url(#f1jj7r371pirm0)" height="31.6094" style="stroke:#A80036;stroke-width:1.5;" width="36" x="395" y="110.7891"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="22" x="402" y="132.3223">FW</text><rect fill="#FEFECE" filter="url(#f1jj7r371pirm0)" height="31.6094" style="stroke:#A80036;stroke-width:1.5;" width="74" x="683" y="110.7891"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="60" x="690" y="132.3223">Key Vault</text><rect fill="#FEFECE" filter="url(#f1jj7r371pirm0)" height="66.8281" style="stroke:#A80036;stroke-width:1.5;" width="136" x="969" y="75.5703"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="60" x="1007" y="97.1035">Key Vault</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="37" x="1018.5" y="114.7129">Slot A</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="122" x="976" y="132.3223">(Storage Root Key)</text><rect fill="#FEFECE" filter="url(#f1jj7r371pirm0)" height="66.8281" style="stroke:#A80036;stroke-width:1.5;" width="107" x="1119" y="75.5703"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="60" x="1142.5" y="97.1035">Key Vault</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="37" x="1154" y="114.7129">Slot B</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="93" x="1126" y="132.3223">(PMEK Secret)</text><rect fill="#FEFECE" filter="url(#f1jj7r371pirm0)" height="66.8281" style="stroke:#A80036;stroke-width:1.5;" width="105" x="1240" y="75.5703"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="60" x="1262.5" y="97.1035">Key Vault</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="39" x="1273" y="114.7129">Slot G</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="91" x="1247" y="132.3223">(KEM Keypair)</text><rect fill="#FEFECE" filter="url(#f1jj7r371pirm0)" height="66.8281" style="stroke:#A80036;stroke-width:1.5;" width="93" x="1359" y="75.5703"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="60" x="1375.5" y="97.1035">Key Vault</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="37" x="1387" y="114.7129">Slot Y</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="79" x="1366" y="132.3223">(Temporary)</text><rect fill="#FEFECE" filter="url(#f1jj7r371pirm0)" height="66.8281" style="stroke:#A80036;stroke-width:1.5;" width="93" x="1466" y="75.5703"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="60" x="1482.5" y="97.1035">Key Vault</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="36" x="1494.5" y="114.7129">Slot Z</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="79" x="1473" y="132.3223">(Temporary)</text><rect fill="#FEFECE" filter="url(#f1jj7r371pirm0)" height="66.8281" style="stroke:#A80036;stroke-width:1.5;" width="64" x="43" y="2110.3047"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="50" x="50" y="2131.8379">Storage</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="43" x="53.5" y="2149.4473">Device</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="22" x="64" y="2167.0566">FW</text><rect fill="#FEFECE" filter="url(#f1jj7r371pirm0)" height="31.6094" style="stroke:#A80036;stroke-width:1.5;" width="66" x="202" y="2110.3047"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="52" x="209" y="2131.8379">Mail Box</text><rect fill="#FEFECE" filter="url(#f1jj7r371pirm0)" height="31.6094" style="stroke:#A80036;stroke-width:1.5;" width="36" x="395" y="2110.3047"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="22" x="402" y="2131.8379">FW</text><rect fill="#FEFECE" filter="url(#f1jj7r371pirm0)" height="31.6094" style="stroke:#A80036;stroke-width:1.5;" width="74" x="683" y="2110.3047"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="60" x="690" y="2131.8379">Key Vault</text><rect fill="#FEFECE" filter="url(#f1jj7r371pirm0)" height="66.8281" style="stroke:#A80036;stroke-width:1.5;" width="136" x="969" y="2110.3047"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="60" x="1007" y="2131.8379">Key Vault</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="37" x="1018.5" y="2149.4473">Slot A</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="122" x="976" y="2167.0566">(Storage Root Key)</text><rect fill="#FEFECE" filter="url(#f1jj7r371pirm0)" height="66.8281" style="stroke:#A80036;stroke-width:1.5;" width="107" x="1119" y="2110.3047"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="60" x="1142.5" y="2131.8379">Key Vault</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="37" x="1154" y="2149.4473">Slot B</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="93" x="1126" y="2167.0566">(PMEK Secret)</text><rect fill="#FEFECE" filter="url(#f1jj7r371pirm0)" height="66.8281" style="stroke:#A80036;stroke-width:1.5;" width="105" x="1240" y="2110.3047"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="60" x="1262.5" y="2131.8379">Key Vault</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="39" x="1273" y="2149.4473">Slot G</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="91" x="1247" y="2167.0566">(KEM Keypair)</text><rect fill="#FEFECE" filter="url(#f1jj7r371pirm0)" height="66.8281" style="stroke:#A80036;stroke-width:1.5;" width="93" x="1359" y="2110.3047"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="60" x="1375.5" y="2131.8379">Key Vault</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="37" x="1387" y="2149.4473">Slot Y</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="79" x="1366" y="2167.0566">(Temporary)</text><rect fill="#FEFECE" filter="url(#f1jj7r371pirm0)" height="66.8281" style="stroke:#A80036;stroke-width:1.5;" width="93" x="1466" y="2110.3047"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="60" x="1482.5" y="2131.8379">Key Vault</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="36" x="1494.5" y="2149.4473">Slot Z</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="79" x="1473" y="2167.0566">(Temporary)</text><path d="M40.75,160.3984 L40.75,235.3984 L1550.75,235.3984 L1550.75,170.3984 L1540.75,160.3984 L40.75,160.3984 " fill="#FBFB77" filter="url(#f1jj7r371pirm0)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M1540.75,160.3984 L1540.75,170.3984 L1550.75,170.3984 L1540.75,160.3984 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="91" x="610.25" y="178.8936">Preconditions:</text><ellipse cx="615.75" cy="190.6016" fill="#000000" rx="2.5" ry="2.5" style="stroke:#000000;stroke-width:0.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="309" x="623.25" y="195.2451">Access Shared Secret already availble in a slot in KV</text><ellipse cx="615.75" cy="206.9531" fill="#000000" rx="2.5" ry="2.5" style="stroke:#000000;stroke-width:0.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="345" x="623.25" y="211.5967">unlocking key already in a slot and generated on each reset</text><text fill="#FF0000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="296" x="610.25" y="227.9482">Is there a separate Shared Secret per Admin User?</text><line style="stroke:#008000;stroke-width:1.0;" x1="230" x2="220" y1="267.1563" y2="263.1563"/><line style="stroke:#008000;stroke-width:1.0;" x1="230" x2="220" y1="267.1563" y2="271.1563"/><line style="stroke:#008000;stroke-width:1.0;" x1="77" x2="231" y1="267.1563" y2="267.1563"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="84" y="262.2998">[001]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="98" x="117" y="262.2998">UNLOCK_PMEK</text><path d="M247,280.1563 L247,408.1563 L848,408.1563 L848,290.1563 L838,280.1563 L247,280.1563 " fill="#FBFB77" filter="url(#f1jj7r371pirm0)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M838,280.1563 L838,290.1563 L848,290.1563 L838,280.1563 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="257" y="300.6514"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="32" x="257" y="300.6514">Field</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="394" y="300.6514"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="28" x="394" y="300.6514">Size</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="521" y="300.6514"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="61" x="521" y="300.6514">Definition</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="46" x="257" y="317.0029">chksum</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="21" x="394" y="317.0029">u32</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="70" x="521" y="317.0029">Little endian</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="125" x="257" y="333.3545">wrapped_access_key</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="119" x="394" y="333.3545">WrappedAccessKey</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="238" x="521" y="333.3545">KEM-wrapped access keyn* kem_handle</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="90" x="517" y="349.7061">*kem_algorithm</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="94" x="517" y="366.0576">*kem_ciphertext</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="143" x="517" y="382.4092">* encrypted_access_key</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="77" x="257" y="398.7607">locked_pmek</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="93" x="394" y="398.7607">EncryptedPmek</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="308" x="521" y="398.7607">PMEK encrypted to storage root key and access key</text><line style="stroke:#000000;stroke-width:1.0;" x1="253" x2="833" y1="287.1563" y2="287.1563"/><line style="stroke:#000000;stroke-width:1.0;" x1="253" x2="833" y1="303.5078" y2="303.5078"/><line style="stroke:#000000;stroke-width:1.0;" x1="253" x2="833" y1="319.8594" y2="319.8594"/><line style="stroke:#000000;stroke-width:1.0;" x1="253" x2="833" y1="385.2656" y2="385.2656"/><line style="stroke:#000000;stroke-width:1.0;" x1="253" x2="833" y1="401.6172" y2="401.6172"/><line style="stroke:#000000;stroke-width:1.0;" x1="253" x2="253" y1="287.1563" y2="401.6172"/><line style="stroke:#000000;stroke-width:1.0;" x1="390" x2="390" y1="287.1563" y2="401.6172"/><line style="stroke:#000000;stroke-width:1.0;" x1="517" x2="517" y1="287.1563" y2="401.6172"/><line style="stroke:#000000;stroke-width:1.0;" x1="833" x2="833" y1="287.1563" y2="401.6172"/><line style="stroke:#008000;stroke-width:1.0;" x1="408" x2="398" y1="439.9688" y2="435.9688"/><line style="stroke:#008000;stroke-width:1.0;" x1="408" x2="398" y1="439.9688" y2="443.9688"/><line style="stroke:#008000;stroke-width:1.0;" x1="242" x2="409" y1="439.9688" y2="439.9688"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="249" y="435.1123">[002]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="59" x="282" y="435.1123">Command</text><polygon fill="#FF0000" points="253,466.3203,243,470.3203,253,474.3203,249,470.3203" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="247" x2="409" y1="470.3203" y2="470.3203"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="259" y="465.4639">[003]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="82" x="292" y="465.4639">Get command</text><line style="stroke:#FF0000;stroke-width:1.0;" x1="420" x2="462" y1="500.6719" y2="500.6719"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="462" x2="462" y1="500.6719" y2="513.6719"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="421" x2="462" y1="513.6719" y2="513.6719"/><polygon fill="#FF0000" points="431,509.6719,421,513.6719,431,517.6719,427,513.6719" style="stroke:#FF0000;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="427" y="495.8154">[004]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="120" x="460" y="495.8154">Determine command</text><line style="stroke:#FF0000;stroke-width:1.0;" x1="420" x2="462" y1="544.0234" y2="544.0234"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="462" x2="462" y1="544.0234" y2="557.0234"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="421" x2="462" y1="557.0234" y2="557.0234"/><polygon fill="#FF0000" points="431,553.0234,421,557.0234,431,561.0234,427,557.0234" style="stroke:#FF0000;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="427" y="539.167">[005]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="158" x="460" y="539.167">Determine rate of unlocking</text><path d="M8,569.0234 L69,569.0234 L69,577.0234 L59,587.0234 L8,587.0234 L8,569.0234 " fill="#EEEEEE" style="stroke:#000000;stroke-width:1.0;"/><rect fill="none" height="1423.875" style="stroke:#000000;stroke-width:2.0;" width="1596" x="8" y="569.0234"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="16" x="23" y="583.5186">alt</text><text fill="#000000" font-family="sans-serif" font-size="11" font-weight="bold" lengthAdjust="spacing" textLength="139" x="84" y="582.4424">[Storage Root Key exists]</text><path d="M27,601.375 L88,601.375 L88,609.375 L78,619.375 L27,619.375 L27,601.375 " fill="#EEEEEE" style="stroke:#000000;stroke-width:1.0;"/><rect fill="none" height="1377.5234" style="stroke:#000000;stroke-width:2.0;" width="1552" x="27" y="601.375"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="16" x="42" y="615.8701">alt</text><text fill="#000000" font-family="sans-serif" font-size="11" font-weight="bold" lengthAdjust="spacing" textLength="181" x="103" y="614.7939">[Unlocking rate below threshold]</text><rect fill="#EEEEEE" filter="url(#f1jj7r371pirm0)" height="3" style="stroke:#EEEEEE;stroke-width:1.0;" width="1608" x="5" y="650.9023"/><line style="stroke:#000000;stroke-width:1.0;" x1="5" x2="1613" y1="650.9023" y2="650.9023"/><line style="stroke:#000000;stroke-width:1.0;" x1="5" x2="1613" y1="653.9023" y2="653.9023"/><rect fill="#EEEEEE" filter="url(#f1jj7r371pirm0)" height="24.3516" style="stroke:#000000;stroke-width:2.0;" width="139" x="739.5" y="639.7266"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="121" x="745.5" y="657.2217">Get the Access Key</text><polygon fill="#FF0000" points="705,725.1328,715,729.1328,705,733.1328,709,729.1328" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="420" x2="711" y1="729.1328" y2="729.1328"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="427" y="707.9248">[006]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="212" x="460" y="691.5732">Decaps(KEM Pair : kem_handle (G),</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="191" x="508" y="707.9248">KEM ciphertext : kem_ciphertext</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="117" x="508" y="724.2764">Destination : Slot Y)</text><polygon fill="#FF0000" points="1277.5,755.4844,1287.5,759.4844,1277.5,763.4844,1281.5,759.4844" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="727" x2="1283.5" y1="759.4844" y2="759.4844"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="734" y="754.6279">[007]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="102" x="767" y="754.6279">Get KEM Keypair</text><line style="stroke:#FF0000;stroke-width:1.0;" x1="727" x2="769" y1="789.8359" y2="789.8359"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="769" x2="769" y1="789.8359" y2="802.8359"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="728" x2="769" y1="802.8359" y2="802.8359"/><polygon fill="#FF0000" points="738,798.8359,728,802.8359,738,806.8359,734,802.8359" style="stroke:#FF0000;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="734" y="784.9795">[008]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="208" x="767" y="784.9795">Decap KEM Ciphertext with Keypair</text><polygon fill="#FF0000" points="1390.5,829.1875,1400.5,833.1875,1390.5,837.1875,1394.5,833.1875" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="727" x2="1396.5" y1="833.1875" y2="833.1875"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="734" y="828.3311">[009]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="107" x="767" y="828.3311">Put Shared Secret</text><polygon fill="#FF0000" points="431,859.5391,421,863.5391,431,867.5391,427,863.5391" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="425" x2="716" y1="863.5391" y2="863.5391"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="437" y="858.6826">[010]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="28" x="470" y="858.6826">done</text><polygon fill="#FF0000" points="705,922.5938,715,926.5938,705,930.5938,709,926.5938" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="420" x2="711" y1="926.5938" y2="926.5938"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="427" y="905.3857">[011]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="152" x="460" y="889.0342">Key_Unwrap(Key : Slot Y,</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="169" x="536" y="905.3857">Data: encrypted_access_key</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="115" x="536" y="921.7373">Destination : Slot Z)</text><polygon fill="#FF0000" points="1390.5,952.9453,1400.5,956.9453,1390.5,960.9453,1394.5,956.9453" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="727" x2="1396.5" y1="956.9453" y2="956.9453"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="734" y="952.0889">[012]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="108" x="767" y="952.0889">Get Shared Secret</text><line style="stroke:#FF0000;stroke-width:1.0;" x1="727" x2="769" y1="987.2969" y2="987.2969"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="769" x2="769" y1="987.2969" y2="1000.2969"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="728" x2="769" y1="1000.2969" y2="1000.2969"/><polygon fill="#FF0000" points="738,996.2969,728,1000.2969,738,1004.2969,734,1000.2969" style="stroke:#FF0000;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="734" y="982.4404">[013]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="265" x="767" y="982.4404">Key_Unwrap encrypted_access_key with Key</text><polygon fill="#FF0000" points="1497.5,1026.6484,1507.5,1030.6484,1497.5,1034.6484,1501.5,1030.6484" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="727" x2="1503.5" y1="1030.6484" y2="1030.6484"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="734" y="1025.792">[014]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="95" x="767" y="1025.792">Put Access Key</text><polygon fill="#FF0000" points="431,1057,421,1061,431,1065,427,1061" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="425" x2="716" y1="1061" y2="1061"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="437" y="1056.1436">[015]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="28" x="470" y="1056.1436">done</text><rect fill="#EEEEEE" filter="url(#f1jj7r371pirm0)" height="3" style="stroke:#EEEEEE;stroke-width:1.0;" width="1608" x="5" y="1090.1758"/><line style="stroke:#000000;stroke-width:1.0;" x1="5" x2="1613" y1="1090.1758" y2="1090.1758"/><line style="stroke:#000000;stroke-width:1.0;" x1="5" x2="1613" y1="1093.1758" y2="1093.1758"/><rect fill="#EEEEEE" filter="url(#f1jj7r371pirm0)" height="24.3516" style="stroke:#000000;stroke-width:2.0;" width="183" x="717.5" y="1079"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="165" x="723.5" y="1096.4951">Create the Encryption Key</text><polygon fill="#FF0000" points="705,1164.4063,715,1168.4063,705,1172.4063,709,1168.4063" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="420" x2="711" y1="1168.4063" y2="1168.4063"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="427" y="1147.1982">[016]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="175" x="460" y="1130.8467">HMAC512_Slots(Key : Slot A,</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="100" x="560" y="1147.1982">Data Key : Slot Z</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="113" x="560" y="1163.5498">Destination Slot: Y)</text><polygon fill="#FF0000" points="1022,1194.7578,1032,1198.7578,1022,1202.7578,1026,1198.7578" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="727" x2="1028" y1="1198.7578" y2="1198.7578"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="734" y="1193.9014">[017]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="128" x="767" y="1193.9014">Get Storage Root Key</text><polygon fill="#FF0000" points="1497.5,1225.1094,1507.5,1229.1094,1497.5,1233.1094,1501.5,1229.1094" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="727" x2="1503.5" y1="1229.1094" y2="1229.1094"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="734" y="1224.2529">[018]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="96" x="767" y="1224.2529">Get Access Key</text><line style="stroke:#FF0000;stroke-width:1.0;" x1="727" x2="769" y1="1259.4609" y2="1259.4609"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="769" x2="769" y1="1259.4609" y2="1272.4609"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="728" x2="769" y1="1272.4609" y2="1272.4609"/><polygon fill="#FF0000" points="738,1268.4609,728,1272.4609,738,1276.4609,734,1272.4609" style="stroke:#FF0000;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="734" y="1254.6045">[019]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="164" x="767" y="1254.6045">HMAC512 Slot A with Slot Z</text><polygon fill="#FF0000" points="1390.5,1298.8125,1400.5,1302.8125,1390.5,1306.8125,1394.5,1302.8125" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="727" x2="1396.5" y1="1302.8125" y2="1302.8125"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="734" y="1297.9561">[020]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="137" x="767" y="1297.9561">HMAC512 result PMEK</text><polygon fill="#FF0000" points="431,1329.1641,421,1333.1641,431,1337.1641,427,1333.1641" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="425" x2="716" y1="1333.1641" y2="1333.1641"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="437" y="1328.3076">[021]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="28" x="470" y="1328.3076">done</text><rect fill="#EEEEEE" filter="url(#f1jj7r371pirm0)" height="3" style="stroke:#EEEEEE;stroke-width:1.0;" width="1608" x="5" y="1362.3398"/><line style="stroke:#000000;stroke-width:1.0;" x1="5" x2="1613" y1="1362.3398" y2="1362.3398"/><line style="stroke:#000000;stroke-width:1.0;" x1="5" x2="1613" y1="1365.3398" y2="1365.3398"/><rect fill="#EEEEEE" filter="url(#f1jj7r371pirm0)" height="24.3516" style="stroke:#000000;stroke-width:2.0;" width="233" x="692.5" y="1351.1641"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="215" x="698.5" y="1368.6592">Extract PMEK with Encryption Key</text><polygon fill="#FF0000" points="705,1436.5703,715,1440.5703,705,1444.5703,709,1440.5703" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="420" x2="711" y1="1440.5703" y2="1440.5703"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="427" y="1419.3623">[022]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="122" x="460" y="1403.0107">Unwrap(Key : Slot Y,</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="112" x="508" y="1419.3623">Data: locked_pmek</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="119" x="508" y="1435.7139">Destination :  Slot Z)</text><polygon fill="#FF0000" points="1390.5,1466.9219,1400.5,1470.9219,1390.5,1474.9219,1394.5,1470.9219" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="727" x2="1396.5" y1="1470.9219" y2="1470.9219"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="734" y="1466.0654">[023]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="114" x="767" y="1466.0654">Get Encryption Key</text><line style="stroke:#FF0000;stroke-width:1.0;" x1="727" x2="769" y1="1501.2734" y2="1501.2734"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="769" x2="769" y1="1501.2734" y2="1514.2734"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="728" x2="769" y1="1514.2734" y2="1514.2734"/><polygon fill="#FF0000" points="738,1510.2734,728,1514.2734,738,1518.2734,734,1514.2734" style="stroke:#FF0000;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="734" y="1496.417">[024]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="126" x="767" y="1496.417">Decrypt locked_pmek</text><polygon fill="#FF0000" points="1497.5,1540.625,1507.5,1544.625,1497.5,1548.625,1501.5,1544.625" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="727" x2="1503.5" y1="1544.625" y2="1544.625"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="734" y="1539.7686">[025]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="38" x="767" y="1539.7686">PMEK</text><polygon fill="#FF0000" points="431,1570.9766,421,1574.9766,431,1578.9766,427,1574.9766" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="425" x2="716" y1="1574.9766" y2="1574.9766"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="437" y="1570.1201">[026]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="28" x="470" y="1570.1201">done</text><rect fill="#EEEEEE" filter="url(#f1jj7r371pirm0)" height="3" style="stroke:#EEEEEE;stroke-width:1.0;" width="1608" x="5" y="1604.1523"/><line style="stroke:#000000;stroke-width:1.0;" x1="5" x2="1613" y1="1604.1523" y2="1604.1523"/><line style="stroke:#000000;stroke-width:1.0;" x1="5" x2="1613" y1="1607.1523" y2="1607.1523"/><rect fill="#EEEEEE" filter="url(#f1jj7r371pirm0)" height="24.3516" style="stroke:#000000;stroke-width:2.0;" width="298" x="660" y="1592.9766"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="280" x="666" y="1610.4717">Encrypt PMEK with unlocked Encryption Key</text><polygon fill="#FF0000" points="705,1678.3828,715,1682.3828,705,1686.3828,709,1682.3828" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="420" x2="711" y1="1682.3828" y2="1682.3828"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="427" y="1661.1748">[027]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="106" x="460" y="1644.8232">Wrap(Key: Slot B,</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="100" x="496" y="1661.1748">Data Key : Slot Z</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="172" x="496" y="1677.5264">Destination : unlocked_pmek)</text><polygon fill="#FF0000" points="1157.5,1708.7344,1167.5,1712.7344,1157.5,1716.7344,1161.5,1712.7344" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="727" x2="1163.5" y1="1712.7344" y2="1712.7344"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="734" y="1707.8779">[028]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="114" x="767" y="1707.8779">Get Encryption Key</text><polygon fill="#FF0000" points="1497.5,1739.0859,1507.5,1743.0859,1497.5,1747.0859,1501.5,1743.0859" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="727" x2="1503.5" y1="1743.0859" y2="1743.0859"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="734" y="1738.2295">[029]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="63" x="767" y="1738.2295">Get PMEK</text><line style="stroke:#FF0000;stroke-width:1.0;" x1="727" x2="769" y1="1773.4375" y2="1773.4375"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="769" x2="769" y1="1773.4375" y2="1786.4375"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="728" x2="769" y1="1786.4375" y2="1786.4375"/><polygon fill="#FF0000" points="738,1782.4375,728,1786.4375,738,1790.4375,734,1786.4375" style="stroke:#FF0000;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="734" y="1768.5811">[030]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="156" x="767" y="1768.5811">Encrypt slot Z using Slot B</text><polygon fill="#FF0000" points="431,1812.7891,421,1816.7891,431,1820.7891,427,1816.7891" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="425" x2="716" y1="1816.7891" y2="1816.7891"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="437" y="1811.9326">[031]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="93" x="470" y="1811.9326">Unocked PMEK</text><polygon fill="#FF0000" points="705,1859.4922,715,1863.4922,705,1867.4922,709,1863.4922" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="420" x2="711" y1="1863.4922" y2="1863.4922"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="427" y="1850.46">[032]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="137" x="460" y="1842.2842">Purge_key(Key: Slot Y,</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="73" x="524" y="1858.6357">Key : Slot Z)</text><polygon fill="#FF0000" points="1390.5,1889.8438,1400.5,1893.8438,1390.5,1897.8438,1394.5,1893.8438" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="727" x2="1396.5" y1="1893.8438" y2="1893.8438"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="734" y="1888.9873">[033]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="34" x="767" y="1888.9873">Purge</text><polygon fill="#FF0000" points="1497.5,1889.8438,1507.5,1893.8438,1497.5,1897.8438,1501.5,1893.8438" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="727" x2="1503.5" y1="1893.8438" y2="1893.8438"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="734" y="1888.9873">[034]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="771" y="1888.9873"/><polygon fill="#FF0000" points="431,1920.1953,421,1924.1953,431,1928.1953,427,1924.1953" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="425" x2="716" y1="1924.1953" y2="1924.1953"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="437" y="1919.3389">[035]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="28" x="470" y="1919.3389">done</text><polygon fill="#FF0000" points="248,1966.8984,238,1970.8984,248,1974.8984,244,1970.8984" style="stroke:#FF0000;stroke-width:1.0;"/><line style="stroke:#FF0000;stroke-width:1.0;" x1="242" x2="409" y1="1970.8984" y2="1970.8984"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="254" y="1957.8662">[036]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="116" x="287" y="1949.6904">Command response</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="99" x="287" y="1966.042">Unlocked_PMEK</text><line style="stroke:#008000;stroke-width:1.0;" x1="82" x2="92" y1="1970.8984" y2="1966.8984"/><line style="stroke:#008000;stroke-width:1.0;" x1="82" x2="92" y1="1970.8984" y2="1974.8984"/><line style="stroke:#008000;stroke-width:1.0;" x1="82" x2="236" y1="1970.8984" y2="1970.8984"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="99" y="1957.8662">[037]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="59" x="132" y="1949.6904">Command</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="53" x="132" y="1966.042">complete</text><path d="M242,2011.8984 L242,2090.8984 L822,2090.8984 L822,2021.8984 L812,2011.8984 L242,2011.8984 " fill="#FBFB77" filter="url(#f1jj7r371pirm0)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M812,2011.8984 L812,2021.8984 L822,2021.8984 L812,2011.8984 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="252" y="2032.3936"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="32" x="252" y="2032.3936">Field</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="351" y="2032.3936"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="28" x="351" y="2032.3936">Size</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="452" y="2032.3936"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="61" x="452" y="2032.3936">Definition</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="46" x="252" y="2048.7451">chksum</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="21" x="351" y="2048.7451">u32</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="70" x="452" y="2048.7451">Little endian</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="63" x="252" y="2065.0967">fips_status</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="21" x="351" y="2065.0967">u32</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="310" x="452" y="2065.0967">Indicates if the command is FIPS approved or an error</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="91" x="252" y="2081.4482">unlocked_pmek</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="93" x="351" y="2081.4482">EncryptedPmek</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="351" x="452" y="2081.4482">PMEK encrypted to an export secret that is rotated  on reset</text><line style="stroke:#000000;stroke-width:1.0;" x1="248" x2="807" y1="2018.8984" y2="2018.8984"/><line style="stroke:#000000;stroke-width:1.0;" x1="248" x2="807" y1="2035.25" y2="2035.25"/><line style="stroke:#000000;stroke-width:1.0;" x1="248" x2="807" y1="2051.6016" y2="2051.6016"/><line style="stroke:#000000;stroke-width:1.0;" x1="248" x2="807" y1="2067.9531" y2="2067.9531"/><line style="stroke:#000000;stroke-width:1.0;" x1="248" x2="807" y1="2084.3047" y2="2084.3047"/><line style="stroke:#000000;stroke-width:1.0;" x1="248" x2="248" y1="2018.8984" y2="2084.3047"/><line style="stroke:#000000;stroke-width:1.0;" x1="347" x2="347" y1="2018.8984" y2="2084.3047"/><line style="stroke:#000000;stroke-width:1.0;" x1="448" x2="448" y1="2018.8984" y2="2084.3047"/><line style="stroke:#000000;stroke-width:1.0;" x1="807" x2="807" y1="2018.8984" y2="2084.3047"/><text fill="#888888" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="136" x="779" y="2202.5137">Filename: unlock_pmec.uml</text><!--MD5=[5b12f0eb75440c4700bd8a579ddd9b54]
+@startuml
+
+!include ocp_lock_utils.inc
+
+!$show_all = %true()
+'!$show_all = %false()
+
+!if ($show_all)
+    !$show_precond = %true()
+    !$show_title = %true()
+    !$show_api = %true()
+    !$show_msg_parsing = %true()
+    !$show_done = %true()
+!else
+    !$show_precond = %false()
+    !$show_title = %false()
+    !$show_api = %false()
+    !$show_msg_parsing = %false()
+    !$show_done = %false()
+!endif
+
+!if ($show_title)
+    Title "Unlock PMEK"
+!endif
+
+!if ($show_precond)
+    note across
+        <b>Preconditions:</b>
+        * Access Shared Secret already availble in a slot in KV
+        * unlocking key already in a slot and generated on each reset
+        <font color=red>Is there a separate Shared Secret per Admin User?</font>
+    end note
+!endif
+
+srk++ $BUFFER_ACTIVATION
+kemg++ $BUFFER_ACTIVATION
+pmeks++ $BUFFER_ACTIVATION
+
+fw $async mb++ : UNLOCK_PMEK
+
+!if ($show_api)
+    note right mb
+        | <b>Field            | <b>Size          | <b>Definition |
+        | chksum              | u32              | Little endian |
+        | wrapped_access_key  | WrappedAccessKey | KEM-wrapped access keyn* kem_handle\n*kem_algorithm\n*kem_ciphertext\n* encrypted_access_key  |
+        | locked_pmek         | EncryptedPmek    | PMEK encrypted to storage root key and access key |
+    end note
+!endif
+
+mb $async cfw++ : Command
+
+!if ($show_msg_parsing)
+    cfw $sync mb : Get command
+    mb- -
+    $self("cfw", "Determine command")
+!else
+    mb- -
+!endif
+cfw $sync cfw: Determine rate of unlocking
+
+alt Storage Root Key exists
+    alt Unlocking rate below threshold
+
+        == Get the Access Key ==
+        cfw $sync kv++: Decaps(KEM Pair : kem_handle (G),\n            KEM ciphertext : kem_ciphertext\n            Destination : Slot Y)
+        kv $sync kemg: Get KEM Keypair
+        kv $sync kv: Decap KEM Ciphertext with Keypair
+        kv $sync tempy: Put Shared Secret
+        tempy++ $BUFFER_ACTIVATION
+        !if ($show_done)
+            kv $sync cfw- - : done
+        !else
+            kv- -
+        !endif
+
+
+        cfw $sync kv++: Key_Unwrap(Key : Slot Y,\n                   Data: encrypted_access_key\n                   Destination : Slot Z)
+        kv $sync tempy: Get Shared Secret
+        kv $sync kv: Key_Unwrap encrypted_access_key with Key
+        kv $sync tempz: Put Access Key
+        tempz++ $BUFFER_ACTIVATION
+        !if ($show_done)
+            kv $sync cfw- - : done
+        !else
+            kv- -
+        !endif
+
+        == Create the Encryption Key ==
+
+        cfw $sync kv++: HMAC512_Slots(Key : Slot A,\n                         Data Key : Slot Z\n                         Destination Slot: Y)
+        kv $sync srk: Get Storage Root Key
+        kv $sync tempz: Get Access Key
+        kv $sync kv: HMAC512 Slot A with Slot Z
+        kv $sync tempy: HMAC512 result PMEK
+        !if ($show_done)
+            kv $sync cfw- - : done
+        !else
+            kv- -
+        !endif
+
+        == Extract PMEK with Encryption Key ==
+
+        cfw $sync kv++: Unwrap(Key : Slot Y,\n            Data: locked_pmek\n            Destination :  Slot Z)
+        kv $sync tempy: Get Encryption Key
+        kv $sync kv: Decrypt locked_pmek
+        kv $sync tempz: PMEK
+        !if ($show_done)
+            kv $sync cfw- - : done
+        !else
+            kv- -
+        !endif
+
+        == Encrypt PMEK with unlocked Encryption Key ==
+
+        cfw $sync kv++: Wrap(Key: Slot B,\n         Data Key : Slot Z\n         Destination : unlocked_pmek)
+        kv $sync pmeks: Get Encryption Key
+        kv $sync tempz: Get PMEK
+        kv $sync kv: Encrypt slot Z using Slot B
+        !if ($show_done)
+            kv $sync cfw- - : Unocked PMEK
+        !else
+            kv- -
+        !endif
+
+        cfw $sync kv++: Purge_key(Key: Slot Y,\n                Key : Slot Z)
+        kv $sync tempy !! : Purge
+        & kv $sync tempz !!
+        !if ($show_done)
+            kv $sync cfw- - : done
+        !else
+            kv- -
+        !endif
+
+        cfw $sync mb : Command response\nUnlocked_PMEK
+        & mb $async fw++ : Command\ncomplete
+    end
+end
+
+!if ($show_api)
+    note right mb
+        | <b>Field      | <b>Size       | <b>Definition |
+        | chksum        | u32           | Little endian |
+        | fips_status   | u32           | Indicates if the command is FIPS approved or an error |
+        | unlocked_pmek | EncryptedPmek | PMEK encrypted to an export secret that is rotated  on reset |
+    end note
+!endif
+cfw- -
+
+@enduml
+
+@startuml
+
+
+
+
+
+
+
+
+
+	autonumber 1 1  "<b>[000]"
+
+	!pragma teoz true
+
+    participant "Remote Key\nManagement Service" as rkms
+
+
+    participant "Host" as host
+
+
+    participant "Storage\nDevice\nFW" as fw
+
+    box "Caliptra"
+    	participant "Mail Box" as mb
+    	participant "ROM" as crom
+    	participant "FW" as cfw
+    	participant "ROM to FW\nHandoff Data" as hoff
+        participant "DRBG" as rand
+        participant "DMA Engine" as dma
+        participant "Key Vault" as kv
+        participant "Key Vault\nFuses" as fuses
+        participant "Key Vault\nStorage Root Key" as gsrk
+        participant "Key Vault\nSlot A\n(Storage Root Key)" as srk
+        participant "Key Vault\nSlot B\n(PMEK Secret)" as pmeks
+        participant "Key Vault\nSlot F\n(DICE Alias Key)\necdsa_secp384r1_sha384" as dice
+        participant "Key Vault\nSlot G\n(KEM Keypair)" as kemg
+        participant "Key Vault\nSlot W\n(Temporary)" as tempw
+        participant "Key Vault\nSlot X\n(MEK Seed)" as meks
+        participant "Key Vault\nSlot Y\n(Temporary)" as tempy
+        participant "Key Vault\nSlot Z\n(Temporary)" as tempz
+        participant "Key Vault\nTemp Memory" as tempmem
+    end box
+
+    box "Encryption Engine"
+        participant "SFR\nInterface" as sfr
+        participant "Control" as ee
+        participant "Key Cache" as kc
+    end box
+
+    box "Media"
+        participant "Create new\Storage Root Key\non NVM subsystem reset" as csrk
+        participant "Destroy all\Storage Root Keys\non NVM subsystem reset" as dsrk
+    end box
+
+    hide unlinked
+	footer Filename: unlock_pmec.uml
+
+	header Version 1
+
+
+
+
+    Title "Unlock PMEK"
+
+    note across
+        <b>Preconditions:</b>
+        * Access Shared Secret already availble in a slot in KV
+        * unlocking key already in a slot and generated on each reset
+        <font color=red>Is there a separate Shared Secret per Admin User?</font>
+    end note
+
+srk++ #lightblue
+kemg++ #lightblue
+pmeks++ #lightblue
+
+fw -[#green]>> mb++ : UNLOCK_PMEK
+
+    note right mb
+        | <b>Field            | <b>Size          | <b>Definition |
+        | chksum              | u32              | Little endian |
+        | wrapped_access_key  | WrappedAccessKey | KEM-wrapped access keyn* kem_handle\n*kem_algorithm\n*kem_ciphertext\n* encrypted_access_key  |
+        | locked_pmek         | EncryptedPmek    | PMEK encrypted to storage root key and access key |
+    end note
+
+mb -[#green]>> cfw++ : Command
+
+    cfw -[#red]> mb : Get command
+    mb- -
+    	   cfw -[#red]> cfw : Determine command
+	   ||0||
+cfw -[#red]> cfw: Determine rate of unlocking
+
+alt Storage Root Key exists
+    alt Unlocking rate below threshold
+
+        == Get the Access Key ==
+        cfw -[#red]> kv++: Decaps(KEM Pair : kem_handle (G),\n            KEM ciphertext : kem_ciphertext\n            Destination : Slot Y)
+        kv -[#red]> kemg: Get KEM Keypair
+        kv -[#red]> kv: Decap KEM Ciphertext with Keypair
+        kv -[#red]> tempy: Put Shared Secret
+        tempy++ #lightblue
+            kv -[#red]> cfw- - : done
+
+
+        cfw -[#red]> kv++: Key_Unwrap(Key : Slot Y,\n                   Data: encrypted_access_key\n                   Destination : Slot Z)
+        kv -[#red]> tempy: Get Shared Secret
+        kv -[#red]> kv: Key_Unwrap encrypted_access_key with Key
+        kv -[#red]> tempz: Put Access Key
+        tempz++ #lightblue
+            kv -[#red]> cfw- - : done
+
+        == Create the Encryption Key ==
+
+        cfw -[#red]> kv++: HMAC512_Slots(Key : Slot A,\n                         Data Key : Slot Z\n                         Destination Slot: Y)
+        kv -[#red]> srk: Get Storage Root Key
+        kv -[#red]> tempz: Get Access Key
+        kv -[#red]> kv: HMAC512 Slot A with Slot Z
+        kv -[#red]> tempy: HMAC512 result PMEK
+            kv -[#red]> cfw- - : done
+
+        == Extract PMEK with Encryption Key ==
+
+        cfw -[#red]> kv++: Unwrap(Key : Slot Y,\n            Data: locked_pmek\n            Destination :  Slot Z)
+        kv -[#red]> tempy: Get Encryption Key
+        kv -[#red]> kv: Decrypt locked_pmek
+        kv -[#red]> tempz: PMEK
+            kv -[#red]> cfw- - : done
+
+        == Encrypt PMEK with unlocked Encryption Key ==
+
+        cfw -[#red]> kv++: Wrap(Key: Slot B,\n         Data Key : Slot Z\n         Destination : unlocked_pmek)
+        kv -[#red]> pmeks: Get Encryption Key
+        kv -[#red]> tempz: Get PMEK
+        kv -[#red]> kv: Encrypt slot Z using Slot B
+            kv -[#red]> cfw- - : Unocked PMEK
+
+        cfw -[#red]> kv++: Purge_key(Key: Slot Y,\n                Key : Slot Z)
+        kv -[#red]> tempy !! : Purge
+        & kv -[#red]> tempz !!
+            kv -[#red]> cfw- - : done
+
+        cfw -[#red]> mb : Command response\nUnlocked_PMEK
+        & mb -[#green]>> fw++ : Command\ncomplete
+    end
+end
+
+    note right mb
+        | <b>Field      | <b>Size       | <b>Definition |
+        | chksum        | u32           | Little endian |
+        | fips_status   | u32           | Indicates if the command is FIPS approved or an error |
+        | unlocked_pmek | EncryptedPmek | PMEK encrypted to an export secret that is rotated  on reset |
+    end note
+cfw- -
+
+@enduml
+
+PlantUML version 1.2021.7(Sun May 23 06:40:07 MDT 2021)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>
