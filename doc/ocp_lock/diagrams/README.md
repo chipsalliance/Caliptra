@@ -7,7 +7,7 @@ The following diagrams illustrate the OCP L.O.C.K. commands.
 To regenerate SVG files, download [PlantUML](https://plantuml.com/download) and run:
 
 ```
-$ java -jar path/to/plant_uml.jar  -tsvg *.uml
+$ java -jar path/to/plant_uml.jar -Ddoc_gen-=1 -tsvg *.uml
 ```
 
 ## Power on
