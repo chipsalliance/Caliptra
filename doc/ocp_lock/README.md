@@ -407,6 +407,43 @@ It is anticipated that controller firmware will perform its own vendor-specific 
 #### Sequence for Getting a Randon Number
 
 ![Get_random](./diagrams/get_random.svg)
+
+# Hardware
+
+The following figure describes the OCP L.O.C.K..
+
+Figure 8: KMB block diagram
+
+This figure will be fleshed out with additional details as they become available.
+
+##	Memory requirements:
+
+This section will be fleshed out with additional details as they become available.
+
+##	Cryptography requirements
+
+This section will be fleshed out with additional details as they become available.
+
+## KMB-Encryption Engine Interface
+
+This section defines the interface between the Key Management Block (KMB) and an Encryption Engine. An Encryption Engine is used to encrypt/decrypt user data and its design and implementation are vendor specific. Media Encryption Keys (MEKs) are the keys which are generated within KMB and used by Encryption Engine to encrypt and decrypt user data. This interface is used to load MEKs from KMB to Encryption Engine or to cause the Encryption Engine to unload (i.e., remove) loaded MEKs. The MEKs transferred between the KMB and the Encryption Engine shall not be accessible by the Controller Firmware.
+
+### Overview
+
+The Encryption Engine uses a stored MEKs to encryption and decryption use data. For the purposes of this specification, the entity within the Encryption Engine used to store the MEKs is called Key Cache. Each encryption and description of user data is coupled to a specific MEK which is stored in Key Cache bound to a unique identifier, called metadata. Each (metadata, MEK) pair is also associated with additional information, called aux, which is used neither as MEK nor an identifier, but has some additional information about the pair. Therefore, the Key Cache as an entity which stores (metadata, aux, MEK) tuples.
+
+In order to achieve the security goals for KMB, KMB is limited to be the unique component which loads unload a (metadata, aux, MEK) tuple into the Key Cache and unloads a tuple within the device, so that MEKs can only be exposed to KMB and Encryption Engine. Controller Firmware arbitrates all operations in the KMB to Encryption Engine interface, therefore Controller FW is responsible for managing which MEK is loaded in Key Cache. Controller Firmware has full control on metadata and optional aux. Figure 8 is an illustration of the KMB to Encryption Engine interface that shows:
+
+-	the tuple for loading a MEK;
+-	the Metadata for unloading a MEK; and 
+-	an example of a Key Cache within the Encryption Engine.
+
+*<p style="text-align: center;">Figure 9: KMB to Encryption SFR Interface</p>*
+
+
+
+
+
  
 # References
 1. <a id="ref-1"></a>Refer to the [Self-encrypting deception: weaknesses in the encryption of solid state drives](https://www.cs.ru.nl/~cmeijer/publications/Self_Encrypting_Deception_Weaknesses_in_the_Encryption_of_Solid_State_Drives.pdf) by Carlo Meijer and Bernard van Gastel
