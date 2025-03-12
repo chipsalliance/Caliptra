@@ -8,25 +8,25 @@ The **Caliptra Checklist and Evaluation Methodology** document serves as a compr
 
 This document outlines detailed requirements and evaluation methodologies across various domains, including asset management, interface implementations, and secure process adherence. The primary goals are to:
 
-* **Ensure Security Compliance:** Provide clear and testable requirements that align with industry best practices and standards, such as those from NIST and FIPS.  
+* **Ensure security compliance:** Provide clear and testable requirements that align with industry best practices and standards, such as those from NIST and FIPS.  
     
-* **Facilitate Evaluation:** Offer comprehensive evaluation methodologies that allow for consistent and thorough assessment of compliance with the checklist items.
+* **Facilitate evaluation:** Offer comprehensive evaluation methodologies that allow for consistent and thorough assessment of compliance with the checklist items.
 
-* **Promote Clarity and Specificity:** Avoid vague language by specifying exact requirements, thereby making the checklist actionable and reducing ambiguity during the evaluation process.
+* **Promote clarity and specificity:** Avoid vague language by specifying exact requirements, thereby making the checklist actionable and reducing ambiguity during the evaluation process.
 
-* **Address Critical Security Areas:** Focus on key areas that have significant impact on the security of Caliptra integration, such as cryptographic key management, secure boot processes, and access control mechanisms.
+* **Address critical security areas:** Focus on key areas that have significant impact on the security of Caliptra integration, such as cryptographic key management, secure boot processes, and access control mechanisms.
 
-* **Enhance Integration Efficiency:** By providing a clear roadmap of requirements, the document aims to streamline the integration process and assist manufacturers in proactively addressing security considerations.
+* **Enhance integration efficiency:** By providing a clear roadmap of requirements, the document aims to streamline the integration process and assist manufacturers in proactively addressing security considerations.
 
 The checklist items have been developed through a thorough analysis of:
 
-* **Caliptra Specifications:** Reviewing the Caliptra IP documentation to extract relevant requirements and ensure alignment with the intended security features.  
+* **Caliptra specifications:** Reviewing the Caliptra IP documentation to extract relevant requirements and ensure alignment with the intended security features.  
     
-* **Industry Standards and Best Practices:** Incorporating guidelines from recognized standards to enhance the robustness of security mechanisms.
+* **Industry standards and best practices:** Incorporating guidelines from recognized standards to enhance the robustness of security mechanisms.
 
-* **Feedback and Collaboration:** Integrating input from various stakeholders, including security experts and industry professionals, to refine the checklist and address potential gaps.
+* **Feedback and collaboration:** Integrating input from various stakeholders, including security experts and industry professionals, to refine the checklist and address potential gaps.
 
-* **Asset-Based Analysis:** Identifying critical assets within the Caliptra integration context and tailoring requirements to protect these assets effectively.
+* **Asset-based analysis:** Identifying critical assets within the Caliptra integration context and tailoring requirements to protect these assets effectively.
 
 By adhering to the checklist and employing the specified evaluation methodologies, manufacturers and evaluators can work collaboratively to ensure that the Caliptra integration meets stringent security requirements, thereby bolstering the trustworthiness of the final product.
 
@@ -85,7 +85,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
   * **Evaluation Methodology:** Manufacturers MUST detail the security measures employed during the handling of the UDS seed, including access controls, secure storage practices, and sanitization procedures.  
 * **Checklist Item:**  
   * **Requirement**: Field Entropy SHOULD be generated on die, and not be exposed outside the die.  
-  * **Evaluation Methodology**: Manufacturers SHOULD detail the generation process and document exposure of UDS seed.
+  * **Evaluation Methodology**: Manufacturers SHOULD detail the generation process for, and document exposure of field entropy.
 
 #### *Access to Fuses*
 
@@ -98,7 +98,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 * **Checklist Item:**  
   * **Requirement:** Firmware authentication keys MUST be generated using an [ESV](https://csrc.nist.rip/Projects/cryptographic-module-validation-program/entropy-validations/esv) certified entropy source, and key derivation functions specified by [NIST SP 800-208](https://csrc.nist.gov/pubs/sp/800/208/final) and [FIPS 186-4](https://csrc.nist.gov/pubs/fips/186-4/final).
   * **Requirement:** Firmware authentication keys MUST NOT allow unauthorized users to perform signing operations.
-  * **Requirement:** Firmware authentication keys MUST be stored in a manner that prevents disclosure of private key material, and does not permit keys to be exported or copied to systems that do not enforce the same controls on usage and disclosure of the key.
+  * **Requirement:** Firmware authentication keys MUST be stored in a manner that prevents disclosure of private key material. The manner of storage MUST only permit keys to be exported or copied to systems that enforce the same controls on usage and disclosure of the key.
   * **Requirement:** Signing operations performed using the firmware authentication key MUST be logged.
   * **Requirement:** Firmware authentication keys SHOULD be created and stored in a [FIPS 140-3](https://csrc.nist.gov/pubs/fips/140-3/final) certified Hardware Security Module (HSM).
   * **Requirement:** Firmware authentication keys SHOULD require multi-party authentication to perform signing operations.
@@ -115,8 +115,8 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Certificate Provisioning*
 
 * **Checklist Item:**  
-  * **Requirement:** The IDEVID certificates, including CA certificates, MUST adhere to specified formats and cryptographic standards (e.g. key sizes and algorithms as per NIST guidelines). Acceptable algorithms and key strengths MUST meet or exceed the security strength that the Caliptra IP produces, for the entire CA cert chain.
-  * **Evaluation Methodology:** Manufacturers MUST provide examples of the certificate chain created demonstrating compliance with the required formats and standards.
+  * **Requirement:** The IDEVID certificates, including CA certificates, MUST adhere to specified formats and cryptographic standards (e.g. key sizes and algorithms as per NIST guidelines). Acceptable algorithms and key strengths MUST meet or exceed the security strength that the Caliptra IP produces. These requirements apply to the entire CA cert chain.
+  * **Evaluation Methodology:** Manufacturers MUST demonstrate compliance with the required formats and standards by providing examples of the certificate chain that is created.
 
 ### Obfuscation Key {#obfuscation-key}
 
@@ -207,13 +207,13 @@ The following is a consolidated list of all requirements to ensure comprehensive
 
 * **Checklist Item:**  
   * **Requirement:** The management of Caliptra's PA\_USER MUST ensure isolation and protection of privileged operations, preventing unprivileged users form forging measurements or accessing privileged functions.
-  * **Evaluation Methodology:** Manufacturers MUST detail how PA\_USER is mapped in hardware and the mechanisms in place to isolate privileged operations from unprivileged ones.
+  * **Evaluation Methodology:** Manufacturers MUST document how PA\_USER is mapped in hardware and the mechanisms in place to isolate privileged operations from unprivileged ones.
 
 #### *Random Number Generator (RNG) Implementation*
 
 * **Checklist Item:**  
   * **Requirement:** If an RNG is included in the Caliptra Wrapper, it MUST be securely implemented, and its design MUST meet applicable cryptographic standards. The source of entropy (internal or external) MUST be specified.  
-  * **Evaluation Methodology:** Manufacturers MUST provide specifications of the RNG, including entropy sources, compliance with standards like [NIST SP 800-90A](https://csrc.nist.gov/pubs/sp/800/90/a/r1/final), [SP 800-90B](https://csrc.nist.gov/pubs/sp/800/90/b/final), [SP 800-90C](https://csrc.nist.gov/pubs/sp/800/90/c/4pd), and test results validating its performance.
+  * **Evaluation Methodology:** Manufacturers MUST demonstrate that the RNG, including entropy sources, is compliant with standards like [NIST SP 800-90A](https://csrc.nist.gov/pubs/sp/800/90/a/r1/final), [SP 800-90B](https://csrc.nist.gov/pubs/sp/800/90/b/final), [SP 800-90C](https://csrc.nist.gov/pubs/sp/800/90/c/4pd).
 
 #### *SRAM Zeroization Process*
 
@@ -245,7 +245,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 
 * **Checklist Item:**  
   * **Requirement:** The SoC SHOULD implement logging functionality that records relevant events related to Caliptra operations, ensuring logs are tamper-evident and provide necessary information for attestation. The log does not need to be kept secure but should be tamper-evident to detect manipulation.  
-  * **Evaluation Methodology:** Manufacturers SHOULD describe the logging mechanism, including how logs are structured, protected against tampering (e.g., using cryptographic hash extensions), and how they integrate with Caliptra's measurement processes.
+  * **Evaluation Methodology:** Manufacturers SHOULD describe the logging mechanism, including how logs are structured, how they are protected against tampering (e.g., using cryptographic hash extensions), and how they integrate with Caliptra's measurement processes.
 
 ## Secure Processes {#secure-processes}
 
@@ -254,7 +254,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Integrity of Firmware and Hardware*
 
 * **Checklist Item:**  
-  * **Requirement:** The Caliptra RTL MUST match an official release. Netlists, layout, and other development collateral derived from the RTL MUST maintain the same  behavior as the released RTL.  
+  * **Requirement:** The Caliptra RTL MUST match an official release. Netlists, layout, and other development collateral derived from the RTL MUST maintain the same behavior as the released RTL.  
   * **Evaluation Methodology:** Manufacturers MUST provide evidence of hash verification against official releases. Manufacturers MUST provide evidence that collateral derived from the released RTL has not had its behavior modified.
 
 #### *Caliptra FW Cryptographic Hash*
@@ -283,10 +283,10 @@ The following is a consolidated list of all requirements to ensure comprehensive
 
 * **Checklist Item:**  
   * **Requirement:** The enabling and disabling of debugging features in production MUST be controlled and documented to prevent unauthorized access or leakage of sensitive information. Specific policies regarding when and how debugging can be enabled must be defined.  
-  * **Evaluation Methodology:** Manufacturers MUST describe how debugging is managed in production, including any fuse settings, access controls, and procedures to disable debugging interfaces before deployment. Documentation should clarify whether physical presence or specific authorization is required to enable debugging.
+  * **Evaluation Methodology:** Manufacturers MUST describe how debugging is managed in production, including any fuse settings, access controls, and procedures to disable debugging interfaces before deployment. Documentation must indicate whether physical presence or specific authorization is required to enable debugging.
 
 #### *Flaw Remediation Process*
 
 * **Checklist Item:**  
   * **Requirement:** There MUST be a defined process for handling reported vulnerabilities, including assessment, communication, and deployment of security updates or mitigations.  
-  * **Evaluation Methodology:** Manufacturers MUST provide their flaw remediation policy, detailing how vulnerabilities are received (e.g. bug bounty programs), evaluated, prioritized, and how updates are securely delivered to devices in the field. Procedures for notifying stakeholders and compliance with relevant regulations should also be described.
+  * **Evaluation Methodology:** Manufacturers MUST provide their flaw remediation policy. This policy must describe how vulnerabilities are received (e.g., bug bounty programs), evaluated, and prioritized, and how updates are securely delivered to devices in the field. Procedures for notifying stakeholders and compliance with relevant regulations should also be described.
