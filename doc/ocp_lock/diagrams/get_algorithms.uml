@@ -6,24 +6,6 @@
 
 !include ocp_lock_utils.inc
 
-!$show_all = %true()
-'!$show_all = %false()
-
-!if ($show_all)
-    !$show_precond = %true()
-    !$show_title = %true()
-    !$show_api = %true()
-    !$show_msg_parsing = %true()
-    !$show_done = %true()
-!else
-    !$show_precond = %false()
-    !$show_title = %false()
-    !$show_api = %false()
-    !$show_msg_parsing = %false()
-    !$show_done = %true()
-!endif
-
-
 !if ($show_title)
     Title "GET_ALGORITHMS command sequence"
 !endif
@@ -49,7 +31,20 @@ mb $async cfw++ : Command
 
 $self("cfw", "Fill the set of algorithms supported ")
 note over cfw
-   <font color=red>Jeff Andersen to provide the Caliptra 2.1 list of algorithms.
+
+    The Algorithms to support
+
+    From the HPKE base spec:
+
+    *	kem_id = 0x0011: P-384
+    *	aead_id = 0x0002: AES-256-GCM
+    *	kdf_id = 0x0002: HKDF-SHA384
+
+    For post-quantum crypto, from the X-Wing draft spec:
+
+    *	kem_id = 0x647a: ML-KEM-768 + X25519
+    *	aead_id and kdf_id will be the same as from the base spec.
+
 end note
 
 cfw $sync mb : Command\nResponse/nSet of algorithms supported

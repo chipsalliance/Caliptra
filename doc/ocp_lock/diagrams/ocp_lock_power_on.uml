@@ -1,0 +1,117 @@
+'
+' OCP Lock: Power on sequence diagram showing Caliptra FW/HW interactions
+'
+'
+@startuml
+
+!include ocp_lock_utils.inc
+
+!$SHOW_LOAD_KEY = 0
+
+
+!if ($show_title)
+    Title "OCP L.O.C.K. Power On"
+!endif
+
+!if ($show_precond)
+    note across
+
+        <font color = red>With the recent chnages to the Fuses, these sequence needs updated
+
+
+'        <b>Preconditions:</b>
+'        * Storage Root Key exists in the fuses
+
+'        <b>Notes:</b>
+'        * <font color=red>Need to add the ability to Purge the existing Storage Root Key and creating a new Storage Root Key to be determined as part of the fuse discussion
+'        * <font color=red>Need to discuss Warm Reset cases
+'          - <font color=red>NVM subsystem Reset - assume reset of ASIC and ROM code re-executed
+'          - <font color=red>PCIe Warm Reset - Discuss : PMEKs maybe unlocked
+'             Gamil to investigate
+'          - <font color=red>Controller Reset - Discuss
+    end note
+!endif
+
+fuses++ $BUFFER_ACTIVATION
+
+[-[$ASYNC_COLOR]>> crom++ : Power on
+
+== Load a KV slot with Storage Root Key  ==
+
+crom $sync kv++: load_storage_root(Key: Slot A)
+loop through fuses entries until valid fuse entry found
+    kv $sync fuses : get next entry
+end
+
+alt if a valid entry
+    kv $sync srk : Put Storage Root Key
+    srk++ $BUFFER_ACTIVATION
+    kv $sync kv: storage_root_ket_exists = True
+else No valid entry
+    kv $sync kv: storage_root_key_exists = False
+end
+!if ($show_done)
+    kv $sync crom-- : storage_root_key_exists
+!else
+    kv--
+!endif
+
+crom $sync crom : Retain storage_root_key_exists
+
+
+== Load a KV slot with KEM for each KEM algorithm supported  ==
+
+alt kem_algorithm ecdh_secp384r1 supported
+    crom $sync kv++: generate_ecdh_secp384r1(Key: Slot G)
+    kv $sync rand: Get random bytes for KEM keypair
+    note right
+        <font color=red>move to FW
+        <font color=red>add note to indiacte would be nice in HW
+    end note
+    kv $sync kemg : Put KEM keypair
+    kemg++ $BUFFER_ACTIVATION
+    !if ($show_done)
+        kv $sync crom-- : done
+    !else
+        kv--
+    !endif
+end
+
+== Load a KV slot with DICE key for each KEM algorithm supported  ==
+
+note right crom
+
+ROM/FMC code already created DICE keys and loaded them. Caliptra FW knows the key so no work to do.
+
+end note
+
+== Load a KV slot with a PMEK unlock Key  ==
+
+crom $sync kv++: new_key(len: 256,\n              Destination: Slot B)
+kv $sync rand: Get new random key of 256 bits
+kv $sync pmeks: Put PMEK Secret Key
+pmeks++ $BUFFER_ACTIVATION
+!if ($show_done)
+    kv $sync crom-- : done
+!else
+    kv--
+!endif
+
+$sometimelater()
+
+crom $sync cfw++ : Hand-off information
+destroy crom
+note right cfw
+    Currently, there is already handoff information
+    from ROM to run-time FW. Need to include:
+    * If the Storage Root Key exists and if so the KV slot containing that Storage Root Key
+    * The KV Slot containing the KEM keypair
+
+end note
+
+cfw $sync cfw: Mark that no MEK sequence has started
+||5||
+cfw--
+
+
+@enduml

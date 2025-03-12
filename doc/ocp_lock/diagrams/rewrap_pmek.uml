@@ -6,23 +6,6 @@
 
 !include ocp_lock_utils.inc
 
-!$show_all = %true()
-'!$show_all = %false()
-
-!if ($show_all)
-    !$show_precond = %true()
-    !$show_title = %true()
-    !$show_api = %true()
-    !$show_msg_parsing = %true()
-    !$show_done = %true()
-!else
-    !$show_precond = %false()
-    !$show_title = %false()
-    !$show_api = %false()
-    !$show_msg_parsing = %false()
-    !$show_done = %false()
-!endif
-
 !if ($show_title)
     Title "Rewrap PMEK"
 !endif
@@ -64,9 +47,9 @@ mb $async cfw++ : Command
 alt Storage Root Key exists
 
     == Get Access Key 1 ==
-    cfw $sync kv++: Decaps(KEM Pair : kem_handle (g),\n            KEM ciphertext : kem_ciphertext from wrapped_access_key_1\n            Destination : Slot Y)
+    cfw $sync kv++: Decaps(KEM Pair : kem_handle (g),\n            KEM ciphertext : kem_ciphertext from\n                                      wrapped_access_key_1\n            Destination : Slot Y)
     kv $sync kemg: Get KEM Keypair
-    kv $sync kv: Decap KEM Ciphertext with Keypair
+    kv $sync kv: Decap KEM Ciphertext\nwith Keypair
     kv $sync tempy: Put Shared Secret
     tempy++ $BUFFER_ACTIVATION
     !if ($show_done)
@@ -78,7 +61,7 @@ alt Storage Root Key exists
 
     cfw $sync kv++: Unwrap(Key : Slot Y\n            Key Data : wrapped_access_key_1,\n            Destination : Slot Z)
     kv $sync tempy: Get Shared Secret
-    kv $sync kv: Unwrap wrapped_access_key_1
+    kv $sync kv: Unwrap\nwrapped_access_key_1
     kv $sync tempz: Put Access Key 1
     tempz++ $BUFFER_ACTIVATION
     !if ($show_done)
@@ -88,9 +71,9 @@ alt Storage Root Key exists
     !endif
 
     == Get Access Key 2 ==
-    cfw $sync kv++: Unwrap(Key : Slot Y,\n            Key Data: double_encrypted_access_key,\n            Destination Memory: <font color=red>Put in memory as not a key)
+    cfw $sync kv++: Unwrap(Key : Slot Y,\n            Key Data: double_encrypted_access_key,\n            Destination Memory: <font color=red>Put in memory\n                                           <font color=red>as not a key)
     kv $sync tempy: Get Shared Secret
-    kv $sync kv: Unwrap double_encrypted_access_key\nwith Slot Y
+    kv $sync kv: Unwrap\ndouble_encrypted_access_key\nwith Slot Y
     kv $sync tempmem: Encrypted Access Key 2
 '    note left
 '      <font color=red>We are encrypting the access key 2 twice, first
@@ -196,8 +179,5 @@ cfw $sync mb : Command response\nnew_encrypted_pmek
     end note
 !endif
 cfw--
-
-
-
 
 @enduml
