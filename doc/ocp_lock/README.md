@@ -459,7 +459,102 @@ KMB uses Special Function Registers (SFRs) to communicate with Encryption Engine
 
 SFR_BASE is an address that is configured on KMB. The integrator should make sure that KMB can access these SFRs through these addresses.
 
-Control Register (Offset SFR_Base + 0h)
+##### Control Register (Offset SFR_Base + 0h)
+
+Figure 10 defines the Control register used to sequence the execution of a command and obtain the status of that command.
+
+*<p style="text-align: center;">Figure 10: Offset SFR_Base + 0h: CTRL – Control</p>*
+
+<table>
+<tr><th>Bits<\th><th>Type</th><th>Reset<\th><th>Description</th></tr>
+<tr><td>31</td><td>RO</td><td>0h</td><td><b>Ready (RDY):</b>b> After an NVM Subsystem Reset, this bit is set to 1b, then the Encryption Engine is ready to execute commands. If this bit is set to 0b, then the Encryption Engine is not ready to execute commands.</td></tr>
+<tr><td>30:20</td><td>RO</td><td>0h</td><td>Reserved</td></tr>
+<tr><td>19:16</td><td>RO</td><td>0h</td><td><b>Error (ERR):</b>> If the DONE bit is set to 1b by the Encryption Engine, then this field if set to a non-zero value to indicate the Encryption Engine detected an error during the execution the command specified by the CMD field. The definition of a non-zero value is vendor specific.
+
+| Value    | Description |
+| :--:     | :---------- |
+| 0h       | Command Successful |
+| 1h to 3h | Reserved |
+| 4h to Fh | Vendor Specific |
+
+If the DONE bit is set to 1b by the Encryption Engine and this field is set to 0h, then the Encryption Engine is indicating a successful execution of a command specified by the CMD field.\n
+If the DONE bit is set to 1b by KMB, then the field is set to 0000b.</td></tr>
+<tr><td>15:6</td><td>RO</td><td>0h</td><td>Reserved</td></tr>
+<tr><td>2:5</td><td>RW</td><td>0h</td><td><b>Command (CMD):</b> This field specifies the command to execute or the command associated with the reported status.
+  
+| Value | Description |
+| :-------: | :---- |
+| 0h        | Reserved |
+| 1h        | <b>Load MEK:</b> Load the key specified by the AUX field and MEK register into the Encryption Engine as specified by the METD field. |
+| 2h        | <b>Unload MEK:</b> Unload the MEK from the Encryption Engine as specified by the METD field. |
+| 3h        | <b>Sanitize:</b> Unload all of the MEKs from the Encryption Engine (i.e., Sanitize the Encryption Engine MEKs). |
+| 4h to Fh  | Reserved |
+
+</td></tr>
+<tr><td>1</td><td>RW</td><td>0b</td><td>Done (DN): This bit indicates the completion of a command by the Encryption Engine.\n
+If this bit is set to 1b by the Encryption Engine, then the Encryption Engine has completed the command specified by the CMD field.\n
+If the EXE bit is set to 1b and this bit is set to 1b, then the Encryption Engine has completed executing the command specified by the CMD field and the ERR field indicates the status of the execution of that command.
+A write of the value 1b to this bit shall cause the Encryption Engine to:
+ - set this bit to 0b;
+ - set the EXE bit to 0b; and
+ - set the ERR field to 00b.
+ </td></tr>
+<tr><td>0</td><td>RW</td><td>0b</td><td><b>Execute (EXE):</b> A write of the value 1b to this bit specifies that the Encryption Engine is to execute the command specified by the CMD field.
+If the DONE bit is set to 1 by KMB, then the bit is set to 0b.
+</td></tr></table
+
+From the KMB, the Controller register is the register to write a command and receive its execution result. From its counterpart, the Encryption Engine, the Controller register is used to receive a command and write its execution result.
+
+The expected change flow of the Controller register to handle a command is as follows:
+
+1. If <b>RDY</b> is set to 1b, then KMB writes <b>CMD</b> and <b>EXE</b>
+    1. <b>CMD:</b> either 1h, 2h or 3h
+    2. <b>EXE:</b> 1b
+2. The Encryption Engine writes</b> <b>ERR</b> and <b>DN</b>
+    1.<b>ERR:</b> either 0b or a non-zero value depending on the execution result
+    2. <b>DN:</b> 1b
+3. The KMB writes <b>DN</b>
+    1. <b>DN:</b> 1b
+4. The Encryption Engine writes <b>CMD</b>, <b>ERR</b>, <b>DN</b> and <b>EXE</b>
+    1. <b>CMD:</b> 0h
+    2. <b>ERR:</b> 0h
+    3. <b>DN:</b> 0b
+    4. <b>EXE:</b> 0b
+  
+The KMB therefore interacts with the Control register as follows in the normal circumstance:
+
+1. The KMB writes <b>CMD</b> and <b>EXE</b>
+    1. <b>CMD:</b> either 1h, 2h or 3h
+    2. <b>EXE:</b> 1b
+2.	The KMB waits <b>DN</b> to be 1
+3.	The KMB writes <b>DN</b>
+    1. <b>DN:</b> 1b
+4.	The KMB waits <b>DN</b> to be 0
+
+Since the Controller register is in fact a part of the Encryption Engine whose implementation can be unique by each vendor, behaviors of the Control register with the unexpected flow are left for vendors. For example, a vendor who wants robustness might integrate a write-lock into the Control register in order to prevent two almost simultaneous writes on EXE bit.
+
+##### Metadata Register (Offset SFR_Base + 0h)
+
+Figure 11 defines the Metadata register.
+
+*<p style="text-align: center;">Figure 11: Offset SFR_Base + 10h: METD – Metadata</p>*
+
+| Bytes | Type | Reset | Description |
+| :---: | :---: | :---: | :--- |
+| 19:00 | RW    | 0b    | <b>Metadata (METD):</b> This field specifies metadata that is vendor specific and specifies the entry in the Encryption Engine for the Encryption Key.|
+
+For the security goal of this project, the KMB and the Encryption Engine supposed to be the only components which have access to MEKs. Each MEK must then be bound to a unique identifier, which can be accessible by other components, in order for an appropriate key to be used for any key-related operations including data I/O. In a LOCK-enabled system, the <b>METD</b> field is expected to be used as such identifier.
+
+Instead of generating a random and unique identifier within the KMB while generating an MEK, the KMB takes an <b>METD</b> value as input from the Controller Firmware and write to the Metadata register without any modification for the sake of the following reasons:
+
+1. A vendor does not need to implement an additional algorithm to map between identifiers in its own system and in the KMB
+2. A vendor-unique key-retrieval algorithm can easily be leveraged into a <b>METD</b>-generation algorithm
+
+In order to reduce ambiguity, two examples of METD field will be given: Logical Block Addressing (LBA) range-based metadata; and key-tag based metadata.
+
+When an SSD stores data with address-based encryption, an MEK can be uniquely identified by a (LBA range, Namespace ID) pair. Then, the (LBA range, Namespace ID) pair can be leveraged into METD as on Figure 12.
+
+*<p style="text-align: center;">Figure 12: LBA Range Based Metadata Format</p>*
 
 
 
