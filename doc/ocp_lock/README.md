@@ -31,6 +31,7 @@
 			<li>Bryan Kelly</li>
 			<li>Anjana Parthasarathy</li>
 			<li>Ben Keen</li>
+			<li>Bharat Pillilli</li>
 		</ul></td></tr>
 <tr><td>Samsung</td><td>
 		<ul>
@@ -627,7 +628,7 @@ This section will be fleshed out with additional details as they become availabl
 
 A storage device equipped with OCP L.O.C.K. will be equipped with N 256-bit ratchet-secret fuse banks, dubbed R<sub>0</sub>..R<sub>N-1</sub>. 4 ≤ N ≤ 16. These ratchet secrets have the following requirements:
 
-- Each ratchet secret can individually transition from all-zeroes → randomized → all-ones. R<sub>N</sub> is only randomized once R<sub>N-1</sub> has transitioned to all-ones.
+- Each ratchet secret can individually transition from all-zeroes → randomized → all-ones. R<sub>X</sub> is only randomized once R<sub>X-1</sub> has transitioned to all-ones.
 - Programmable via the Caliptra fuse controller.
 	- Caliptra Core's fuse controller will not support individual zeroization of fuse banks.
 	- Open: can we mirror UDS and have the values come from Caliptra, even if they're programmed external to UDS?
@@ -671,7 +672,9 @@ The device will go through the following state transitions over its lifespan:
 7. The storage controller programs R<sub>2</sub> to all-ones and resets.
 8. The storage controller programs R<sub>3</sub> to a random value and resets.
 	1. See steps 2 and 3 for Caliptra's behavior in each state.
-...
+    
+   ...
+
 9. The storage controller programs R<sub>N-1</sub> to all-ones and resets.
 	1. Upon next reset, Caliptra detects that there are no randomized ratchet secrets, and no all-zeroes ratchet secrets.
 	2. Caliptra derives a storage root key from a non-ratchetable secret derived from the DICE UDS + field entropy.
@@ -1367,6 +1370,7 @@ The Caliptra Workgroup acknowledges the following individuals for their contribu
 			<li>Bryan Kelly</li>
 			<li>Anjana Parthasarathy</li>
 			<li>Ben Keen</li>
+			<li>Bharat Pillilli</li>
 		</ul></td></tr>
 <tr><td>Samsung</td><td>
 		<ul>
