@@ -246,7 +246,7 @@ An example of when an owner must protect assets is moving from secure mode to in
 | Boot measurements protected by Caliptra | Boot measurements that Caliptra gathers, stores, and reports | Integrity | Expert | 1. Manipulate measurements AiTM while in transit to Caliptra <br>2. SoC sends manipulated measurements to Caliptra |  |
 | Caliptra inputs | Security state | Integrity | Proficient | Glitching | Environmental monitoring and protection |
 | Caliptra inputs | Mode selection (Boot Media Integrated and dependent selections) | Integrity | Proficient | Glitching | Environmental monitoring and protection |
-| Caliptra inputs | PAUSER attribute | Integrity | Proficient | Glitching | Environmental monitoring and protection |
+| Caliptra inputs | AXI_USER attribute | Integrity | Proficient | Glitching | Environmental monitoring and protection |
 | Caliptra inputs | Design-for-Test (DFT) and Design-for-Debug (DFD) | Integrity | Proficient | 1. Attempt to manipulate RoT execution via DFT or DFD flows to flows that are not plan-of-record<br>2. Attempt to retrieve device secrets via DFT or DFD flows when product is field-deployed<br>3. Attempt to retrieve device secrets via DFT or DFD flows while the product is being developed and debugged | Implement scan mode and debug unlock management within Caliptra with the required SoC support |
 
 # High level architecture
@@ -430,7 +430,7 @@ Combine the internal TRNG output with a Manufacturing time provided value to pro
 9. HVM, through JTAG or using the SoC interface, polls for the “IDevID CSR ready" bit 24 that is set in “CPTRA\_FLOW\_STATUS” register.
 10. HVM reads mbox\_status\[3:0\] to check if the data is ready to be read (DATA\_READY encoding).
 11. HVM must clear bit 0 of CPTRA\_DBG\_MANUF\_SERVICE\_REG, indicating that it completed reading the CSR.
-12. Caliptra ROM opens the Caliptra Mailbox for SoC usages, such as FW loading (if required in some HVM flows). The SoC is only allowed to request a lock of the APB-exposed mailbox interface after this CSR operation is complete.
+12. Caliptra ROM opens the Caliptra Mailbox for SoC usages, such as FW loading (if required in some HVM flows). The SoC is only allowed to request a lock of the AXI-exposed mailbox interface after this CSR operation is complete.
 
 ## Certificate format
 
@@ -675,7 +675,7 @@ Each of these security states may be mapped to different SoC level debug and sec
 
 The service surface of Caliptra has multiple vectors. All use cases are control plane services, useful to power on a system or start a task. Supporting line rate high performance IO cryptography or any other data path capability is not required.
 
-* **Logic IOs:** Required to indicate status of the IP, availability of a message through APB, and to enable or disable certain debug capabilities (like JTAG enable or disable).
+* **Logic IOs:** Required to indicate status of the IP, availability of a message through AXI, and to enable or disable certain debug capabilities (like JTAG enable or disable).
 * **Command mailbox**: Caliptra shall offer services to other parts of the SoC. The APIs are documented in the [Caliptra Runtime specification](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md) and summarized below:
   * **Loading firmware**: Caliptra firmware is loaded via the mailbox at cold boot. In addition, Caliptra firmware can be loaded at runtime to support hitless or impactless updates.
   * **DICE-as-a-Service**: Caliptra shall expose the TCG DICE Protection Environment iRoT Profile API, allowing Caliptra to derive and wield a DICE identity on behalf of other elements within the SoC. For example, Caliptra can sign messages for an SPDM responder.
@@ -983,9 +983,9 @@ Fields are little endian unless described otherwise.
 | Revision | 8 | 8-byte version of the firmware image bundle |
 | Vendor ECDSA public key hash index | 4 | The hint to ROM to indicate which ECDSA public key hash it should use to validate the active ECDSA public key. |
 | Vendor LMS or MLDSA public key hash index | 4 | The hint to ROM to indicate which LMS or MLDSA public key hash it should use to validate the active public key. |
-| Flags | 4 | Feature flags. <br> **Bit0:** - Interpret the pl0_pauser field. If not set, all PAUSERs are PL1 <br>**Bit1-Bit31:** Reserved |
+| Flags | 4 | Feature flags. <br> **Bit0:** - Interpret the pl0_axi_user field. If not set, all AXI_USERs are PL1 <br>**Bit1-Bit31:** Reserved |
 | TOC Entry Count | 4 | Number of entries in TOC. |
-| PL0 PAUSER | 4 | The PAUSER with PL0 privileges. This value is used by the RT FW to verify the caller privilege against its PAUSER. The PAUSER is wired through APB. |
+| PL0 AXI_USER | 4 | The AXI_USER with PL0 privileges. This value is used by the RT FW to verify the caller privilege against its AXI_USER. The AXI_USER is wired through AXI. |
 | TOC Digest | 48 | SHA384 Digest of table of contents. |
 | SVN | 4 | Security Version Number for the firmware, checked against the SVN fuses. |
 | Vendor Data | 40 | Vendor Data. <br> **Not Before:** Vendor Start Date [ASN1 Time Format] for Caliptra-issued certificates (15 bytes) <br> **Not After:** Vendor End Date [ASN1 Time Format] for Caliptra-issued certificates (15 bytes) <br> **Reserved:** (10 bytes) |
@@ -1036,7 +1036,7 @@ Please refer to Caliptra HW specification -> https://github.com/chipsalliance/ca
 
 1. After the Caliptra microcontroller is out of reset, ROM starts executing and triggers the crypto block to run the UDS decrypt flow.
 2. Caliptra ROM enables the mailbox. (Until this point, any accidental or non-accidental writes that target the mailbox are dropped by the hardware.)
-3. Caliptra ROM asserts READY\_FOR\_FW wire. This is done by writing an internal register. This register is also visible to read on the APB interface. SoC can choose to poll on this bit instead of using the wire (it is the SoC integration choice).
+3. Caliptra ROM asserts READY\_FOR\_FW wire. This is done by writing an internal register. This register is also visible to read on the AXI interface. SoC can choose to poll on this bit instead of using the wire (it is the SoC integration choice).
 4. SoC follows the mailbox protocol and pushes Caliptra FW into the mailbox.
 5. Caliptra’s mailbox HW  asserts an interrupt to the microcontroller after the GO is written, per mailbox protocol. See [Mailbox](#mailbox) for specifics.
 6. After Caliptra’s FW is authenticated and loaded into ICCM, microcontroller runs the firmware and asserts READY\_FOR\_RTFLOWS wire.
@@ -1054,7 +1054,7 @@ Please see the subsystem architecture section below.
 **Note:** Since Caliptra IP may be placed in an ACPI S5 domain of the device, there may be devices where Caliptra IP may not go through reset on a device hot reset or CPU warm reset. But the flow shows what happens when such a reset happens.
 
 1. Caliptra IP’s reset is asserted by the SoC.
-2. Caliptra’s internal BootFSM resets the microcontroller and then resets all of the logic (including the SoC-facing APB interface). Only registers or flops that are sitting on powergood are left with the same value. Note that SRAMs do not have a reset.
+2. Caliptra’s internal BootFSM resets the microcontroller and then resets all of the logic (including the SoC-facing AXI interface). Only registers or flops that are sitting on powergood are left with the same value. Note that SRAMs do not have a reset.
 3. Caliptra IP’s reset is deasserted by the SoC.
 4. At this point, the HW boot flow is the same as the cold boot flow. SoC is required to configure the internal TRNG and ROM WDT and then set CPTRA\_FUSE\_WR\_DONE. This causes Caliptra IP to deassert the Ready\_for\_Fuse wire.
 5. Caliptra’s ROM reads an internal register to differentiate between warm, cold, and impactless flow. If it's a warm reset flow, then it skips DICE key generation and FW load flows (because keys were already derived and FW is already present in ICCM). This is an important reset time optimization for devices that need to meet the hot reset specification time.
@@ -1069,7 +1069,7 @@ Because warm reset is a pin input to Caliptra, Caliptra may not be idle when a w
 
 The Caliptra Mailbox is a 128 KiB buffer that is used to exchange data between the SoC and the Caliptra microcontroller.
 
-The SoC communicates with the mailbox over an APB interface. This allows the SoC to identify the device that is using the interface. This ensures that the mailbox, control registers, and fuses are read or written only by the appropriate device.
+The SoC communicates with the mailbox over an AXI interface. This allows the SoC to identify the device that is using the interface. This ensures that the mailbox, control registers, and fuses are read or written only by the appropriate device.
 
 When a mailbox is populated by SoC, an interrupt to the FW occurs. This indicates that a command is available in the mailbox. The microcontroller is responsible for reading from and responding to the command.
 
@@ -1129,7 +1129,7 @@ Upon receiving an indication that the mailbox is populated, the appropriate devi
 
 ### User attributes
 
-The PAUSER field of the APB interface is used to encode device attributes for the requester that is utilizing the SoC interface. These values can be used for:
+The AXI_USER field of the AXI interface is used to encode device attributes for the requester that is utilizing the SoC interface. These values can be used for:
 
 * Ensuring the device that was granted the LOCK is the one that accesses the MBOX, DLEN, COMMAND, and STATUS registers.
 * Prioritizing who is next granted the LOCK.
@@ -1223,7 +1223,7 @@ Note: These are injected as TAP register read/write commands as defined in the [
 
 ### Architectural registers
 
-These registers are accessible over APB to be read according to the register access permissions. For more information, see the register reference manual at <https://ereg.caliptra.org>.
+These registers are accessible over AXI to be read according to the register access permissions. For more information, see the register reference manual at <https://ereg.caliptra.org>.
 
 ### Fuse requirements
 
