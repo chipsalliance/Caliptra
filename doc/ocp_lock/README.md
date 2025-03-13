@@ -700,16 +700,26 @@ Table: GET_STATUS input arguments
 
 | Name | Type | Description |
 | :---: | :---: | :--- |
-|chksum	u32	Checksum over other input arguments, computed by the caller. Little endian.
+|chksum | u32 | Checksum over other input arguments, computed by the caller. Little endian. |
 
 Table: GET_STATUS output arguments
 
-| Name | Type | Description |
-| :----------: | :-----: | :------- |
-| chksum       | u32     | Checksum over other output arguments, computed by Caliptra. Little endian. |
-| fips_status  | u32     | Indicates if the command is FIPS approved or an error |
-| engine_ready | u32     | Ready status of the storage device crypto engine:\n  * Btye 0 Bit 0: 1 = Ready 0 = Not ready |
-| reserved     | u32[4]  | Reserved|
+<table>
+<tr><th>Name</th><th>Type</th><th>Description</th></tr>
+<tr><td>chksum</td><td>u32</td><td>Checksum over other output arguments, computed by Caliptra. Little endian.</td></tr>                
+<tr><td>fips_status</td><td>u32</td><td>Indicates if the command is FIPS approved or an error</td></tr>           
+
+<tr><td>engine_ready</td><td>u32</td>
+	<td>Ready status of the storage device crypto engine:
+ 		<ul>
+			<li>LOCK defines low range, vendor defines high range</li>
+   			<li>Byte 0:
+				<ul>
+					<li>Bit 0: 1 = Ready 0 = Not ready</li>
+				</ul></td>
+		</ul></td></tr>           
+<tr><td>reserved</td><td>u32[4]</td><td>Reserved</td></tr>             
+</table>
 
 ### GET_ALGORITHMS
 
@@ -731,22 +741,34 @@ Table: GET_ALGORITHMS output arguments
 <tr><td>endorsement_algorithms</td><td>u32</td>
 	<td>Identifies the supported endorsement algorithms:
 		<ul>
-		<li>Byte 0 bit 0: ecdsa_secp384r1_sha384[^2]</li>
+			<li>Byte 0
+				<ul>
+					<li>bit 0: ecdsa_secp384r1_sha384[^2]</li>
+			</ul></li>
 	</ul></td></tr>
 <tr><td>kem_algorithms</td><td>u32</td>
 	<td>Identifies the supported KEM algorithms:
 		<ul>
-			<li>Byte 0 bit 0: ecdh_secp384r1_aes256_gcm[^3]</li>
+			<li>Byte 0
+				<ul>
+					<li>bit 0: ecdh_secp384r1_aes256_gcm[^3]</li>
+			</ul></li>
 		</ul></td></tr> 
 <tr><td>pmek_algorithms</td><td>u32</td>
 	<td>Indicates the size of PMEKs:
 		<ul>
-			<li>Byte 0 bit 0: 256 bits</li>
+			<li>Byte 0
+				<ul>
+					<li>bit 0: 256 bits</li>
+			</ul></li>
 		</ul></td></tr>
 <tr><td>access_key_algorithm</td><td>u32</td>
 	<td>Indicates the size of access keys:
 		<ul>
-			<li>Byte 0 bit 0: 256 bits</li>
+			<li>Byte 0
+				<ul>
+					<li>bit 0: 256 bits, with a 128-bit truncated SHA384 ID</li>
+			</ul></li>
 		</ul></td></tr>
 <tr><td>Reserved</td><td>u32[4]</td><td>Reserved</td></tr>
 </table>
@@ -849,9 +871,12 @@ Table: GENERATE_PMEK input arguments
 <tr><th>Name</th><th>Type</th><th>Description</th></tr>
 <tr><td>chksum</td><td>u32</td><td>Checksum over other input arguments, computed by the caller. Little endian.</td></tr>                
 <tr><td>pmek_algorithms</td><td>u32</td>
-<td>ndicates the size of PMEKs. Only one bit shall be reported:
+<td>Indicates the size of PMEKs. Only one bit shall be reported:
 	<ul>
-		<li>Byte 0 bit 0: 256 bits</li>
+		<li>Byte 0
+			<ul>
+				<li>bit 0: 256 bits</li>
+		</ul></li>
 	</ul>
 </td></tr>
 <tr><td>wrapped_access_key</td><td>WrappedAccessKey</td>
@@ -869,7 +894,7 @@ Table: GENERATE_PMEK output arguments
 
 | Name | Type | Description |
 | :----------: | :-----: | :------- |
-| chksum             | u32           | Checksum over other output arguments, computed by Caliptra. Little endian |
+| chksum             | u32           | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status        | u32           | Indicates if the command is FIPS approved or an error |
 | new_encrypted_pmek | EncryptedPmek | PMEK encrypted to access_key_2 |
 
@@ -907,7 +932,7 @@ Table: REWRAP_PMEK output arguments
 
 | Name | Type | Description |
 | :----------: | :-----: | :------- |
-| chksum             | u32           | Checksum over other output arguments, computed by Caliptra. Little endian |
+| chksum             | u32           | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status        | u32           | Indicates if the command is FIPS approved or an error |
 | new_encrypted_pmek | EncryptedPmek | PMEK encrypted to access_key_2 |
 
@@ -939,7 +964,7 @@ Table: UNLOCK_PMEK output arguments
 
 | Name | Type | Description |
 | :----------: | :-----: | :------- |
-| chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian |
+| chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status   | u32           | Indicates if the command is FIPS approved or an error |
 | unlocked_pmek | EncryptedPmek | PMEK encrypted to an export secret that is rotated  on reset |
 
@@ -967,7 +992,7 @@ Table: MIX_PMEK output arguments
 
 | Name | Type | Description |
 | :----------: | :-----: | :------- |
-| chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian |
+| chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status   | u32           | Indicates if the command is FIPS approved or an error |
 
 ### LOAD_MEK
@@ -1001,7 +1026,7 @@ Table: LOAD_MEK output arguments
 
 | Name | Type | Description |
 | :----------: | :-----: | :------- |
-| chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian |
+| chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status   | u32           | Indicates if the command is FIPS approved or an error |
 
 ### UNLOAD_MEK
@@ -1014,7 +1039,7 @@ Table: UNLOAD _MEK input arguments
 
 | Name | Type | Description |
 | :----------: | :-----: | :------- |
-| chksum     | u32     | Checksum over other input arguments, computed by the caller. Little endian |
+| chksum     | u32     | Checksum over other input arguments, computed by the caller. Little endian. |
 | metadata     | u8[20] | Metadata for MEK to load into the drive crypto engine (i.e. NSID + LBA range) |
 | rdy_timeout  | u32   | Timeout in ms for encryption engine to become ready for a new command |
 | cmd_timeout  | u32   | Timeout in ms for command to crypto engine to complete |
@@ -1036,13 +1061,13 @@ Table: ENUMERATE_KEM_HANDLES input arguments
 
 | Name | Type | Description |
 | :----------: | :-----: | :------- |
-| chksum     | u32     | Checksum over other input arguments, computed by the caller. Little endian |
+| chksum     | u32     | Checksum over other input arguments, computed by the caller. Little endian. |
 
 Table: ENUMERATE_KEM_HANDLES output arguments
 
 | Name | Type | Description |
 | :----------: | :-----: | :------- |
-| chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian |
+| chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status   | u32           | Indicates if the command is FIPS approved or an error |
 | kem_handle_count | u32          | Number of KEM handles (N) |
 | kem_handles      | KEMHandle[N] | List of (KEM handle value, KEM algorithm) tuples |
@@ -1057,13 +1082,13 @@ Table: ERASE_CURRENT_ROOT_KEY input arguments
 
 | Name | Type | Description |
 | :----------: | :-----: | :------- |
-| chksum     | u32     | Checksum over other input arguments, computed by the caller. Little endian |
+| chksum     | u32     | Checksum over other input arguments, computed by the caller. Little endian. |
 
 Table: ERASE_CURRENT_ROOT_KEY output arguments
 
 | Name | Type | Description |
 | :----------: | :-----: | :------- |
-| chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian |
+| chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status   | u32           | Indicates if the command is FIPS approved or an error |
 
 ### PROGRAM_NEXT_ROOT_KEY
@@ -1076,13 +1101,13 @@ Table: PROGRAM_NEXT_ROOT_KEY input arguments
 
 | Name | Type | Description |
 | :----------: | :-----: | :------- |
-| chksum     | u32     | Checksum over other input arguments, computed by the caller. Little endian |
+| chksum     | u32     | Checksum over other input arguments, computed by the caller. Little endian. |
 
 Table: PROGRAM_NEXT_ROOT_KEY output arguments
 
 | Name | Type | Description |
 | :----------: | :-----: | :------- |
-| chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian |
+| chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status   | u32           | Indicates if the command is FIPS approved or an error |
 
 ### ENABLE_PERMA_DIRTY_STATE
@@ -1095,13 +1120,13 @@ Table: ENABLE_PERMA_DIRTY_STATE input arguments
 
 | Name | Type | Description |
 | :----------: | :-----: | :------- |
-| chksum     | u32     | Checksum over other input arguments, computed by the caller. Little endian |
+| chksum     | u32     | Checksum over other input arguments, computed by the caller. Little endian. |
 
 Table: ENABLE_PERMA_DIRTY_STATE output arguments
 
 | Name | Type | Description |
 | :----------: | :-----: | :------- |
-| chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian |
+| chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status   | u32           | Indicates if the command is FIPS approved or an error |
 
 ### REPORT_ROOT_KEY_STATE
@@ -1114,7 +1139,7 @@ Table: REPORT_ROOT_KEY_STATE input arguments
 
 | Name | Type | Description |
 | :----------: | :-----: | :------- |
-| chksum     | u32     | Checksum over other input arguments, computed by the caller. Little endian |
+| chksum     | u32     | Checksum over other input arguments, computed by the caller. Little endian. |
 | nonce      | u8[16]  | Freshness nonce |
 
 
@@ -1165,7 +1190,7 @@ Table: GET_RANDOM input arguments
 
 | Name | Type | Description |
 | :----------: | :-----: | :------- |
-| chksum   | u32     | Checksum over other input arguments, computed by the caller. Little endian |
+| chksum   | u32     | Checksum over other input arguments, computed by the caller. Little endian. |
 | len      | u32     | Size, in bytes, of random number requested |
 
 Table: GET_RANDOM output arguments
@@ -1187,7 +1212,7 @@ Table: RAW_DECRYPT_AES256_GCM input arguments
 
 | Name | Type | Description |
 | :----------: | :-----: | :------- |
-| chksum         | u32    | Checksum over other input arguments, computed by the caller. Little endian |
+| chksum         | u32    | Checksum over other input arguments, computed by the caller. Little endian. |
 | len            | u32    | Number of bytes to be returned with a random number |
 | key            | u8[32] | AES 256 key |
 | iv             | u8[12] | IV |
@@ -1199,7 +1224,7 @@ Table: RAW_DECRYPT_AES256_GCM output arguments
 
 | Name | Type | Description |
 | :----------: | :-----: | :------- |
-| chksum        | u32     | Checksum over other output arguments, computed by Caliptra. Little endian |
+| chksum        | u32     | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status   | u32     | Indicates if the command is FIPS approved or an error |
 | plaintext_len | u32      | Number of bytes returned in the plaintext (M) |
 | plaintext     | u8[M]   | Bytes of the decrypted ciphertext |
@@ -1214,7 +1239,7 @@ Table: RAW_KDF_HMAC384 input arguments
 
 | Name | Type | Description |
 | :----------: | :-----: | :------- |
-| chksum      | u32    | Checksum over other input arguments, computed by the caller. Little endian |
+| chksum      | u32    | Checksum over other input arguments, computed by the caller. Little endian. |
 | key         | u8[48] | Input key |
 | label_len   | u32    | Number of bytes in the label (N) |
 | context_len | u32    | Number of bytes in the context (N) |
