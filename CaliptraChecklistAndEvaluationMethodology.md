@@ -2,7 +2,18 @@
 
 **Version 0.2**
 
-# Introduction {#introduction}
+# Table of Contents
+- [Introduction](#introduction)
+- [Caliptra Documentation](#caliptra-documentation)
+- [Checklist Summary](#checklist-summary)
+- [Checklist Areas](#checklist-areas)
+  - [Assets](#assets)
+  - [Interfaces](#interfaces)
+  - [SoC Root of Trust (RoT)](#soc-root-of-trust-rot)
+  - [Specific Functionality](#specific-functionality)
+  - [Secure Process](#secure-processes)
+
+# Introduction
 
 The **Caliptra Checklist and Evaluation Methodology** document serves as a comprehensive guide for ensuring the secure and correct integration of the Caliptra intellectual property (IP) into a system-on-chip (SoC). Caliptra is a hardware root-of-trust (RoT) IP designed to provide foundational security services within a computing system. Proper integration of Caliptra is crucial to maintaining the overall security posture of the final product.
 
@@ -32,13 +43,13 @@ By adhering to the checklist and employing the specified evaluation methodologie
 
 # Caliptra Documentation
 
-The Caliptra Specification is maintained within the [ChipsAlliance Caliptra github](https://github.com/chipsalliance/Caliptra/blob/main/doc/Caliptra.md).  This is a live link. Each generation, the main specification will be updated and the older specifications will be maintained for reference for designs based on that specification.  For example, here is the specification for [Calitpra 1.X](https://github.com/chipsalliance/Caliptra/blob/main/doc/caliptra_1x/Caliptra.md).
+The Caliptra Specification is maintained within the [ChipsAlliance Caliptra repository](https://github.com/chipsalliance/Caliptra/blob/main/doc/Caliptra.md).  This is a live link. Each generation, the main specification will be updated and the older specifications will be maintained for reference for designs based on that specification.  For example, here is the specification for [Calitpra 1.X](https://github.com/chipsalliance/Caliptra/blob/main/doc/caliptra_1x/Caliptra.md).
 
 The [HW specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraHardwareSpecification.md) and [HW integration specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md) also have their own live links. For older versions of the HW, it is best to go to the same location which is tagged with that release version.
 
 This checklist is built from these specifications with the goal to help ensure that Caliptra is integrated correctly within a design.
 
-# Checklist Summary {#checklist-summary}
+# Checklist Summary
 
 The following is a consolidated list of all requirements to ensure comprehensive coverage:
 
@@ -48,7 +59,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
    * IDEVID Generation and Endorsement Flow  
    * Obfuscation Key  
    * Fuses Management  
-2. **Interfaces**  
+2. **Interfaces**
    * Mailbox Interface Compliance  
    * Secure Handling of Mailbox Access  
    * Debug Interface Management  
@@ -69,11 +80,11 @@ The following is a consolidated list of all requirements to ensure comprehensive
    * Production Process Security  
    * Flaw Remediation Process
 
-# Checklist Areas {#checklist-areas}
+# Checklist Areas
 
-## Assets {#assets}
+## Assets
 
-### UDS Seed & Field Entropy {#uds-seed-&-field-entropy}
+### UDS Seed & Field Entropy
 
 #### *Generation and Provisioning*
 
@@ -81,7 +92,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
   * **Requirement:** The UDS seed and field entropy MUST be generated using a cryptographically secure random number generator (CSRNG) compliant with [NIST Entropy Source Certification](https://csrc.nist.gov/projects/cryptographic-module-validation-program/entropy-validations) SP 800-90B.  
   * **Evaluation Methodology:** Manufacturers MUST provide documentation demonstrating compliance with applicable standards for entropy generation.   
 * **Checklist Item:**  
-  * **Requirement:** The confidentiality and integrity of the UDS seed MUST be protected during generation, storage, and provisioning. Access to these assets must be strictly controlled, and any temporary storage MUST be sanitized after use.  
+  * **Requirement:** The confidentiality and integrity of the UDS seed MUST be protected during generation, storage, and provisioning. Access to this assets must be strictly controlled, and any temporary storage MUST be sanitized after use.  
   * **Evaluation Methodology:** Manufacturers MUST detail the security measures employed during the handling of the UDS seed, including access controls, secure storage practices, and sanitization procedures.  
 * **Checklist Item:**  
   * **Requirement**: Field Entropy SHOULD be generated on die, and not be exposed outside the die.  
@@ -93,7 +104,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
   * **Requirement:** Access to the fuses containing the UDS seed and field entropy SHOULD be restricted exclusively to the mechanisms needed for loading these values into Caliptra's fuse registers. No other components or firmware should have read or write access, except for essential hardware functions like fuse sense and distribution logic.  
   * **Evaluation Methodology:** Manufacturers SHOULD provide architectural diagrams and RTL code excerpts demonstrating that only authorized hardware mechanisms can access these fuses.
 
-### FW Authentication Keys {#fw-authentication-keys}
+### FW Authentication Keys
 
 * **Checklist Item:**  
   * **Requirement:** Firmware authentication keys MUST be generated using an [ESV](https://csrc.nist.rip/Projects/cryptographic-module-validation-program/entropy-validations/esv) certified entropy source, and key derivation functions specified by [NIST SP 800-208](https://csrc.nist.gov/pubs/sp/800/208/final) and [FIPS 186-4](https://csrc.nist.gov/pubs/fips/186-4/final).
@@ -104,7 +115,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
   * **Requirement:** Firmware authentication keys SHOULD require multi-party authentication to perform signing operations.
   * **Evaluation Methodology:** Manufacturers MUST describe their key management practices, including storage solutions, access controls, and procedures to prevent unauthorized access.
 
-### IDEVID Generation and Endorsement Flow {#idevid-generation-and-endorsement-flow}
+### IDEVID Generation and Endorsement Flow
 
 #### *CSR Handling*
 
@@ -118,7 +129,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
   * **Requirement:** The IDEVID certificates, including CA certificates, MUST adhere to specified formats and cryptographic standards (e.g. key sizes and algorithms as per NIST guidelines). Acceptable algorithms and key strengths MUST meet or exceed the security strength that the Caliptra IP produces. These requirements apply to the entire CA cert chain.
   * **Evaluation Methodology:** Manufacturers MUST demonstrate compliance with the required formats and standards by providing examples of the certificate chain that is created.
 
-### Obfuscation Key {#obfuscation-key}
+### Obfuscation Key
 
 #### *Generation and Handling*
 
@@ -126,10 +137,10 @@ The following is a consolidated list of all requirements to ensure comprehensive
   * **Requirement:** The obfuscation key MUST be generated using a method that ensures sufficient entropy, such as an [ESV](https://csrc.nist.rip/Projects/cryptographic-module-validation-program/entropy-validations/esv) certified entropy source or an on-die Physically Unclonable Function (PUF) that is compliant with industry standards. 
   * **Evaluation Methodology:** Manufacturers MUST provide documentation on the obfuscation key generation method, including entropy measurements and compliance with relevant standards if applicable.  
 * **Checklist Item:**  
-  * **Requirement:** The obfuscation key MUST NOT be accessible (readable or modifiable) to firmware or any on-chip non-Caliptra entities, including preventing oracle attacks.  
+  * **Requirement:** The obfuscation key MUST NOT be accessible (readable or modifiable) to firmware or any on-chip non-Caliptra entities, including preventing oracle attacks. The RTL key MUST not be on any scannaable path. 
   * **Evaluation Methodology:** Manufacturers MUST demonstrate, through architectural documentation and security analyses, that the obfuscation key is inaccessible to firmware and other unauthorized components.
 
-### Fuses {#fuses}
+### Fuses
 
 #### *Access Control*
 
@@ -167,35 +178,35 @@ The following is a consolidated list of all requirements to ensure comprehensive
   * **Requirement:** Before updating any Caliptra SVN fuses, the SoC SHOULD verify that the firmware integrity and authenticity have been validated, and that the new SVN is greater than the current one.  
   * **Evaluation Methodology:** Manufacturers SHOULD describe the SVN update process, including checks performed to prevent unauthorized or erroneous updates.
 
-### Interfaces {#interfaces}
+## Interfaces
 
-#### *Mailbox Interface Compliance*
+### *Mailbox Interface Compliance*
 
 * **Checklist Item:**  
   * **Requirement:** The SoC Manager SHOULD implement the mailbox interface according to the Caliptra specification, ensuring proper handling of commands and status registers. Using the Caliptra Libraries (RUST and C version) provided by the Caliptra WG release is recommended as a reference codebase.  
   * **Evaluation Methodology:** Manufacturers SHOULD provide evidence, such as interface specifications or test results, demonstrating compliance with the mailbox interface requirements.
 
-#### *Secure Mailbox Access*
+### *Secure Mailbox Access*
 
 * **Checklist Item:**  
   * **Requirement:** Access to the mailbox MUST be securely managed to prevent unauthorized entities from initiating communication with Caliptra. Only authenticated and authorized components may interact with the mailbox.  
   * **Evaluation Methodology:** Manufacturers MUST describe access control mechanisms for the mailbox, including any authentication methods and policies enforcing proper usage.
 
-#### *Debug Interface Management*
+### *Debug Interface Management*
 
 * **Checklist Item:**  
   * **Requirement:** The debug interfaces, including JTAG, MUST be securely managed to prevent unauthorized access to Caliptra internals or sensitive data.  
   * **Evaluation Methodology:** Manufacturers MUST explain how debug interfaces are controlled, including secure enable/disable mechanisms, and how they prevent unauthorized access to Caliptra.
 
-#### *Interface Wires Implementation*
+### *Interface Wires Implementation*
 
 * **Checklist Item:**  
   * **Requirement:** All interface signals between the SoC and Caliptra, especially those related to security and debug states, MUST be correctly implemented to ensure proper functionality and security. This includes signals like clock, reset, power good, ready signals, and any security state indicators.  
   * **Evaluation Methodology:** Manufacturers MUST provide hardware schematics and documentation showing correct implementation of critical interface signals, highlighting measures taken to prevent signal tampering or misuse.
 
-### SoC Root of Trust (RoT) {#soc-root-of-trust-(rot)}
+## SoC Root of Trust (RoT)
 
-#### *Boot and Initialization Process*
+### *Boot and Initialization Process*
 
 * **Checklist Item:**  
   * **Requirement:** Measurements of firmware and configuration MUST be submitted to Caliptra before execution of the firmware, or usage of the configuration data. Measurements MUST be submitted to Caliptra by the same entity that collected the measurement (e.g. SOC FMC cannot pass measurements to SOC FW for submission to the Caliptra mailbox).   
@@ -203,53 +214,53 @@ The following is a consolidated list of all requirements to ensure comprehensive
 * **Checklist Item:**  
   * **Requirement:** TBD, minimum set of measurements that MUST be taken
 
-#### *Caliptra PA\_USER Management*
+### *Caliptra PA\_USER Management*
 
 * **Checklist Item:**  
   * **Requirement:** The management of Caliptra's PA\_USER MUST ensure isolation and protection of privileged operations, preventing unprivileged users from forging measurements or accessing privileged functions.
   * **Evaluation Methodology:** Manufacturers MUST document how PA\_USER is mapped in hardware and the mechanisms in place to isolate privileged operations from unprivileged ones.
 
-#### *Random Number Generator (RNG) Implementation*
+### *Random Number Generator (RNG) Implementation*
 
 * **Checklist Item:**  
   * **Requirement:** If an RNG is included in the Caliptra Wrapper, it SHOULD be securely implemented, and its design SHOULD meet applicable cryptographic standards. The source of entropy (internal or external) SHOULD be specified.  
   * **Evaluation Methodology:** Manufacturers SHOULD demonstrate that the RNG, including entropy sources, is compliant with standards like [NIST SP 800-90A](https://csrc.nist.gov/pubs/sp/800/90/a/r1/final), [SP 800-90B](https://csrc.nist.gov/pubs/sp/800/90/b/final), [SP 800-90C](https://csrc.nist.gov/pubs/sp/800/90/c/4pd).
 
-#### *SRAM Zeroization Process*
+### *SRAM Zeroization Process*
 
 * **Checklist Item:**  
   * **Requirement:** The SoC SHOULD implement a secure SRAM zeroization process to ensure that sensitive data is not retained in memory after use.  
   * **Evaluation Methodology:** Manufacturers SHOULD describe the zeroization process, including when it is triggered (e.g. on reset, power-down) and how it ensures that all sensitive data is thoroughly erased.
 
-#### *External Entity Interaction*
+### *External Entity Interaction*
 
 * **Checklist Item:**  
   * **Requirement:** The pathways through which external entities interact with Caliptra MUST be securely implemented, ensuring that only authorized interactions are permitted, and that these interactions do not compromise Caliptra's security.  
   * **Evaluation Methodology:** Manufacturers MUST outline the architecture of interactions between external entities and Caliptra, emphasizing access controls, authentication mechanisms, and any intermediaries like security processors. Details on how untrusted entities are prevented from accessing Caliptra internals must be provided.
 
-### Specific Functionality {#specific-functionality}
+## Specific Functionality
 
-#### *Caliptra Mode Selection and State Handling*
+### *Caliptra Mode Selection and State Handling*
 
 * **Checklist Item:**  
   * **Requirement:** Where SoC behavior necessary to meet other requirements in this document is conditioned on SoC lifecycle state, the SoC MUST ensure that its own lifecycle is in a state that meets the requirements here prior to transitioning Caliptra's operational mode from unprovisioned to manufacturing or production.  
   * **Evaluation Methodology:** Manufacturers MUST provide a state machine diagram or equivalent documentation showing how Caliptra's mode transitions are managed and synchronized with the SoC's states.
 
-#### *Error Handling*
+### *Error Handling*
 
 * **Checklist Item:**  
   * **Requirement:** The SoC MUST correctly implement error handling and reporting mechanisms for interactions with Caliptra, especially for security-relevant events, without leaking sensitive information.  
   * **Evaluation Methodology:** Manufacturers MUST document the error handling procedures, including what information is reported, how errors are logged, and measures taken to prevent information leakage. Specific error codes and messages should be reviewed for appropriateness.
 
-#### *Log Functionality in SoC*
+### *Log Functionality in SoC*
 
 * **Checklist Item:**  
   * **Requirement:** The SoC SHOULD implement logging functionality that records relevant events related to Caliptra operations, ensuring logs are tamper-evident and provide necessary information for attestation. The log does not need to be kept secure but should be tamper-evident to detect manipulation.  
   * **Evaluation Methodology:** Manufacturers SHOULD describe the logging mechanism, including how logs are structured, how they are protected against tampering (e.g., using cryptographic hash extensions), and how they integrate with Caliptra's measurement processes.
 
-## Secure Processes {#secure-processes}
+## Secure Processes
 
-### Development Process {#development-process}
+### Development Process
 
 #### *Integrity of Firmware and Hardware*
 
@@ -277,7 +288,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
     * SVN updates and enforcement  
     * Firmware updates (FMC and RT FW)
 
-### Production Process {#production-process}
+### Production Process
 
 #### *Debugging Controls*
 
