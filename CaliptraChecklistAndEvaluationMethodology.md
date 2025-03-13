@@ -100,7 +100,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
   * **Requirement:** Firmware authentication keys MUST NOT allow unauthorized users to perform signing operations.
   * **Requirement:** Firmware authentication keys MUST be stored in a manner that prevents disclosure of private key material. The manner of storage MUST only permit keys to be exported or copied to systems that enforce the same controls on usage and disclosure of the key.
   * **Requirement:** Signing operations performed using the firmware authentication key MUST be logged.
-  * **Requirement:** Firmware authentication keys SHOULD be created and stored in a [FIPS 140-3](https://csrc.nist.gov/pubs/fips/140-3/final) certified Hardware Security Module (HSM).
+  * **Requirement:** Firmware authentication keys SHOULD be created and stored in a Hardware Security Module (HSM).
   * **Requirement:** Firmware authentication keys SHOULD require multi-party authentication to perform signing operations.
   * **Evaluation Methodology:** Manufacturers MUST describe their key management practices, including storage solutions, access controls, and procedures to prevent unauthorized access.
 
