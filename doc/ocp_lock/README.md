@@ -12,33 +12,51 @@
 
 **Contributors**
 
-- Andrés Lagar-Cavilla (Google) 
-- Amber Huffman (Google)
-- Charles Kuzman (Google) 
-- Jeff Andersen (Google)
-- Chris Sabol (Google)
-- Srini Narayanamurthy (Google)
-- Lee Prewitt (Microsoft)
-- Michael Norris (Microsoft)
-- Eric Eilertson (Microsoft)
-- Bryan Kelly (Microsoft)
-- Anjana Parthasarathy (Microsoft)
-- Ben Keen (Microsoft)
-- Jisoo Kim (Samsung)
-- Gwangbae Chio (Samsung)
-- Eric Hibbard (Samsung)
-- Mike Allison (Samsung)
-- Scott Shadley (Solidigm)
-- Gamil Cain (Solidigm)
-- Festus Hategekimana (Solidigm)
-- John Geldman (Kioxia)
-- Fred Knight (Kioxia)
-- Paul Suhler (Kioxia)
-- James Borden (Kioxia)
+<table>
+<tr><th>Company</th><th>Individuals</th></tr>
+<tr><td>Google</td><td>
+		<ul>
+			<li>Andrés Lagar-Cavilla</li>
+			<li>Amber Huffman</li>
+			<li>Charles Kuzman</li>
+			<li>Jeff Andersen</li>
+			<li>Chris Sabol</li>
+			<li>Srini Narayanamurthy</li>
+		</ul></td></tr>
+<tr><td>Microsoft</td><td>
+		<ul>
+			<li>Lee Prewitt</li>
+			<li>Michael Norris</li>
+			<li>Eric Eilertson</li>
+			<li>Bryan Kelly</li>
+			<li>Anjana Parthasarathy</li>
+			<li>Ben Keen</li>
+		</ul></td></tr>
+<tr><td>Samsung</td><td>
+		<ul>
+			<li>Jisoo Kim</li>
+			<li>Gwangbae Chio</li>
+			<li>Eric Hibbard</li>
+			<li>Mike Allison</li>
+		</ul></td></tr>
+<tr><td>Solidigm</td><td>
+		<ul>
+			<li>Scott Shadley</li>
+			<li>Gamil Cain</li>
+			<li>Festus Hategekimana</li>
+		</ul></td></tr>
+<tr><td>Kioxia</td><td>
+		<ul>
+			<li>John Geldman</li>
+			<li>Fred Knight</li>
+			<li>Paul Suhler</li>
+			<li>James Borden</li>
+		</ul></td></tr>
+</table>
 
 <div style="page-break-after: always"></div>
 
-**REviosn Table**
+**Revision Table**
 
 |     Date | Revision # | Author | Description |
 | :--------------: | :---: | :-------------------: | :-----|
@@ -607,7 +625,58 @@ This section will be fleshed out with additional details as they become availabl
 
 ## Storage Root Key Fuse requirements
 
-This section will be fleshed out with additional details as they become available.
+A storage device equipped with OCP L.O.C.K. will be equipped with N 256-bit ratchet-secret fuse banks, dubbed R<sub>0</sub>..R<sub>N-1</sub>. 4 ≤ N ≤ 16. These ratchet secrets have the following requirements:
+
+- Each ratchet secret can individually transition from all-zeroes → randomized → all-ones. R<sub>N</sub> is only randomized once R<sub>N-1</sub> has transitioned to all-ones.
+- Programmable via the Caliptra fuse controller.
+	- Caliptra Core's fuse controller will not support individual zeroization of fuse banks.
+	- Open: can we mirror UDS and have the values come from Caliptra, even if they're programmed external to UDS?
+- Only readable by Caliptra Core, via fuse registers.
+	- Internally, the fuse registers will be treated like the DICE UDS, in that their contents can only be deposited into Key Vault slots, without direct visibility by Caliptra firmware.
+	- TBD on de-obfuscation.
+-Caliptra Core firmware can detect which ratchet secrets are all-zeroes, randomized, or all-ones. This can be done by representing a counter in fuses, which maps to ratchet secret states. Controller firmware would be responsible for ensuring that the counter value corresponds with the ratchet secrets' current state.<br>The counter values map to the following states:
+
+| State  | Description |
+| :----: | :---------- |
+| 4i + 0 | Ri has begun being programmed with randomness, but is not yet considered randomized. |
+| 4i + 1 | Ri has been randomized. |
+| 4i + 2 | Ri has begun being programmed to all-ones, and is no longer considered randomized. |
+| 4i + 3 | Ri has been programmed to all-ones. |
+
+This scheme allows ratchet state transitions to be resilient in the face of unexpected power loss. A power loss during randomization will burn the ratchet being randomized.
+
+The counter is readable by Caliptra Core firmware and controller firmware.
+
+Open: add popcnt for checking the controller firmware's work after the fact.
+
+### Lifecycle Transitions
+
+The device will go through the following state transitions over its lifespan:
+
+1. At the factory, R<sub>0</sub>..R<sub>N-1</sub> are all-zero.
+	1. Caliptra derives a storage root key from a non-ratchetable secret derived from the DICE UDS + field entropy.
+	2. Caliptra allows MEKs to be programmed to the storage encryption engine, derived from the storage root key.
+	3. Caliptra firmware reports a bit indicating that it is operating in a state where any data written cannot be ratchet-erased.
+2. The storage controller programs R<sub>0</sub> with randomness.
+	1. Caliptra detects that R<sub>0</sub> is randomized, and derives its OCP L.O.C.K. storage root key from R<sub>0</sub> and a non-ratchetable secret derived from DICE UDS + field entropy.
+	2. Caliptra allows MEKs to be programmed to the storage encryption engine, derived from the storage root key.
+3. The storage controller programs R<sub>0</sub> to all-ones and resets.
+	1. Upon next reset, Caliptra detects that there are no randomized ratchet secrets and does not derive a storage root key.
+	2. Caliptra does not allow any MEKs to be programmed to the storage encryption engine.
+4. The storage controller programs R<sub>1</sub> to a random value and resets.
+	1. Upon next reset, Caliptra detects that R<sub>1</sub> is randomized, and derives its OCP L.O.C.K. storage root key from R<sub>1</sub> and a non-ratchetable secret derived from the DICE UDS + field entropy.
+	2. Caliptra allows MEKs to be programmed to the storage encryption engine, derived from the storage root key.
+5. The storage controller programs R<sub>1</sub> to all-ones and resets.
+6. The storage controller programs R<sub>2</sub> to a random value and resets.
+7. The storage controller programs R<sub>2</sub> to all-ones and resets.
+8. The storage controller programs R<sub>3</sub> to a random value and resets.
+	1. See steps 2 and 3 for Caliptra's behavior in each state.
+...
+9. The storage controller programs R<sub>N-1</sub> to all-ones and resets.
+	1. Upon next reset, Caliptra detects that there are no randomized ratchet secrets, and no all-zeroes ratchet secrets.
+	2. Caliptra derives a storage root key from a non-ratchetable secret derived from the DICE UDS + field entropy.
+	3. Caliptra allows MEKs to be programmed to the storage encryption engine, derived from the storage root key.
+	4. Caliptra firmware reports a bit indicating that it is operating in a perma-dirty state, where no future ratchets are possible.
 
 ### Storage Root Key Fuse programming
 
@@ -1279,29 +1348,47 @@ The following acronyms and abbreviations are used throughout this document.
 
 The Caliptra Workgroup acknowledges the following individuals for their contributions to this specification.
 
-- Andrés Lagar-Cavilla (Google) 
-- Amber Huffman (Google)
-- Charles Kuzman (Google) 
-- Jeff Anderson (Google)
-- Chris Sabol (Google)
-- Lee Prewitt (Microsoft)
-- Michael Norris (Microsoft)
-- Eric Eilertson (Microsoft)
-- Bryan Kelly (Microsoft)
-- Anjana Parthasarathy (Microsoft)
-- Ben Keen (Microsoft)
-- Jisoo Kim (Samsung)
-- Gwangbae Chio (Samsung)
-- Eric Hibbard (Samsung)
-- Mike Allison (Samsung)
-- Scott Shadley (Solidigm)
-- Gamil Cain (Solidigm)
-- Festus Hategekimana (Solidigm)
-- John Geldman (Kioxia)
-- Fred Knight (Kioxia)
-- Paul Suhler (Kioxia)
-- James Borden (Kioxia)
-
+<table>
+<tr><th>Company</th><th>Individuals</th></tr>
+<tr><td>Google</td><td>
+		<ul>
+			<li>Andrés Lagar-Cavilla</li>
+			<li>Amber Huffman</li>
+			<li>Charles Kuzman</li>
+			<li>Jeff Andersen</li>
+			<li>Chris Sabol</li>
+			<li>Srini Narayanamurthy</li>
+		</ul></td></tr>
+<tr><td>Microsoft</td><td>
+		<ul>
+			<li>Lee Prewitt</li>
+			<li>Michael Norris</li>
+			<li>Eric Eilertson</li>
+			<li>Bryan Kelly</li>
+			<li>Anjana Parthasarathy</li>
+			<li>Ben Keen</li>
+		</ul></td></tr>
+<tr><td>Samsung</td><td>
+		<ul>
+			<li>Jisoo Kim</li>
+			<li>Gwangbae Chio</li>
+			<li>Eric Hibbard</li>
+			<li>Mike Allison</li>
+		</ul></td></tr>
+<tr><td>Solidigm</td><td>
+		<ul>
+			<li>Scott Shadley</li>
+			<li>Gamil Cain</li>
+			<li>Festus Hategekimana</li>
+		</ul></td></tr>
+<tr><td>Kioxia</td><td>
+		<ul>
+			<li>John Geldman</li>
+			<li>Fred Knight</li>
+			<li>Paul Suhler</li>
+			<li>James Borden</li>
+		</ul></td></tr>
+</table>
  
 # References
 1. <a id="ref-1"></a>Refer to the [Self-encrypting deception: weaknesses in the encryption of solid state drives](https://www.cs.ru.nl/~cmeijer/publications/Self_Encrypting_Deception_Weaknesses_in_the_Encryption_of_Solid_State_Drives.pdf) by Carlo Meijer and Bernard van Gastel
