@@ -291,8 +291,6 @@ Controller firmware may then store the encrypted PMEK in persistent storage.
 
 ##### Sequence to Generate a PMEK
 
-![PMEK_generation](./diagrams/generate_pmek.svg)
-
 #### PMEK unlock
 
 Encrypted PMEKs stored at rest in persistent storage are considered "locked", and must be unlocked before they can be used to derive MEKs. Unlocked PMEKs are also encrypted when handled by controller firmware. Unlocked PMEKs do not survive across device reset.
