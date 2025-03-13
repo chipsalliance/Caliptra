@@ -212,8 +212,8 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Random Number Generator (RNG) Implementation*
 
 * **Checklist Item:**  
-  * **Requirement:** If an RNG is included in the Caliptra Wrapper, it MUST be securely implemented, and its design MUST meet applicable cryptographic standards. The source of entropy (internal or external) MUST be specified.  
-  * **Evaluation Methodology:** Manufacturers MUST demonstrate that the RNG, including entropy sources, is compliant with standards like [NIST SP 800-90A](https://csrc.nist.gov/pubs/sp/800/90/a/r1/final), [SP 800-90B](https://csrc.nist.gov/pubs/sp/800/90/b/final), [SP 800-90C](https://csrc.nist.gov/pubs/sp/800/90/c/4pd).
+  * **Requirement:** If an RNG is included in the Caliptra Wrapper, it SHOULD be securely implemented, and its design SHOULD meet applicable cryptographic standards. The source of entropy (internal or external) SHOULD be specified.  
+  * **Evaluation Methodology:** Manufacturers SHOULD demonstrate that the RNG, including entropy sources, is compliant with standards like [NIST SP 800-90A](https://csrc.nist.gov/pubs/sp/800/90/a/r1/final), [SP 800-90B](https://csrc.nist.gov/pubs/sp/800/90/b/final), [SP 800-90C](https://csrc.nist.gov/pubs/sp/800/90/c/4pd).
 
 #### *SRAM Zeroization Process*
 
