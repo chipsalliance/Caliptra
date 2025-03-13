@@ -4,8 +4,6 @@
 
 **Version 0.2**
 
-**2025/01/21**
-
 **Document history**
 
 | Version | Date | Changes |
@@ -13,7 +11,17 @@
 | 0.1 | 2024/09/30 | First draft of the report |
 | 0.2 | 2025/01/21 | Additional Changes after Feedback |
 
-# Introduction {#introduction}
+# Table of Contents
+- [Introduction](#introduction)
+- [Caliptra Trademark Auditing Process](#caliptra-trademark-auditing-process)
+  - [Suggestion](#suggestion)
+  - [Roles](#roles)
+  - [Properties of the Scheme](#properties-of-the-scheme)
+  - [Overview of the Example Scheme](#overview-of-example-scheme)
+  - [Specific Questions for the Scheme Rules](#specific-questions-for-the-scheme-rules)
+  - [Typical Process for Obtaining the Caliptra Trademark](#typical-process-for-obtaining-the-caliptra-trademark)
+
+# Introduction
 
 The objective of the Caliptra Trademark Auditing Process is to provide guidelines to Caliptra instantiation, with focus on the most important security aspects and properties for “real-world” security, based on the security objectives and use cases of Caliptra. It is expected that the Caliptra Trademark Auditing Process will be less detailed than the NIST certification requirements and the auditing process and documents should focus on analyzing vendor architecture and implementation of Caliptra on vendor products, rather than testing of vendor products. 
 
@@ -27,7 +35,7 @@ The main objective of the Checklist document is to ensure the secure integration
 * **Report measurements** to a host and/or external entity, which can further verify the authenticity & integrity of the device (a.k.a Attestation)  
 * Furthermore, Caliptra offers **DICE hardware identity service**.
 
-# Caliptra Trademark Auditing Process {#caliptra-trademark-auditing-process}
+# Caliptra Trademark Auditing Process
 
 The checklist describes the specific requirements to be reviewed by a 3rd party laboratory. 
 
@@ -35,20 +43,20 @@ The Caliptra Trademark Auditing Process defines the roles and process in achievi
 
 The following contains suggestions on how the scheme can be defined.
 
-## Suggestion {#suggestion}
+## Suggestion
 
 * Start with a minimal scheme and develop and grow when there is a need and as maturity grows.  
 * Add more specifics when identified and needed.  
 * Make sure feedback about the scheme is possible to incorporate to facilitate growth and improvements.
 
-## Roles {#roles}
+## Roles
 
 * **Manufacturer:** Manufacturer of device that claims Caliptra integration.  
 * **Laboratory:** OCP SAFE 3rd party laboratory for evaluation of TOE, for potential recommendation of approval of Caliptra Trademark Usage.  The laboratory should have experience reviewing RTL.  
 * **Caliptra Trademark Owner (TAC):** Approves or disapproves Caliptra Trademark Usage based on evaluation and recommendation by Laboratory.  
 * **OCP SAFE Certification body:** Acts independently, and it´s accreditation for Laboratories is used.
 
-## Properties of the scheme {#properties-of-the-scheme}
+## Properties of the Scheme
 
 * The scheme for the Caliptra Trademark Auditing Process is not under the OCP SAFE scheme.  
 * The scheme for the Caliptra Trademark Auditing Process relies directly on laboratories that are approved under OCP SAFE Level 2\.  
@@ -62,7 +70,7 @@ The following contains suggestions on how the scheme can be defined.
 * The scope of the laboratory in short is to  
   * Verify the self-assessment of the checklist and additional information provided by the manufacturer using the evaluation methodology.
 
-## Overview of example scheme {#overview-of-example-scheme}
+## Overview of Example Scheme
 
 For a formal certification scheme there are rules and documents of the scheme that defines it. In this example scheme definition, the discussed possible solution for the Caliptra Trademark Audit Process is commented within parenthesis.
 
@@ -110,7 +118,7 @@ For a formal certification scheme there are rules and documents of the scheme th
   * *A forum where the Labs can ask questions and make sure the level of evaluation is more or less consistent across labs. In such a forum the scheme can be further developed and improved.*  
     *(Task for Caliptra TAC to develop.)*
 
-## Specific questions for the scheme rules {#specific-questions-for-the-scheme-rules}
+## Specific Questions for the Scheme Rules
 
 This section considers some specific questions and suggestions for discussion on how this could be handled.
 
@@ -123,17 +131,15 @@ This section considers some specific questions and suggestions for discussion on
   * Updates of the hardware of the device that integrates Caliptra that are expected to **affect the security** of the Caliptra integration.  
     * **Suggestion:** A new Caliptra Trademark Audit Process is required. If the manufacturer is using the same laboratory as for a similar previous version, it is expected that the audit process is more efficient.  
 * Validity of granted Caliptra Trademark  
-  * Revocation of Caliptra Trademark usage  
+  * Revocation of Caliptra Trademark Usage
     * **Suggestion:** Caliptra TAC can revoke the usage of the Caliptra Trademark under certain conditions.  
       * The validity time of the Caliptra Trademark Usage has expired.  
       * Critical vulnerabilities have been discovered in either the integration of Caliptra, or Caliptra, that would fail a new Caliptra Trademark audit, and the vulnerabilities have not, or cannot, be mitigated.  
-      * New threats have emerged that were not considered in the Caliptra Trademark Process, and that critically effects the security.  
-      * …  
+      * New threats have emerged that were not considered in the Caliptra Trademark Process, and that critically effects the security.
   * **Suggestion:** There is validity time granted for each Caliptra Trademark usage.  
-  * **Suggestion:** Caliptra 1.X will in time be replaced by Caliptra 2.0 with PQC compliance. Set a last time for when the grant of using Caliptra trademark with Caliptra 1.X is valid, and before that migration to Caliptra 2.0 is needed.  
-    Consider also setting a, synchronized, last time for applying to the Caliptra Trademark and the Caliptra Trademark Audit process.
+  * **Suggestion:** Caliptra 1.X will in time be replaced by Caliptra 2.X with PQC compliance. A date will be set for when the grant of using Caliptra trademark with Caliptra 1.X will no longer be given, and before that migration to Caliptra 2.X is needed.
 
-##  Typical process for obtaining the Caliptra Trademark {#typical-process-for-obtaining-the-caliptra-trademark}
+## Typical Process for Obtaining the Caliptra Trademark
 
 1. The manufacturer contacts a licensed laboratory.  
 2. The laboratory and manufacturer agree on terms and sign a contract to help respond to the documentation required within the checklist and methodology document.  
