@@ -2,9 +2,9 @@
 
 <p style="text-align: center;">Caliptra: A Datacenter System on a Chip (SoC) Root of Trust (RoT)</p>
 
-<p style="text-align: center;">Revision 2.1</p>
+<p style="text-align: center;">Revision 2.0</p>
 
-<p style="text-align: center;">Version 0.1</p>
+<p style="text-align: center;">Version 1.0</p>
 
 <div style="page-break-after: always"></div>
 

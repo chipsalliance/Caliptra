@@ -35,7 +35,7 @@ marks](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkPoli
   * [Runtime](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md)
 
 ### Caliptra 2.x:
-  * [Main Caliptra specification 2.0 - Version 0.5](https://github.com/chipsalliance/Caliptra/blob/main/doc/Caliptra.md)
+  * [Main Caliptra specification 2.0 - Version 1.0](https://github.com/chipsalliance/Caliptra/blob/main/doc/caliptra_20/Caliptra.md)
   * [Caliptra Subsystem Hardware Specification - Version 0.5](https://github.com/chipsalliance/caliptra-ss/blob/main/docs/Caliptra%202.0%20Subsystem%20Specification%201.pdf)
   * **Note:** Hardware integration specs will be following the RTL Freezes & Releases timelines
   * [ROM 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/rom/dev/README.md)
@@ -96,6 +96,21 @@ Compatible Configurations:
 | 1.1.x | 1.2.x | 1.2.x |
 | 1.1.x | 1.1.x | 1.2.x |
 | 1.0.x | 1.0.x | 1.2.x |
+
+### Caliptra 2.0
+
+Additional Features
+  - Support ML-DSA Caliptra FW Signature
+  - Support OCP Recovery
+  - Support [Caliptra Sub-System](https://github.com/chipsalliance/caliptra-ss/)
+  - IDevID CSR HMAC Signing
+  - Crypto Offload Mailbox Services
+
+Compatible Configurations:
+
+| RTL | ROM | Runtime FMC/FW |
+| --- | --- | --- |
+| 2.0.x | 2.0.x | 2.0.x |
 
 ## Test Dashboards
 
