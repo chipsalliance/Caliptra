@@ -6,22 +6,6 @@
 
 !include ocp_lock_utils.inc
 
-!$show_all = %true()
-
-!if ($show_all)
-    !$show_precond = %true()
-    !$show_title = %true()
-    !$show_api = %true()
-    !$show_msg_parsing = %true()
-    !$show_done = %true()
-!else
-    !$show_precond = %false()
-    !$show_title = %false()
-    !$show_api = %false()
-    !$show_msg_parsing = %false()
-    !$show_done = %false()
-!endif
-
 !if ($show_title)
     Title "Load MEK"
 !endif
@@ -32,9 +16,8 @@
         * The following sequence may or may not have occurred prior: Zero or more MIX_PMEK commands
 
         <b>Notes:</b>
-          * The sequence diagram assumes that the KV will not allow an input KV slot to also be used as an out KV slot. Calitra FW is responsible for managing which KVC slots are used and can adapt if this assumption is not correct.
-          * This sequence is focused on successful execution of operations by the KV. Sill need to do:
-                 - <font color=red>Define the reported error conditions and handling
+          * The sequence diagram assumes that the KV will not allow an input KV slot to also be used as an out KV slot. Caliptra FW is responsible for managing which KV slots are used and can adapt if this assumption is not correct.
+          * This sequence is focused on successful execution of operations by the KV.
     end note
 !endif
 
@@ -136,7 +119,7 @@ alt Storage Root Key exists and Encryption Engin has become ready
     sfr--
 
     cfw $sync sfr : Write Control Reg (DN = 1b)
-    note right: Reset the SFR interface for next operation - not waiting for response
+    note left sfr: Reset the SFR interface for next operation - not waiting for response
 
     $self("cfw", "Mark that the sequence\nof an Initialize MEK then\nzero or more MIX_PMEK sequence\n is completed")
 end

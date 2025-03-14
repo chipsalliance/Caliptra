@@ -5,6 +5,31 @@
 !if %not(%variable_exists("ocp_lock_inc"))
     !$ocp_lock_inc = %true()
 
+    !if %not(%variable_exists("show_precond"))
+        !$show_precond = %true()
+    !endif
+    !if %not(%variable_exists("show_title"))
+        !$show_title = %true()
+    !endif
+    !if %not(%variable_exists("sshow_api"))
+        !$show_api = %true()
+    !endif
+    !if %not(%variable_exists("show_msg_parsing"))
+        !$show_msg_parsing = %true()
+    !endif
+    !if %not(%variable_exists("show_done"))
+        !$show_done = %true()
+    !endif
+
+    !if %variable_exists("doc_gen")
+        !$show_precond = %true()
+        !$show_title = %true()
+        !$show_api = %false()
+        !$show_msg_parsing = %false()
+        !$show_done = %true()
+        !log doc gen exists
+    !endif
+
 	!$SYNC_COLOR = "#red"
 	!$ASYNC_COLOR = "#green"
 	!$BUFFER_ACTIVATION = "#lightblue"

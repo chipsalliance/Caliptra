@@ -6,23 +6,6 @@
 
 !include ocp_lock_utils.inc
 
-!$show_all = %true()
-'!$show_all = %false()
-
-!if ($show_all)
-    !$show_precond = %true()
-    !$show_title = %true()
-    !$show_api = %true()
-    !$show_msg_parsing = %true()
-    !$show_done = %true()
-!else
-    !$show_precond = %false()
-    !$show_title = %false()
-    !$show_api = %false()
-    !$show_msg_parsing = %false()
-    !$show_done = %false()
-!endif
-
 !if ($show_title)
     Title "Clear the key cache in the Encryption Engine"
 !endif
@@ -94,7 +77,7 @@ alt Encryption Engin has become ready
     sfr--
 
     cfw $sync sfr : Write Control Reg (DN = 1b)
-    note right: Reset the SFR interface for next operation - not waiting for response
+    note left sfr : Reset the SFR interface for next operation - not waiting for response
 
 end
 
