@@ -36,7 +36,7 @@
 <tr><td>Samsung</td><td>
 		<ul>
 			<li>Jisoo Kim</li>
-			<li>Gwangbae Chio</li>
+			<li>Gwangbae Choi</li>
 			<li>Eric Hibbard</li>
 			<li>Mike Allison</li>
 		</ul></td></tr>
@@ -449,7 +449,7 @@ In order to achieve the security goals for KMB, KMB is limited to be the unique 
 
 *<p style="text-align: center;">Figure 9: KMB to Encryption SFR Interface</p>*
 
-![ee_diagram](./images/encryption_engine.jpg#center)
+![ee_diagram](./images/kmb_ee.svg#center)
 
 KMB uses Special Function Registers (SFRs) to communicate with Encryption Engine which are descripts in the following sections.
 
@@ -744,9 +744,9 @@ For each Mailbox command that causes a command to execute on the Encryption Engi
 
 Table 3 defines the additional Caliptra result codes due to supporting OCP L.O.C.K.
 
-*<p style="text-align: center;">Table 3: OCP L.O.CK. mailbox command result codes</p>*
+*<p style="text-align: center;">Table 3: OCP L.O.C.K. mailbox command result codes</p>*
 
-Table 2: OCP L.O.CK. mailbox command result codes
+Table 2: OCP L.O.C.K. mailbox command result codes
 
 | Name                  |      Value    |   Description |
 | :------------------:  | :-----------: | :--------------- |
@@ -784,7 +784,7 @@ Table: GET_STATUS output arguments
 <tr><td>engine_ready</td><td>u32</td>
 	<td>Ready status of the storage device crypto engine:
  		<ul>
-			<li>LOCK defines low range, vendor defines high range</li>
+			<li>OCP L.O.C.K. defines low range, vendor defines high range</li>
    			<li>Byte 0:
 				<ul>
 					<li>Bit 0: 1 = Ready 0 = Not ready</li>
@@ -1375,7 +1375,7 @@ The Caliptra Workgroup acknowledges the following individuals for their contribu
 <tr><td>Samsung</td><td>
 		<ul>
 			<li>Jisoo Kim</li>
-			<li>Gwangbae Chio</li>
+			<li>Gwangbae Choi</li>
 			<li>Eric Hibbard</li>
 			<li>Mike Allison</li>
 		</ul></td></tr>
