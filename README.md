@@ -86,7 +86,9 @@ Additional Features
   - Self-signed FMC Alias CSR
     - [GET_FMC_ALIAS_CSR](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#get_fmc_alias_csr)
   - DPE export of CDI
-    - SIGN_WITH_EXPORTED - WIP
+    - [SIGN_WITH_EXPORTED_ECDSA](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#sign_with_exported_ecdsa)
+    - [REVOKE_EXPORTED_CDI_HANDLE](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#revoke_exported_cdi_handle)
+  - DPE max cert size increased to 6kB
 
 \*\* Requires 1.2 ROM
 
