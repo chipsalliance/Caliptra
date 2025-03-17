@@ -4,9 +4,9 @@
 
 **<center>NVMe™ Key Management Block</center>**
 
-**<center>Revision 0.8</center>**
+**<center>Revision 0.7</center>**
 
-**<center>Version 0.8</p>**
+**<center>Version 0.7</p>**
 
 <div style="page-break-after: always"></div>
 
@@ -62,7 +62,7 @@
 |     Date | Revision # | Author | Description |
 | :--------------: | :---: | :-------------------: | :-----|
 |  September 2024  |  0.5 |   Authoring Companies  | Initial proposal draft based on work from the list of contributors |
-|    April 2025    |  0.8 |   Authoring Companies  | Updates that include updates APIs, UNL Sequence digrams, and rachetting with fuses |
+|    April 2025    |  0.7 |   Authoring Companies  | Updates that include updates APIs, UNL Sequence digrams, and rachetting with fuses |
 
 **License**
 
