@@ -251,23 +251,33 @@ When controller firmware wishes to program an MEK to the hardware cryptographic 
 
 #### Sequence to mix a PMEK into the MEK seed
 
-![PMEK mixing](./diagrams/include_pmec.svg)
+<p align="center">
+  <img src="./diagrams/include_pmec.svg" alt="PMEK mixing" />
+</p>
 
 #### Sequence to load an MEK
 
-![MEK loading](./diagrams/load_mek.svg)
+<p align="center">
+  <img src="./diagrams/load_mek.svg" alt="MEK loading" />
+</p>
 
 #### Sequence to load MEK into the Encryption Engine Key Cache
 
-![Load_MEK](./diagrams/load_mek_into_ee.svg)
+<p align="center">
+  <img src="./diagrams/load_mek_into_ee.svg" alt="Load_MEK" />
+</p>
 
 #### Sequence unload a MEK from the Encryption Engine Key Cache
 
-![Unload_MEK](./diagrams/unload_mek.svg)
+<p align="center">
+  <img src="./diagrams/unload_mek.svg" alt="Unload_MEK" />
+</p>
 
 #### Sequence unload all MEKs (i.e., purge) from the Encryption Engine Key Cache
 
-![Unload_All_MEKs](./diagrams/clear_key_cache.svg)
+<p align="center">
+  <img src="./diagrams/clear_key_cache.svg" alt="Unload_All_MEKs" />
+</p>
 
 #### Legacy MEK derivation for TCG Opal
 
@@ -297,7 +307,9 @@ Controller firmware may then store the encrypted PMEK in persistent storage.
 
 ##### Sequence to Generate a PMEK
 
-![PMEK mixing](./diagrams/generate_pmek.svg)
+<p align="center">
+  <img src="./diagrams/generate_pmek.svg" alt="Gen_PMEK" />
+</p>
 
 #### PMEK unlock
 
@@ -315,7 +327,9 @@ Controller firmware may then stash the encrypted unlocked PMEK in volatile stora
 
 ##### Sequence to Unlock a PMEK
 
-![PMEK_unlock](./diagrams/unlock_pmek.svg)
+<p align="center">
+  <img src="./diagrams/unlock_pme.svg" alt="PMEK_unlock" />
+</p>
 
 #### PMEK access key rotation
 
@@ -332,7 +346,9 @@ Controller firmware then erases the old encrypted PMEK and stores the new encryp
 
 ##### Sequence to Rotate Access Key to a PMEK
 
-![PMEK_rewrap](./diagrams/rewrap_pmek.svg)
+<p align="center">
+  <img src="./diagrams/rewrap_pmek.svg" alt="PMEK_rewrap" />
+</p>
 
 #### Transport encryption for PMEK access keys
 
@@ -355,7 +371,9 @@ Upon drive reset, the KEMs are regenerated, and any access keys for PMEKs that h
 
 ##### Sequence to Endorse Encapsulation Public Key
 
-![Endorse_Pub_Key](./diagrams/endorse_encapsulation_pub_key.svg)
+<p align="center">
+  <img src="./diagrams/endorse_encapsulation_pub_key.svg" alt="Endorse_Pub_Key" />
+</p>
 
 #### Access key rotation flows
 
@@ -365,7 +383,9 @@ The KMB then performs a double decryption when unwrapping the new access key, pr
 
 ##### Sequence to Rotate Encapsulation Key
 
-![Rotate_Encap_Key](./diagrams/rotate_encapsulation_key.svg)
+<p align="center">
+  <img src="./diagrams/rotate_encapsulation_key.svg" alt="Rotate_Encap_Key" />
+</p>
 
 #### Algorithm support
 
@@ -376,7 +396,9 @@ OCP L.O.C.K. will support the following KEM algorithms:
 
 ##### Sequence to obtain the supported Algorithms
 
-![Supported_Algorithm](./diagrams/get_algorithms.svg)
+<p align="center">
+  <img src="./diagrams/get_algorithms.svg" alt="Supported_Algorithm" />
+</p>
 
 ### Helper Functions
 
@@ -386,7 +408,9 @@ OCP L.O.C.K. has the following helper function to assist with determining the su
 
 ##### Sequence to obtain the current status of OCP L.O.C.K.
 
-![Get_Algorithm](./diagrams/get_algorithms.svg)
+<p align="center">
+  <img src="./diagrams/get_status.svg" alt="Get_Status" />
+</p>
 
 ### Storage root key rotation
 
@@ -408,7 +432,9 @@ The KMB relies on randomness to generate PMEKs and KEM keypairs. Storage devices
 
 Note: this does not invalidate any requirements around integration of entropy sources with Caliptra.
 
-![Inject_entropy](./diagrams/mix_external_entropy.svg)
+<p align="center">
+  <img src="./diagrams/mix_external_entropy.svg" alt="Inject_entropy" />
+</p>
 
 ### Cryptography helper commands
 
@@ -451,7 +477,9 @@ In order to achieve the security goals for KMB, KMB is limited to be the unique 
 
 *<p style="text-align: center;">Figure 9: KMB to Encryption SFR Interface</p>*
 
-![ee_diagram](./images/kmb_ee.svg#center)
+<p align="center">
+  <img src="./images/kmb_ee.svg" alt="ee_diagram" />
+</p>
 
 KMB uses Special Function Registers (SFRs) to communicate with Encryption Engine which are descripts in the following sections.
 
@@ -550,7 +578,7 @@ Figure 11 defines the Metadata register.
 
 *<p style="text-align: center;">Figure 11: Offset SFR_Base + 10h: METD – Metadata</p>*
 
-| Bytes | Type | Reset | Description |
+| Bytes | Type  | Reset | Description |
 | :---: | :---: | :---: | :--- |
 | 19:00 | RW    | 0b    | <b>Metadata (METD):</b> This field specifies metadata that is vendor specific and specifies the entry in the Encryption Engine for the Encryption Key.|
 
@@ -701,18 +729,18 @@ There can be errors programming a System Root Key and erasing a System Root Key.
 
 The diagram below has an example flow where the number of System Rook Keys available to be programmed is 3 (N=3):
 
-| State transition | active_slot | slot_state | next_action |
-| :--------------- | :---------: | :--------  | :---------- |
-| Factory                                       | 0 | EMPTY                | PROGRAM |
-| Program first entry                           | 0 | PROGRAMMED           | ERASE |
-| Erase first entry<br>(recoverable failure)    | 0 | PARTIALLY_ERASED     | ERASE |
-| Erase first entry                             | 0 | ERASED               | PROGRAM  |
-| Program next entry<br>(recoverable failure)   | 1 | PARTIALLY_PROGRAMMED | PROGRAM |
-| Program next entry<br>(unrecoverable failure) | 1 | PARTIALLY_PROGRAMMED | ERASE |
-| Erase failed entry                            | 1 | ERASED               | PROGRAM  |
-| Program next entry                            | 2 | PROGRAMMED           | ERASE |
-| Erase final entry                             | 2 | ERASED               | ENABLE_PERMA_DIRTY |
-| Enable perma dirty                            | 2 | NON_FUSE_RATCHETABLE | NONE |
+| State transition                              | active_slot | slot_state           | next_action |
+| :-------------------------------------------- | :---------: | :------------------: | :---------- |
+| Factory                                       | 0           | EMPTY                | PROGRAM |
+| Program first entry                           | 0           | PROGRAMMED           | ERASE |
+| Erase first entry<br>(recoverable failure)    | 0           | PARTIALLY_ERASED     | ERASE |
+| Erase first entry                             | 0           | ERASED               | PROGRAM  |
+| Program next entry<br>(recoverable failure)   | 1           | PARTIALLY_PROGRAMMED | PROGRAM |
+| Program next entry<br>(unrecoverable failure) | 1           | PARTIALLY_PROGRAMMED | ERASE |
+| Erase failed entry                            | 1           | ERASED               | PROGRAM  |
+| Program next entry                            | 2           | PROGRAMMED           | ERASE |
+| Erase final entry                             | 2           | ERASED               | ENABLE_PERMA_DIRTY |
+| Enable perma dirty                            | 2           | NON_FUSE_RATCHETABLE | NONE |
 
 ## Error reporting and handling
 
@@ -1200,16 +1228,16 @@ Command Code: 4550_4443 (“EPDS”)
 
 Table: ENABLE_PERMA_DIRTY_STATE input arguments
 
-| Name | Type | Description |
-| :----------: | :-----: | :------- |
-| chksum | u32     | Checksum over other input arguments, computed by the caller. Little endian. |
+| Name   | Type | Description |
+| :----: | :--: | :------- |
+| chksum | u32  | Checksum over other input arguments, computed by the caller. Little endian. |
 
 Table: ENABLE_PERMA_DIRTY_STATE output arguments
 
-| Name | Type | Description |
-| :----------: | :-----: | :------- |
-| chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian. |
-| fips_status   | u32           | Indicates if the command is FIPS approved or an error |
+| Name        | Type | Description |
+| :---------: | :--: | :------- |
+| chksum      | u32  | Checksum over other output arguments, computed by Caliptra. Little endian. |
+| fips_status | u32  | Indicates if the command is FIPS approved or an error |
 
 ### REPORT_ROOT_KEY_STATE
 
@@ -1219,10 +1247,10 @@ Command Code: 5252_4B53 (“RRKS”)
 
 Table: REPORT_ROOT_KEY_STATE input arguments
 
-| Name | Type | Description |
-| :----------: | :-----: | :------- |
-| chksum     | u32     | Checksum over other input arguments, computed by the caller. Little endian. |
-| nonce      | u8[16]  | Freshness nonce |
+| Name   | Type   | Description |
+| :----: | :----: | :------- |
+| chksum | u32    | Checksum over other input arguments, computed by the caller. Little endian. |
+| nonce  | u8[16] | Freshness nonce |
 
 
 Table: REPORT_ROOT_KEY_STATE output arguments
@@ -1236,26 +1264,26 @@ Table: REPORT_ROOT_KEY_STATE output arguments
 <tr><td>slot_state</td><td>SlotState (u16)</td>
 	<td>State of the currently-active slot
 
-| Value | Description |
-| :--:  | :---- |
-| 0h    | EMPTY (Able to load MEKs) |
-| 1h    | PARTIALLY_PROGRAMMED (Not to load MEKs) |
-| 2h    | PROGRAMMED (Able to load MEKs)  |
-| 3h    | PARTIALLY_ERASED (Not to load MEKs)  |
-| 4h    | ERASED (Not to load MEKs)  |
-| 5h    | NON_FUSE_RATCHETABLE (Able to load MEKs) |
+| Value       | Description |
+| :--------:  | :---- |
+| 0h          | EMPTY (Able to load MEKs) |
+| 1h          | PARTIALLY_PROGRAMMED (Not to load MEKs) |
+| 2h          | PROGRAMMED (Able to load MEKs)  |
+| 3h          | PARTIALLY_ERASED (Not to load MEKs)  |
+| 4h          | ERASED (Not to load MEKs)  |
+| 5h          | NON_FUSE_RATCHETABLE (Able to load MEKs) |
 | 6h to FFFFh | Reserved |
 
 </td></tr>
 <tr><td>next_action</td><td>NextAction (u16)</td>
 	<td>Next action that can be taken on the active slot
 
-| Value | Description |
-| :--:  | :---- |
-| 0h    | NONE |
-| 1h    | PROGRAM  |
-| 2h    | ERASE   |
-| 3h    | ENABLE_IO_WITHOUT_RATCHET |
+| Value       | Description |
+| :--------:  | :---- |
+| 0h          | NONE |
+| 1h          | PROGRAM  |
+| 2h          | ERASE   |
+| 3h          | ENABLE_IO_WITHOUT_RATCHET |
 | 4h to FFFFh | Reserved |
 </td></tr>
 <tr><td>eat_len</td><td>u16</td><td>Total length of the IETF EAT</td></tr>
@@ -1268,28 +1296,28 @@ The following acronyms and abbreviations are used throughout this document.
 
 | Abbreviation | Description |
 | :----------: | :---------- |
-| AES      | Advanced Encryption Standard |
-| CSP      | Cloud Service Provider |
-| DEK      | Data Encryption Key |
-| DICE     | Device Identifier Composition Engine |
-| DRBG     | Deterministic Random Bit Generator |
-| ECDH     | Elliptic-curve Diffie–Hellman |
-| ECDSA    | Elliptic Curve Digital Signature Algorithm |
-| HMAC     | Hash-Based Message Authentication Codes |
-| KDF      | Key Derivation Function |
-| KEM      | Key Encapsulation Mechanism |
-| KMB      | Key Management Block |
-| L.O.C.K. | Layered Open-Source Cryptographic Key-management |
-| MEK      | Media Encryption Key |
-| ML-KEM   | Module-Lattice-Based Key-Encapsulation Mechanism |
-| NIST     | National Institute of Standards and Technology |
-| OCP      | Open Compute Project |
-| PMEK     | Partial Media Encryption Key |
-| RTL      | Register Transfer Level |
-| SED      | Self-encrypting drive |
-| SSD      | Solid-state drive |
-| UART     | Universal asynchronous receiver-transmitter |
-| XTS      | XEX-based tweaked-codebook mode with ciphertext stealing |
+| AES          | Advanced Encryption Standard |
+| CSP          | Cloud Service Provider |
+| DEK          | Data Encryption Key |
+| DICE         | Device Identifier Composition Engine |
+| DRBG         | Deterministic Random Bit Generator |
+| ECDH         | Elliptic-curve Diffie–Hellman |
+| ECDSA        | Elliptic Curve Digital Signature Algorithm |
+| HMAC         | Hash-Based Message Authentication Codes |
+| KDF          | Key Derivation Function |
+| KEM          | Key Encapsulation Mechanism |
+| KMB          | Key Management Block |
+| L.O.C.K.     | Layered Open-Source Cryptographic Key-management |
+| MEK          | Media Encryption Key |
+| ML-KEM       | Module-Lattice-Based Key-Encapsulation Mechanism |
+| NIST         | National Institute of Standards and Technology |
+| OCP          | Open Compute Project |
+| PMEK         | Partial Media Encryption Key |
+| RTL          | Register Transfer Level |
+| SED          | Self-encrypting drive |
+| SSD          | Solid-state drive |
+| UART         | Universal asynchronous receiver-transmitter |
+| XTS          | XEX-based tweaked-codebook mode with ciphertext stealing |
 
 # Acknowledgements
 
