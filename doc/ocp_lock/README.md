@@ -1,4 +1,6 @@
-![OCP Logo](./images/ocp_page_1.jpg#center)
+<p align="center">
+  <img src="./images/ocp_page_1.jpg" alt="OCP Logo" />
+</p>
 
 **<center>OCP Layered Open-Source Cryptographic Key-management (L.O.C.K.)</center>**
 
@@ -6,7 +8,7 @@
 
 **<center>Revision 0.7</center>**
 
-**<center>Version 0.7</p>**
+**<center>Version 0.7</center>**
 
 <div style="page-break-after: always"></div>
 
@@ -190,7 +192,9 @@ The following figure shows the basic high-level blocks of OCP L.O.C.K.
 
 *<p style="text-align: center;">Figure 1: OCP L.O.C.K high level blocks</p>*
 
-![Architecture Diagram](./images/architecture_diagram.jpg#center)
+<p align="center">
+  <img src="./images/architecture_diagram.jpg" alt="Architecture Diagram" />
+</p>
 
 Caliptra that includes the optional OCP L.O.C.K. has a Key Management Block (KMB) that is the only entity that can derive the MEKs which protect user data and load the MEKs into the Key Cache of the Encryption Engine. The KMB derives MEKs using the following keys:
 
@@ -221,7 +225,9 @@ KMB is able to generate two kinds of keys: KEMs (used for access key transport e
 
 *<p style="text-align: center;">Figure 2: KEM and PMEK Key Generation</p>*
 
-![KEM Diagram](./images/KEM_diagram.jpg#center)
+<p align="center">
+  <img src="./images/KEM_diagram.jpg" alt="KEM Diagram" />
+</p>
 
 ### Interfaces
 
@@ -561,13 +567,17 @@ When an SSD stores data with address-based encryption, an MEK can be uniquely id
 
 *<p style="text-align: center;">Figure 12: LBA Range Based Metadata Format</p>*
 
-![lba_nsid](./images/lba_nsid_info.jpg#center)
+<p align="center">
+  <img src="./images/lba_nsid_info.jpg" alt="lba_nsid" />
+</p>
 
 Address-based encryption is not however the only encryption mechanism in SSDs. For example, in the TCG Key per I/O […], an MEK is selected by a key tag, which is hard to be mapped with an address. Figure 123 shows an example of <b>METD</b> in such cases.
 
 *<p style="text-align: center;">Figure 13: Key Tag Based Metadata Format</p>*
 
-![lba_nsid](./images/key_tag_info.jpg#center)
+<p align="center">
+  <img src="./images/key_tag_info.jpg" alt="key_tag_info" />
+</p>
 
 The above examples are not the only possible values of <b>METD</b>. Vendors are encouraged to design and use their own <b>METD</b> if it fits better to their system.
 
@@ -589,7 +599,9 @@ One of simple use cases of <b>AUX</b> field is to store an offset of initializat
 
 *<p style="text-align: center;">Figure 15: Auxiliary Data Format Example</p>*
 
-![aux_info](./images/aux_info.jpg#center)
+<p align="center">
+  <img src="./images/aux_info.jpg" alt="aux_info" />
+</p>
 
 When the Controller Firmware requests an MEK generation to the KMB, the Controller Firmware can use the <b>AUX</b> value to specify which mode of operation should be used and which value should be used as an initialization vector or a nonce with the generated MEK.
 
@@ -614,7 +626,9 @@ Figure 17 shows a sample command execution. This is an expected sequence when th
 
 *<p style="text-align: center;">Figure 17: Command Execution Example</p>*
 
-![cmd_exe](./images/cmd_exe_example.jpg#center)
+<p align="center">
+  <img src="./images/cmd_exe_example.jpg" alt="cmd_exe" />
+</p>
 
 ### Encryption Engine Requirements
 
