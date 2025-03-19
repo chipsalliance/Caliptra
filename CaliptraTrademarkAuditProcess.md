@@ -25,13 +25,13 @@
 
 The objective of the Caliptra Trademark Auditing Process is to provide guidelines to Caliptra instantiation, with focus on the most important security aspects and properties for “real-world” security, based on the security objectives and use cases of Caliptra. It is expected that the Caliptra Trademark Auditing Process will be less detailed than the NIST certification requirements and the auditing process and documents should focus on analyzing vendor architecture and implementation of Caliptra on vendor products, rather than testing of vendor products. 
 
-This work concerns to define an auditing process to be used by vendors to determine if the vendor’s products meet the Caliptra trademark requirements. The auditing process will be captured in a “Process” document which can be used by vendors to request permission to use the Caliptra trademark. Additionally, a “Checklist” document will be provided, which can be used by vendors to determine if the vendor is complying with the Caliptra Integration Specification. 
+This document defines an auditing process to be used by vendors to determine if the vendor’s products meet the Caliptra trademark requirements. The auditing process will be captured in a “Process” document that can be used by vendors to request permission to use the Caliptra trademark. Additionally, a “Checklist” document will be provided, which can be used by vendors to determine if the vendor is complying with the Caliptra Integration Specification. 
 
-The main objective of the Checklist document is to ensure the secure integration of Caliptra in another device, to ensure that Caliptra can leverage its main security functionality (security services) and remain secure. The main security functionality of Caliptra as a silicon RoT, when integrated, is to
+The main objective of the [Checklist and evaluation methodology document](https://ghttps://github.com/chipsalliance/Caliptra/blob/main/CaliptraChecklistAndEvaluationMethodology.md) is to ensure the secure integration of Caliptra in another device, to ensure that Caliptra can leverage its main security functionality (security services) and remain secure. The main security functionality of Caliptra as a silicon RoT, when integrated, is to:
 
 * Cryptographically measure its own **code** & **configuration**   
 * Sign these measurements with a unique **attestation key**   
-* Provide an interface for storing additional measurements.  
+* Provide an interface for storing additional measurements
 * **Report measurements** to a host and/or external entity, which can further verify the authenticity & integrity of the device (a.k.a Attestation)  
 * Furthermore, Caliptra offers **DICE hardware identity service**.
 
@@ -39,7 +39,7 @@ The main objective of the Checklist document is to ensure the secure integration
 
 The checklist describes the specific requirements to be reviewed by a 3rd party laboratory. 
 
-The Caliptra Trademark Auditing Process defines the roles and process in achieving the approval of the Trademark Usage.
+The Caliptra Trademark Auditing Process defines the roles and process that third-party laboratories use to achieve the approval of the Trademark Usage.
 
 The following contains suggestions on how the scheme can be defined.
 
@@ -137,14 +137,14 @@ This section considers some specific questions and suggestions for discussion on
       * Critical vulnerabilities have been discovered in either the integration of Caliptra, or Caliptra, that would fail a new Caliptra Trademark audit, and the vulnerabilities have not, or cannot, be mitigated.  
       * New threats have emerged that were not considered in the Caliptra Trademark Process, and that critically effects the security.
   * **Suggestion:** There is validity time granted for each Caliptra Trademark usage.  
-  * **Suggestion:** Caliptra 1.X will in time be replaced by Caliptra 2.X with PQC compliance. A date will be set for when the grant of using Caliptra trademark with Caliptra 1.X will no longer be given, and before that migration to Caliptra 2.X is needed.
+  * **Suggestion:** Caliptra 1.X will in time be replaced by Caliptra 2.X with PQC compliance. A date will be set for when the grant of using Caliptra trademark with Caliptra 1.X will no longer be given because it doesn't support PQC algorithms.  After that date, no other Calitpra 1.X trademarks will be given.
 
 ## Typical Process for Obtaining the Caliptra Trademark
 
 1. The manufacturer contacts a licensed laboratory.  
 2. The laboratory and manufacturer agree on terms and sign a contract to help respond to the documentation required within the checklist and methodology document.  
-3. The laboratory and manufacturer communicate and jointly, when aligned, provides an application for Caliptra Trademark Usage for a TOE to Caliptra Trademark Owner TAC, signed by both laboratory and manufacturer.  
-4. The manufacturer is responsible of providing a self-assessment of why the checklist requirements are fulfilled, together with other necessary information for the laboratory.  
+3. The laboratory and manufacturer communicate and jointly, when aligned, provide an application for Caliptra Trademark Usage for a TOE to Caliptra Trademark Owner TAC, signed by both laboratory and manufacturer.  
+4. It is the manufacturer's responsibility to provide a self-assessment of why the checklist requirements are fulfilled, together with other necessary information for the laboratory.  
 5. The laboratory evaluates and assesses the TOE using the provided filled-in checklist and the evaluation methodology. Iterations with the manufacturer are expected until all issues are resolved, as judged by the laboratory.  
 6. The laboratory produces an evaluation technical report, using an evaluation technical report template, and sends this to the Caliptra Trademark Owner.  
 7. The Caliptra Trademark Owner TAC assesses the submitted evaluation technical report, and, if needed, communicates with the laboratory for any questions and comments.  
