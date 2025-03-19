@@ -17,8 +17,9 @@
 **Contributors**
 
 <table>
-<tr><th>Company</th><th>Individuals</th></tr>
-<tr><td>Google</td><td>
+<tr><td>Google</td><td>Microsoft</td><td>Samsung</td><td>Solidigm</td><td>Kioxia</td></tr>
+<tr>
+	<td>
 		<ul>
 			<li>Andrés Lagar-Cavilla</li>
 			<li>Amber Huffman</li>
@@ -26,8 +27,8 @@
 			<li>Jeff Andersen</li>
 			<li>Chris Sabol</li>
 			<li>Srini Narayanamurthy</li>
-		</ul></td></tr>
-<tr><td>Microsoft</td><td>
+	</ul></td>
+	<td>
 		<ul>
 			<li>Lee Prewitt</li>
 			<li>Michael Norris</li>
@@ -36,30 +37,28 @@
 			<li>Anjana Parthasarathy</li>
 			<li>Ben Keen</li>
 			<li>Bharat Pillilli</li>
-		</ul></td></tr>
-<tr><td>Samsung</td><td>
+	</ul></td>
+	<td>
 		<ul>
 			<li>Jisoo Kim</li>
 			<li>Gwangbae Choi</li>
 			<li>Eric Hibbard</li>
 			<li>Mike Allison</li>
-		</ul></td></tr>
-<tr><td>Solidigm</td><td>
+	</ul></td>
+	<td>
 		<ul>
 			<li>Scott Shadley</li>
 			<li>Gamil Cain</li>
 			<li>Festus Hategekimana</li>
-		</ul></td></tr>
-<tr><td>Kioxia</td><td>
+	</ul></td>
+	<td>
 		<ul>
 			<li>John Geldman</li>
 			<li>Fred Knight</li>
 			<li>Paul Suhler</li>
 			<li>James Borden</li>
-		</ul></td></tr>
+	</ul></td></tr>
 </table>
-
-<div style="page-break-after: always"></div>
 
 **Revision Table**
 
@@ -67,6 +66,8 @@
 | :--------------: | :---: | :-------------------: | :-----|
 |  September 2024  |  0.5 |   Authoring Companies  | Initial proposal draft based on work from the list of contributors |
 |    April 2025    |  0.7 |   Authoring Companies  | Updates that include updates APIs, UNL Sequence digrams, and rachetting with fuses |
+
+<div style="page-break-after: always"></div>
 
 **License**
 
@@ -1326,8 +1327,9 @@ The following acronyms and abbreviations are used throughout this document.
 The Caliptra Workgroup acknowledges the following individuals for their contributions to this specification.
 
 <table>
-<tr><th>Company</th><th>Individuals</th></tr>
-<tr><td>Google</td><td>
+<tr><td>Google</td><td>Microsoft</td><td>Samsung</td><td>Solidigm</td><td>Kioxia</td></tr>
+<tr>
+	<td>
 		<ul>
 			<li>Andrés Lagar-Cavilla</li>
 			<li>Amber Huffman</li>
@@ -1335,8 +1337,8 @@ The Caliptra Workgroup acknowledges the following individuals for their contribu
 			<li>Jeff Andersen</li>
 			<li>Chris Sabol</li>
 			<li>Srini Narayanamurthy</li>
-		</ul></td></tr>
-<tr><td>Microsoft</td><td>
+	</ul></td>
+	<td>
 		<ul>
 			<li>Lee Prewitt</li>
 			<li>Michael Norris</li>
@@ -1345,28 +1347,29 @@ The Caliptra Workgroup acknowledges the following individuals for their contribu
 			<li>Anjana Parthasarathy</li>
 			<li>Ben Keen</li>
 			<li>Bharat Pillilli</li>
-		</ul></td></tr>
-<tr><td>Samsung</td><td>
+	</ul></td>
+	<td>
 		<ul>
 			<li>Jisoo Kim</li>
 			<li>Gwangbae Choi</li>
 			<li>Eric Hibbard</li>
 			<li>Mike Allison</li>
-		</ul></td></tr>
-<tr><td>Solidigm</td><td>
+	</ul></td>
+	<td>
 		<ul>
 			<li>Scott Shadley</li>
 			<li>Gamil Cain</li>
 			<li>Festus Hategekimana</li>
-		</ul></td></tr>
-<tr><td>Kioxia</td><td>
+	</ul></td>
+	<td>
 		<ul>
 			<li>John Geldman</li>
 			<li>Fred Knight</li>
 			<li>Paul Suhler</li>
 			<li>James Borden</li>
-		</ul></td></tr>
+	</ul></td></tr>
 </table>
+
  
 # References
 1. <a id="ref-1"></a>Refer to the [Self-encrypting deception: weaknesses in the encryption of solid state drives](https://www.cs.ru.nl/~cmeijer/publications/Self_Encrypting_Deception_Weaknesses_in_the_Encryption_of_Solid_State_Drives.pdf) by Carlo Meijer and Bernard van Gastel
