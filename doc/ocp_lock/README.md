@@ -102,11 +102,11 @@ OCP L.O.C.K source for RTL and firmware will be licensed using the Apache 2.0 li
 
 **Efficiency**
 
-OCP  is used generate and load keys for use of encrypting user data prior to storing data at rest and decrypting stored user data at rest when read. So, it cannot yield a measurable impact on system efficiency.
+OCP L.O.C.K. is used generate and load keys for use of encrypting user data prior to storing data at rest and decrypting stored user data at rest when read. So, it cannot yield a measurable impact on system efficiency.
 
 **Impact**
 
-OCP  enables consistency and transparency to a foundational area of security of media encryption keys such that no firmware in the device ever has access to a media encryption key. Furthermore, no decrypted media encryption key exists in the device when power is removed from the device.
+OCP L.O.C.K. enables consistency and transparency to a foundational area of security of media encryption keys such that no firmware in the device ever has access to a media encryption key. Furthermore, no decrypted media encryption key exists in the device when power is removed from the device.
 
 **Scale**
 
@@ -128,9 +128,9 @@ OCP L.O.C.K. was originally created as part of the Open Compute Project (OCP). T
 
 # Background
 
-OCP L.O.C.K is being defined to improve drive security. The life of a storage device in a datacenter is that the device leaves the supplier, a customer writes user data to the device, and then the device is decommissioned. The problem is that customer data is not allowed to leave the data center. There needs to be a high confidence that and storage device leaving the datacenter is secure. The current default cloud service provider (CSP) policy to ensure this level of security is to destroy the drive. Other policies may exist that leverage drive capabilities (e.g., Sanitize), but are deemed insufficient by these CSPs[^1] . This produces significant e-waste and inhibits any re-use/recycling.
+OCP L.O.C.K is being defined to improve drive security. The life of a storage device in a datacenter is that the device leaves the supplier, a customer writes user data to the device, and then the device is decommissioned. The problem is that customer data is not allowed to leave the data center. There needs to be a high confidence that the storage device leaving the datacenter is secure. The current default cloud service provider (CSP) policy to ensure this level of security is to destroy the drive. Other policies may exist that leverage drive capabilities (e.g., Sanitize), but are not generally deemed inherently trustworthy by these CSPs[^1]. This produces significant e-waste and inhibits any re-use/recycling.
 
-OCP L.O.C.K. is solving this security issue with data encryption by defining entropy used to create a media encryption key that is able to encrypt all data on the storage device. If that entropy is deleted, then the media encryption key is unable to be generated to decrypt the data on that storage device (i.e., no access to the plaintext behind the ciphertext). 
+OCP L.O.C.K. is solving this security issue with data encryption by defining a fuse-backed storage root key used to protect all media encryption keys used to encrypt data stored on the device. If that storage root key is deleted, then all prior media encryption keys are unable to be recovered. If that entropy is deleted, then the media encryption key is unable to be generated to decrypt the data on that storage device (i.e., no access to the plaintext behind the ciphertext). 
 
 OCP L.O.C.K. is addressing these issues by:
 
@@ -142,11 +142,11 @@ OCP L.O.C.K. is addressing these issues by:
 
 The goal of OCP L.O.C.K. is to define a Key Management Block (KMB) that:
 
-*	Isolates storage keys to a trusted hardware block
-*	Binds storage keys to a given set of externally-supplied access keys
-*	Provides replay-resistant transport security for these access keys
-*	Allows access key injection into KMB without trusting the host
-*	able to be used in conjunction with the storage device support Opal and Key per I/O
+- Isolates storage keys to a trusted hardware block
+- Binds storage keys to a given set of externally-supplied access keys
+- Provides replay-resistant transport security for these access keys such that they can be injected without trusting the host
+- Manages a fuse-backed storage root key for sanitization
+- Is able to be used in conjunction with the Opal and Key Per I/O storage device specifications
 
 # Overview
 
@@ -211,20 +211,20 @@ The DEK and storage root key do not require any changes to the host APIs for TCG
 
 Additional host APIs (i.e., Remote Key Mnagement Services) are required to fully model storage root key rotation, PMEKs, and injectable host entropy. Such APIs are beyond the scope of the present document.
 
-MEKs are never visible to any firmware. To load a MEK into the Key Cache of the Encryption Engine, Firmware interfaces to the Key Management Block to generate or retrieve a previously generated MEK that is created using thosekeys and then cause hardware to load the MEK into the Encryption Engine. Each MEK has associated metadata, to identify the namespace, LBA range, and how to load the MEK in the Encryption Engine.
+MEKs are never visible to any firmware. To load an MEK into the Key Cache of the Encryption Engine, Storage controller firmware interfaces to the Key Management Block to generate or retrieve a previously generated MEK that is created using those keys and then cause hardware to load the MEK into the Encryption Engine. Each MEK has associated metadata, to identify the namespace, LBA range, and how to load the MEK in the Encryption Engine.
 
-The Remote Key Management Service is utilized by the host to allow the host access to information for the PMEKs. OPAL or Key per I/O are example Remote Key Management Services. Each PMEK is encrypted as rest using an externally-injected access key where that access key is not stored persistently on the storage device. If there is more than one PMEK used to generate a MEK, then it requires multiple authorities to unlock a given range of user data.
+The Remote Key Management Service is utilized by the host to allow the host access to information for the PMEKs. Opal or Key Per I/O storage device APIs used by Remote Key Management Services. Each PMEK is encrypted as rest using an externally-injected access key where that access key is not stored persistently on the storage device. If there is more than one PMEK used to generate an MEK, then it requires multiple authorities to unlock a given range of user data.
 
-Each MEK is bound for its lifetime to the Storage Root Key, the list of PMEKs, and the DEK. To generate a MEK, the access key for each PMEK must be provided. All MEKs are removed from the Encryption Engine on a power cycle or during sanitization on the storage device. 
+Each MEK is bound for its lifetime to the Storage Root Key, the list of PMEKs, and the DEK. To generate an MEK, the access key for each PMEK must be provided. All MEKs are removed from the Encryption Engine on a power cycle or during sanitization on the storage device. 
 
-The DEK may be derived from or decrypted by a users C-pin to support legacy OPAL. The DEK may be the imported key associated with a Key per I/O key tag.
-KMB generates Key Encapsulation Mechanism (KEM) keypairs and stores them in internal volatile memory using a KEM algorithm such as ECDH or MLKEM/Kyber. KMB can issue endorsements of KEM public keys allowing a Remote Key Management Services to ensure they only release access keys to authentic devices. PMEK access keys are encrypted in transit using these KEM keypairs. Upon drive reset, the access key must be re-encrypted to a new KEM for its associated PMEK to be usable.
+The DEK may be derived from or decrypted by a user's C-PIN to support legacy Opal. The DEK may be the imported key associated with a Key Per I/O key tag.
+KMB generates HPKE keypairs and stores them in internal volatile memory using a KEM algorithm such as ECDH or ML-KEM/Kyber. KMB can issue endorsements of KEM public keys allowing a Remote Key Management Services to ensure they only release access keys to authentic devices. PMEK access keys are encrypted in transit using these KEM keypairs. Upon drive reset, the access key must be re-encrypted to a new KEM for its associated PMEK to be usable.
 
 KMB can maintain multiple active KEM keypairs. Nominally, one for each supported algorithm. KMB will automatically initialize a KEM for each supported algorithm and this may be done lazily. KMB will allow the controller to trigger KEM rotation. This can be done as part of zeroization.
 
 KMB supports PMEK access key rotation where the storage controller must replace an old encrypted PMEK with a new encrypted PMEK. The end user must prove to KMB that they control both old and new access key. This is done by encrypting the new access key with the old access key. The new access key is therefore double-encrypted when provided to KMB with the old access key and with an ephemeral transport encryption key.
 
-KMB is able to generate two kinds of keys: KEMs (used for access key transport encryption) and PMEKs (used for MEK derivation). A host is able to external inject entropy into KMB where it is held in internal volatile memory. Subsequent keys are randomly generated using both KMB's TRNG and the host's entropy as shown in figure 2.
+KMB is able to generate two kinds of keys: KEMs (used for access key transport encryption) and PMEKs (used for MEK derivation). A host is able to inject external entropy into KMB where it is held in internal volatile memory. Subsequent keys are randomly generated using both KMB's TRNG and the host's entropy as shown in figure 2.
 
 *<p style="text-align: center;">Figure 2: KEM and PMEK Key Generation</p>*
 
@@ -270,7 +270,7 @@ When controller firmware wishes to program an MEK to the hardware cryptographic 
   <img src="./diagrams/load_mek_into_ee.svg" alt="Load_MEK" />
 </p>
 
-#### Sequence unload a MEK from the Encryption Engine Key Cache
+#### Sequence unload an MEK from the Encryption Engine Key Cache
 
 <p align="center">
   <img src="./diagrams/unload_mek.svg" alt="Unload_MEK" />
@@ -409,7 +409,7 @@ OCP L.O.C.K. has the following helper function to assist with determining the su
 
 - Get the current status
 
-##### Sequence to obtain the current status of OCP L.O.C.K.
+#### Sequence to obtain the current status of OCP L.O.C.K.
 
 <p align="center">
   <img src="./diagrams/get_status.svg" alt="Get_Status" />
@@ -429,25 +429,6 @@ OCP L.O.C.K. will enable reporting of whether a drive is clean following a stora
 
 This section will be fleshed out with additional details as they become available.
 
-### Externally-injected entropy
-
-The KMB relies on randomness to generate PMEKs and KEM keypairs. Storage devices feature their own source of randomness. For end users that prefer not to solely trust device-level randomness sources, KMB allows the host to sample entropy from its own randomness source and inject it into the KMB. Injected randomness is used to permute DRBG state that is held in volatile memory within the KMB.
-
-Note: this does not invalidate any requirements around integration of entropy sources with Caliptra.
-
-<p align="center">
-  <img src="./diagrams/mix_external_entropy.svg" alt="Inject_entropy" />
-</p>
-
-### Cryptography helper commands
-
-It is anticipated that controller firmware will perform its own vendor-specific cryptographic operations outside of the KMB boundary. To allow those operations to leverage FIPS-validated cryptographic implementations within Caliptra, Caliptra will support helper mailbox commands that expose the following raw primitive cryptographic operations:
-
-- Get random bytes, using a DRBG as defined in NIST [SP 800-90A](https://csrc.nist.gov/pubs/sp/800/90/a/r1/final)
-- Perform AES-256-GCM encryption or decryption, as defined in NIST [SP 800-38D](https://csrc.nist.gov/pubs/sp/800/38/d/final)
-- Perform AES-256-KeyWrap encryption or decryption, as defined in NIST [SP 800-38F](https://csrc.nist.gov/pubs/sp/800/38/f/final)
-- Perform HMAC-384-KDF key derivation, as defined in NIST [SP 800-108](https://csrc.nist.gov/pubs/sp/800/108/r1/upd1/final)
-
 # Hardware
 
 The following figure describes the OCP L.O.C.K..
@@ -466,16 +447,16 @@ This section will be fleshed out with additional details as they become availabl
 
 ## KMB-Encryption Engine Interface
 
-This section defines the interface between the Key Management Block (KMB) and an Encryption Engine. An Encryption Engine is used to encrypt/decrypt user data and its design and implementation are vendor specific. Media Encryption Keys (MEKs) are the keys which are generated within KMB and used by Encryption Engine to encrypt and decrypt user data. This interface is used to load MEKs from KMB to Encryption Engine or to cause the Encryption Engine to unload (i.e., remove) loaded MEKs. The MEKs transferred between the KMB and the Encryption Engine shall not be accessible by the Controller Firmware.
+This section defines the interface between the Key Management Block (KMB) and an Encryption Engine. An Encryption Engine is used to encrypt/decrypt user data and its design and implementation are vendor specific. Media Encryption Keys (MEKs) are the keys which are generated within KMB and used by Encryption Engine to encrypt and decrypt user data. This interface is used to load MEKs from KMB to Encryption Engine or to cause the Encryption Engine to unload (i.e., remove) loaded MEKs. The MEKs transferred between the KMB and the Encryption Engine shall not be accessible by the controller firmware.
 
 ### Overview
 
-The Encryption Engine uses a stored MEKs to encryption and decryption use data. For the purposes of this specification, the entity within the Encryption Engine used to store the MEKs is called Key Cache. Each encryption and description of user data is coupled to a specific MEK which is stored in Key Cache bound to a unique identifier, called metadata. Each (metadata, MEK) pair is also associated with additional information, called aux, which is used neither as MEK nor an identifier, but has some additional information about the pair. Therefore, the Key Cache as an entity which stores (metadata, aux, MEK) tuples.
+The Encryption Engine uses a stored MEK to encryption and decryption use data. For the purposes of this specification, the entity within the Encryption Engine used to store the MEKs is called Key Cache. Each encryption and description of user data is coupled to a specific MEK which is stored in Key Cache bound to a unique identifier, called metadata. Each (metadata, MEK) pair is also associated with additional information, called aux, which is used neither as MEK nor an identifier, but has some additional information about the pair. Therefore, the Key Cache as an entity which stores (metadata, aux, MEK) tuples.
 
-In order to achieve the security goals for KMB, KMB is limited to be the unique component which loads unload a (metadata, aux, MEK) tuple into the Key Cache and unloads a tuple within the device, so that MEKs can only be exposed to KMB and Encryption Engine. Controller Firmware arbitrates all operations in the KMB to Encryption Engine interface, therefore Controller FW is responsible for managing which MEK is loaded in Key Cache. Controller Firmware has full control on metadata and optional aux. Figure 9 is an illustration of the KMB to Encryption Engine interface that shows:
+In order to achieve the security goals for KMB, KMB is limited to be the unique component which loads a (metadata, aux, MEK) tuple into the Key Cache and unloads a tuple within the device, so that MEKs can only be exposed to KMB and Encryption Engine. Controller firmware arbitrates all operations in the KMB to Encryption Engine interface, therefore controller firmware is responsible for managing which MEK is loaded in Key Cache. Controller firmware has full control on metadata and optional aux. Figure 9 is an illustration of the KMB to Encryption Engine interface that shows:
 
--	the tuple for loading a MEK;
--	the Metadata for unloading a MEK; and 
+-	the tuple for loading an MEK;
+-	the Metadata for unloading an MEK; and 
 -	an example of a Key Cache within the Encryption Engine.
 
 *<p style="text-align: center;">Figure 9: KMB to Encryption SFR Interface</p>*
@@ -543,7 +524,7 @@ A write of the value 1b to this bit shall cause the Encryption Engine to:
  </td></tr>
 <tr><td>0</td><td>RW</td><td>0b</td><td><b>Execute (EXE):</b> A write of the value 1b to this bit specifies that the Encryption Engine is to execute the command specified by the CMD field.
 If the DONE bit is set to 1 by KMB, then the bit is set to 0b.
-</td></tr></table
+</td></tr></table>
 
 From the KMB, the Controller register is the register to write a command and receive its execution result. From its counterpart, the Encryption Engine, the Controller register is used to receive a command and write its execution result.
 
@@ -585,14 +566,14 @@ Figure 11 defines the Metadata register.
 | :---: | :---: | :---: | :--- |
 | 19:00 | RW    | 0b    | <b>Metadata (METD):</b> This field specifies metadata that is vendor specific and specifies the entry in the Encryption Engine for the Encryption Key.|
 
-For the security goal of this project, the KMB and the Encryption Engine supposed to be the only components which have access to MEKs. Each MEK must then be bound to a unique identifier, which can be accessible by other components, in order for an appropriate key to be used for any key-related operations including data I/O. In a LOCK-enabled system, the <b>METD</b> field is expected to be used as such identifier.
+For the security goal of this project, the KMB and the Encryption Engine must be the only components which have access to MEKs. Each MEK must then be bound to a unique identifier, which can be accessible by other components, in order for an appropriate key to be used for any key-related operations including data I/O. In a LOCK-enabled system, the <b>METD</b> field is expected to be used as such identifier.
 
-Instead of generating a random and unique identifier within the KMB while generating an MEK, the KMB takes an <b>METD</b> value as input from the Controller Firmware and write to the Metadata register without any modification for the sake of the following reasons:
+Instead of generating a random and unique identifier within the KMB while generating an MEK, the KMB takes an <b>METD</b> value as input from the controller firmware and write to the Metadata register without any modification for the sake of the following reasons:
 
 1. A vendor does not need to implement an additional algorithm to map between identifiers in its own system and in the KMB
 2. A vendor-unique key-retrieval algorithm can easily be leveraged into a <b>METD</b>-generation algorithm
 
-In order to reduce ambiguity, two examples of <b>METD</b> field will be given: Logical Block Addressing (LBA) range-based metadata; and key-tag based metadata.
+In order to reduce ambiguity, two examples of the <b>METD</b> field will be given: Logical Block Addressing (LBA) range-based metadata; and key-tag based metadata.
 
 When an SSD stores data with address-based encryption, an MEK can be uniquely identified by a (LBA range, Namespace ID) pair. Then, the (LBA range, Namespace ID) pair can be leveraged into METD as on Figure 12.
 
@@ -602,7 +583,7 @@ When an SSD stores data with address-based encryption, an MEK can be uniquely id
   <img src="./images/lba_nsid_info.jpg" alt="lba_nsid" />
 </p>
 
-Address-based encryption is not however the only encryption mechanism in SSDs. For example, in the TCG Key per I/O […], an MEK is selected by a key tag, which is hard to be mapped with an address. Figure 123 shows an example of <b>METD</b> in such cases.
+Address-based encryption is not however the only encryption mechanism in SSDs. For example, in the TCG Key Per I/O […], an MEK is selected by a key tag, which does not map to an address. Figure 13 shows an example of <b>METD</b> in such cases.
 
 *<p style="text-align: center;">Figure 13: Key Tag Based Metadata Format</p>*
 
@@ -624,9 +605,9 @@ Figure 14 defines the Auxiliary Data register.
 
 At first glance, the usage of <b>AUX</b> might not be straightforward. The intuition behind introducing the <b>AUX</b> field is to support vendor-specific features on MEKs. The KMB itself is only supporting fundamental functionalities in order to minimize attack surfaces on MEKs. Moreover, vendors are not restricted to design and implement their own MEK-related functionalities on the Encryption Engine unless they can be used to exfiltrate MEKs. In order to support these functionalities, some data may be associated and stored with an MEK and the <b>AUX</b> field is introduced to store such data with each MEK.
 
-When the Controller Firmware requests the KMB to generate a new MEK, the Controller Firmware is expected to provide an <b>AUX</b> value. Similar to the <b>METD</b> field, the KMB will write the <b>AUX</b> value into the Auxiliary Data register without any modification.
+When the controller firmware requests the KMB to generate a new MEK, the controller firmware is expected to provide an <b>AUX</b> value. Similar to the <b>METD</b> field, the KMB will write the <b>AUX</b> value into the Auxiliary Data register without any modification.
 
-One of simple use cases of <b>AUX</b> field is to store an offset of initialization vector or nonce. It can also be used in a more complicate use case. Here is an example. Suppose that there exists a vendor who wants to design a system which supports several mode of operations through the Encryption Engine while using the KMB. Then, a structure of <b>AUX</b> value as on Figure 15 can be used.
+One  simple use cases of the <b>AUX</b> field is to store an offset of initialization vector or nonce. It can also be used in a more complicated use case. Here is an example. Suppose that there exists a vendor who wants to design a system which supports several modes of operations through the Encryption Engine while using the KMB. Then, a structure of <b>AUX</b> value as on Figure 15 can be used.
 
 *<p style="text-align: center;">Figure 15: Auxiliary Data Format Example</p>*
 
@@ -634,7 +615,7 @@ One of simple use cases of <b>AUX</b> field is to store an offset of initializat
   <img src="./images/aux_info.jpg" alt="aux_info" />
 </p>
 
-When the Controller Firmware requests an MEK generation to the KMB, the Controller Firmware can use the <b>AUX</b> value to specify which mode of operation should be used and which value should be used as an initialization vector or a nonce with the generated MEK.
+When the controller firmware instructs KMB to generate an KMB, the controller firmware can use the <b>AUX</b> value to specify which mode of operation should be used and which value should be used as an initialization vector or a nonce with the generated MEK.
 
 ##### Media Encryption Key (MEK) Register (Offset SFR_Base + 50h)
 
@@ -649,11 +630,11 @@ Figure 16 defines the MEK register.
 
 Since the AES-XTS is one of the most popular algorithms for data encryption, the MEK register is also designed with the key format of AES-XTS. The layout of the MEK register is however designed to help understanding the structure. The Encryption Engine is not restricted to only support the AES-XTS. The choice of encryption algorithm is solely dependent on vendors. When a vendor decides to use a different encryption algorithm, an MEK can be seen as a 64-byte random value rather than a (secret key, tweak key) pair and how to slice the 64-byte random value into an encryption key will be left to the vendor.
 
-As a part of Caliptra, KMB protects MEK as secure as any secret key in Caliptra. MEK is stored in the Caliptra Key Vault, so that it can be protected against any firmware-level attacks. When KMB needs to write an MEK into the MEK register, it will be accomplished by using the DMA engine. Given an index and a destination identifier, the DMA engine copies the key value stored in the key vault of given index to the destination address to which the DMA engine translates the destination identifier. 
+As a part of Caliptra, KMB protects an MEK as securely as any secret key in Caliptra. Within Caliptra, MEKs are only ever present in the Key Vault, so that it can be protected against any firmware-level attacks. When KMB needs to write an MEK into the MEK register, it will be accomplished by using the DMA engine. Given an index and a destination identifier, the DMA engine copies the key value stored in the key vault of given index to the destination address to which the DMA engine translates the destination identifier. 
 
 ### KMB Command Sequence
 
-Figure 17 shows a sample command execution. This is an expected sequence when the Controller Firmware requests the KMB to generate a new MEK. The behavior of Encryption Engine can be seen as one of possible mechanisms, and it can be different by vendors.
+Figure 17 shows a sample command execution. This is an expected sequence when the controller firmware requests the KMB to generate a new MEK. The behavior of the Encryption Engine is one of several possible mechanisms, and it can be different by vendors.
 
 *<p style="text-align: center;">Figure 17: Command Execution Example</p>*
 
@@ -671,11 +652,8 @@ A storage device equipped with OCP L.O.C.K. will be equipped with N 256-bit ratc
 
 - Each ratchet secret can individually transition from all-zeroes → randomized → all-ones. R<sub>X</sub> is only randomized once R<sub>X-1</sub> has transitioned to all-ones.
 - Programmable via the Caliptra fuse controller.
-	- Caliptra Core's fuse controller will not support individual zeroization of fuse banks.
-	- Open: can we mirror UDS and have the values come from Caliptra, even if they're programmed external to UDS?
 - Only readable by Caliptra Core, via fuse registers.
 	- Internally, the fuse registers will be treated like the DICE UDS, in that their contents can only be deposited into Key Vault slots, without direct visibility by Caliptra firmware.
-	- TBD on de-obfuscation.
 -Caliptra Core firmware can detect which ratchet secrets are all-zeroes, randomized, or all-ones. This can be done by representing a counter in fuses, which maps to ratchet secret states. Controller firmware would be responsible for ensuring that the counter value corresponds with the ratchet secrets' current state.<br>The counter values map to the following states:
 
 | State  | Description |
@@ -688,8 +666,6 @@ A storage device equipped with OCP L.O.C.K. will be equipped with N 256-bit ratc
 This scheme allows ratchet state transitions to be resilient in the face of unexpected power loss. A power loss during randomization will burn the ratchet being randomized.
 
 The counter is readable by Caliptra Core firmware and controller firmware.
-
-Open: add popcnt for checking the controller firmware's work after the fact.
 
 ### Lifecycle Transitions
 
@@ -726,7 +702,7 @@ The device will go through the following state transitions over its lifespan:
 
 OCP L.O.C.K contains a fused block that contains the ability to program N number of Storage Root Keys one at a time. A device out of manufacturing does not program a System Root Key and the device behaves as existing devices do today where the SSD firmware manages the key. This is known as the EMPTY state. OCP L.O.C.K supports a PROGAM_NEXT_ROOT_KEY API to then program the initial System Root Key. That System Root Key is then used to dervice all MEKs. That System Root Key can be erased by using the ERASE_CURRENT_ROOT_KEY Api. Once that System Root Key is erased, no System Root Key exists in OCP L.O.C.K. and no MEKs can be generated by OCP L.O.C.K until the PROGAM_NEXT_ROOT_KEY API causes a new System Root Key to be programmed.
 
-Once all of the N Storage Root Keys have been programmed and erased, no System Root Key exists in OCP L.O.C.K. and no MEKs can be generated by OCP L.O.C.K. The ENABLE_IO_WITHOUT_RATCHET API can be used to perminetly allow the device to behaves as existing devices do today where the SSD firmware manages the key.
+Once all of the N Storage Root Keys have been programmed and erased, no System Root Key exists in OCP L.O.C.K. and no MEKs can be generated by OCP L.O.C.K. The ENABLE_IO_WITHOUT_RATCHET API can be used to perminetly allow the device to behave as existing devices do today where the SSD firmware manages the key.
 
 There can be errors programming a System Root Key and erasing a System Root Key. If these errors occur, the APIs can be use to retry the operation. If there still is an error, then the device is in an unusable state.
 
@@ -765,7 +741,7 @@ This section provides an extension to the Runtime Firmware environment defined f
 
 ## Boot and initialization
 
-The section defined additional boot and initialization needed to support OCP L.O.C.K.
+The section defines additional boot and initialization needed to support OCP L.O.C.K.
 
 The Runtime Firmware main function SHALL cause the generation of Storage Root Key and store this into volatile memory within KMB. The Storage Root key is generated from the Storage Root Key fuses.
 
@@ -1015,7 +991,7 @@ Table: GENERATE_PMEK output arguments
 
 This command Unwraps access_key_1 and enc_access_key_2. Then access_key_1 is used to decrypt enc_access_key_2. The specified PMEK is decrypted using KDF(Storage root key, "PMEK", access_key_1). A new PMEK is encrypted with the output of KDF(Storage root key, "PMEK", access_key_2). The new encrypted PMEK is returned.
 
-The Storage Controller stores the returned new encrypted PMEK. The Storage Controller may attempt to do a decryption the new PMEK without an error before deleting old PMEK. Controller FW erases the old encrypted PMEK
+The Storage Controller stores the returned new encrypted PMEK. The Storage Controller may attempt to do a decryption the new PMEK without an error before deleting old PMEK. Controller firmware erases the old encrypted PMEK
 
 Command Code: 0x5245_5750 (“REWP”)
 
@@ -1053,7 +1029,7 @@ Table: REWRAP_PMEK output arguments
 
 This command Unwraps access_key_1 and enc_access_key_2. Then access_key_1 is used to decrypt enc_access_key_2. The specified PMEK is decrypted using KDF(Storage root key, "PMEK", access_key_1). A new PMEK is encrypted with the output of KDF(Storage root key, "PMEK", access_key_2). The new encrypted PMEK is returned.
 
-The Storage Controller stores the returned new encrypted PMEK. The Storage Controller may attempt to do a decryption the new PMEK without an error before deleting old PMEK. Controller FW erases the old encrypted PMEK
+The Storage Controller stores the returned new encrypted PMEK. The Storage Controller may attempt to do a decryption the new PMEK without an error before deleting old PMEK. Controller firmware erases the old encrypted PMEK
 
 Command Code: 0x5245_5750 (“REWP”)
 
@@ -1085,7 +1061,7 @@ Table: UNLOCK_PMEK output arguments
 
 This command initiailize the MEK seed if not already initialize, decrypts the specified PMEK with the with the ephemeral export secret and then updates the MEK seed in KMB by performing a KDF with the Meek seed, the decrypted PMEK, and the string “PMIX mix”.
 
-When generating a MEK, one or more MIX_PMEK are subsequently processed to modify the MEK seed.
+When generating an MEK, one or more MIX_PMEK are subsequently processed to modify the MEK seed.
 
 Command Code: 0x4D50_4D4B (“MPMK”)
 
@@ -1116,7 +1092,7 @@ The storage controller specified data encryption key may be a C-PIN-derived secr
 
 The final MEK is generated by performing a KDF on the existing MEK seed in the KMB, the dek, and the string “MEK”.
 
-When generating a MEK, if the MEK seed is initialized if no PMEK has already been inserted into the MEK seed.
+When generating an MEK, if the MEK seed is initialized if no PMEK has already been inserted into the MEK seed.
 
 Command Code: 0x4C4D_454B (“LMEK”)
 
@@ -1324,51 +1300,9 @@ The following acronyms and abbreviations are used throughout this document.
 
 # Acknowledgements
 
-The Caliptra Workgroup acknowledges the following individuals for their contributions to this specification.
+The Caliptra Workgroup acknowledges the following individuals for their contributions to this specification:
 
-<table>
-<tr><td>Google</td><td>Microsoft</td><td>Samsung</td><td>Solidigm</td><td>Kioxia</td></tr>
-<tr>
-	<td>
-		<ul>
-			<li>Andrés Lagar-Cavilla</li>
-			<li>Amber Huffman</li>
-			<li>Charles Kuzman</li>
-			<li>Jeff Andersen</li>
-			<li>Chris Sabol</li>
-			<li>Srini Narayanamurthy</li>
-	</ul></td>
-	<td>
-		<ul>
-			<li>Lee Prewitt</li>
-			<li>Michael Norris</li>
-			<li>Eric Eilertson</li>
-			<li>Bryan Kelly</li>
-			<li>Anjana Parthasarathy</li>
-			<li>Ben Keen</li>
-			<li>Bharat Pillilli</li>
-	</ul></td>
-	<td>
-		<ul>
-			<li>Jisoo Kim</li>
-			<li>Gwangbae Choi</li>
-			<li>Eric Hibbard</li>
-			<li>Mike Allison</li>
-	</ul></td>
-	<td>
-		<ul>
-			<li>Scott Shadley</li>
-			<li>Gamil Cain</li>
-			<li>Festus Hategekimana</li>
-	</ul></td>
-	<td>
-		<ul>
-			<li>John Geldman</li>
-			<li>Fred Knight</li>
-			<li>Paul Suhler</li>
-			<li>James Borden</li>
-	</ul></td></tr>
-</table>
+Currely this list is identical to the list contributers.
 
  
 # References
