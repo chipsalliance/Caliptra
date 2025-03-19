@@ -1,7 +1,5 @@
 # Diagrams
 
-mike allison chnage
-
 The following diagrams illustrate the OCP L.O.C.K. commands.
 
 To regenerate SVG files, download [PlantUML](https://plantuml.com/download) and run:
@@ -114,10 +112,3 @@ $ java -jar path/to/plant_uml.jar -Ddoc_gen-=1 -tsvg *.uml
 <img src="./rotate_encapsulation_key.svg">
 
 ([UML source](./rotate_encapsulation_key.uml))
-
-## Mix external entropy
-
-![Alt text](./mix_external_entropy.svg)
-<img src="./mix_external_entropy.svg">
-
-([UML source](./mix_external_entropy.uml))

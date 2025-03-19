@@ -11,7 +11,7 @@
     !if %not(%variable_exists("show_title"))
         !$show_title = %true()
     !endif
-    !if %not(%variable_exists("sshow_api"))
+    !if %not(%variable_exists("show_api"))
         !$show_api = %true()
     !endif
     !if %not(%variable_exists("show_msg_parsing"))
