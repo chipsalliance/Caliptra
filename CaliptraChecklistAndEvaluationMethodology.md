@@ -45,7 +45,7 @@ By adhering to the checklist and employing the specified evaluation methodologie
 
 The Caliptra Specification is maintained within the [ChipsAlliance Caliptra repository](https://github.com/chipsalliance/Caliptra/blob/main/doc/Caliptra.md).  This is a live link. Each generation, the main specification will be updated and the older specifications will be maintained for reference for designs based on that specification.  For example, here is the specification for [Calitpra 1.X](https://github.com/chipsalliance/Caliptra/blob/main/doc/caliptra_1x/Caliptra.md).
 
-The [HW specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraHardwareSpecification.md) and [HW integration specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md) also have their own live links. For older versions of the HW, it is best to go to the same location which is tagged with that release version.
+The [HW specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraHardwareSpecification.md) and [HW integration specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md) also have their own live links. For previous versions of the hardware specification, go to the location that is tagged with that release version.
 
 This checklist is built from these specifications with the goal to help ensure that Caliptra is integrated correctly within a design.
 
@@ -54,7 +54,7 @@ This checklist is built from these specifications with the goal to help ensure t
 The following is a consolidated list of all requirements to ensure comprehensive coverage:
 
 1. **Assets**  
-   * UDS Seed & Field Entropy  
+   * UDS Seed and Field Entropy  
    * Firmware Authentication Keys  
    * IDEVID Generation and Endorsement Flow  
    * Obfuscation Key  
@@ -84,7 +84,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 
 ## Assets
 
-### UDS Seed & Field Entropy
+### UDS Seed and Field Entropy
 
 #### *Generation and Provisioning*
 
@@ -92,7 +92,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
   * **Requirement:** The UDS seed and field entropy MUST be generated using a cryptographically secure random number generator (CSRNG) compliant with [NIST Entropy Source Certification](https://csrc.nist.gov/projects/cryptographic-module-validation-program/entropy-validations) SP 800-90B.  
   * **Evaluation Methodology:** Manufacturers MUST provide documentation demonstrating compliance with applicable standards for entropy generation.   
 * **Checklist Item:**  
-  * **Requirement:** The confidentiality and integrity of the UDS seed MUST be protected during generation, storage, and provisioning. Access to this assets must be strictly controlled, and any temporary storage MUST be sanitized after use.  
+  * **Requirement:** The confidentiality and integrity of the UDS seed MUST be protected during generation, storage, and provisioning. Access to this asset must be strictly controlled, and any temporary storage MUST be sanitized after use.  
   * **Evaluation Methodology:** Manufacturers MUST detail the security measures employed during the handling of the UDS seed, including access controls, secure storage practices, and sanitization procedures.  
 * **Checklist Item:**  
   * **Requirement**: Field Entropy SHOULD be generated on die, and not be exposed outside the die.  
@@ -277,8 +277,8 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Testing and Verification*
 
 * **Checklist Item:**  
-  * **Requirement:** The product MUST undergo thorough testing and verification during development, focusing on both functional correctness and security aspects. This includes testing of specific features and security mechanisms.  
-  * **Evaluation Methodology:** Manufacturers MUST present test plans, results, and security analyses covering critical functionalities such as:  
+  * **Requirement:** The product SHOULD undergo thorough testing and verification during development, focusing on both functional correctness and security aspects. This includes testing of specific features and security mechanisms.  
+  * **Evaluation Methodology:** Manufacturers SHOULD present test plans, results, and security analyses covering critical functionalities such as:  
     * Field programmable entropy API  
     * Generation and endorsement of attestation messages  
     * CSR generation and handling  
