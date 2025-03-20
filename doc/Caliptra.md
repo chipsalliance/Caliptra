@@ -1519,8 +1519,7 @@ Please refer to Caliptra subsystem Hardware specification.
 13. Irrespective of success or failure from image authentication (step 17 or 18), Caliptra ROM clears the image activation bit before updating `RECOVERY_STATUS` register.
 14. If the image activation is successful, and another recovery image stage is expected, then Caliptra RT firmware shall increment the “Recovery image index” in `RECOVERY_STATUS` register and set the `RECOVERY_STATUS` to indicate “Awaiting for recovery image” (0x1). If no other stages are expected, then Caliptra RT firmware shall set the `RECOVERY_STATUS` to “Recovery successful”. Also, Caliptra ROM/Caliptra RT must update the `DEVICE_STATUS` register to indicate "Running Recovery Image".
 15. If the image consumption fails for any reason (for example, image authentication failure), Caliptra ROM/firmware updates `RECOVERY_STATUS` register to indicate appropriate recovery status and `DEVICE_STATUS` register to "Fatal Error (Recover Reason Code not populated)". 
-17. BMC or a similar platform component sends the next image as requested in the image index, upon observing “Awaiting for recovery image” in `RECOVERY_STATUS` register, and Caliptra RT FW and I3C HW go through the same flow as above.
-
+16. BMC or a similar platform component sends the next image as requested in the image index, upon observing “Awaiting for recovery image” in `RECOVERY_STATUS` register, and Caliptra RT FW and I3C HW go through the same flow as above.
 ## Streaming Boot Sequence notes
 
 - ROM refers to I3C registers by offset, and any change to the offset results in ROM failure or unexpected behavior.
