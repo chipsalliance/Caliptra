@@ -1,28 +1,10 @@
 '
-' OCP Lock: ENDORSE_ENCAPSULATION_PUB_KEY API sequence diagram showing Caliptra FW/HW interactions
+' OCP Lock: GENERATE_PMEK API sequence diagram showing Caliptra FW/HW interactions
 '
 '
 @startuml
 
 !include ocp_lock_utils.inc
-
-!$show_all = %true()
-'!$show_all = %false()
-
-!if ($show_all)
-    !$show_precond = %true()
-    !$show_title = %true()
-    !$show_api = %true()
-    !$show_msg_parsing = %true()
-    !$show_done = %true()
-!else
-    !$show_precond = %false()
-    !$show_title = %false()
-    !$show_api = %false()
-    !$show_msg_parsing = %false()
-    !$show_done = %false()
-!endif
-
 
 !if ($show_title)
     Title "Generate PMEK"
@@ -35,9 +17,8 @@
           * KEM Keypair in a KV slot where Caliptra FW manages which slot
 
         <b>Notes:</b>
-          * The sequence diagram assumes that the KV will not allow an input KV slot to also be used as an out KV slot. Calitra FW is responsible for managing which KVC slots are used and can adapt if this assumption is not correct.
-          * This sequence is focused on successful execution of operations by the KV. Sill need to do:
-                 - <font color=red>Define the reported error conditions and handling
+          * The sequence diagram assumes that the KV will not allow an input KV slot to also be used as an out KV slot. Caliptra FW is responsible for managing which KV slots are used and can adapt if this assumption is not correct.
+          * This sequence is focused on successful execution of operations by the KV.
     end note
 !endif
 
@@ -144,10 +125,6 @@ cfw $sync mb : Command response and\nLocked PMEK
     end note
 !endif
 cfw--
-
 kv--
-
-
-
 
 @enduml

@@ -6,24 +6,6 @@
 
 !include ocp_lock_utils.inc
 
-!$show_all = %true()
-'!$show_all = %false()
-
-!if ($show_all)
-    !$show_precond = %true()
-    !$show_title = %true()
-    !$show_api = %true()
-    !$show_msg_parsing = %true()
-    !$show_done = %true()
-!else
-    !$show_precond = %false()
-    !$show_title = %false()
-    !$show_api = %false()
-    !$show_msg_parsing = %false()
-    !$show_done = %false()
-!endif
-
-
 !$SHOW_LOAD_KEY = 0
 
 
@@ -33,16 +15,13 @@
 
 !if ($show_precond)
     note across
-        <b>Preconditions:</b>
-        * Storage Root Key exists in the fuses
 
-        <b>Notes:</b>
-        * <font color=red>Need to add the ability to Purge the existing Storage Root Key and creating a new Storage Root Key to be determined as part of the fuse discussion
-        * <font color=red>Need to discuss Warm Reset cases
-          - <font color=red>NVM subsystem Reset - assume reset of ASIC and ROM code re-executed
-          - <font color=red>PCIe Warm Reset - Discuss : PMEKs maybe unlocked
-             Gamil to investigate
-          - <font color=red>Controller Reset - Discuss
+'        <b>Notes:</b>
+'        * <font color=red>Need to discuss Warm Reset cases
+'          - <font color=red>NVM subsystem Reset - assume reset of ASIC and ROM code re-executed
+'          - <font color=red>PCIe Warm Reset - Discuss : PMEKs maybe unlocked
+'             Gamil to investigate
+'          - <font color=red>Controller Reset - Discuss
     end note
 !endif
 

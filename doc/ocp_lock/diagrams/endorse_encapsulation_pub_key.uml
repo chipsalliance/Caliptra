@@ -6,23 +6,6 @@
 
 !include ocp_lock_utils.inc
 
-!$show_all = %true()
-'!$show_all = %false()
-
-!if ($show_all)
-    !$show_precond = %true()
-    !$show_title = %true()
-    !$show_api = %true()
-    !$show_msg_parsing = %true()
-    !$show_done = %true()
-!else
-    !$show_precond = %false()
-    !$show_title = %false()
-    !$show_api = %false()
-    !$show_msg_parsing = %false()
-    !$show_done = %false()
-!endif
-
 !if ($show_title)
     Title "Endorse Encapsulation Pub Key"
 !endif
@@ -37,7 +20,6 @@
         <b>Notes:</b>
           * The sequence diagram assumes that the KV will not allow an input KV slot to also be used as an out KV slot. Caliptra FW is responsible for managing which KV slots are used and can adapt if this assumption is not correct.
           * This sequence is focused on successful execution of operations by the KV. Sill need to do:
-                 - <font color=red>Define the reported error conditions and handling          `
 
            <font color=red> Need to add more algorithms
     end note
