@@ -1488,7 +1488,7 @@ I3C streaming boot interface is responsible for the following list of actions:
 
 # OCP Recovery Interface Hardware Specifications
 
-- Referece specifications for streaming boot sequence, 
+- Reference specifications for streaming boot sequence, 
   - [OCP Secure Firmware recovery Spec **rev 1.1-rc6**](https://docs.google.com/document/d/1Ge_w9i5A6YKG-7nlTp--JhZf6By7I9oB3oW_2_i7JbE/edit?tab=t.0#heading=h.gjdgxs) 
   - [I3C core specification](https://github.com/chipsalliance/i3c-core)
   - [Flashless Boot using OCP, PCIe, and DMTF Standards](https://docs.google.com/document/d/1Ge_w9i5A6YKG-7nlTp--JhZf6By7I9oB3oW_2_i7JbE/edit?usp=sharing)
