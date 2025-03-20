@@ -1501,7 +1501,7 @@ Please refer to Caliptra subsystem Hardware specification.
 
 
 
-1. MCU ROM initializes the `PROT_CAP`, `DEVICE_STATUS`, `DEVICE_ID`, and `HW_STATUS` registers. Any other I3C intialization settings must be confirmed against I3C core specification.
+1. MCU ROM initializes the `PROT_CAP`, `DEVICE_STATUS`, `DEVICE_ID`, and `HW_STATUS` registers. Any other I3C initialization settings must be confirmed against I3C core specification.
 2. Caliptra ROM updates the `PROT_CAP` register to set "Flashless boot (From RESET)", "FIFO CMS Support", and "Push-C-Image Support".
 3. To start streaming boot, Caliptra ROM updates the `DEVICE_STATUS` register to "Recovery mode - ready to accept recovery image” for Device status byte (for the first image only) and "Flashless/Streaming Boot (FSB)" for Recovery reason codes.
 4. Caliptra ROM updates the `RECOVERY_STATUS` register to "Awaiting Recovery Image" for  Device recovery status and "image index" for Recovery image index.
