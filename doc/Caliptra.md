@@ -1546,7 +1546,9 @@ Please refer to Caliptra subsystem Hardware specification.
 - **Destination**: Caliptra core
 
 ### Assertion
-- The `payload_available` signal must assert if recovery FIFO indicates full (256B) or image activation status is asserted (which indicates the last transfer is complete).
+- The `payload_available` signal must assert under either of the following conditions:
+  - If the recovery FIFO indicates full (256 bytes).
+  - If the image activation status is asserted and the recovery FIFO indicates not empty for the last transfer.
 
 ### De-assertion
 - The `payload_available` signal must reset if recovery FIFO indicates empty.
