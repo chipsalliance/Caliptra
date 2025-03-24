@@ -1527,7 +1527,7 @@ Please refer to Caliptra subsystem Hardware specification.
 - SoC is responsible for booting the I3C Core by configuring clock frequency/sampling rate with the following registers and any other requirements specified in [I3C core specifications](https://github.com/chipsalliance/i3c-core).
 - SoC is responsible for assigning static addresses to the I3C Core.
 - Caliptra ROM/runtime firmware updates the `RECOVERY_STATUS` with the recovery image index.
-  - For recovery Image index:
+  - For recovery image index:
     - `0x0`: Caliptra firmware
     - `0x1`: SoC Manifest
     - `0x2`: MCU firmware
