@@ -1540,9 +1540,10 @@ Please refer to Caliptra subsystem Hardware specification.
 - ALL Caliptra ROM accesses to recovery interface are completed via DMA assist.
 
 ## Requirement for Payload Available Signal Implementation
+
 - **Name**: `payload_available`
 - **Type**: 1 bit wire
-- **Source**: Recovery Interface
+- **Source**: Recovery Interface / I3C Core
 - **Destination**: Caliptra core
 
 ### Assertion
