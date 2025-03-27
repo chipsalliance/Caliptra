@@ -1489,9 +1489,10 @@ I3C streaming boot interface is responsible for the following list of actions:
 
 # OCP Recovery Interface Hardware Specifications
 
-[OCP Recovery Document](https://docs.google.com/document/d/1Ge_w9i5A6YKG-7nlTp--JhZf6By7I9oB3oW_2_i7JbE/edit?usp=sharing)
-
-[Flashless Boot using OCP, PCIe, and DMTF Standards](https://docs.google.com/document/d/1Ge_w9i5A6YKG-7nlTp--JhZf6By7I9oB3oW_2_i7JbE/edit?usp=sharing)
+- Reference specifications for streaming boot sequence, 
+  - [OCP Secure Firmware recovery Spec **rev 1.1-rc6**](https://docs.google.com/document/d/1Ge_w9i5A6YKG-7nlTp--JhZf6By7I9oB3oW_2_i7JbE/edit?tab=t.0#heading=h.gjdgxs) 
+  - [I3C core specification](https://github.com/chipsalliance/i3c-core)
+  - [Flashless Boot using OCP, PCIe, and DMTF Standards](https://docs.google.com/document/d/1Ge_w9i5A6YKG-7nlTp--JhZf6By7I9oB3oW_2_i7JbE/edit?usp=sharing)
 
 # Caliptra Subsystem Streaming Boot Interface Hardware
 
@@ -1499,30 +1500,79 @@ Please refer to Caliptra subsystem Hardware specification.
 
 # Caliptra Subsystem Streaming Boot Sequence
 
-1. **Initialization step:** Caliptra ROM initializes PROT_CAP, DEVICE_ID, DEVICE_STATUS, RECOVERY_STATUS, HW_STATUS, INDIRECT_FIFO_STATUS (remove these two reg from ROM initialization) default values. Note: Any I3C initialization is done b/w MCU ROM, I3C target HW and I3C initiator. This is not part of this document.
-2. MCU Specific SoC init of I3C & streaming boot interface.
-    1. MCU ROM can set HW_STATUS register per recovery spec, at any time based on SOC specific conditions.
-    2. MCU ROM will program DEVICE_ID register value based on associated fuse values.
-    3. I3C device must update FIFO size (1-256 Byte), Max transfer size and type of region (tie this to 0x1) to INDIRECT_FIFO_STATUS register, which could be read by BMC firmware to understand the size of the FIFO & max transfer size.
-3. Caliptra ROM will update PROT_CAP register, bit 11 to set to ‘1 “Flashless boot (From RESET)”. Caliptra ROM will set other register bits based on other recovery capabilities. PROT_CAP will also indicate support for FIFO CMS for I3C device by updating byte 10-11, bit 12 with 0x1 “FIFO CMS Support”.
-4. To start streaming boot, Caliptra ROM will write DEVICE_STATUS register to “RECOVERY_MODE” by writing byte 0, with data 0x3. Caliptra ROM will write DEVICE_STATUS register’s byte 2-3 to set the FSB parameter (0x12).
-5. I3C streaming boot HW will set byte 1 based on the DEVICE_STATUS register based on the rules defined for this register. This register status will assist BMC operation.
-6. Caliptra ROM will write via DMA assist to RECOVERY_STATUS register with data of (byte 0, 0x1) and sets the streaming boot image index to 0x0
-7. BMC or a similar platform component will update INDIRECT_FIFO_CTRL with Component Memory Space (CMS) byte 0 with 0x0, Reset field byte 1 with 0x1 and Image size byte 2 to 5 field to size of the image.
-8. BMC or a similar platform component writes to INDIRECT_FIFO_DATA register. I3C device shall return a NACK response for any transfer that would cause the Head Pointer to advance to equal the Tail Pointer. BMC can implement flow control through NACK responses or by monitoring the FIFO space remaining via the Head and Tail Pointers.
-9. The I3C device will keep head and tail pointers along with FIFO status up to date into INDIRECT_FIFO_STATUS register. I3C streaming boot interface HW wait for an update to INDIRECT_DATA_REG with 1-256B data from BMC.
-10. If there is a write to INDIRECT_DATA_FIFO, I3C device will indicate data availability via side channel implemented as wire “payload_available” ( for more details read here) to Caliptra. Caliptra HW will latch this wire into the register for Caliptra firmware to read.
-11. Caliptra ROM arms DMA interface to read INDIRECT_FIFO_CTRL for the image size and programs DMA engine back to read the image data from INDIRECT_FIFO_DATA.
-12. Steps 9 through 11 repeat until all the images are pushed over I3C and it matches the image size initialized into the INDIRECT_FIFO_CTRL register.
-13. After the above steps, Caliptra ROM Firmware will wait for BMC to activate image indicated to Caliptra via side channel.
-14. If the Image is activated, update RECOVERY STATUS to “Booting recovery image” by writing byte0, with data 0x2. If the image is authenticated, then the Caliptra RT FW will update the image index in RECOVERY_STATUS register (0x1 in byte 0, bits 7:4) and then set then update the byte 0, bit 3:0 to “Awaiting for recovery image” (0x1)
-15. BMC or a similar platform component will send the next image as requested in the image index, and Caliptra RT FW and I3C HW go through the same flow as above.
 
-**BMC or a similar platform component requirements for recovery support**
 
-1. It should not send payload to streaming boot interface (/I3C target)  device if RECOVERY_CTRL register has byte 2 indicating Image Activated. BMC must wait to clear the byte 2. (Streaming boot Interface is responsible for clearing this bye by writing 1).
-2. It must send payload to I3C target device in chunks of 256 bytes ( header (4B) + FW bytes(256B) as I3C target transfer ) only unless it is the last write for the image. Before sending the payload, it must read FIFO empty status from INDIRECT_FIFO_STATUS register.
-3. After last write for the image, it must activate the image after reading INDIRECT_FIFO_STATUS register, FIFO empty status.
+1. MCU ROM initializes the `PROT_CAP`, `DEVICE_STATUS`, `DEVICE_ID`, and `HW_STATUS` registers. Any other I3C initialization settings must be confirmed against I3C core specification.
+2. Caliptra ROM updates the `PROT_CAP` register to set "Flashless boot (From RESET)", "FIFO CMS Support", and "Push-C-Image Support".
+3. To start streaming boot, Caliptra ROM updates the `DEVICE_STATUS` register to "Recovery mode - ready to accept recovery image” for Device status byte (for the first image only) and "Flashless/Streaming Boot (FSB)" for Recovery reason codes.
+4. Caliptra ROM updates the `RECOVERY_STATUS` register to "Awaiting Recovery Image" for  Device recovery status and "image index" for Recovery image index.
+5. BMC or a similar platform component sends an `INDIRECT_FIFO_CTRL` write command with Component Memory Space (CMS) set to 0x0, reset set to 0x1, and image size set to streaming boot image size.
+6. BMC or a similar platform component sends an `INDIRECT_FIFO_DATA` write command. I3C device shall return a NACK response for any transfer that would cause the Head Pointer to advance to equal the Tail Pointer. BMC can implement flow control through NACK responses or by monitoring the FIFO space remaining via the Head and Tail Pointers.
+7. The I3C device keeps head and tail pointers along with FIFO status up to date in the `INDIRECT_FIFO_STATUS` register. I3C streaming boot interface HW waits for an update to `INDIRECT_FIFO_DATA` with exactly 256 bytes of data or less if remaining image data is less than 256 bytes. BMC could send multiple commands to `INDIRECT_FIFO_DATA` register to fill the FIFO, but it must be a multiple of 4 bytes. The I3C device indicates payload availability only if the FIFO is full (256 bytes) or if BMC writes to image activation byte in `RECOVERY_CTRL` register.
+8. If `INDIRECT_FIFO_DATA` has 256B available to read, I3C device indicates data availability via side channel implemented as wire `payload_available` to Caliptra. For more information, see [Requirement for payload available signal Implementation](#requirement-for-payload-available-signal-implementation). Caliptra HW latches this wire into the register for Caliptra ROM/firmware to read.
+9. If `payload_available` is asserted for the first time, Caliptra ROM reads `INDIRECT_FIFO_CTRL_IMG_SIZE` for the image size. For each `payload_available` assertion including the first one, Caliptra ROM continues to read the image data from the `INDIRECT_FIFO_DATA` register until it finishes reading the data count specified as the image size.
+10. Steps 8 and 9 repeat until all the image bytes are pushed over I3C and it matches the image size initialized in the `INDIRECT_FIFO_CTRL_IMG_SIZE` register.
+11. When all the image bytes are received, Caliptra ROM sets `DEVICE_STATUS` to "Recovery Pending (waiting for activation)". During image authentication, `DEVICE_STATUS` register field device status remains "Recovery Pending (waiting for activation)".
+12. After the above steps, Caliptra ROM/Firmware waits for BMC to activate the image. Image activation is indicated to Caliptra via either of the following methods:
+  - Side channel `image_activated` signal. For more information, see [Requirement for image activation signal implementation](#requirement-for-image-activation-signal-implementation).
+  - Caliptra ROM polls on `RECOVERY_CTRL` register for image activation status. 
+13. When the image is activated, Caliptra ROM updates `RECOVERY_STATUS` to “Booting recovery image” and moves to image authentication.
+14. Irrespective of success or failure from image authentication (step 15 or 16), Caliptra ROM clears the image activation status before updating `RECOVERY_STATUS` & `DEVICE_STATUS` registers.
+15. If the image activation is successful, and another recovery image stage is expected, then Caliptra RT firmware shall increment the “Recovery image index” in `RECOVERY_STATUS` register and set the `RECOVERY_STATUS` to indicate “Awaiting recovery image” (0x1). If no other stages are expected, then Caliptra RT firmware shall set the `RECOVERY_STATUS` to “Recovery successful”. Also, Caliptra ROM/Caliptra RT must update the `DEVICE_STATUS` register to indicate "Running Recovery Image".
+16. If the image consumption fails for any reason (for example, image authentication failure), Caliptra ROM/firmware updates `RECOVERY_STATUS` register to indicate appropriate recovery status and `DEVICE_STATUS` register to "Fatal Error (Recover Reason Code not populated)". 
+17. BMC or a similar platform component sends the next image as requested in the image index, upon observing “Awaiting recovery image” in `RECOVERY_STATUS` register, and Caliptra RT FW and I3C HW go through the same flow as above.
+
+## Streaming Boot Sequence notes
+
+- ROM refers to I3C registers by offset, and any change to the offset results in ROM failure or unexpected behavior.
+- SoC is responsible for booting the I3C Core by configuring clock frequency/sampling rate with the following registers and any other requirements specified in [I3C core specifications](https://github.com/chipsalliance/i3c-core).
+- SoC is responsible for assigning static addresses to the I3C Core.
+- Caliptra ROM/runtime firmware updates the `RECOVERY_STATUS` with the recovery image index.
+  - For recovery image index:
+    - `0x0`: Caliptra firmware
+    - `0x1`: SoC Manifest
+    - `0x2`: MCU firmware
+- SoC/MCU ROM sets the `HW_STATUS` register per recovery spec at any time based on SoC-specific conditions.
+- MCU ROM programs `DEVICE_ID` register value based on associated fuse values.
+- SoC/MCU ROM initializes the `PROT_CAP`, `DEVICE_ID`, and `DEVICE_STATUS` registers.
+- Caliptra ROM performs only read-modify-write (RMW) for updates to registers.
+- I3C device must update FIFO size (1-256 Byte), Max transfer size and type of region (tie this to 0x1) to `INDIRECT_FIFO_STATUS` register, which could be read by BMC firmware to understand the size of the FIFO and max transfer size.
+- BMC is responsible for re-sending the transaction if it fails due to PEC error.
+- ALL Caliptra ROM accesses to recovery interface are completed via DMA assist.
+
+## Requirement for Payload Available Signal Implementation
+
+- **Name**: `payload_available`
+- **Type**: 1 bit wire
+- **Source**: Recovery Interface / I3C Core
+- **Destination**: Caliptra core
+
+### Assertion
+- The `payload_available` signal must assert under either of the following conditions:
+  - If the recovery FIFO indicates full (256 bytes).
+  - If the image activation status is asserted and the recovery FIFO indicates not empty for the last transfer.
+
+### De-assertion
+- The `payload_available` signal must reset if recovery FIFO indicates empty.
+
+## Requirement for Image Activation Signal Implementation
+- **Name**: `image_activated`
+- **Type**: 1 bit wire
+- **Source**: Recovery Interface
+- **Destination**: Caliptra core
+
+### Assertion
+- The `image_activated` signal must assert when `RECOVERY_CTRL` register byte 2 has value `0xf` (indicating image activation).
+
+### De-assertion
+- The `image_activated` signal must deassert when the `RECOVERY_CTRL` register byte 2 has value `0x0` (indicating image activation is cleared).
+
+## Platform component requirements for recovery support 
+
+1. The BMC, or a similar platform, should not send payload to streaming boot interface (/I3C target) device if `RECOVERY_CTRL` register has byte 2 indicating Image Activated. BMC must wait to clear the byte 2. (Streaming boot interface is responsible for clearing this byte by writing 1).
+2. The BMC, or a similar platform, sends payload to I3C target device in chunks of 256 bytes (header (4B) + FW bytes(256B) as I3C target transfer) only, unless it is the last write for the image. Before sending the payload, it reads FIFO empty status from `INDIRECT_FIFO_STATUS` register.
+3. After the last write for the image, the BMC, or a similar platform, activates the image.
+
 
 # Life Cycle Controller & SoC Debug Architecture
 
