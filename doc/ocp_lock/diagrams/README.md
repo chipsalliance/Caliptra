@@ -57,12 +57,12 @@ $ java -jar path/to/plant_uml.jar -Ddoc_gen-=1 -tsvg *.uml
 
 ([UML source](./generate_pmek.uml))
 
-## Unlock PMEK
+## Ready PMEK
 
-![Alt text](./unlock_pmek.svg)
-<img src="./unlock_pmek.svg">
+![Alt text](./ready_pmek.svg)
+<img src="./ready_pmek.svg">
 
-([UML source](./unlock_pmek.uml))
+([UML source](./ready_pmek.uml))
 
 ## Rewrap PMEK
 
@@ -71,12 +71,12 @@ $ java -jar path/to/plant_uml.jar -Ddoc_gen-=1 -tsvg *.uml
 
 ([UML source](./rewrap_pmek.uml))
 
-## Include PMEK
+## Mix PMEK
 
-![Alt text](./include_pmek.svg)
-<img src="./include_pmek.svg">
+![Alt text](./mix_pmek.svg)
+<img src="./mix_pmek.svg">
 
-([UML source](./include_pmek.uml))
+([UML source](./mix_pmek.uml))
 
 ## Load MEK
 

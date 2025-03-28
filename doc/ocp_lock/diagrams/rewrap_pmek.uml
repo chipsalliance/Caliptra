@@ -13,8 +13,7 @@
 !if ($show_precond)
     note across
         <b>Preconditions:</b>
-        * Access Shared Secret already availble in a slot in KV
-        * unlocking key already in a slot and generated on each reset
+        * Storage root key already availble in a slot in KV
     end note
 !endif
 

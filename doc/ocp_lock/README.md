@@ -64,8 +64,8 @@
 
 |     Date | Revision # | Author | Description |
 | :--------------: | :---: | :-------------------: | :-----|
-|  September 2024  |  0.5 |   Authoring Companies  | Initial proposal draft based on work from the list of contributors |
-|    April 2025    |  0.7 |   Authoring Companies  | Updates that include updates APIs, UML Sequence diagrams, and racheting with fuses |
+|  September 2024  |  0.5  |   Authoring Companies  | Initial proposal draft based on work from the list of contributors |
+|    March 2025    |  0.8  |   Authoring Companies  | Updates that include updates APIs, UML Sequence diagrams, and racheting with fuses |
 
 <div style="page-break-after: always"></div>
 
@@ -125,6 +125,7 @@ The goal of OCP L.O.C.K. is to eliminate the need to destroy storage devices (e.
    * [OCP L.O.C.K. goals](#ocp-lock-goals)
 - [Overview](#overview)
 - [Threat model](#threat-model)
+   * [Mitigation verification](#mitigation-verification)
 - [Architecture](#architecture)
    * [Interfaces](#interfaces)
    * [MEK derivation](#mek-derivation)
@@ -137,7 +138,7 @@ The goal of OCP L.O.C.K. is to eliminate the need to destroy storage devices (e.
       + [Legacy MEK derivation for Key Per I/O](#legacy-mek-derivation-for-key-per-io)
    * [PMEK lifecycle](#pmek-lifecycle)
       + [PMEK generation](#pmek-generation)
-      + [PMEK unlock](#pmek-unlock)
+      + [PMEK ready](#pmek-ready)
       + [PMEK access key rotation](#pmek-access-key-rotation)
       + [Transport encryption for PMEK access keys](#transport-encryption-for-pmek-access-keys)
       + [Access key rotation flows](#access-key-rotation-flows)
@@ -169,7 +170,7 @@ The goal of OCP L.O.C.K. is to eliminate the need to destroy storage devices (e.
    * [ROTATE_ENCAPSULATION_KEY](#rotate_encapsulation_key)
    * [GENERATE_PMEK](#generate_pmek)
    * [REWRAP_PMEK](#rewrap_pmek)
-   * [UNLOCK_PMEK](#unlock_pmek)
+   * [READY_PMEK](#ready_pmek)
    * [MIX_PMEK](#mix_pmek)
    * [LOAD_MEK](#load_mek)
    * [UNLOAD_MEK](#unload_mek)
@@ -189,11 +190,11 @@ The goal of OCP L.O.C.K. is to eliminate the need to destroy storage devices (e.
 
 OCP L.O.C.K. (Layered Open-source Cryptographic Key management) is a feature set conditionally compiled into Caliptra, which provides secure key management for Data-At-Rest protection in self-encrypting storage devices.
 
-OCP L.O.C.K. was originally created as part of the Open Compute Project (OCP). The major revisions of the OCP L.O.C.K. specifications are published as part of Caliptra at OCP as OCP L.O.C.K. is an optional extension to Caliptra. The evolving source code and documentation for Caliptra are in the repository within the CHIPS Alliance Project, a Series of LF Projects, LLC.
+OCP L.O.C.K. was originally created as part of the Open Compute Project (OCP). The major revisions of the OCP L.O.C.K. specifications are published as part of Caliptra at OCP, as OCP L.O.C.K. is an extension to Caliptra. The evolving source code and documentation for Caliptra are in the repository within the CHIPS Alliance Project, a Series of LF Projects, LLC.
 
 # Background
 
-OCP L.O.C.K is being defined to improve drive security. The life of a storage device in a datacenter is that the device leaves the supplier, a customer writes user data to the device, and then the device is decommissioned. The problem is that customer data is not allowed to leave the data center. There needs to be a high confidence that the storage device leaving the datacenter is secure. The current default cloud service provider (CSP) policy to ensure this level of security is to destroy the drive. Other policies may exist that leverage drive capabilities (e.g., Sanitize), but are not generally deemed inherently trustworthy by these CSPs[^1]. This produces significant e-waste and inhibits any re-use/recycling.
+OCP L.O.C.K is being defined to improve drive security. The life of a storage device in a datacenter is that the device leaves the supplier, a customer writes user data to the device, and then the device is decommissioned. The problem is that customer data is not allowed to leave the data center. There needs to be a high confidence that the storage device leaving the datacenter is secure. The current default cloud service provider (CSP) policy to ensure this level of security is to destroy the drive. Other policies may exist that leverage drive capabilities (e.g., Purge), but are not generally deemed inherently trustworthy by these CSPs[^1]. This produces significant e-waste and inhibits any re-use/recycling.
 
 OCP L.O.C.K. is solving this security issue with data encryption by defining a fuse-backed storage root key used to protect all media encryption keys used to encrypt data stored on the device. If that storage root key is deleted, then all prior media encryption keys are unable to be recovered. If that entropy is deleted, then the media encryption key is unable to be generated to decrypt the data on that storage device (i.e., no access to the plaintext behind the ciphertext). 
 
@@ -210,7 +211,7 @@ The goal of OCP L.O.C.K. is to define a Key Management Block (KMB) that:
 - Isolates storage keys to a trusted hardware block
 - Binds storage keys to a given set of externally-supplied access keys
 - Provides replay-resistant transport security for these access keys such that they can be injected without trusting the host
-- Manages a fuse-backed storage root key for sanitization
+- Manages a fuse-backed storage root key for hard cryptographic purge
 - Is able to be used in conjunction with the Opal[^2] and Key Per I/O[^3] storage device specifications
 
 # Overview
@@ -225,7 +226,7 @@ MEKs may be bound to user credentials, which the host must provide to the drive 
 
 MEKs, or other keys from which MEKs are derived, may be injected into the drive and tagged with address range metadata, such that subsequent I/Os which target that address range will be encrypted to that injected MEK. This model is captured in the TCG Key Per I/O (KPIO) [specification](https://trustedcomputinggroup.org/resource/tcg-storage-security-subsystem-class-ssc-key-per-i-o/).
 
-MEKs may be securely erased, to effectively erase all data which was encrypted to the MEK. To erase an MEK, it is sufficient for the controller to erase the MEK itself or a key from which it was derived.
+MEKs may be securely purged, to effectively purge all data which was encrypted to the MEK. To purge an MEK, it is sufficient for the controller to purge the MEK itself or a key from which it was derived.
 
 In an SED that takes Caliptra with OCP L.O.C.K. features enabled, Caliptra will act as a Key Management Block (KMB). The KMB will be the only entity that can read MEKs and program them into the SED's cryptographic engine. The KMB will expose services to controller firmware which will allow the controller to transparently manage each MEK's lifecycle, without being able to access the raw MEK itself.
 
@@ -248,11 +249,15 @@ Adversary capabilities include:
 
 Given the above adversary profile, the following are a list of vulnerabilities that L.O.C.K. is designed to mitigate.
 
-- Keys managed by storage controller firmware are compromised due to implementation bugs or side channels.
-- Keys erased by storage controller firmware are recoverable via invasive techniques.
+- MEKs managed by storage controller firmware are compromised due to implementation bugs or side channels.
+- MEKs purged by storage controller firmware are recoverable via invasive techniques.
 - MEKs are not fully bound to user credentials due to implementation bugs.
 - MEKs are bound to user credentials which are compromised by a vulnerable host.
 - Cryptographic erasure was not performed properly due to a buggy host.
+
+## Mitigation verification
+
+A product which integrates OCP L.O.C.K. will be expected to undergo an OCP S.A.F.E. review, to ensure that the controller firmware correctly invokes OCP L.O.C.K. services.
 
 # Architecture
 
@@ -264,11 +269,11 @@ The following figure shows the basic high-level blocks of OCP L.O.C.K.
   <img src="./images/architecture_diagram.jpg" alt="Architecture Diagram" />
 </p>
 
-Caliptra that includes the optional OCP L.O.C.K. has a Key Management Block (KMB) that is the only entity that can derive the MEKs which protect user data and load the MEKs into the Key Cache of the Encryption Engine. The KMB derives MEKs using the following keys:
+OCP L.O.C.K. defines a Key Management Block (KMB), which is the only entity that can derive the MEKs that protect user data and load them into the Key Cache of the Encryption Engine. The KMB derives MEKs using the following keys:
 
 - A controller-supplied data encryption key (DEK). The DEK is the mechanism by which the controller enforces privilege separation between user credentials under TCG Opal, as well as the mechanism used to model injected MEKs under KPIO.
 
-- A KMB-supplied storage root key, derived from secrets held in device fuses that are only accessible by the KMB. The storage root key may be rotated a small number of times, providing assurance that an advanced adversary cannot recover key material used by the drive prior to the storage root key rotation. KMB does not allow MEKs to be derived while the storage root key is erased. KMB can report whether the storage root key is erased and therefore whether the drive is clean.
+- A KMB-supplied storage root key, derived from secrets held in device fuses that are only accessible by the KMB. The storage root key may be rotated a small number of times, providing assurance that an advanced adversary cannot recover key material that had been in use by the drive prior to the storage root key rotation. KMB does not allow MEKs to be derived while the storage root key is erased. KMB can report whether the storage root key is erased and therefore whether the drive is clean.
 
 - Zero or more partial MEKs (PMEKs), each of which is a cryptographically-strong value, encrypted to an externally-supplied access key. PMEKs enable multi-party authorization flows: the access key for each PMEK used to derive an MEK must be provided to the drive before the MEK can be used. Access keys are protected in transit using asymmetric encryption. This enables use-cases where the access key is served to the drive from a remote entity, without having to trust the host to which the drive is attached.
 
@@ -280,7 +285,7 @@ MEKs are never visible to any firmware. To load an MEK into the Key Cache of the
 
 Each PMEK is encrypted as rest using an externally-injected access key where that access key is not stored persistently on the storage device. If there is more than one PMEK used to generate an MEK, then it requires multiple authorities to unlock a given range of user data. Access keys may be held at rest in a remote key management service.
 
-Each MEK is bound for its lifetime to the Storage Root Key, the list of PMEKs, and the DEK. To generate an MEK, the access key for each PMEK must be provided. All MEKs are removed from the Encryption Engine on a power cycle or during sanitization on the storage device. 
+Each MEK is bound for its lifetime to the Storage Root Key, the list of PMEKs, and the DEK. To generate an MEK, the access key for each PMEK must be provided. All MEKs are removed from the Encryption Engine on a power cycle or during zeroization on the storage device. 
 
 The DEK may be derived from or decrypted by a user's C_PIN to support legacy Opal. The DEK may be the imported key associated with a Key Per I/O key tag.
 KMB generates [HPKE](https://datatracker.ietf.org/doc/rfc9180/) keypairs and stores them in internal volatile memory using a KEM algorithm such as ECDH or ML-KEM/Kyber. KMB can issue endorsements of KEM public keys allowing a Remote Key Management Services to ensure they only release access keys to authentic devices. PMEK access keys are encrypted in transit using these KEM keypairs. Upon drive reset, the access key must be re-encrypted to a new KEM for its associated PMEK to be usable.
@@ -310,10 +315,19 @@ OCP L.O.C.K. provides two interfaces:
   <img src="./images/mek_derivation.svg" alt="MEK derivation" />
 </p>
 
+An MEK is derived from a storage root key, zero or more PMEKs, and a DEK. PMEKs exist in one of two states: locked or ready. In both these states the PMEK is encrypted to a key known only to Caliptra.
+
+- A locked PMEK's encryption key is derived from the storage root key as well as an externally-supplied access key. The locked PMEK is held at rest by controller firmware.
+- A ready PMEK's encryption key is an ephemeral key held within Caliptra. Ready PMEKs are held in controller firmware memory.
+
+The externally-supplied access key is encrypted in transit using an HPKE public key held by Caliptra. The "ready" state allows the HPKE keypair to be rotated after the access key has been provisioned to the storage device, without removing the ability for Caliptra to decrypt the PMEK when later deriving an MEK bound to that PMEK.
+
+For each PMEK to which a given MEK is bound, the host is expected to invoke an API to supply the PMEK's encrypted access key. Upon receipt the controller firmware passes that encrypted access key to Caliptra, along with the locked PMEK, to produce the ready PMEK which is cached in controller memory. This may be done prior to the controller firmware actually deriving and programming the MEK.
+
 When controller firmware wishes to program an MEK to the Encryption Engine, the controller firmware performs the following steps:
 
-1. Provides zero or more unlocked PMEKs to the KMB.
-  - KMB initializes the MEK seed buffer with the System Root Key and then extends that MEK seed buffer using each given unlocked PMEK.
+1. Provides zero or more ready PMEKs to the KMB.
+  - KMB initializes the MEK seed buffer with the Storage Root Key and then extends that MEK seed buffer using each given ready PMEK.
 2. Provide a DEK to the KMB.
   - KMB derives the MEK using the given DEK and the contents of the MEK seed buffer.
 3. Provide MEK metadata to KMB, such as the MEK's associated namespace and logical block address range.
@@ -381,24 +395,26 @@ Controller firmware may then store the encrypted PMEK in persistent storage.
   <img src="./diagrams/generate_pmek.svg" alt="Generating a PMEK" />
 </p>
 
-### PMEK unlock
+### PMEK ready
 
-Encrypted PMEKs stored at rest in persistent storage are considered "locked", and must be unlocked before they can be used to derive MEKs. Unlocked PMEKs are also encrypted when handled by controller firmware. Unlocked PMEKs do not survive across device reset.
+Encrypted PMEKs stored at rest in persistent storage are considered "locked", and must be ready before they can be used to derive MEKs. Ready PMEKs are also encrypted when handled by controller firmware. Ready PMEKs do not survive across device reset.
 
-To unlock a PMEK, KMB performs the following steps:
+To ready a PMEK, KMB performs the following steps:
 
-1. Unwrap the given PMEK access key.
+1. Unwrap the given PMEK access key using the HPKE keypair held within Caliptra.
 2. Derive the PMEK decryption key from the storage root key and the decrypted access key.
 3. Decrypt the PMEK using the PMEK decryption key.
 4. Encrypt the PMEK using an ephemeral export key that is randomly initialized on startup and lost on reset.
-5. Return the re-encrypted "unlocked" PMEK to the controller firmware.
+5. Return the re-encrypted "ready" PMEK to the controller firmware.
 
-Controller firmware may then stash the encrypted unlocked PMEK in volatile storage, and later provide it to the KMB when deriving an MEK, as described [above](#mek-derivation).
+Controller firmware may then stash the encrypted ready PMEK in volatile storage, and later provide it to the KMB when deriving an MEK, as described [above](#mek-derivation).
 
-<b>Sequence to unlock a PMEK:</b>
+To mitigate against cryptographic attacks on the HPKE keypair that rely on repeated invocations of this command, this command is rate-limited.
+
+<b>Sequence to ready a PMEK:</b>
 
 <p align="center">
-  <img src="./diagrams/unlock_pmek.svg" alt="Unlocking a PMEK" />
+  <img src="./diagrams/ready_pmek.svg" alt="Readying a PMEK" />
 </p>
 
 ### PMEK access key rotation
@@ -422,24 +438,24 @@ Controller firmware then erases the old encrypted PMEK and stores the new encryp
 
 ### Transport encryption for PMEK access keys
 
-In OCP L.O.C.K., the KMB maintains a set of key-encapsulation-mechanism (KEM) keypairs, one per algorithm that OCP L.O.C.K. supports. Each KEM public key is endorsed with a certificate that is generated by Caliptra and signed by Caliptra's DICE identity. KEM keypairs are randomly generated on KMB startup, may be periodically rotated, and are lost when the drive resets.
+In OCP L.O.C.K., the KMB maintains a set of HPKE keypairs, one per algorithm that OCP L.O.C.K. supports. Each HPKE public key is endorsed with a certificate that is generated by Caliptra and signed by Caliptra's DICE identity. HPKE keypairs are randomly generated on KMB startup, may be periodically rotated, and are lost when the drive resets.
 
-When a user wishes to unlock a PMEK (which is required prior to deriving any MEKs bound to that PMEK), the user performs the following steps:
+When a user wishes to ready a PMEK (which is required prior to deriving any MEKs bound to that PMEK), the user performs the following steps:
 
-1. Obtain the KEM public key and certificate from the storage device.
-2. Validate the KEM certificate and attached DICE certificate chain.
-3. Run `Encaps` and encrypt their access key to the resulting shared key.
-4. Transmit the KEM ciphertext and encrypted access key to the storage device.
+1. Obtain the HPKE public key and certificate from the storage device.
+2. Validate the HPKE certificate and attached DICE certificate chain.
+3. Encrypt their access key to the HPKE public key.
+4. Transmit the encrypted access key to the storage device.
 
 Upon receipt, KMB will perform the following steps:
 
-1. Run `Decaps` and decrypt the user's access key with the resulting shared secret.
+1. Ddecrypt the user's access key using the HPKE private key.
 2. Derive the PMEK encryption key using the storage root key and the decrypted access key.
-3. Perform PMEK generation, unlock, or rotation actions detailed [above](#pmek-lifecycle).
+3. Perform PMEK generation, ready, or rotation actions detailed [above](#pmek-lifecycle).
 
-Upon drive reset, the KEMs are regenerated, and any access keys for PMEKs that had been unlocked prior to the reset will need to be re-provisioned.
+Upon drive reset, the HPEK keypairs are regenerated, and any access keys for PMEKs that had been made ready prior to the reset will need to be re-provisioned.
 
-<b>Sequence to endorse an encapsulation public key:</b>
+<b>Sequence to endorse an HPKE public key:</b>
 
 <p align="center">
   <img src="./diagrams/endorse_encapsulation_pub_key.svg" alt="Endorseing a KEM Pub key" />
@@ -502,7 +518,7 @@ This section defines the interface between the Key Management Block (KMB) and an
 
 ### Overview
 
-The Encryption Engine uses a stored MEK to encrypt and decrypt user data. For the purposes of this specification, the entity within the Encryption Engine used to store the MEKs is called Key Cache. Each encryption and description of user data is coupled to a specific MEK which is stored in Key Cache bound to a unique identifier, called metadata. Each (metadata, MEK) pair is also associated with additional information, called aux, which is used neither as MEK nor an identifier, but has some additional information about the pair. Therefore, the Key Cache as an entity which stores (metadata, aux, MEK) tuples.
+The Encryption Engine uses a stored MEK to encrypt and decrypt user data. For the purposes of this specification, the entity within the Encryption Engine used to store the MEKs is called Key Cache. Each encryption and decryption of user data is coupled to a specific MEK which is stored in Key Cache bound to a unique identifier, called metadata. Each (metadata, MEK) pair is also associated with additional information, called aux, which is used neither as MEK nor an identifier, but has some additional information about the pair. Therefore, the Key Cache as an entity which stores (metadata, aux, MEK) tuples.
 
 In order to achieve the security goals for KMB, KMB is limited to be the unique component which loads an (metadata, aux, MEK) tuple into the Key Cache and unloads a tuple within the device, so that MEKs can only be exposed to KMB and Encryption Engine. Controller firmware arbitrates all operations in the KMB to Encryption Engine interface, therefore controller firmware is responsible for managing which MEK is loaded in Key Cache. Controller firmware has full control on metadata and optional aux. Figure 9 is an illustration of the KMB to Encryption Engine interface that shows:
 
@@ -543,7 +559,7 @@ Figure 10 defines the Control register used to sequence the execution of a comma
 <tr><th>Bits</th><th>Type</th><th>Reset</th><th>Description</th></tr>
 <tr><td>31</td><td>RO</td><td>0h</td><td><b>Ready (RDY):</b> After an NVM Subsystem Reset, this bit is set to 1b, then the Encryption Engine is ready to execute commands. If this bit is set to 0b, then the Encryption Engine is not ready to execute commands.</td></tr>
 <tr><td>30:20</td><td>RO</td><td>0h</td><td>Reserved</td></tr>
-<tr><td>19:16</td><td>RO</td><td>0h</td><td><b>Error (ERR):</b>> If the DONE bit is set to 1b by the Encryption Engine, then this field if set to a non-zero value to indicate the Encryption Engine detected an error during the execution the command specified by the CMD field. The definition of a non-zero value is vendor specific.
+<tr><td>19:16</td><td>RO</td><td>0h</td><td><b>Error (ERR):</b>> If the DONE bit is set to 1b by the Encryption Engine, then this field if set to a non-zero value to indicate the Encryption Engine detected an error during the execution the command specified by the CMD field. The definition of a non-zero value is vendor specific. Encryption engine error codes are surfaced back to controller firmware.
 
 | Value    | Description |
 | :--:     | :---------- |
@@ -561,7 +577,7 @@ If the DONE bit is set to 1b by KMB, then the field is set to 0000b.</td></tr>
 | 0h        | Reserved |
 | 1h        | <b>Load MEK:</b> Load the key specified by the AUX field and MEK register into the Encryption Engine as specified by the METD field. |
 | 2h        | <b>Unload MEK:</b> Unload the MEK from the Encryption Engine as specified by the METD field. |
-| 3h        | <b>Sanitize:</b> Unload all of the MEKs from the Encryption Engine (i.e., Sanitize the Encryption Engine MEKs). |
+| 3h        | <b>Zeroize:</b> Unload all of the MEKs from the Encryption Engine (i.e., Zeroize the Encryption Engine MEKs). |
 | 4h to Fh  | Reserved |
 
 </td></tr>
@@ -605,7 +621,7 @@ The KMB therefore interacts with the Control register as follows in the normal c
     1. <b>DN:</b> 1b
 4.	The KMB waits <b>DN</b> to be 0
 
-Since the Controller register is in fact a part of the Encryption Engine whose implementation can be unique by each vendor, behaviors of the Control register with the unexpected flow are left for vendors. For example, a vendor who wants robustness might integrate a write-lock into the Control register in order to prevent two almost simultaneous writes on EXE bit.
+Since the Controller register is in fact a part of the Encryption Engine whose implementation can be unique to each vendor, behaviors of the Control register with the unexpected flow are left for vendors. For example, a vendor who wants robustness might integrate a write-lock into the Control register in order to prevent two almost simultaneous writes on EXE bit.
 
 #### Metadata Register
 
@@ -745,28 +761,29 @@ The device will go through the following state transitions over its lifespan:
 	3. Caliptra allows MEKs to be programmed to the storage encryption engine, derived from the storage root key.
 	4. Caliptra firmware reports a bit indicating that it is operating in a perma-dirty state, where no future ratchets are possible.
 
+To satisfy FIPS 140 zeroization requirements, the FIPS boundary will need to include functionality in the storage controller firmware which maintains a flash secret which can be zeroed on-demand and which is used to derive each DEK.
+
 ### Storage root key fuse programming
 
-OCP L.O.C.K contains a fused block that contains the ability to program N number of Storage Root Keys one at a time. A device out of manufacturing does not program a System Root Key and the device behaves as existing devices do today where the SSD firmware manages the key. This is known as the EMPTY state. OCP L.O.C.K supports a PROGAM_NEXT_ROOT_KEY API to then program the initial System Root Key. That System Root Key is then used to derive all MEKs. That System Root Key can be erased by using the ERASE_CURRENT_ROOT_KEY Api. Once that System Root Key is erased, no System Root Key exists in OCP L.O.C.K. and no MEKs can be generated by OCP L.O.C.K until the PROGAM_NEXT_ROOT_KEY API causes a new System Root Key to be programmed.
+OCP L.O.C.K contains a fused block that contains the ability to program N number of 256-bit Storage Root Keys one at a time. A device out of manufacturing is not required to have a Storage Root Key programmed; such a device behaves as existing devices do today where the SSD firmware manages the key. This is known as the EMPTY state. OCP L.O.C.K supports a PROGAM_NEXT_ROOT_KEY command to then program the initial Storage Root Key, which may be invoked during manufacturing. That Storage Root Key is then used to derive all MEKs. That Storage Root Key can be erased by using the ERASE_CURRENT_ROOT_KEY command. Once that Storage Root Key is erased, no Storage Root Key exists in OCP L.O.C.K. and no MEKs can be generated by OCP L.O.C.K until the PROGAM_NEXT_ROOT_KEY command causes a new Storage Root Key to be programmed.
 
-Once all of the N Storage Root Keys have been programmed and erased, no System Root Key exists in OCP L.O.C.K. and no MEKs can be generated by OCP L.O.C.K. The ENABLE_IO_WITHOUT_RATCHET API can be used to permanently allow the device to behave as existing devices do today where the SSD firmware manages the key.
+Once all of the N Storage Root Keys have been programmed and erased, no Storage Root Key exists in OCP L.O.C.K. and no MEKs can be generated by OCP L.O.C.K. The ENABLE_IO_WITHOUT_RATCHET API can be used to permanently allow the device to behave as existing devices do today where the SSD firmware manages the key.
 
-There can be errors programming a System Root Key and erasing a System Root Key. If these errors occur, the APIs can be use to retry the operation. If there still is an error, then the device is in an unusable state.
+There can be errors programming a Storage Root Key and erasing a Storage Root Key. If these errors occur, the APIs can be use to retry the operation. If there still is an error, then the device is in an unusable state.
 
-The diagram below has an example flow where the number of System Rook Keys available to be programmed is 3 (N=3):
+The diagram below has an example flow where the number of Storage Rook Keys available to be programmed is 3 (N=3):
 
-| State transition                              | active_slot | slot_state           | next_action |
-| :-------------------------------------------- | :---------: | :------------------: | :---------- |
-| Factory                                       | 0           | EMPTY                | PROGRAM |
-| Program first entry                           | 0           | PROGRAMMED           | ERASE |
-| Erase first entry<br>(recoverable failure)    | 0           | PARTIALLY_ERASED     | ERASE |
-| Erase first entry                             | 0           | ERASED               | PROGRAM  |
-| Program next entry<br>(recoverable failure)   | 1           | PARTIALLY_PROGRAMMED | PROGRAM |
-| Program next entry<br>(unrecoverable failure) | 1           | PARTIALLY_PROGRAMMED | ERASE |
-| Erase failed entry                            | 1           | ERASED               | PROGRAM  |
-| Program next entry                            | 2           | PROGRAMMED           | ERASE |
-| Erase final entry                             | 2           | ERASED               | ENABLE_IO_WITHOUT_RATCHET |
-| Enable perma dirty                            | 2           | NON_FUSE_RATCHETABLE | NONE |
+| State transition                    | active_slot | slot_state           | next_action |
+| :---------------------------------- | :---------: | :------------------: | :---------- |
+| Factory                             | 0           | EMPTY                | PROGRAM |
+| Program first entry                 | 0           | PROGRAMMED           | ERASE |
+| Erase first entry<br>(interrupted)  | 0           | INVALID              | ERASE |
+| Erase first entry                   | 0           | ERASED               | PROGRAM  |
+| Program next entry<br>(interrupted) | 1           | INVALID              | ERASE |
+| Erase failed entry                  | 1           | ERASED               | PROGRAM  |
+| Program next entry                  | 2           | PROGRAMMED           | ERASE |
+| Erase final entry                   | 2           | ERASED               | ENABLE_IO_WITHOUT_RATCHET |
+| Enable perma dirty                  | 2           | NON_FUSE_RATCHETABLE | NONE |
 
 ## Error reporting and handling
 
@@ -915,13 +932,13 @@ Table: ENDORSE_ENCAPSULATION_PUB_KEY input arguments
 
 Table: ENDORSE_ENCAPSULATION_PUB_KEY output arguments
 
-| Name            | Type      | Description |
-| :-------------: | :-------: | :------- |
-| chksum          | u32       | Checksum over other output arguments, computed by Caliptra. Little endian |
-| fips_status     | u32       | Indicates if the command is FIPS approved or an error |
-| pub_key         | KemPubKey | KEM public key |
-| endorsement_len | u32       | Length of endorsement data (N) |
-| endorsement     | u8[N]     | DER-encoded X.509 certificate (includes nonce as extension) |
+| Name            | Type       | Description |
+| :-------------: | :--------: | :------- |
+| chksum          | u32        | Checksum over other output arguments, computed by Caliptra. Little endian |
+| fips_status     | u32        | Indicates if the command is FIPS approved or an error |
+| pub_key         | HpkePubKey | HPKE public key |
+| endorsement_len | u32        | Length of endorsement data (N) |
+| endorsement     | u8[N]      | DER-encoded X.509 certificate (includes nonce as extension) |
 
 ## ROTATE_ENCAPSULATION_KEY
 
@@ -1021,13 +1038,13 @@ Table: REWRAP_PMEK output arguments
 | fips_status        | u32           | Indicates if the command is FIPS approved or an error |
 | new_encrypted_pmek | EncryptedPmek | PMEK encrypted to access_key_2 |
 
-## UNLOCK_PMEK
+## READY_PMEK
 
-This command Unwraps wrapped_access_key. Then the unwrapped access_key is used to decrypt locked_pmek using KDF(Storage root key, "PMEK", access_key). An "unlocked" PMEK is encrypted with the the ephemeral export secret. The encrypted unlocked PMEK is returned.
+This command unwraps wrapped_access_key. Then the unwrapped access_key is used to decrypt locked_pmek using KDF(Storage root key, "PMEK", access_key). A "ready" PMEK is encrypted with the the ephemeral export secret. The encrypted ready PMEK is returned.
 
 Command Code: 0x554E_4C50 (“UNLP”)
 
-Table: UNLOCK_PMEK input arguments
+Table: READY_PMEK input arguments
 
 <table>
 <tr><th>Name</th><th>Type</th><th>Description</th></tr>
@@ -1043,13 +1060,13 @@ Table: UNLOCK_PMEK input arguments
 <tr><td>locked_pmek</td><td>EncryptedPmek</td><td>PMEK encrypted to storage root key and access key</td></tr>
 </table>
 
-Table: UNLOCK_PMEK output arguments
+Table: READY_PMEK output arguments
 
-| Name          | Type          | Description |
-| :-----------: | :-----------: | :------- |
-| chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian. |
-| fips_status   | u32           | Indicates if the command is FIPS approved or an error |
-| unlocked_pmek | EncryptedPmek | PMEK encrypted to an export secret that is rotated  on reset |
+| Name        | Type          | Description |
+| :---------: | :-----------: | :------- |
+| chksum      | u32           | Checksum over other output arguments, computed by Caliptra. Little endian. |
+| fips_status | u32           | Indicates if the command is FIPS approved or an error |
+| ready_pmek  | EncryptedPmek | PMEK encrypted to an export secret that is rotated  on reset |
 
 ## MIX_PMEK
 
@@ -1061,10 +1078,10 @@ Command Code: 0x4D50_4D4B (“MPMK”)
 
 Table: MIX_PMEK input arguments
 
-| Name          | Type          | Description |
-| :-----------: | :-----------: | :------- |
-| chksum        | u32           | Checksum over other input arguments, computed by the caller. Little endian. |
-| unlocked_pmek | EncryptedPmek | PMEK encrypted to an export secret that is rotated  on reset |
+| Name       | Type          | Description |
+| :--------: | :-----------: | :------- |
+| chksum     | u32           | Checksum over other input arguments, computed by the caller. Little endian. |
+| ready_pmek | EncryptedPmek | PMEK encrypted to an export secret that is rotated  on reset |
 
 Table: MIX_PMEK output arguments
 
@@ -1235,12 +1252,11 @@ Table: REPORT_ROOT_KEY_STATE output arguments
 | Value       | Description |
 | :--------:  | :---- |
 | 0h          | EMPTY (Able to load MEKs) |
-| 1h          | PARTIALLY_PROGRAMMED (Not to load MEKs) |
-| 2h          | PROGRAMMED (Able to load MEKs)  |
-| 3h          | PARTIALLY_ERASED (Not to load MEKs)  |
-| 4h          | ERASED (Not to load MEKs)  |
-| 5h          | NON_FUSE_RATCHETABLE (Able to load MEKs) |
-| 6h to FFFFh | Reserved |
+| 1h          | PROGRAMMED (Able to load MEKs)  |
+| 2h          | INVALID (Not to load MEKs)  |
+| 3h          | ERASED (Not to load MEKs)  |
+| 4h          | NON_FUSE_RATCHETABLE (Able to load MEKs) |
+| 5h to FFFFh | Reserved |
 
 </td></tr>
 <tr><td>next_action</td><td>NextAction (u16)</td>
@@ -1278,16 +1294,16 @@ Table 3 defines the additional Caliptra result codes due to supporting OCP L.O.C
 
 Table 2: OCP L.O.C.K. mailbox command result codes
 
-| Name                  |      Value               |   Description |
-| :------------------:  | :----------------------: | :--------------- |
-|LOCK_ENGINE_TIMEOUT    | 0x4C45_544F<br>(“LETO”)  | Timeout occurred when communicating with the drive crypto engine to execute a command | 
-|LOCK_ENGINE_CODE + u16 | 0x4443_xxxx<br>(“ECxx”)  | Vendor-specific error code in the low 16 bits |
-|LOCK_BAD_ALGORITHM     | 0x4C42_414C<br>(“LBAL”)  | Unsupported algorithm, or algorithm does not match the given handle |
-|LOCK_BAD_HANDLE        | 0x4C42_4841<br>(“LBHA”)  | Unknown handle |
-|LOCK_NO_HANDLES        | 0x 4C4E_4841<br>(“LNHA”) | Too many extant handles exist |
-|LOCK_KEM_DECAPSULATION | 0x4C4B_4445<br>(“LKDE”)  | Error during KEM decapsulation |
-|LOCK_ACCESS_KEY_UNWRAP | 0x4C41_4B55<br>(“LAKU”)  | Error during access key decryption |
-|LOCK_PMEK_DECRYPT      | 0x4C50_4445<br>(“LPDE”)  | Error during PMEK decryption |
+| Name                   |      Value               |   Description |
+| :--------------------: | :----------------------: | :--------------- |
+| LOCK_ENGINE_TIMEOUT    | 0x4C45_544F<br>(“LETO”)  | Timeout occurred when communicating with the drive crypto engine to execute a command | 
+| LOCK_ENGINE_CODE + u16 | 0x4443_xxxx<br>(“ECxx”)  | Vendor-specific error code in the low 16 bits |
+| LOCK_BAD_ALGORITHM     | 0x4C42_414C<br>(“LBAL”)  | Unsupported algorithm, or algorithm does not match the given handle |
+| LOCK_BAD_HANDLE        | 0x4C42_4841<br>(“LBHA”)  | Unknown handle |
+| LOCK_NO_HANDLES        | 0x 4C4E_4841<br>(“LNHA”) | Too many extant handles exist |
+| LOCK_KEM_DECAPSULATION | 0x4C4B_4445<br>(“LKDE”)  | Error during KEM decapsulation |
+| LOCK_ACCESS_KEY_UNWRAP | 0x4C41_4B55<br>(“LAKU”)  | Error during access key decryption |
+| LOCK_PMEK_DECRYPT      | 0x4C50_4445<br>(“LPDE”)  | Error during PMEK decryption |
 
 # Terminology
 
@@ -1303,6 +1319,7 @@ The following acronyms and abbreviations are used throughout this document.
 | ECDH         | Elliptic-curve Diffie–Hellman |
 | ECDSA        | Elliptic Curve Digital Signature Algorithm |
 | HMAC         | Hash-Based Message Authentication Code |
+| IETF EAT     | IETF Entity Attestation Token |
 | KDF          | Key Derivation Function |
 | KEM          | Key Encapsulation Mechanism |
 | KMB          | Key Management Block |
