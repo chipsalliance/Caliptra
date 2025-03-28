@@ -19,7 +19,7 @@
 '        <b>Notes:</b>
 '        * <font color=red>Need to discuss Warm Reset cases
 '          - <font color=red>NVM subsystem Reset - assume reset of ASIC and ROM code re-executed
-'          - <font color=red>PCIe Warm Reset - Discuss : PMEKs maybe unlocked
+'          - <font color=red>PCIe Warm Reset - Discuss : PMEKs maybe ready
 '             Gamil to investigate
 '          - <font color=red>Controller Reset - Discuss
     end note
@@ -78,11 +78,11 @@ ROM/FMC code already created DICE keys and loaded them. Caliptra FW knows the ke
 
 end note
 
-== Load a KV slot with a PMEK unlock Key  ==
+== Load a KV slot with a Ready PMEK Encryption Key  ==
 
 crom $sync kv++: new_key(len: 256,\n              Destination: Slot B)
 kv $sync rand: Get new random key of 256 bits
-kv $sync pmeks: Put PMEK Secret Key
+kv $sync pmeks: Put Ready PMEK Encryption Key
 pmeks++ $BUFFER_ACTIVATION
 !if ($show_done)
     kv $sync crom-- : done

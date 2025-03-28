@@ -15,7 +15,7 @@
         <b>Preconditions:</b>
           * DICE Alias Key is available in a KV slot and FW manages the slot #
             The DICE Alias Key in already defined by Caliptra and is not the DPE Key
-          * KEM Keypair available in a KV slot and FW manages the slot #
+          * HPKE Keypair available in a KV slot and FW manages the slot #
 
         <b>Notes:</b>
           * The sequence diagram assumes that the KV will not allow an input KV slot to also be used as an out KV slot. Caliptra FW is responsible for managing which KV slots are used and can adapt if this assumption is not correct.
@@ -34,10 +34,10 @@ fw $async mb++ : ENDORSE_ENCAPSULATION_PUB_KEY
 
 !if ($show_api)
     note right mb
-        | <b>Field             | <b>Size | <b>Definition |
-        | chksum                | u32    | Little endian |
-        | kem_handle            | u32    | Handle for KEM keypair held in KMB memory|
-        | endorsement_algorithm | u32    | Endorsement algorithm identifier\n * If 0h, then return public key |
+        | <b>Field              | <b>Size | <b>Definition |
+        | chksum                | u32     | Little endian |
+        | kem_handle            | u32     | Handle for KEM keypair held in KMB memory |
+        | endorsement_algorithm | u32     | Endorsement algorithm identifier\n * If 0h, then return public key |
     end note
 !endif
 
@@ -78,7 +78,7 @@ alt kem_handle (G) has a Key Pair in KV slot G
             kv--
         !endif
         cfw $sync cfw: Append signature to certificate To Be Signed (TBS)
-        cfw $sync mb : signed_certificate
+        cfw $sync mb : signed endorsement
     end
 end
 
@@ -88,12 +88,13 @@ cfw $sync mb : Command response
 
 !if ($show_api)
     note right mb
-        | <b>Field        | <b>Size   | <b>Definition |
-        | chksum          | u32       | Little endian |
-        | fips_status     | u32       | Indicates if the command is FIPS approved or an error |
-        | pub_key         | KemPubKey | KEM public key |
-        | endorsement_len | u32       | Length of endorsement data (N) |
-        | endorsement     | u8[N]     | DER-encoded X.509 certificate (includes nonce as extension) |
+        | <b>Field        | <b>Size             | <b>Definition |
+        | chksum          | u32                 | Little endian |
+        | fips_status     | u32                 | Indicates if the command is FIPS approved or an error |
+        | pub_key_len     | u32                 | Length of HPKE public key (`Npk` in RFC 9180) |
+        | endorsement_len | u32                 | Length of endorsement data |
+        | pub_key         | u8[pub_key_len]     | KEM public key |
+        | endorsement     | u8[endorsement_len] | DER-encoded X.509 certificate |
     end note
 !endif
 cfw--

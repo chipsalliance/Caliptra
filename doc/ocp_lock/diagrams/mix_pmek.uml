@@ -13,7 +13,7 @@
 !if ($show_precond)
     note across
         <b>Preconditions:</b>
-        * PMEK Secret is stored in Key Vault slot B
+        * Ready PMEK Encryption Key is stored in Key Vault slot B
         * The following sequence has occurred prior: Initialize MEK then zero or more MIX_PMEK
 
         <b>Notes:</b>
@@ -32,9 +32,9 @@ fw $async mb++ : MIX_PMEK
 
 !if ($show_api)
     note right mb
-        | <b>Field      | <b>Size        | <b>Definition |
-        | chksum        | u32            | Little endian |
-        | unlocked_pmek | 512 bytes | Unlocked encrypted PMEK\n * PMEK Algorithm embedded |
+        | <b>Field   | <b>Size   | <b>Definition |
+        | chksum     | u32       | Little endian |
+        | ready_pmek | 512 bytes | Ready PMEK\n * PMEK Algorithm embedded |
     end note
 !endif
 
@@ -64,9 +64,9 @@ alt FEK exists
 
     $self("cfw", "Determine Temporary slox Y for PMEK")
 
-    cfw $sync kv++: Key_Unwrap(Key:  SlotB,\n                   Key Data: unlocked_pmek,\n                   Destination Slot: Y)
-    kv $sync pmeks: Get PMEK secret
-    kv $sync kv: Key_Unwrap unlocked_pmek
+    cfw $sync kv++: Key_Unwrap(Key:  SlotB,\n                   Key Data: ready_pmek,\n                   Destination Slot: Y)
+    kv $sync pmeks: Get Ready PMEK Encryption Key
+    kv $sync kv: Key_Unwrap ready_pmek
     kv $sync tempy: Put PMEK
     tempy++ $BUFFER_ACTIVATION
     !if ($show_done)
