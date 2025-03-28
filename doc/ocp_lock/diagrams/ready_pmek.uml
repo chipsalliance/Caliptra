@@ -1,5 +1,5 @@
 '
-' OCP Lock: UNLOCK_PMEK API sequence diagram showing Caliptra FW/HW interactions
+' OCP Lock: READY_PMEK API sequence diagram showing Caliptra FW/HW interactions
 '
 @startuml
 
@@ -7,14 +7,14 @@
 
 
 !if ($show_title)
-    Title "Unlock PMEK"
+    Title "Ready PMEK"
 !endif
 
 !if ($show_precond)
     note across
         <b>Preconditions:</b>
         * Access Shared Secret already availble in a slot in KV
-        * unlocking key already in a slot and generated on each reset
+        * Ephemeral PMEK encryption key already in a slot and generated on each reset
         <font color=red>Is there a separate Shared Secret per Admin User?</font>
     end note
 !endif
@@ -23,7 +23,7 @@ srk++ $BUFFER_ACTIVATION
 kemg++ $BUFFER_ACTIVATION
 pmeks++ $BUFFER_ACTIVATION
 
-fw $async mb++ : UNLOCK_PMEK
+fw $async mb++ : READY_PMEK
 
 !if ($show_api)
     note right mb
@@ -43,12 +43,13 @@ mb $async cfw++ : Command
 !else
     mb--
 !endif
-cfw $sync cfw: Determine rate of unlocking
+cfw $sync cfw: Determine rate of ready commands
 
 alt Storage Root Key exists
-    alt Unlocking rate below threshold
+    alt Ready command rate below threshold
 
-        == Get the Access Key ==
+        == Decapsulate ciphertext and decrypt the access key ==
+
         alt kem_id = 0x0011 (DHKEM(P-384, HKDF-SHA384))
             cfw $sync kv++: ECDH(KEM Pair : kem_handle (G),\n            KEM ciphertext : kem_ciphertext\n            Destination : memory)
             kv $sync kemg: Get KEM Keypair
@@ -188,17 +189,17 @@ alt Storage Root Key exists
         kv $sync srk: Get Storage Root Key
         kv $sync tempz: Get Access Key
         kv $sync kv: HMAC512 Slot A with Slot Z
-        kv $sync tempy: HMAC512 result PMEK
+        kv $sync tempy: HMAC512 result locked PMEK encryption key
         !if ($show_done)
             kv $sync cfw-- : done
         !else
             kv--
         !endif
 
-        == Extract PMEK with Encryption Key ==
+        == Decrypt PMEK with locked PMEK encryption key ==
 
         cfw $sync kv++: Unwrap(Key : Slot Y,\n            Data: locked_pmek\n            Destination :  Slot Z)
-        kv $sync tempy: Get Encryption Key
+        kv $sync tempy: Get locked PMEK encryption key
         kv $sync kv: Decrypt locked_pmek
         kv $sync tempz: PMEK
         !if ($show_done)
@@ -207,14 +208,14 @@ alt Storage Root Key exists
             kv--
         !endif
 
-        == Encrypt PMEK with unlocked Encryption Key ==
+        == Encrypt PMEK with ephemeral PMEK encryption key ==
 
-        cfw $sync kv++: Wrap(Key: Slot B,\n         Data Key : Slot Z\n         Destination : unlocked_pmek)
-        kv $sync pmeks: Get Encryption Key
+        cfw $sync kv++: Wrap(Key: Slot B,\n         Data Key : Slot Z\n         Destination : ready_pmek)
+        kv $sync pmeks: Get ephemeral PMEK encryption key
         kv $sync tempz: Get PMEK
         kv $sync kv: Encrypt slot Z using Slot B
         !if ($show_done)
-            kv $sync cfw-- : Unocked PMEK
+            kv $sync cfw-- : Ready PMEK
         !else
             kv--
         !endif
@@ -228,17 +229,17 @@ alt Storage Root Key exists
             kv--
         !endif
 
-        cfw $sync mb : Command response\nUnlocked_PMEK
+        cfw $sync mb : Command response\nReady_PMEK
         & mb $async fw++ : Command\ncomplete
     end
 end
 
 !if ($show_api)
     note right mb
-        | <b>Field      | <b>Size       | <b>Definition |
-        | chksum        | u32           | Little endian |
-        | fips_status   | u32           | Indicates if the command is FIPS approved or an error |
-        | unlocked_pmek | EncryptedPmek | PMEK encrypted to an export secret that is rotated  on reset |
+        | <b>Field    | <b>Size       | <b>Definition |
+        | chksum      | u32           | Little endian |
+        | fips_status | u32           | Indicates if the command is FIPS approved or an error |
+        | ready_pmek  | EncryptedPmek | PMEK encrypted to an export secret that is rotated  on reset |
     end note
 !endif
 cfw--
