@@ -13,7 +13,7 @@
 !if ($show_precond)
     note across
         <b>Preconditions:</b>
-          * Storage Root Key in a KV slot where Caliptra FW manages which slot
+          * FEK in a KV slot where Caliptra FW manages which slot
           * KEM Keypair in a KV slot where Caliptra FW manages which slot
 
         <b>Notes:</b>
@@ -23,7 +23,7 @@
 !endif
 
 ' Pre-existing state
-srk++ $BUFFER_ACTIVATION
+fek++ $BUFFER_ACTIVATION
 kemg++ $BUFFER_ACTIVATION
 
 fw $async mb++ : GENERATE_PMEK
@@ -73,7 +73,7 @@ tempz++ $BUFFER_ACTIVATION
 
 alt pmek algorith 512 bits
     cfw $sync kv++: HMAC512_Slots(Key : Slot A,\n                         Data Key : Slot Z\n                         Destination :  Slot Y)
-    kv $sync srk: Get Storage Root Key
+    kv $sync fek: Get FEK
     kv $sync tempz: Get Access Key
     kv $sync kv: HMAC512 slot A and Slot Z
     kv $sync tempy: Put HMAC512 result Encryption Key
