@@ -29,27 +29,27 @@ fuses++ $BUFFER_ACTIVATION
 
 [-[$ASYNC_COLOR]>> crom++ : Power on
 
-== Load a KV slot with Storage Root Key  ==
+== Load a KV slot with FEK  ==
 
-crom $sync kv++: load_storage_root(Key: Slot A)
+crom $sync kv++: load_fek(Key: Slot A)
 loop through fuses entries until valid fuse entry found
     kv $sync fuses : get next entry
 end
 
 alt if a valid entry
-    kv $sync srk : Put Storage Root Key
-    srk++ $BUFFER_ACTIVATION
-    kv $sync kv: storage_root_ket_exists = True
+    kv $sync fek : Put FEK
+    fek++ $BUFFER_ACTIVATION
+    kv $sync kv: fek_exists = True
 else No valid entry
-    kv $sync kv: storage_root_key_exists = False
+    kv $sync kv: fek_exists = False
 end
 !if ($show_done)
-    kv $sync crom-- : storage_root_key_exists
+    kv $sync crom-- : fek_exists
 !else
     kv--
 !endif
 
-crom $sync crom : Retain storage_root_key_exists
+crom $sync crom : Retain fek_exists
 
 
 == Load a KV slot with KEM for each KEM algorithm supported  ==
@@ -97,7 +97,7 @@ destroy crom
 note right cfw
     Currently, there is already handoff information
     from ROM to run-time FW. Need to include:
-    * If the Storage Root Key exists and if so the KV slot containing that Storage Root Key
+    * If the FEK exists and if so the KV slot containing that FEK
     * The KV Slot containing the KEM keypair
 
 end note

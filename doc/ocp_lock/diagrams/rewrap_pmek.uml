@@ -18,7 +18,7 @@
     end note
 !endif
 
-srk++ $BUFFER_ACTIVATION
+fek++ $BUFFER_ACTIVATION
 kemg++ $BUFFER_ACTIVATION
 
 
@@ -44,7 +44,7 @@ mb $async cfw++ : Command
     mb--
 !endif
 
-alt Storage Root Key exists
+alt FEK exists
 
     == Get Access Key 1 ==
     cfw $sync kv++: Decaps(KEM Pair : kem_handle (g),\n            KEM ciphertext : kem_ciphertext from\n                                      wrapped_access_key_1\n            Destination : Slot Y)
@@ -104,7 +104,7 @@ alt Storage Root Key exists
 
     == Create PMEK wrapping/unwrapping Keys ==
     cfw $sync kv++: HMAC512_Slots(Key : Slot A,\n                         Data Key : Slot Z\n                         Destination : Slot W)
-    kv $sync srk: Get Storage Root Key
+    kv $sync fek: Get FEK
     kv $sync tempz: Get Access Key 1
     kv $sync kv: HMAC512 slot A and Slot Z
     kv $sync tempw: HMAC512 result Encryption Key for old PMEK
@@ -116,7 +116,7 @@ alt Storage Root Key exists
     !endif
 
     cfw $sync kv++: HMAC512_Slots(Key : Slot A,\n                         Data Key : Slot Y\n                         Destination : Slot Z)
-    kv $sync srk: Get System Root Key
+    kv $sync fek: Get FEK
     kv $sync tempy: Get Access Key 2
     kv $sync kv: HMAC512 slot A and Slot Y
     kv $sync tempz: HMAC512 result New Encryption Key for PMEK
