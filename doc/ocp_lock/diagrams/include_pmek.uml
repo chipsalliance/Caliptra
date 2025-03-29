@@ -48,13 +48,13 @@ mb $async cfw++ : Command
     mb--
 !endif
 
-alt Storage Root Key exists
+alt FEK exists
 
     alt MEK is not initialized (i.e., no PMEK has yet been included)
         cfw $sync kv++: HMAC512(Key: Slot A,\n                Key Data: "MEK Seed",\n                Destination: Slot X)
-        kv $sync srk: Get Storage Root Key
+        kv $sync fek: Get FEK
         kv $sync kv: HMAC512 slot A with Data
-        kv $sync meks: HMAC512 result MEK Seed with Storage Root Key
+        kv $sync meks: HMAC512 result MEK Seed with FEK
         !if ($show_done)
             kv $sync cfw-- : done
         !else

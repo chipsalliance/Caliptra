@@ -19,7 +19,7 @@
     end note
 !endif
 
-srk++ $BUFFER_ACTIVATION
+fek++ $BUFFER_ACTIVATION
 kemg++ $BUFFER_ACTIVATION
 pmeks++ $BUFFER_ACTIVATION
 
@@ -30,7 +30,7 @@ fw $async mb++ : UNLOCK_PMEK
         | <b>Field            | <b>Size          | <b>Definition |
         | chksum              | u32              | Little endian |
         | wrapped_access_key  | WrappedAccessKey | KEM-wrapped access key\n* kem_handle\n*kem_algorithm\n*kem_ciphertext\n* encrypted_access_key  |
-        | locked_pmek         | EncryptedPmek    | PMEK encrypted to storage root key and access key |
+        | locked_pmek         | EncryptedPmek    | PMEK encrypted to the FEK and the access key |
     end note
 !endif
 
@@ -45,7 +45,7 @@ mb $async cfw++ : Command
 !endif
 cfw $sync cfw: Determine rate of unlocking
 
-alt Storage Root Key exists
+alt FEK exists
     alt Unlocking rate below threshold
 
         == Get the Access Key ==
@@ -185,7 +185,7 @@ alt Storage Root Key exists
         == Create the Encryption Key ==
 
         cfw $sync kv++: HMAC512_Slots(Key : Slot A,\n                         Data Key : Slot Z\n                         Destination Slot: Y)
-        kv $sync srk: Get Storage Root Key
+        kv $sync fek: Get FEK
         kv $sync tempz: Get Access Key
         kv $sync kv: HMAC512 Slot A with Slot Z
         kv $sync tempy: HMAC512 result PMEK
