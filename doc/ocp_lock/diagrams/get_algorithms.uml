@@ -36,14 +36,14 @@ note over cfw
 
     From the HPKE base spec:
 
-    *	kem_id = 0x0011: P-384
-    *	aead_id = 0x0002: AES-256-GCM
-    *	kdf_id = 0x0002: HKDF-SHA384
+    * kem_id = 0x0011: P-384
+    * aead_id = 0x0002: AES-256-GCM
+    * kdf_id = 0x0002: HKDF-SHA384
 
     For post-quantum crypto, from [Hybrid PQ/T Key Encapsulation Mechanisms](https://datatracker.ietf.org/doc/draft-irtf-cfrg-hybrid-kems/):
 
-    *	kem_id = 0x0a25: ML-KEM-1024 + P-384
-    *	aead_id and kdf_id will be the same as from the base spec.
+    * kem_id = 0x0a25: ML-KEM-1024 + P-384
+    * aead_id and kdf_id will be the same as from the base spec.
 
 end note
 
