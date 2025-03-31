@@ -62,10 +62,10 @@
 
 **Revision Table**
 
-|     Date | Revision # | Author | Description |
-| :--------------: | :---: | :-------------------: | :-----|
-|  September 2024  |  0.5 |   Authoring Companies  | Initial proposal draft based on work from the list of contributors |
-|    April 2025    |  0.7 |   Authoring Companies  | Updates that include updates APIs, UML Sequence diagrams, and racheting with fuses |
+| Date             | Revision # | Author              | Description |
+| :--------------- | :--------- | :-----------------: | :---------- |
+|  September 2024  |  0.5       | Authoring Companies | Initial proposal draft based on work from the list of contributors |
+|    April 2025    |  0.7       | Authoring Companies | Updates that include updates APIs, UML Sequence diagrams, and racheting with fuses |
 
 <div style="page-break-after: always"></div>
 
@@ -375,7 +375,7 @@ Controller firmware may request that KMB generate a random PMEK, bound to a give
 
 Controller firmware may then store the encrypted PMEK in persistent storage.
 
-<b>Sequence to generate a PMEK:</b>
+**Sequence to generate a PMEK:**
 
 <p align="center">
   <img src="./diagrams/generate_pmek.svg" alt="Generating a PMEK" />
@@ -395,7 +395,7 @@ To unlock a PMEK, KMB performs the following steps:
 
 Controller firmware may then stash the encrypted unlocked PMEK in volatile storage, and later provide it to the KMB when deriving an MEK, as described [above](#mek-derivation).
 
-<b>Sequence to unlock a PMEK:</b>
+**Sequence to unlock a PMEK:**
 
 <p align="center">
   <img src="./diagrams/unlock_pmek.svg" alt="Unlocking a PMEK" />
@@ -414,7 +414,7 @@ The access key to which a PMEK is bound may be rotated. The user must prove that
 
 Controller firmware then erases the old encrypted PMEK and stores the new encrypted PMEK in persistent storage.
 
-<b>Sequence to rotate the access key of a PMEK:</b>
+**Sequence to rotate the access key of a PMEK:**
 
 <p align="center">
   <img src="./diagrams/rewrap_pmek.svg" alt="Rewrapping a PMEK" />
@@ -439,7 +439,7 @@ Upon receipt, KMB will perform the following steps:
 
 Upon drive reset, the KEMs are regenerated, and any access keys for PMEKs that had been unlocked prior to the reset will need to be re-provisioned.
 
-<b>Sequence to endorse an encapsulation public key:</b>
+**Sequence to endorse an encapsulation public key:**
 
 <p align="center">
   <img src="./diagrams/endorse_encapsulation_pub_key.svg" alt="Endorseing a KEM Pub key" />
@@ -451,7 +451,7 @@ As noted [above](#pmek-access-key-rotation), during access key rotation the user
 
 The KMB then performs a double decryption when unwrapping the new access key, proving that the provisioner of the new access key also knows the old access key.
 
-<b>Sequence to rotate an encapsulation key:</b>
+**Sequence to rotate an encapsulation key:**
 
 <p align="center">
   <img src="./diagrams/rotate_encapsulation_key.svg" alt="Rotateing a KEM Encapsulation Key" />
@@ -464,7 +464,7 @@ OCP L.O.C.K. supports the following KEM algorithms:
 - P384 ECDH
 - Hybridized ML-KEM-1024 with P-384 ECDH
 
-<b>Sequence to obtain the supported algorithms:</b>
+**Sequence to obtain the supported algorithms:**
 
 <p align="center">
   <img src="./diagrams/get_algorithms.svg" alt="Get Supported Algorithms" />
@@ -474,7 +474,7 @@ OCP L.O.C.K. supports the following KEM algorithms:
 
 OCP L.O.C.K. has the following function to assist with determining the status.
 
-<b>Sequence to obtain the current status of OCP L.O.C.K.:</b>
+**Sequence to obtain the current status of OCP L.O.C.K.:**
 
 <p align="center">
   <img src="./diagrams/get_status.svg" alt="Get Status" />
@@ -524,12 +524,12 @@ KMB uses Special Function Registers (SFRs) to communicate with Encryption Engine
 
 *<p style="text-align: center;">Table 1: KBM to Encryption Engine SFRs</p>*
 
-| Register | Address | 	Byte Size	| Description |
-| :-------: | :------------: | :--: | :---------------------------|
-| Control                    | SFR_BASE + 0h  | 4h   | Register to handle commands |
-| Metadata                   | SFR_BASE + 10h | 14h  | Register to provide metadata |
-| Auxiliary Data (AUX)       | SFR_BASE + 30h | 20h  | Register to provide auxiliary values |
-| Media Encryption Key (MEK) | SFR_BASE + 50h | 40h  | Register to provide MEK |
+| Register                   | Address        | Byte Size | Description |
+| :------------------------- | :------------- | :-------- | :---------- |
+| Control                    | SFR_BASE + 0h  | 4h        | Register to handle commands |
+| Metadata                   | SFR_BASE + 10h | 14h       | Register to provide metadata |
+| Auxiliary Data (AUX)       | SFR_BASE + 30h | 20h       | Register to provide auxiliary values |
+| Media Encryption Key (MEK) | SFR_BASE + 50h | 40h       | Register to provide MEK |
 
 SFR_BASE is an address that is configured on KMB. The integrator should make sure that KMB can access these SFRs through these addresses.
 
@@ -539,71 +539,43 @@ Figure 10 defines the Control register used to sequence the execution of a comma
 
 *<p style="text-align: center;">Figure 10: Offset SFR_Base + 0h: CTRL – Control</p>*
 
-<table>
-<tr><th>Bits</th><th>Type</th><th>Reset</th><th>Description</th></tr>
-<tr><td>31</td><td>RO</td><td>0h</td><td><b>Ready (RDY):</b> After an NVM Subsystem Reset, this bit is set to 1b, then the Encryption Engine is ready to execute commands. If this bit is set to 0b, then the Encryption Engine is not ready to execute commands.</td></tr>
-<tr><td>30:20</td><td>RO</td><td>0h</td><td>Reserved</td></tr>
-<tr><td>19:16</td><td>RO</td><td>0h</td><td><b>Error (ERR):</b>> If the DONE bit is set to 1b by the Encryption Engine, then this field if set to a non-zero value to indicate the Encryption Engine detected an error during the execution the command specified by the CMD field. The definition of a non-zero value is vendor specific.
-
-| Value    | Description |
-| :--:     | :---------- |
-| 0h       | Command Successful |
-| 1h to 3h | Reserved |
-| 4h to Fh | Vendor Specific |
-
-If the DONE bit is set to 1b by the Encryption Engine and this field is set to 0h, then the Encryption Engine is indicating a successful execution of a command specified by the CMD field.\n
-If the DONE bit is set to 1b by KMB, then the field is set to 0000b.</td></tr>
-<tr><td>15:6</td><td>RO</td><td>0h</td><td>Reserved</td></tr>
-<tr><td>2:5</td><td>RW</td><td>0h</td><td><b>Command (CMD):</b> This field specifies the command to execute or the command associated with the reported status.
-  
-| Value | Description |
-| :-------: | :---- |
-| 0h        | Reserved |
-| 1h        | <b>Load MEK:</b> Load the key specified by the AUX field and MEK register into the Encryption Engine as specified by the METD field. |
-| 2h        | <b>Unload MEK:</b> Unload the MEK from the Encryption Engine as specified by the METD field. |
-| 3h        | <b>Sanitize:</b> Unload all of the MEKs from the Encryption Engine (i.e., Sanitize the Encryption Engine MEKs). |
-| 4h to Fh  | Reserved |
-
-</td></tr>
-<tr><td>1</td><td>RW</td><td>0b</td><td>Done (DN): This bit indicates the completion of a command by the Encryption Engine.\n
-If this bit is set to 1b by the Encryption Engine, then the Encryption Engine has completed the command specified by the CMD field.\n
-If the EXE bit is set to 1b and this bit is set to 1b, then the Encryption Engine has completed executing the command specified by the CMD field and the ERR field indicates the status of the execution of that command.
-A write of the value 1b to this bit shall cause the Encryption Engine to:
- - set this bit to 0b;
- - set the EXE bit to 0b; and
- - set the ERR field to 00b.
- </td></tr>
-<tr><td>0</td><td>RW</td><td>0b</td><td><b>Execute (EXE):</b> A write of the value 1b to this bit specifies that the Encryption Engine is to execute the command specified by the CMD field.
-If the DONE bit is set to 1 by KMB, then the bit is set to 0b.
-</td></tr></table>
+| Bits  | Type | Reset | Description |
+| :---- | :--- | :---- | :---------- |
+| 31    | RO   | 0h    | **Ready (RDY):** After an NVM Subsystem Reset, this bit is set to 1b, then the Encryption Engine is ready to execute commands. If this bit is set to 0b, then the Encryption Engine is not ready to execute commands. |
+| 30:20 | RO   | 0h    | Reserved |
+| 19:16 | RO   | 0h    | **Error (ERR):** If the DONE bit is set to 1b by the Encryption Engine, then this field is set to a non-zero value to indicate the Encryption Engine detected an error during the execution the command specified by the CMD field. The definition of a non-zero value is vendor specific. <table><tr><td><b>Value</b></td><td><b>Description</b></td></tr><tr><td>0h</td><td>Command Successful</td></tr><tr><td>1h to 3h</td><td>Reserved</td></tr><tr><td>4h to Fh</td><td>Vendor Specific</td></tr></table> If the DONE bit is set to 1b by the Encryption Engine and this field is set to 0h, then the Encryption Engine is indicating a successful execution of a command specified by the CMD field. If the DONE bit is set to 1b by KMB, then the field is set to 0000b. |
+| 15:6  | RO   | 0h    | Reserved |
+| 5:2   | RW   | 0h    | **Command (CMD):** This field specifies the command to execute or the command associated with the reported status. <table><tr><tr><b>Value</b></tr><tr><b>Description</b></tr></tr><tr><td>0h</td><td>Reserved</td></tr><tr><td>1h</td><td><b>Load MEK:</b> Load the key specified by the AUX field and MEK register into the Encryption Engine as specified by the METD field.</td></tr><tr><td>2h</td><td><b>Unload MEK:</b> Unload the MEK from the Encryption Engine as specified by the METD field.</td></tr><tr><td>3h</td><td><b>Sanitize:</b> Unload all of the MEKs from the Encryption Engine (i.e., Sanitize the Encryption Engine MEKs).</td></tr><tr><td>4h to Fh</td><td>Reserved</td></tr></table> |
+| 1     | RW   | 0b    | **Done (DN):** This bit indicates the completion of a command by the Encryption Engine. If this bit is set to 1b by the Encryption Engine, then the Encryption Engine has completed the command specified by the CMD field. If the EXE bit is set to 1b and this bit is set to 1b, then the Encryption Engine has completed executing the command specified by the CMD field and the ERR field indicates the status of the execution of that command. A write of the value 1b to this bit shall cause the Encryption Engine to:<ul><li>set this bit to 0b;</li><li>set the EXE bit to 0b; and</li><li>set the ERR field to 0000b.</li></ul> |
+| 0     | RW   | 0b    | **Execute (EXE):** A write of the value 1b to this bit specifies that the Encryption Engine is to execute the command specified by the CMD field. If the DONE bit is set to 1 by KMB, then the bit is set to 0b. |
 
 From the KMB, the Controller register is the register to write a command and receive its execution result. From its counterpart, the Encryption Engine, the Controller register is used to receive a command and write its execution result.
 
 The expected change flow of the Controller register to handle a command is as follows:
 
-1. If <b>RDY</b> is set to 1b, then KMB writes <b>CMD</b> and <b>EXE</b>
-    1. <b>CMD:</b> either 1h, 2h or 3h
-    2. <b>EXE:</b> 1b
-2. The Encryption Engine writes</b> <b>ERR</b> and <b>DN</b>
-    1.<b>ERR:</b> either 0b or a non-zero value depending on the execution result
-    2. <b>DN:</b> 1b
-3. The KMB writes <b>DN</b>
-    1. <b>DN:</b> 1b
-4. The Encryption Engine writes <b>CMD</b>, <b>ERR</b>, <b>DN</b> and <b>EXE</b>
-    1. <b>CMD:</b> 0h
-    2. <b>ERR:</b> 0h
-    3. <b>DN:</b> 0b
-    4. <b>EXE:</b> 0b
+1. If **RDY** is set to 1b, then KMB writes **CMD** and **EXE**
+    1. **CMD:** either 1h, 2h or 3h
+    2. **EXE:** 1b
+2. The Encryption Engine writes** **ERR** and **DN**
+    1. **ERR:** either 0b or a non-zero value depending on the execution result
+    2. **DN:** 1b
+3. The KMB writes **DN**
+    1. **DN:** 1b
+4. The Encryption Engine writes **CMD**, **ERR**, **DN** and **EXE**
+    1. **CMD:** 0h
+    2. **ERR:** 0h
+    3. **DN:** 0b
+    4. **EXE:** 0b
   
 The KMB therefore interacts with the Control register as follows in the normal circumstance:
 
-1. The KMB writes <b>CMD</b> and <b>EXE</b>
-    1. <b>CMD:</b> either 1h, 2h or 3h
-    2. <b>EXE:</b> 1b
-2.	The KMB waits <b>DN</b> to be 1
-3.	The KMB writes <b>DN</b>
-    1. <b>DN:</b> 1b
-4.	The KMB waits <b>DN</b> to be 0
+1. The KMB writes **CMD** and **EXE**
+    1. **CMD:** either 1h, 2h or 3h
+    2. **EXE:** 1b
+2.	The KMB waits **DN** to be 1
+3.	The KMB writes **DN**
+    1. **DN:** 1b
+4.	The KMB waits **DN** to be 0
 
 Since the Controller register is in fact a part of the Encryption Engine whose implementation can be unique by each vendor, behaviors of the Control register with the unexpected flow are left for vendors. For example, a vendor who wants robustness might integrate a write-lock into the Control register in order to prevent two almost simultaneous writes on EXE bit.
 
@@ -614,17 +586,17 @@ Figure 11 defines the Metadata register.
 *<p style="text-align: center;">Figure 11: Offset SFR_Base + 10h: METD – Metadata</p>*
 
 | Bytes | Type  | Reset | Description |
-| :---: | :---: | :---: | :--- |
-| 19:00 | RW    | 0b    | <b>Metadata (METD):</b> This field specifies metadata that is vendor specific and specifies the entry in the Encryption Engine for the Encryption Key.|
+| :---- | :---- | :---- | :---------- |
+| 19:00 | RW    | 0h    | **Metadata (METD):** This field specifies metadata that is vendor specific and specifies the entry in the Encryption Engine for the Encryption Key.|
 
-For the security goal of this project, the KMB and the Encryption Engine must be the only components which have access to MEKs. Each MEK must then be bound to a unique identifier, which can be accessible by other components, in order for an appropriate key to be used for any key-related operations including data I/O. In a LOCK-enabled system, the <b>METD</b> field is expected to be used as such identifier.
+For the security goal of this project, the KMB and the Encryption Engine must be the only components which have access to MEKs. Each MEK must then be bound to a unique identifier, which can be accessible by other components, in order for an appropriate key to be used for any key-related operations including data I/O. In a LOCK-enabled system, the **METD** field is expected to be used as such identifier.
 
-Instead of generating a random and unique identifier within the KMB while generating an MEK, the KMB takes an <b>METD</b> value as input from the controller firmware and write to the Metadata register without any modification for the sake of the following reasons:
+Instead of generating a random and unique identifier within the KMB while generating an MEK, the KMB takes an **METD** value as input from the controller firmware and write to the Metadata register without any modification for the sake of the following reasons:
 
 1. A vendor does not need to implement an additional algorithm to map between identifiers in its own system and in the KMB
-2. A vendor-unique key-retrieval algorithm can easily be leveraged into a <b>METD</b>-generation algorithm
+2. A vendor-unique key-retrieval algorithm can easily be leveraged into a **METD**-generation algorithm
 
-In order to reduce ambiguity, two examples of the <b>METD</b> field will be given: Logical Block Addressing (LBA) range-based metadata; and key-tag based metadata.
+In order to reduce ambiguity, two examples of the **METD** field will be given: Logical Block Addressing (LBA) range-based metadata; and key-tag based metadata.
 
 When an SSD stores data with address-based encryption, an MEK can be uniquely identified by a (LBA range, Namespace ID) pair. Then, the (LBA range, Namespace ID) pair can be leveraged into METD as on Figure 12.
 
@@ -634,7 +606,7 @@ When an SSD stores data with address-based encryption, an MEK can be uniquely id
   <img src="./images/lba_nsid_info.jpg" alt="LBA and NSID" />
 </p>
 
-Address-based encryption is not however the only encryption mechanism in SSDs. For example, in TCG Key Per I/O, an MEK is selected by a key tag, which does not map to an address. Figure 13 shows an example of <b>METD</b> in such cases.
+Address-based encryption is not however the only encryption mechanism in SSDs. For example, in TCG Key Per I/O, an MEK is selected by a key tag, which does not map to an address. Figure 13 shows an example of **METD** in such cases.
 
 *<p style="text-align: center;">Figure 13: Key Tag Based Metadata Format</p>*
 
@@ -642,7 +614,7 @@ Address-based encryption is not however the only encryption mechanism in SSDs. F
   <img src="./images/key_tag_info.jpg" alt="Key Tag Info" />
 </p>
 
-The above examples are not the only possible values of <b>METD</b>. Vendors are encouraged to design and use their own <b>METD</b> if it fits better to their system.
+The above examples are not the only possible values of **METD**. Vendors are encouraged to design and use their own **METD** if it fits better to their system.
 
 #### Auxiliary Data Register
 
@@ -651,14 +623,14 @@ Figure 14 defines the Auxiliary Data register.
 *<p style="text-align: center;">Figure 14: Offset SFR_Base + 20h: AUX – Auxiliary Data</p>*
 
 | Bytes | Type | Reset | Description |
-| :---- | :--: | :---: | :---------: |
-| 19:00 | RW   |  0h   | <b>Auxiliary Data (AUX):</b> This field specifies auxiliary data associated to the MEK. |
+| :---- | :--- | :---- | :---------- |
+| 31:00 | RW   |  0h   | **Auxiliary Data (AUX):** This field specifies auxiliary data associated to the MEK. |
 
-At first glance, the usage of <b>AUX</b> might not be straightforward. The intuition behind introducing the <b>AUX</b> field is to support vendor-specific features on MEKs. The KMB itself is only supporting fundamental functionalities in order to minimize attack surfaces on MEKs. Moreover, vendors are not restricted to design and implement their own MEK-related functionalities on the Encryption Engine unless they can be used to exfiltrate MEKs. In order to support these functionalities, some data may be associated and stored with an MEK and the <b>AUX</b> field is introduced to store such data with each MEK.
+At first glance, the usage of **AUX** might not be straightforward. The intuition behind introducing the **AUX** field is to support vendor-specific features on MEKs. The KMB itself is only supporting fundamental functionalities in order to minimize attack surfaces on MEKs. Moreover, vendors are not restricted to design and implement their own MEK-related functionalities on the Encryption Engine unless they can be used to exfiltrate MEKs. In order to support these functionalities, some data may be associated and stored with an MEK and the **AUX** field is introduced to store such data with each MEK.
 
-When the controller firmware instructs the KMB to generate a new MEK, the controller firmware is expected to provide an <b>AUX</b> value. Similar to the <b>METD</b> field, the KMB will write the <b>AUX</b> value into the Auxiliary Data register without any modification.
+When the controller firmware instructs the KMB to generate a new MEK, the controller firmware is expected to provide an **AUX** value. Similar to the **METD** field, the KMB will write the **AUX** value into the Auxiliary Data register without any modification.
 
-One simple use case of the <b>AUX</b> field is to store an offset of initialization vector or nonce. It can also be used in a more complicated use case. Here is an example. Suppose that there exists a vendor who wants to design a system which supports several modes of operation through the Encryption Engine while using the KMB. Then, a structure of <b>AUX</b> value as on Figure 15 can be used.
+One simple use case of the **AUX** field is to store an offset of initialization vector or nonce. It can also be used in a more complicated use case. Here is an example. Suppose that there exists a vendor who wants to design a system which supports several modes of operation through the Encryption Engine while using the KMB. Then, a structure of **AUX** value as on Figure 15 can be used.
 
 *<p style="text-align: center;">Figure 15: Auxiliary Data Format Example</p>*
 
@@ -666,7 +638,7 @@ One simple use case of the <b>AUX</b> field is to store an offset of initializat
   <img src="./images/aux_info.jpg" alt="Aux Info" />
 </p>
 
-When the controller firmware instructs KMB to generate an KMB, the controller firmware can use the <b>AUX</b> value to specify which mode of operation should be used and which value should be used as an initialization vector or a nonce with the generated MEK.
+When the controller firmware instructs KMB to generate an KMB, the controller firmware can use the **AUX** value to specify which mode of operation should be used and which value should be used as an initialization vector or a nonce with the generated MEK.
 
 #### Media Encryption Key (MEK) register
 
@@ -675,9 +647,9 @@ Figure 16 defines the MEK register.
 *<p style="text-align: center;">Figure 16: Offset SFR_Base + 40h: MEK – Media Encryption Key</p>*
 
 | Bytes | Type | Reset | Description |
-| :--:  | :--: | :--:  | :------ |
-| 31:00 |  WO  |   0h  | <b>Secret Encryption Key (SEK):</b> This field specifies a 256-bit Encryption Key |
-| 63:32 |  WO  |   0h  | <b>Tweakable Key (TWK):</b> This is the 256-bit AES-XTS tweakable key. |
+| :---- | :--- | :---- | :---------- |
+| 31:00 |  WO  |   0h  | **Secret Encryption Key (SEK):** This field specifies a 256-bit Encryption Key |
+| 63:32 |  WO  |   0h  | **Tweakable Key (TWK):** This is the 256-bit AES-XTS tweakable key. |
 
 Since the AES-XTS is one of the most popular algorithms for data encryption, the MEK register is also designed with the key format of AES-XTS. The layout of the MEK register is however designed to help understanding the structure. The Encryption Engine is not restricted to only support the AES-XTS. The choice of encryption algorithm is solely dependent on vendors. When a vendor decides to use a different encryption algorithm, an MEK can be seen as a 64-byte random value rather than a (secret key, tweak key) pair and how to slice the 64-byte random value into an encryption key will be left to the vendor.
 
@@ -704,7 +676,7 @@ A storage device equipped with OCP L.O.C.K. will be equipped with N 256-bit ratc
 -Caliptra Core firmware can detect which ratchet secrets are all-zeroes, randomized, or all-ones. This can be done by representing a counter in fuses, which maps to ratchet secret states. Controller firmware would be responsible for ensuring that the counter value corresponds with the ratchet secrets' current state.<br>The counter values map to the following states:
 
 | State  | Description |
-| :----: | :---------- |
+| :----- | :---------- |
 | 4i + 0 | Ri has begun being programmed with randomness, but is not yet considered randomized. |
 | 4i + 1 | Ri has been randomized. |
 | 4i + 2 | Ri has begun being programmed to all-ones, and is no longer considered randomized. |
@@ -756,7 +728,7 @@ There can be errors programming a System Root Key and erasing a System Root Key.
 The diagram below has an example flow where the number of System Rook Keys available to be programmed is 3 (N=3):
 
 | State transition                              | active_slot | slot_state           | next_action |
-| :-------------------------------------------- | :---------: | :------------------: | :---------- |
+| :-------------------------------------------- | :---------- | :------------------- | :---------- |
 | Factory                                       | 0           | EMPTY                | PROGRAM |
 | Program first entry                           | 0           | PROGRAMMED           | ERASE |
 | Erase first entry<br>(recoverable failure)    | 0           | PARTIALLY_ERASED     | ERASE |
@@ -803,27 +775,17 @@ Command Code: 0x4753_5441 (“GSTA”)
 Table: GET_STATUS input arguments
 
 | Name  | Type  | Description |
-| :---: | :---: | :--- |
+| :---- | :---- | :---------- |
 |chksum | u32   | Checksum over other input arguments, computed by the caller. Little endian. |
 
 Table: GET_STATUS output arguments
 
-<table>
-<tr><th>Name</th><th>Type</th><th>Description</th></tr>
-<tr><td>chksum</td><td>u32</td><td>Checksum over other output arguments, computed by Caliptra. Little endian.</td></tr>                
-<tr><td>fips_status</td><td>u32</td><td>Indicates if the command is FIPS approved or an error</td></tr>           
-
-<tr><td>engine_ready</td><td>u32</td>
-	<td>Ready status of the storage device crypto engine:
- 		<ul>
-			<li>OCP L.O.C.K. defines low range, vendor defines high range</li>
-   			<li>Byte 0:
-				<ul>
-					<li>Bit 0: 1 = Ready 0 = Not ready</li>
-				</ul></td>
-		</ul></td></tr>           
-<tr><td>reserved</td><td>u32[4]</td><td>Reserved</td></tr>             
-</table>
+| Name         | Type    | Description |
+| :----------- | :------ | :---------- |
+| chksum       | u32     | Checksum over other output arguments, computed by Caliptra. Little endian. |
+| fips_status  | u32     | Indicates if the command is FIPS approved or an error |
+| engine_ready | u32     | Ready status of the storage device crypto engine.<br>OCP L.O.C.K. defines low range, vendor defines high range. <ul><li>Byte 0 Bit 0: 1 = Ready 0 = Not ready</li></ul> | Reserved |
+| reserved     | u32[4]  | 
 
 ## GET_ALGORITHMS
 
@@ -834,49 +796,20 @@ Command Code: 0x4743_4150 (“GCAP”)
 Table: GET_ALGORITHMS input arguments
 
 | Name     | Type    | Description |
-| :------: | :-----: | :------- |
+| :------- | :------ | :---------- |
 | chksum   | u32     | Checksum over other input arguments, computed by the caller. Little endian. |
 
 Table: GET_ALGORITHMS output arguments
 
-<table>
-<tr><th>Name</th><th>Type</th><th>Description</th></tr>
-<tr><td>chksum</td><td>u32</td><td>Checksum over other output arguments, computed by Caliptra. Little endian.</td></tr>                
-<tr><td>endorsement_algorithms</td><td>u32</td>
-	<td>Identifies the supported endorsement algorithms:
-		<ul>
-			<li>Byte 0
-				<ul>
-					<li>bit 0: ecdsa_secp384r1_sha384[^2]</li>
-			</ul></li>
-	</ul></td></tr>
-<tr><td>hpke_algorithms</td><td>u32</td>
-	<td>Identifies the supported HPKE algorithms:
-		<ul>
-			<li>Byte 0
-				<ul>
-					<li>bit 0: kem_id = 0x0011, aead_id = 0x0002, kdf_id = 0x0002[^5]</li>
-					<li>bit 1: kem_id = 0x0a25, aead_id = 0x0002, kdf_id = 0x0002[^6]</li>
-			</ul></li>
-		</ul></td></tr>
-<tr><td>pmek_algorithms</td><td>u32</td>
-	<td>Indicates the size of PMEKs:
-		<ul>
-			<li>Byte 0
-				<ul>
-					<li>bit 0: 256 bits</li>
-			</ul></li>
-		</ul></td></tr>
-<tr><td>access_key_algorithm</td><td>u32</td>
-	<td>Indicates the size of access keys:
-		<ul>
-			<li>Byte 0
-				<ul>
-					<li>bit 0: 256 bits, with a 128-bit truncated SHA384 ID</li>
-			</ul></li>
-		</ul></td></tr>
-<tr><td>Reserved</td><td>u32[4]</td><td>Reserved</td></tr>
-</table>
+| Name                   | Type   | Description |
+| :--------------------- | :----- | :---------- |
+| chksum                 | u32    | Checksum over other output arguments, computed by Caliptra. Little endian. |
+| fips_status            | u32    | Indicates if the command is FIPS approved or an error |
+| endorsement_algorithms | u32    | Identifies the supported endorsement algorithms:<ul><li>Byte 0 bit 0: ecdsa_secp384r1_sha384[^4]</li><li>Byte 0 bit 1: ml-dsa-87[^5]</li></ul> |
+| hpke_algorithms        | u32    | Identifies the supported HPKE algorithms:<ul><li>Byte 0 bit 0: kem_id = 0x0011, aead_id = 0x0002, kdf_id = 0x0002[^6]</li><li>Byte 0 bit 1: bit 1: kem_id = 0x0a25, aead_id = 0x0002, kdf_id = 0x0002[^7]</li></ul> |
+| pmek_algorithms        | u32    | Indicates the size of PMEKs:<ul><li>Byte 0 bit 0: 256 bits</li></ul> |
+| access_key_algorithm   | u32    | Indicates the size of access keys:<ul><li>Byte 0 bit 0: 256 bits, with a 128-bit truncated SHA384 ID</li></ul> |
+| reserved               | u32[4] | Reserved |
 
 ## CLEAR_KEY_CACHE
 
@@ -887,7 +820,7 @@ Command Code: 0x4353_4543 (“CSEC”)?????
 Table: CLEAR_KEY_CACHE input arguments
 
 | Name        | Type | Description |
-| :---------: | :--: | :------- |
+| :---------- | :--- | :---------- |
 | chksum      | u32  | Checksum over other input arguments, computed by the caller. Little endian. |
 | rdy_timeout | u32  | Timeout in ms for encryption engine to become ready for a new command |
 | cmd_timeout | u32  | Timeout in ms for command to crypto engine to complete |
@@ -895,7 +828,7 @@ Table: CLEAR_KEY_CACHE input arguments
 Table: CLEAR_KEY_CACHE output arguments
 
 | Name        | Type    | Description |
-| :---------: | :-----: | :------- |
+| :---------- | :------ | :---------- |
 | chksum      | u32     | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status | u32     | Indicates if the command is FIPS approved or an error |
 
@@ -908,7 +841,7 @@ Command Code: 0x4E45_505B (“EEPK”)
 Table: ENDORSE_ENCAPSULATION_PUB_KEY input arguments
 
 | Name                  | Type   | Description |
-| :-------------------: | :----: | :------- |
+| :-------------------- | :----- | :---------- |
 | chksum                | u32    | Checksum over other input arguments, computed by the caller. Little endian |
 | kem_handle            | u32    | Handle for KEM keypair held in KMB memory|
 | endorsement_algorithm | u32    | Endorsement algorithm identifier. If 0h, then return public key |
@@ -916,7 +849,7 @@ Table: ENDORSE_ENCAPSULATION_PUB_KEY input arguments
 Table: ENDORSE_ENCAPSULATION_PUB_KEY output arguments
 
 | Name            | Type      | Description |
-| :-------------: | :-------: | :------- |
+| :-------------- | :-------- | :---------- |
 | chksum          | u32       | Checksum over other output arguments, computed by Caliptra. Little endian |
 | fips_status     | u32       | Indicates if the command is FIPS approved or an error |
 | pub_key         | KemPubKey | KEM public key |
@@ -931,18 +864,18 @@ Command Code: 0x5245_4E4B (“RENK”)
 
 Table: ROTATE_ENCAPSULATION_KEY input arguments
 
-| Name | Type | Description |
-| :----------: | :-----: | :------- |
-| chksum     | u32     | Checksum over other input arguments, computed by the caller. Little endian |
-| kem_handle | u32     | Handle for old KEM keypair held in KMB memory|
+| Name       | Type | Description |
+| :--------- | :--- | :---------- |
+| chksum     | u32  | Checksum over other input arguments, computed by the caller. Little endian. |
+| kem_handle | u32  | Handle for old KEM keypair held in KMB memory. |
 
 Table: ROTATE_ENCAPSULATION_KEY output arguments
 
-| Name       | Type    | Description |
-| :--------: | :-----: | :------- |
-| chksum     | u32     | Checksum over other output arguments, computed by Caliptra. Little endian |
-| fips_status| u32     | Indicates if the command is FIPS approved or an error |
-| kem_handle | u32     | Handle for new KEM keypair held in KMB memory |
+| Name       | Type | Description |
+| :--------- | :--- | :---------- |
+| chksum     | u32  | Checksum over other output arguments, computed by Caliptra. Little endian |
+| fips_status| u32  | Indicates if the command is FIPS approved or an error |
+| kem_handle | u32  | Handle for new KEM keypair held in KMB memory |
 
 ## GENERATE_PMEK
 
@@ -952,33 +885,16 @@ Command Code: 0x5245_4E4B (“RENK”)
 
 Table: GENERATE_PMEK input arguments
 
-<table>
-<tr><th>Name</th><th>Type</th><th>Description</th></tr>
-<tr><td>chksum</td><td>u32</td><td>Checksum over other input arguments, computed by the caller. Little endian.</td></tr>                
-<tr><td>pmek_algorithms</td><td>u32</td>
-<td>Indicates the size of PMEKs. Only one bit shall be reported:
-	<ul>
-		<li>Byte 0
-			<ul>
-				<li>bit 0: 256 bits</li>
-		</ul></li>
-	</ul>
-</td></tr>
-<tr><td>wrapped_access_key</td><td>WrappedAccessKey</td>
-<td>KEM-wrapped access key:
-	<ul>
-		<li>access_key_algorithm</li>
-		<li>kem_handle</li>
-		<li>kem_algorithm</li>
-		<li>kem_ciphertext</li>
-		<li>encrypted_access_key</li>
-	</ul>
-</td></tr></table>
+| Name               | Type             | Description |
+| :----------------- | :--------------- | :---------- |
+| chksum             | u32              | Checksum over other input arguments, computed by the caller. Little endian. |
+| pmek_algorithm     | u32              | Indicates the size of PMEKs. Only one bit shall be reported: <ul><li>Byte 0 bit 0: 256 bits</li></ul> |
+| wrapped_access_key | WrappedAccessKey | KEM-wrapped access key: <ul><li>access_key_algorithm</li><li>kem_handle</li><li>kem_algorithm</li><li>kem_ciphertext</li><li>encrypted_access_key</li></ul> |
 
 Table: GENERATE_PMEK output arguments
 
 | Name               | Type          | Description |
-| :----------------: | :-----------: | :------- |
+| :----------------- | :------------ | :---------- |
 | chksum             | u32           | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status        | u32           | Indicates if the command is FIPS approved or an error |
 | new_encrypted_pmek | EncryptedPmek | PMEK encrypted to access_key_2 |
@@ -993,30 +909,16 @@ Command Code: 0x5245_5750 (“REWP”)
 
 Table: REWRAP_PMEK input arguments
 
-<table>
-<tr><th>Name</th><th>Type</th><th>Description</th></tr>
-<tr><td>chksum</td><td>u32</td><td>Checksum over other input arguments, computed by the caller. Little endian.</td></tr>                
-<tr><td>wrapped_access_key_1</td><td>WrappedAccessKey</td>
-	<td>KEM-wrapped access key:
-		<ul>
-			<li>access_key_algorithm</li>
-			<li>kem_handle (X)m</li>
-			<li>kem_algorith</li>
-			<li>kem_ciphertext</li>
-			<li>encrypted_access_key</li>
-		</ul></td></tr>
-<tr><td>wrapped_enc_access_key_2</td><td>DoubleWrappedAccessKey</td>
-	<td>KEM-wrapped (access_key_2 encrypted to access_key_1):
-		<ul>
-			<li>double_encrypted_access_key</li>
-		</ul></td></tr>
-<tr><td>old_locked_pmek</td><td>EncryptedPmek</td><td>PMEK encrypted to access_key_1</td></tr>
-</table>
+| Name                     | Type                   | Description |
+| :----------------------- | :--------------------- | :---------- |
+| chksum                   | u32                    | Checksum over other input arguments, computed by the caller. Little endian. |
+| wrapped_access_key_1     | WrappedAccessKey       | KEM-wrapped access key: <ul><li>access_key_algorithm</li><li>kem_handle</li><li>kem_algorithm</li><li>kem_ciphertext</li><li>encrypted_access_key</li></ul> |
+| wrapped_enc_access_key_2 | DoubleWrappedAccessKey | KEM-wrapped (access_key_2 encrypted to access_key_1) |
 
 Table: REWRAP_PMEK output arguments
 
 | Name               | Type          | Description |
-| :----------------: | :-----------: | :------- |
+| :----------------- | :------------ | :---------- |
 | chksum             | u32           | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status        | u32           | Indicates if the command is FIPS approved or an error |
 | new_encrypted_pmek | EncryptedPmek | PMEK encrypted to access_key_2 |
@@ -1029,24 +931,16 @@ Command Code: 0x554E_4C50 (“UNLP”)
 
 Table: UNLOCK_PMEK input arguments
 
-<table>
-<tr><th>Name</th><th>Type</th><th>Description</th></tr>
-<tr><td>chksum</td><td>u32</td><td>Checksum over other input arguments, computed by the caller. Little endian.</td></tr>                
-<tr><td>wrapped_access_key</td><td>WrappedAccessKey</td>
-	<td>KEM-wrapped access key:
-		<ul>
-			<li>kem_handle</li>
-			<li>kem_algorithm</li>
-			<li>kem_ciphertext</li>
-			<li>encrypted_access_key</li>
-		</ul></td></tr>
-<tr><td>locked_pmek</td><td>EncryptedPmek</td><td>PMEK encrypted to storage root key and access key</td></tr>
-</table>
+| Name               | Type             | Description |
+| :----------------- | :--------------- | :---------- |
+| chksum             | u32              | Checksum over other input arguments, computed by the caller. Little endian. |
+| wrapped_access_key | WrappedAccessKey | KEM-wrapped access key: <ul><li>access_key_algorithm</li><li>kem_handle</li><li>kem_algorithm</li><li>kem_ciphertext</li><li>encrypted_access_key</li></ul> |
+| locked_pmek        | EncryptedPmek    | PMEK encrypted to storage root key and access key. |
 
 Table: UNLOCK_PMEK output arguments
 
 | Name          | Type          | Description |
-| :-----------: | :-----------: | :------- |
+| :------------ | :------------ | :---------- |
 | chksum        | u32           | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status   | u32           | Indicates if the command is FIPS approved or an error |
 | unlocked_pmek | EncryptedPmek | PMEK encrypted to an export secret that is rotated  on reset |
@@ -1062,14 +956,14 @@ Command Code: 0x4D50_4D4B (“MPMK”)
 Table: MIX_PMEK input arguments
 
 | Name          | Type          | Description |
-| :-----------: | :-----------: | :------- |
+| :------------ | :------------ | :---------- |
 | chksum        | u32           | Checksum over other input arguments, computed by the caller. Little endian. |
 | unlocked_pmek | EncryptedPmek | PMEK encrypted to an export secret that is rotated  on reset |
 
 Table: MIX_PMEK output arguments
 
 | Name         | Type | Description |
-| :----------: | :--: | :------- |
+| :----------- | :--- | :---------- |
 | chksum       | u32  | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status  | u32  | Indicates if the command is FIPS approved or an error |
 
@@ -1087,23 +981,19 @@ Command Code: 0x4C4D_454B (“LMEK”)
 
 Table: LOAD_MEK input arguments
 
-<table>
-<tr><th>Name</th><th>Type</th><th>Description</th></tr>
-<tr><td>chksum</td><td>u32</td><td>Checksum over other input arguments, computed by the caller. Little endian.</td></tr>                
-<tr><td>metadata</td><td>u8[20]</td><td>Metadata for MEK to load into the drive crypto engine (i.e. NSID + LBA range)</td></tr>           
-<tr><td>aux_metadata</td><td>u8[32]</td><td>Auxiliary metadata for the MEK (optional; i.e. operation mode)</td></tr>                
-<tr><td>rdy_timeout</td><td>u32</td><td>Timeout in ms for encryption engine to become ready for a new command</td></tr>                
-<tr><td>cmd_timeout</td><td>u32</td><td>Checksum over other input arguments, computed by the caller. Little endian.</td></tr>             <tr><td>dek</td><td>u8[32]</td>
-	<td>Controller-supplied "data encryption key:
-		<ul>
-			<li>May be a C_PIN-derived secret in Opal or a per-MEK value in KPIO</li>
-		</ul></td></tr>
-</table>
+| Name         | Type   | Description |
+| :----------- | :----- | :---------- |
+| chksum       | u32    | Checksum over other input arguments, computed by the caller. Little endian. |
+| metadata     | u8[20] | Metadata for MEK to load into the drive crypto engine (i.e. NSID + LBA range) |
+| aux_metadata | u8[32] | Auxiliary metadata for the MEK (optional; i.e. operation mode) |
+| rdy_timeout  | u32    | Timeout in ms for encryption engine to become ready for a new command |
+| cmd_timeout  | u32    | Timeout in ms for command to crypto engine to complete |
+| dek          | u8[32] | "Data encryption key". May be a C_PIN-derived secret in Opal or a per-MEK value in KPIO. |
 
 Table: LOAD_MEK output arguments
 
 | Name         | Type | Description |
-| :----------: | :--: | :------- |
+| :----------- | :--- | :---------- |
 | chksum       | u32  | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status  | u32  | Indicates if the command is FIPS approved or an error |
 
@@ -1116,7 +1006,7 @@ Command Code: 0x554D_454B (“UMEK”)
 Table: UNLOAD_MEK input arguments
 
 | Name         | Type    | Description |
-| :----------: | :-----: | :------- |
+| :----------- | :------ | :---------- |
 | chksum       | u32     | Checksum over other input arguments, computed by the caller. Little endian. |
 | metadata     | u8[20]  | Metadata for MEK to load into the drive crypto engine (i.e. NSID + LBA range) |
 | rdy_timeout  | u32     | Timeout in ms for encryption engine to become ready for a new command |
@@ -1125,7 +1015,7 @@ Table: UNLOAD_MEK input arguments
 Table: UNLOAD_MEK output arguments
 
 | Name         | Type   | Description |
-| :----------: | :----: | :------- |
+| :----------- | :----- | :---------- |
 | chksum       | u32    | Checksum over other output arguments, computed by Caliptra. Little endian |
 | fips_status  | u32    | Indicates if the command is FIPS approved or an error |
 
@@ -1137,18 +1027,18 @@ Command Code: 0x4548_444C (“EHDL”)
 
 Table: ENUMERATE_KEM_HANDLES input arguments
 
-| Name    | Type | Description |
-| :-----: | :--: | :------- |
-| chksum  | u32  | Checksum over other input arguments, computed by the caller. Little endian. |
+| Name   | Type | Description |
+| :----- | :--- | :---------- |
+| chksum | u32  | Checksum over other input arguments, computed by the caller. Little endian. |
 
 Table: ENUMERATE_KEM_HANDLES output arguments
 
 | Name             | Type         | Description |
-| :--------------: | :----------: | :------- |
+| :--------------- | :----------- | :---------- |
 | chksum           | u32          | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status      | u32          | Indicates if the command is FIPS approved or an error |
 | kem_handle_count | u32          | Number of KEM handles (N) |
-| kem_handles      | KEMHandle[N] | List of (KEM handle value, KEM algorithm) tuples |
+| kem_handles      | KemHandle[N] | List of (KEM handle value, KEM algorithm) tuples |
 
 ## ERASE_CURRENT_ROOT_KEY
 
@@ -1158,14 +1048,14 @@ Command Code: 0x4543_524B (“ECRK”)
 
 Table: ERASE_CURRENT_ROOT_KEY input arguments
 
-| Name    | Type | Description |
-| :-----: | :--: | :------- |
-| chksum  | u32  | Checksum over other input arguments, computed by the caller. Little endian. |
+| Name   | Type | Description |
+| :----- | :--- | :---------- |
+| chksum | u32  | Checksum over other input arguments, computed by the caller. Little endian. |
 
 Table: ERASE_CURRENT_ROOT_KEY output arguments
 
 | Name        | Type | Description |
-| :---------: | :--: | :------- |
+| :---------- | :--- | :---------- |
 | chksum      | u32  | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status | u32  | Indicates if the command is FIPS approved or an error |
 
@@ -1178,13 +1068,13 @@ Command Code: 504E_524B (“PNRK”)
 Table: PROGRAM_NEXT_ROOT_KEY input arguments
 
 | Name   | Type | Description |
-| :----: | :--: | :------- |
+| :----- | :--- | :---------- |
 | chksum | u32  | Checksum over other input arguments, computed by the caller. Little endian. |
 
 Table: PROGRAM_NEXT_ROOT_KEY output arguments
 
 | Name        | Type | Description |
-| :---------: | :--: | :------- |
+| :---------- | :--- | :---------- |
 | chksum      | u32  | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status | u32  | Indicates if the command is FIPS approved or an error |
 
@@ -1197,13 +1087,13 @@ Command Code: 4550_4443 (“EPDS”)
 Table: ENABLE_IO_WITHOUT_RATCHET input arguments
 
 | Name   | Type | Description |
-| :----: | :--: | :------- |
+| :----- | :--- | :---------- |
 | chksum | u32  | Checksum over other input arguments, computed by the caller. Little endian. |
 
 Table: ENABLE_IO_WITHOUT_RATCHET output arguments
 
 | Name        | Type | Description |
-| :---------: | :--: | :------- |
+| :---------- | :--- | :---------- |
 | chksum      | u32  | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status | u32  | Indicates if the command is FIPS approved or an error |
 
@@ -1216,47 +1106,23 @@ Command Code: 5252_4B53 (“RRKS”)
 Table: REPORT_ROOT_KEY_STATE input arguments
 
 | Name   | Type   | Description |
-| :----: | :----: | :------- |
+| :----- | :----- | :---------- |
 | chksum | u32    | Checksum over other input arguments, computed by the caller. Little endian. |
 | nonce  | u8[16] | Freshness nonce |
 
 
 Table: REPORT_ROOT_KEY_STATE output arguments
 
-<table>
-<tr><th>Name</th><th>Type</th><th>Description</th></tr>
-<tr><td>chksum</td><td>u32</td><td>Checksum over other output arguments, computed by Caliptra. Little endian.</td></tr>                
-<tr><td>fips_status</td><td>u32</td><td>Indicates if the command is FIPS approved or an error</td></tr>           
-<tr><td>total_slots</td><td>u16</td><td>Total number of root-key slots</td></tr>
-<tr><td>active_slot</td><td>u16</td><td>Currently-active root-key slots</td></tr>
-<tr><td>slot_state</td><td>SlotState (u16)</td>
-	<td>State of the currently-active slot
-
-| Value       | Description |
-| :--------:  | :---- |
-| 0h          | EMPTY (Able to load MEKs) |
-| 1h          | PARTIALLY_PROGRAMMED (Not to load MEKs) |
-| 2h          | PROGRAMMED (Able to load MEKs)  |
-| 3h          | PARTIALLY_ERASED (Not to load MEKs)  |
-| 4h          | ERASED (Not to load MEKs)  |
-| 5h          | NON_FUSE_RATCHETABLE (Able to load MEKs) |
-| 6h to FFFFh | Reserved |
-
-</td></tr>
-<tr><td>next_action</td><td>NextAction (u16)</td>
-	<td>Next action that can be taken on the active slot
-
-| Value       | Description |
-| :--------:  | :---- |
-| 0h          | NONE |
-| 1h          | PROGRAM  |
-| 2h          | ERASE   |
-| 3h          | ENABLE_IO_WITHOUT_RATCHET |
-| 4h to FFFFh | Reserved |
-</td></tr>
-<tr><td>eat_len</td><td>u16</td><td>Total length of the IETF EAT</td></tr>
-<tr><td>eat</td><td>u8[eat_len]</td><td>CBOR-encoded and signed IETF EAT</td></tr>
-</table>
+| Name        | Type        | Description |
+| :---------- | :---------- | :---------- |
+| chksum      | u32         | Checksum over other output arguments, computed by Caliptra. Little endian. |
+| fips_status | u32         | Indicates if the command is FIPS approved or an error |
+| total_slots | u16         | Total number of root-key slots |
+| active_slot | u16         | Currently-active root-key slot |
+| slot_state  | u16         | State of the currently-active slot:<table><tr><td><b>Value</b></td><td><b>Description</b></td></tr><tr><td>0h</td><td>EMPTY (Able to load MEKs)</td></tr><tr><td>1h</td><td>PARTIALLY_PROGRAMMED (Not to load MEKs)</td></tr><tr><td>2h</td><td>PROGRAMMED (Able to load MEKs)</td></tr><tr><td>3h</td><td>PARTIALLY_ERASED (Not to load MEKs)</td></tr><tr><td>4h</td><td>ERASED (Not to load MEKs)</td></tr><tr><td>5h</td><td>NON_FUSE_RATCHETABLE (Able to load MEKs)</td></tr><tr><td>6h to FFFFh</td><td>Reserved</td></tr></table> |
+| next_action | u16         | Next action that can be taken on the active slot:<table><tr><td><b>Value</b></td><td><b>Description</b></td></tr><tr><td>0h</td><td>NONE</td></tr><tr><td>1h</td><td>PROGRAM</td></tr><tr><td>2h</td><td>ERASE</td></tr><tr><td>3h</td><td>ENABLE_IO_WITHOUT_RATCHET</td></tr><tr><td>4h to FFFFh</td><td>Reserved</td></tr></table> |
+| eat_len     | u16         | Total length of the IETF EAT |
+| eat         | u8[eat_len] | CBOR-encoded and signed IETF EAT |
 
 ## Fault handling
 
@@ -1278,23 +1144,23 @@ Table 3 defines the additional Caliptra result codes due to supporting OCP L.O.C
 
 Table 2: OCP L.O.C.K. mailbox command result codes
 
-| Name                  |      Value               |   Description |
-| :------------------:  | :----------------------: | :--------------- |
-|LOCK_ENGINE_TIMEOUT    | 0x4C45_544F<br>(“LETO”)  | Timeout occurred when communicating with the drive crypto engine to execute a command | 
-|LOCK_ENGINE_CODE + u16 | 0x4443_xxxx<br>(“ECxx”)  | Vendor-specific error code in the low 16 bits |
-|LOCK_BAD_ALGORITHM     | 0x4C42_414C<br>(“LBAL”)  | Unsupported algorithm, or algorithm does not match the given handle |
-|LOCK_BAD_HANDLE        | 0x4C42_4841<br>(“LBHA”)  | Unknown handle |
-|LOCK_NO_HANDLES        | 0x 4C4E_4841<br>(“LNHA”) | Too many extant handles exist |
-|LOCK_KEM_DECAPSULATION | 0x4C4B_4445<br>(“LKDE”)  | Error during KEM decapsulation |
-|LOCK_ACCESS_KEY_UNWRAP | 0x4C41_4B55<br>(“LAKU”)  | Error during access key decryption |
-|LOCK_PMEK_DECRYPT      | 0x4C50_4445<br>(“LPDE”)  | Error during PMEK decryption |
+| Name                   |      Value               |   Description |
+| :--------------------- | :----------------------- | :------------ |
+| LOCK_ENGINE_TIMEOUT    | 0x4C45_544F<br>(“LETO”)  | Timeout occurred when communicating with the drive crypto engine to execute a command | 
+| LOCK_ENGINE_CODE + u16 | 0x4443_xxxx<br>(“ECxx”)  | Vendor-specific error code in the low 16 bits |
+| LOCK_BAD_ALGORITHM     | 0x4C42_414C<br>(“LBAL”)  | Unsupported algorithm, or algorithm does not match the given handle |
+| LOCK_BAD_HANDLE        | 0x4C42_4841<br>(“LBHA”)  | Unknown handle |
+| LOCK_NO_HANDLES        | 0x 4C4E_4841<br>(“LNHA”) | Too many extant handles exist |
+| LOCK_KEM_DECAPSULATION | 0x4C4B_4445<br>(“LKDE”)  | Error during KEM decapsulation |
+| LOCK_ACCESS_KEY_UNWRAP | 0x4C41_4B55<br>(“LAKU”)  | Error during access key decryption |
+| LOCK_PMEK_DECRYPT      | 0x4C50_4445<br>(“LPDE”)  | Error during PMEK decryption |
 
 # Terminology
 
 The following acronyms and abbreviations are used throughout this document.
 
 | Abbreviation | Description |
-| :----------: | :---------- |
+| :----------- | :---------- |
 | AES          | Advanced Encryption Standard |
 | CSP          | Cloud Service Provider |
 | DEK          | Data Encryption Key |
@@ -1328,7 +1194,8 @@ Currently this list is identical to the list contributors.
 # References
 1. <a id="ref-1"></a>[Self-encrypting deception: weaknesses in the encryption of solid state drives](https://www.cs.ru.nl/~cmeijer/publications/Self_Encrypting_Deception_Weaknesses_in_the_Encryption_of_Solid_State_Drives.pdf) by Carlo Meijer and Bernard van Gastel
 2. <a id="ref-2"></a>[TCG Opal](https://trustedcomputinggroup.org/resource/storage-work-group-storage-security-subsystem-class-opal/)
-3. <a id="ref-2"></a>[TCG Key Per I/O](https://trustedcomputinggroup.org/resource/tcg-storage-security-subsystem-class-ssc-key-per-i-o/)
-4. <a id="ref-2"></a>[RFC 8446: The Transport Layer Security (TLS) Protocol Version 1.3](https://datatracker.ietf.org/doc/html/rfc8446)
-5. <a id="ref-3"></a>[RFC 9180: Hybrid Public Key Encryption](https://www.rfc-editor.org/rfc/rfc9180.html)
-6. <a id="ref-4"></a>[Hybrid PQ/T Key Encapsulation Mechanisms](https://datatracker.ietf.org/doc/draft-irtf-cfrg-hybrid-kems/) 
+3. <a id="ref-3"></a>[TCG Key Per I/O](https://trustedcomputinggroup.org/resource/tcg-storage-security-subsystem-class-ssc-key-per-i-o/)
+4. <a id="ref-4"></a>[RFC 8446: The Transport Layer Security (TLS) Protocol Version 1.3](https://datatracker.ietf.org/doc/html/rfc8446)
+5. <a id="ref-5"></a>[Internet X.509 Public Key Infrastructure: Algorithm Identifiers for ML-DSA](https://datatracker.ietf.org/doc/draft-ietf-lamps-dilithium-certificates/)
+6. <a id="ref-6"></a>[RFC 9180: Hybrid Public Key Encryption](https://www.rfc-editor.org/rfc/rfc9180.html)
+7. <a id="ref-7"></a>[Hybrid PQ/T Key Encapsulation Mechanisms](https://datatracker.ietf.org/doc/draft-irtf-cfrg-hybrid-kems/) 
