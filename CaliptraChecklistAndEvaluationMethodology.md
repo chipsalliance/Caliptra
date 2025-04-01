@@ -66,8 +66,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 3. **SoC Root of Trust (RoT)**  
    * Boot and Initialization Process Compliance  
    * Handling of Caliptra PA\_USER Management  
-   * Random Number Generator (RNG) Implementation   
-   * Key Revocation Bits Verification  
+   * Random Number Generator (RNG) Implementation    
 4. **Specific Functionality**  
    * Caliptra Mode Selection and State Handling  
    * Error Handling Mechanisms  
@@ -162,12 +161,6 @@ The following is a consolidated list of all requirements to ensure comprehensive
 * **Checklist Item:**  
   * **Requirement:** Authorization mechanisms SHOULD be implemented for in-field programmable fuses to prevent unauthorized updates that could lead to denial-of-service or other attacks.  
   * **Evaluation Methodology:** Manufacturers SHOULD document the authorization processes required to program fuses in the field, including cryptographic protections or authentication steps.
-
-#### *Key Revoke Bits Handling*
-
-* **Checklist Item:**  
-  * **Requirement:** The key revocation bits for public keys MUST be securely managed within the SOC Manager.  
-  * **Evaluation Methodology:** Manufacturers MUST explain how key revocation bits are set, verified, and enforced within the system.
 
 #### *Caliptra SVN (Security Version Number) Management*
 
