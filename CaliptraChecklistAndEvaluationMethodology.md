@@ -66,8 +66,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 3. **SoC Root of Trust (RoT)**  
    * Boot and Initialization Process Compliance  
    * Handling of Caliptra PA\_USER Management  
-   * Random Number Generator (RNG) Implementation  
-   * SRAM Zeroization Process  
+   * Random Number Generator (RNG) Implementation   
    * Key Revocation Bits Verification  
 4. **Specific Functionality**  
    * Caliptra Mode Selection and State Handling  
@@ -217,12 +216,6 @@ The following is a consolidated list of all requirements to ensure comprehensive
 * **Checklist Item:**  
   * **Requirement:** If an RNG is included in the Caliptra Wrapper, it SHOULD be securely implemented, and its design SHOULD meet applicable cryptographic standards. The source of entropy (internal or external) SHOULD be specified.  
   * **Evaluation Methodology:** Manufacturers SHOULD demonstrate that the RNG, including entropy sources, is compliant with standards like [NIST SP 800-90A](https://csrc.nist.gov/pubs/sp/800/90/a/r1/final), [SP 800-90B](https://csrc.nist.gov/pubs/sp/800/90/b/final), [SP 800-90C](https://csrc.nist.gov/pubs/sp/800/90/c/4pd).
-
-### *SRAM Zeroization Process*
-
-* **Checklist Item:**  
-  * **Requirement:** The SoC SHOULD implement a secure SRAM zeroization process to ensure that sensitive data is not retained in memory after use.  
-  * **Evaluation Methodology:** Manufacturers SHOULD describe the zeroization process, including when it is triggered (e.g. on reset, power-down) and how it ensures that all sensitive data is thoroughly erased.
 
 ## Specific Functionality
 
