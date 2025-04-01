@@ -30,34 +30,34 @@
         !log doc gen exists
     !endif
 
-	!$SYNC_COLOR = "#red"
-	!$ASYNC_COLOR = "#green"
-	!$BUFFER_ACTIVATION = "#lightblue"
+    !$SYNC_COLOR = "#red"
+    !$ASYNC_COLOR = "#green"
+    !$BUFFER_ACTIVATION = "#lightblue"
 
-	!$sync = "-[" + $SYNC_COLOR + "]>"
-	!$return = "-[" + $SYNC_COLOR + "]->"
-	!$async = "-[" + $ASYNC_COLOR + "]>>"
-	!$sometimelater = "..."
+    !$sync = "-[" + $SYNC_COLOR + "]>"
+    !$return = "-[" + $SYNC_COLOR + "]->"
+    !$async = "-[" + $ASYNC_COLOR + "]>>"
+    !$sometimelater = "..."
 
-	!unquoted procedure $self($who, $msg)
-	   $who $sync $who : $msg
-	   ||0||
-	!endprocedure
+    !unquoted procedure $self($who, $msg)
+       $who $sync $who : $msg
+       ||0||
+    !endprocedure
 
     !if %not(%variable_exists($show_sometime_later))
         !$show_sometime_later = %true()
     !endif
 
-	!unquoted procedure $sometimelater()
+    !unquoted procedure $sometimelater()
         !if ($show_sometime_later)
            ...
-	       ||0||
+           ||0||
         !endif
-	!endprocedure
+    !endprocedure
 
-	autonumber 1 1  "<b>[000]"
+    autonumber 1 1  "<b>[000]"
 
-	!pragma teoz true
+    !pragma teoz true
 
     participant "Remote Key\nManagement Service" as rkms
 
@@ -68,10 +68,10 @@
     participant "Storage\nDevice\nFW" as fw
 
     box "Caliptra"
-    	participant "Mail Box" as mb
-    	participant "ROM" as crom
-    	participant "FW" as cfw
-    	participant "ROM to FW\nHandoff Data" as hoff
+        participant "Mail Box" as mb
+        participant "ROM" as crom
+        participant "FW" as cfw
+        participant "ROM to FW\nHandoff Data" as hoff
         participant "DRBG" as rand
         participant "DMA Engine" as dma
         participant "Key Vault" as kv
@@ -100,8 +100,8 @@
     end box
 
     hide unlinked
-	footer Filename: %filename()
+    footer Filename: %filename()
 
-	header Version 1
+    header Version 1
 !endif
 

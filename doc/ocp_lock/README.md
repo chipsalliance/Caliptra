@@ -19,45 +19,45 @@
 <table>
 <tr><td>Google</td><td>Microsoft</td><td>Samsung</td><td>Solidigm</td><td>Kioxia</td></tr>
 <tr>
-	<td>
-		<ul>
-			<li>Andrés Lagar-Cavilla</li>
-			<li>Amber Huffman</li>
-			<li>Charles Kuzman</li>
-			<li>Jeff Andersen</li>
-			<li>Chris Sabol</li>
-			<li>Srini Narayanamurthy</li>
-	</ul></td>
-	<td>
-		<ul>
-			<li>Lee Prewitt</li>
-			<li>Michael Norris</li>
-			<li>Eric Eilertson</li>
-			<li>Bryan Kelly</li>
-			<li>Anjana Parthasarathy</li>
-			<li>Ben Keen</li>
-			<li>Bharat Pillilli</li>
-	</ul></td>
-	<td>
-		<ul>
-			<li>Jisoo Kim</li>
-			<li>Gwangbae Choi</li>
-			<li>Eric Hibbard</li>
-			<li>Mike Allison</li>
-	</ul></td>
-	<td>
-		<ul>
-			<li>Scott Shadley</li>
-			<li>Gamil Cain</li>
-			<li>Festus Hategekimana</li>
-	</ul></td>
-	<td>
-		<ul>
-			<li>John Geldman</li>
-			<li>Fred Knight</li>
-			<li>Paul Suhler</li>
-			<li>James Borden</li>
-	</ul></td></tr>
+    <td>
+        <ul>
+            <li>Andrés Lagar-Cavilla</li>
+            <li>Amber Huffman</li>
+            <li>Charles Kuzman</li>
+            <li>Jeff Andersen</li>
+            <li>Chris Sabol</li>
+            <li>Srini Narayanamurthy</li>
+    </ul></td>
+    <td>
+        <ul>
+            <li>Lee Prewitt</li>
+            <li>Michael Norris</li>
+            <li>Eric Eilertson</li>
+            <li>Bryan Kelly</li>
+            <li>Anjana Parthasarathy</li>
+            <li>Ben Keen</li>
+            <li>Bharat Pillilli</li>
+    </ul></td>
+    <td>
+        <ul>
+            <li>Jisoo Kim</li>
+            <li>Gwangbae Choi</li>
+            <li>Eric Hibbard</li>
+            <li>Mike Allison</li>
+    </ul></td>
+    <td>
+        <ul>
+            <li>Scott Shadley</li>
+            <li>Gamil Cain</li>
+            <li>Festus Hategekimana</li>
+    </ul></td>
+    <td>
+        <ul>
+            <li>John Geldman</li>
+            <li>Fred Knight</li>
+            <li>Paul Suhler</li>
+            <li>James Borden</li>
+    </ul></td></tr>
 </table>
 
 **Revision Table**
@@ -441,9 +441,9 @@ The Encryption Engine uses a stored MEK to encrypt and decrypt user data. For th
 
 In order to achieve the security goals for KMB, KMB is limited to be the unique component which loads an (metadata, aux, MEK) tuple into the Key Cache and unloads a tuple within the device, so that MEKs can only be exposed to KMB and Encryption Engine. Controller firmware arbitrates all operations in the KMB to Encryption Engine interface, therefore controller firmware is responsible for managing which MEK is loaded in Key Cache. Controller firmware has full control on metadata and optional aux. Figure 9 is an illustration of the KMB to Encryption Engine interface that shows:
 
--	the tuple for loading an MEK;
--	the Metadata for unloading an MEK; and 
--	an example of a Key Cache within the Encryption Engine.
+-    the tuple for loading an MEK;
+-    the Metadata for unloading an MEK; and 
+-    an example of a Key Cache within the Encryption Engine.
 
 *<p style="text-align: center;">Figure 9: KMB to Encryption SFR Interface</p>*
 
@@ -501,16 +501,16 @@ The expected change flow of the Controller register to handle a command is as fo
     2. **ERR:** 0h
     3. **DN:** 0b
     4. **EXE:** 0b
-  
+
 The KMB therefore interacts with the Control register as follows in the normal circumstance:
 
 1. The KMB writes **CMD** and **EXE**
     1. **CMD:** either 1h, 2h or 3h
     2. **EXE:** 1b
-2.	The KMB waits **DN** to be 1
-3.	The KMB writes **DN**
+2. The KMB waits **DN** to be 1
+3. The KMB writes **DN**
     1. **DN:** 1b
-4.	The KMB waits **DN** to be 0
+4. The KMB waits **DN** to be 0
 
 Since the Controller register is in fact a part of the Encryption Engine whose implementation can be unique by each vendor, behaviors of the Control register with the unexpected flow are left for vendors. For example, a vendor who wants robustness might integrate a write-lock into the Control register in order to prevent two almost simultaneous writes on EXE bit.
 
@@ -607,7 +607,7 @@ A storage device equipped with OCP L.O.C.K. will be equipped with N 256-bit ratc
 - Each ratchet secret can individually transition from all-zeroes → randomized → all-ones. R<sub>X</sub> is only randomized once R<sub>X-1</sub> has transitioned to all-ones.
 - Programmable via the Caliptra fuse controller.
 - Only readable by Caliptra Core, via fuse registers.
-	- Internally, the fuse registers will be treated like the DICE UDS, in that their contents can only be deposited into Key Vault slots, without direct visibility by Caliptra firmware.
+    - Internally, the fuse registers will be treated like the DICE UDS, in that their contents can only be deposited into Key Vault slots, without direct visibility by Caliptra firmware.
 -Caliptra Core firmware can detect which ratchet secrets are all-zeroes, randomized, or all-ones. This can be done by representing a counter in fuses, which maps to ratchet secret states. Controller firmware would be responsible for ensuring that the counter value corresponds with the ratchet secrets' current state.<br>The counter values map to the following states:
 
 | State  | Description |
@@ -626,31 +626,31 @@ The counter is readable by Caliptra Core firmware and controller firmware.
 The device will go through the following state transitions over its lifespan:
 
 1. At the factory, R<sub>0</sub>..R<sub>N-1</sub> are all-zero.
-	1. Caliptra derives a storage root key from a non-ratchetable secret derived from the DICE UDS + field entropy.
-	2. Caliptra allows MEKs to be programmed to the storage encryption engine, derived from the storage root key.
-	3. Caliptra firmware reports a bit indicating that it is operating in a state where any data written cannot be ratchet-erased.
+    1. Caliptra derives a storage root key from a non-ratchetable secret derived from the DICE UDS + field entropy.
+    2. Caliptra allows MEKs to be programmed to the storage encryption engine, derived from the storage root key.
+    3. Caliptra firmware reports a bit indicating that it is operating in a state where any data written cannot be ratchet-erased.
 2. The storage controller programs R<sub>0</sub> with randomness.
-	1. Caliptra detects that R<sub>0</sub> is randomized, and derives its OCP L.O.C.K. storage root key from R<sub>0</sub> and a non-ratchetable secret derived from DICE UDS + field entropy.
-	2. Caliptra allows MEKs to be programmed to the storage encryption engine, derived from the storage root key.
+    1. Caliptra detects that R<sub>0</sub> is randomized, and derives its OCP L.O.C.K. storage root key from R<sub>0</sub> and a non-ratchetable secret derived from DICE UDS + field entropy.
+    2. Caliptra allows MEKs to be programmed to the storage encryption engine, derived from the storage root key.
 3. The storage controller programs R<sub>0</sub> to all-ones and resets.
-	1. Upon next reset, Caliptra detects that there are no randomized ratchet secrets and does not derive a storage root key.
-	2. Caliptra does not allow any MEKs to be programmed to the storage encryption engine.
+    1. Upon next reset, Caliptra detects that there are no randomized ratchet secrets and does not derive a storage root key.
+    2. Caliptra does not allow any MEKs to be programmed to the storage encryption engine.
 4. The storage controller programs R<sub>1</sub> to a random value and resets.
-	1. Upon next reset, Caliptra detects that R<sub>1</sub> is randomized, and derives its OCP L.O.C.K. storage root key from R<sub>1</sub> and a non-ratchetable secret derived from the DICE UDS + field entropy.
-	2. Caliptra allows MEKs to be programmed to the storage encryption engine, derived from the storage root key.
+    1. Upon next reset, Caliptra detects that R<sub>1</sub> is randomized, and derives its OCP L.O.C.K. storage root key from R<sub>1</sub> and a non-ratchetable secret derived from the DICE UDS + field entropy.
+    2. Caliptra allows MEKs to be programmed to the storage encryption engine, derived from the storage root key.
 5. The storage controller programs R<sub>1</sub> to all-ones and resets.
 6. The storage controller programs R<sub>2</sub> to a random value and resets.
 7. The storage controller programs R<sub>2</sub> to all-ones and resets.
 8. The storage controller programs R<sub>3</sub> to a random value and resets.
-	1. See steps 2 and 3 for Caliptra's behavior in each state.
+    1. See steps 2 and 3 for Caliptra's behavior in each state.
     
    ...
 
 9. The storage controller programs R<sub>N-1</sub> to all-ones and resets.
-	1. Upon next reset, Caliptra detects that there are no randomized ratchet secrets, and no all-zeroes ratchet secrets.
-	2. Caliptra derives a storage root key from a non-ratchetable secret derived from the DICE UDS + field entropy.
-	3. Caliptra allows MEKs to be programmed to the storage encryption engine, derived from the storage root key.
-	4. Caliptra firmware reports a bit indicating that it is operating in a perma-dirty state, where no future ratchets are possible.
+    1. Upon next reset, Caliptra detects that there are no randomized ratchet secrets, and no all-zeroes ratchet secrets.
+    2. Caliptra derives a storage root key from a non-ratchetable secret derived from the DICE UDS + field entropy.
+    3. Caliptra allows MEKs to be programmed to the storage encryption engine, derived from the storage root key.
+    4. Caliptra firmware reports a bit indicating that it is operating in a perma-dirty state, where no future ratchets are possible.
 
 ### Storage root key fuse programming
 
@@ -1063,9 +1063,9 @@ Table: REPORT_ROOT_KEY_STATE output arguments
 
 A mailbox command can fail to complete in the following ways due to OCP L.O.C.K.:
 
--	An ill-formed command
--	Encryption Engine timeout
--	Encryption Engine reported error
+-    An ill-formed command
+-    Encryption Engine timeout
+-    Encryption Engine reported error
 
 In all of these cases, the error is reported in the command returned status.
 
