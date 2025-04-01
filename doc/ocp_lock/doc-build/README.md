@@ -1,5 +1,15 @@
 # Documentation build instructions
 
+## Render UML
+
+To generate SVG files from the UML diagrams, download [PlantUML](https://plantuml.com/download) and run:
+
+```
+$ java -jar path/to/plant_uml.jar -Ddoc_gen-=1 -tsvg diagrams/*.uml
+```
+
+## Render Markdown
+
 To render the specification in HTML or PDF, use the [Markdown PDF](https://marketplace.visualstudio.com/items?itemName=yzane.markdown-pdf) Visual Studio Code extension.
 
 The table of contents requires [this](./extension.js.patch) patch. To apply it, first [locate](https://code.visualstudio.com/api/working-with-extensions/publishing-extension#your-extension-folder) the extension folder, and then run:
