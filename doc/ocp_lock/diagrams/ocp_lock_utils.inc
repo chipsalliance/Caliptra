@@ -76,8 +76,8 @@
         participant "DMA Engine" as dma
         participant "Key Vault" as kv
         participant "Key Vault\nFuses" as fuses
-        participant "Key Vault\nStorage Root Key" as gsrk
-        participant "Key Vault\nSlot A\n(Storage Root Key)" as srk
+        participant "Key Vault\nFEK" as gfek
+        participant "Key Vault\nSlot A\n(FEK)" as fek
         participant "Key Vault\nSlot B\n(PMEK Secret)" as pmeks
         participant "Key Vault\nSlot F\n(DICE Alias Key)\necdsa_secp384r1_sha384" as dice
         participant "Key Vault\nSlot G\n(KEM Keypair)" as kemg
@@ -95,8 +95,8 @@
     end box
 
     box "Media"
-        participant "Create new\Storage Root Key\non NVM subsystem reset" as csrk
-        participant "Destroy all\Storage Root Keys\non NVM subsystem reset" as dsrk
+        participant "Create new FEK\non NVM subsystem reset" as cfek
+        participant "Destroy all FEK\non NVM subsystem reset" as dfek
     end box
 
     hide unlinked

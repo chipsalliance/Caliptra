@@ -22,7 +22,7 @@
 !endif
 
 
-srk++ $BUFFER_ACTIVATION
+fek++ $BUFFER_ACTIVATION
 sfr++
 
 fw $async mb++ : LOAD_MEK
@@ -33,9 +33,10 @@ fw $async mb++ : LOAD_MEK
         | chksum       | u32     | Little endian |
         | metadata     | u8[20]  | Metadata for MEK to load into the drive crypto engine (i.e. NSID + LBA range) |
         | aux_metadata | u8[32]  | Auxiliary metadata for the MEK (optional; i.e. operation mode) |
+        | cek          | u8[32]  | "Controller epoch key".\nMay be rotated by the controller as part of a cryptographic purge. |
+        | dek          | u8[32]  | "Data encryption key".\nMay be a C_PIN-derived secret in Opal or a per-MEK value in KPIO. |
         | rdy_timeout  | u32     | Timeout in ms for encryption engine to become ready for a new command |
         | cmd_timeout  | u32     | Timeout in ms for command to crypto engine to complete |
-        | dek          | u8[32]  | Controller-supplied "data encryption key"\n    * May be a C_PIN-derived secret in Opal or a per-MEK value in KPIO |
     end note
 !endif
 
@@ -52,13 +53,13 @@ mb $async cfw++ : Command
 $self("cfw", "Use KV Slot X for deriving MEK")
 
 
-alt Storage Root Key exists and Encryption Engin has become ready
+alt FEK exists and Encryption Engine has become ready
 
     alt MEK is not initialized (i.e., no PMEK in the final MEK)
         cfw $sync kv++: HMAC512(Key: Slot A,\n                Key Data: "MEK Seed",\n                Destination: Slot X)
-        kv $sync srk: Get Storage Root Key
+        kv $sync fek: Get FEK
         kv $sync kv: HMAC512 slot A with Data
-        kv $sync meks: HMAC512 result MEK Seed with Storage Root Key
+        kv $sync meks: HMAC512 result MEK Seed with FEK
         meks++ $BUFFER_ACTIVATION
         !if ($show_done)
             kv $sync cfw-- : done
@@ -67,9 +68,19 @@ alt Storage Root Key exists and Encryption Engin has become ready
         !endif
     end
 
-    cfw $sync kv++: HMAC512(Key : Slox X,\n                Data String: "DEK" || dek,\n                Destination : Slot Y)
+    cfw $sync kv++: HMAC512(Key string : cek,\n                Data String: dek,\n                Destination : Slot Y)
+    kv $sync kv: HMAC512(CEK, DEK)
+    kv $sync tempy: HMAC512 result pre-MEK
+    tempy++ $BUFFER_ACTIVATION
+    !if ($show_done)
+        kv $sync cfw-- : done
+    !else
+        kv--
+    !endif
+
+    cfw $sync kv++: HMAC512(Key : pre-MEK,\n                Data: MEK seed,\n                Destination : Slot Y)
     kv $sync meks: Get MEK Seed
-    kv $sync kv: HMAC512 Data Key String with Key
+    kv $sync kv: HMAC512(pre-MEK, MEK seed)
     kv $sync tempy: HMAC512 result MEK
     tempy++ $BUFFER_ACTIVATION
     !if ($show_done)
