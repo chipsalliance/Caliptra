@@ -60,17 +60,13 @@ The following is a consolidated list of all requirements to ensure comprehensive
    * Obfuscation Key  
    * Fuses Management  
 2. **Interfaces**
-   * Mailbox Interface Compliance  
-   * Secure Handling of Mailbox Access  
+   * Mailbox Interface Compliance    
    * Debug Interface Management  
    * Interface Wires Implementation  
 3. **SoC Root of Trust (RoT)**  
    * Boot and Initialization Process Compliance  
    * Handling of Caliptra PA\_USER Management  
-   * Random Number Generator (RNG) Implementation  
-   * SRAM Zeroization Process  
-   * Key Revocation Bits Verification  
-   * External Entity Interaction with Caliptra  
+   * Random Number Generator (RNG) Implementation    
 4. **Specific Functionality**  
    * Caliptra Mode Selection and State Handling  
    * Error Handling Mechanisms  
@@ -166,12 +162,6 @@ The following is a consolidated list of all requirements to ensure comprehensive
   * **Requirement:** Authorization mechanisms SHOULD be implemented for in-field programmable fuses to prevent unauthorized updates that could lead to denial-of-service or other attacks.  
   * **Evaluation Methodology:** Manufacturers SHOULD document the authorization processes required to program fuses in the field, including cryptographic protections or authentication steps.
 
-#### *Key Revoke Bits Handling*
-
-* **Checklist Item:**  
-  * **Requirement:** The key revocation bits for public keys MUST be securely managed within the SOC Manager.  
-  * **Evaluation Methodology:** Manufacturers MUST explain how key revocation bits are set, verified, and enforced within the system.
-
 #### *Caliptra SVN (Security Version Number) Management*
 
 * **Checklist Item:**  
@@ -185,12 +175,6 @@ The following is a consolidated list of all requirements to ensure comprehensive
 * **Checklist Item:**  
   * **Requirement:** The SoC Manager SHOULD implement the mailbox interface according to the Caliptra specification, ensuring proper handling of commands and status registers. Using the Caliptra Libraries (RUST and C version) provided by the Caliptra WG release is recommended as a reference codebase.  
   * **Evaluation Methodology:** Manufacturers SHOULD provide evidence, such as interface specifications or test results, demonstrating compliance with the mailbox interface requirements.
-
-### *Secure Mailbox Access*
-
-* **Checklist Item:**  
-  * **Requirement:** Access to the mailbox MUST be securely managed to prevent unauthorized entities from initiating communication with Caliptra. Only authenticated and authorized components may interact with the mailbox.  
-  * **Evaluation Methodology:** Manufacturers MUST describe access control mechanisms for the mailbox, including any authentication methods and policies enforcing proper usage.
 
 ### *Debug Interface Management*
 
@@ -225,18 +209,6 @@ The following is a consolidated list of all requirements to ensure comprehensive
 * **Checklist Item:**  
   * **Requirement:** If an RNG is included in the Caliptra Wrapper, it SHOULD be securely implemented, and its design SHOULD meet applicable cryptographic standards. The source of entropy (internal or external) SHOULD be specified.  
   * **Evaluation Methodology:** Manufacturers SHOULD demonstrate that the RNG, including entropy sources, is compliant with standards like [NIST SP 800-90A](https://csrc.nist.gov/pubs/sp/800/90/a/r1/final), [SP 800-90B](https://csrc.nist.gov/pubs/sp/800/90/b/final), [SP 800-90C](https://csrc.nist.gov/pubs/sp/800/90/c/4pd).
-
-### *SRAM Zeroization Process*
-
-* **Checklist Item:**  
-  * **Requirement:** The SoC SHOULD implement a secure SRAM zeroization process to ensure that sensitive data is not retained in memory after use.  
-  * **Evaluation Methodology:** Manufacturers SHOULD describe the zeroization process, including when it is triggered (e.g. on reset, power-down) and how it ensures that all sensitive data is thoroughly erased.
-
-### *External Entity Interaction*
-
-* **Checklist Item:**  
-  * **Requirement:** The pathways through which external entities interact with Caliptra MUST be securely implemented, ensuring that only authorized interactions are permitted, and that these interactions do not compromise Caliptra's security.  
-  * **Evaluation Methodology:** Manufacturers MUST outline the architecture of interactions between external entities and Caliptra, emphasizing access controls, authentication mechanisms, and any intermediaries like security processors. Details on how untrusted entities are prevented from accessing Caliptra internals must be provided.
 
 ## Specific Functionality
 
