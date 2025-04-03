@@ -182,11 +182,11 @@ The following is a consolidated list of all requirements to ensure comprehensive
   * **Requirement:** The debug interfaces, including JTAG, MUST be securely managed to prevent unauthorized access to Caliptra internals or sensitive data.  
   * **Evaluation Methodology:** Manufacturers MUST explain how debug interfaces are controlled, including secure enable/disable mechanisms, and how they prevent unauthorized access to Caliptra.
 
-### *Interface Wires Implementation*
+### *Interface Implementation*
 
 * **Checklist Item:**  
-  * **Requirement:** All interface signals between the SoC and Caliptra, especially those related to security and debug states, MUST be correctly implemented to ensure proper functionality and security. This includes signals like clock, reset, power good, ready signals, and any security state indicators.  
-  * **Evaluation Methodology:** Manufacturers MUST provide hardware schematics and documentation showing correct implementation of critical interface signals, highlighting measures taken to prevent signal tampering or misuse.
+  * **Requirement:** Interfaces to Caliptra MUST adhere to the [SoC Integration Requirements](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md#soc-integration-requirements) specified in the caliptra-rtl repo.
+  * **Evaluation Methodology:** Manufacturers MUST provide hardware schematics and documentation showing correct implementation of interfaces.
 
 ## SoC Root of Trust (RoT)
 
