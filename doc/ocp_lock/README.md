@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./images/ocp_page_1.jpg" alt="OCP Logo" />
+  <img src="./images/ocp_page_1.png" alt="OCP Logo" style="height:530px" />
 </p>
 
 **<p align="center">OCP Layered Open-Source Cryptographic Key-management (L.O.C.K.)</p>**
@@ -118,7 +118,13 @@ The goal of OCP L.O.C.K. is to eliminate the need to destroy storage devices (e.
 
 <div style="page-break-after: always"></div>
 
+<p align="center">
+  <img src="./images/LOCK_logo_color.svg" alt="OCP L.O.C.K. logo" style="width: 300px" />
+</p>
+
 [[toc]]
+
+<div style="page-break-after: always"></div>
 
 # Introduction
 
@@ -194,7 +200,7 @@ The following figure shows the basic high-level blocks of OCP L.O.C.K.
 *<p style="text-align: center;">Figure 1: OCP L.O.C.K high level blocks</p>*
 
 <p align="center">
-  <img src="./images/architecture_diagram.jpg" alt="Architecture Diagram" />
+  <img src="./images/architecture_diagram.drawio.svg" alt="Architecture Diagram" />
 </p>
 
 Caliptra that includes the optional OCP L.O.C.K. has a Key Management Block (KMB) that is the only entity that can derive the MEKs which protect user data and load the MEKs into the Key Cache of the Encryption Engine. The KMB derives MEKs using the following keys:
@@ -224,14 +230,6 @@ KMB can maintain multiple active KEM keypairs. Nominally, one for each supported
 
 KMB supports PMEK access key rotation where the storage controller must replace an old encrypted PMEK with a new encrypted PMEK. The end user must prove to KMB that they control both old and new access key. This is done by encrypting the new access key with the old access key. The new access key is therefore double-encrypted when provided to KMB with the old access key and with an ephemeral transport encryption key.
 
-KMB is able to generate two kinds of keys: KEMs (used for access key transport encryption) and PMEKs (used for MEK derivation). A host is able to inject external entropy into KMB where it is held in internal volatile memory. Subsequent keys are randomly generated using both KMB's TRNG and the host's entropy as shown in figure 2.
-
-*<p style="text-align: center;">Figure 2: KEM and PMEK Key Generation</p>*
-
-<p align="center">
-  <img src="./images/KEM_diagram.jpg" alt="KEM Diagram" />
-</p>
-
 ## Interfaces
 
 OCP L.O.C.K. provides two interfaces:
@@ -239,10 +237,10 @@ OCP L.O.C.K. provides two interfaces:
 - The Encryption Engine interface is exposed from the vendor-implemented Encryption Engine to KMB, and defines a standard mechanism for programming MEKs and control messages.
 - The mailbox interface is exposed from KMB to storage controller firmware, and enables the controller to manage MEKs.
 
-## MEK derivation
+## Key hierarchy
 
 <p align="center">
-  <img src="./images/mek_derivation.svg" alt="MEK derivation" />
+  <img src="./images/key_hierarchy.drawio.svg" alt="Key hierarchy" />
 </p>
 
 When controller firmware wishes to program an MEK to the Encryption Engine, the controller firmware performs the following steps:
@@ -253,6 +251,20 @@ When controller firmware wishes to program an MEK to the Encryption Engine, the 
   - KMB derives the MEK using the given CEK, DEK, and the contents of the MEK seed buffer.
 3. Provide MEK metadata to KMB, such as the MEK's associated namespace and logical block address range.
   - KMB programs the derived MEK and its metadata to the Encryption Engine.
+
+### Random key generation
+
+KMB is able to generate two kinds of keys: KEMs (used for access key transport encryption) and PMEKs (used for MEK derivation). A host is able to inject external entropy into KMB where it is held in internal volatile memory. Subsequent keys are randomly generated using both KMB's TRNG and the host's entropy.
+
+<p align="center">
+  <img src="./images/drbg_diagram.drawio.svg" alt="HPKE and PMEK Generation" />
+</p>
+
+### MEK loading key hierarchy
+
+<p align="center">
+  <img src="./images/load_mek.drawio.svg" alt="Readying PMEKs" />
+</p>
 
 ### Sequence to mix a PMEK into the MEK seed
 
@@ -310,6 +322,12 @@ Controller firmware may request that KMB generate a random PMEK, bound to a give
 
 Controller firmware may then store the encrypted PMEK in persistent storage.
 
+#### PMEK generation key hierarchy
+
+<p align="center">
+  <img src="./images/pmek_generate.drawio.svg" alt="PMEK generation" />
+</p>
+
 **Sequence to generate a PMEK:**
 
 <p align="center">
@@ -330,6 +348,12 @@ To unlock a PMEK, KMB performs the following steps:
 
 Controller firmware may then stash the encrypted unlocked PMEK in volatile storage, and later provide it to the KMB when deriving an MEK, as described [above](#mek-derivation).
 
+#### PMEK unlock hierarchy
+
+<p align="center">
+  <img src="./images/pmek_ready.drawio.svg" alt="Readying PMEKs" />
+</p>
+
 **Sequence to unlock a PMEK:**
 
 <p align="center">
@@ -348,6 +372,12 @@ The access key to which a PMEK is bound may be rotated. The user must prove that
 6. Return the re-encrypted PMEK to the controller firmware.
 
 Controller firmware then erases the old encrypted PMEK and stores the new encrypted PMEK in persistent storage.
+
+#### PMEK access key rotation hierarchy
+
+<p align="center">
+  <img src="./images/pmek_access_key_rotation.drawio.svg" alt="PMEK generation" />
+</p>
 
 **Sequence to rotate the access key of a PMEK:**
 
@@ -378,6 +408,20 @@ Upon drive reset, the KEMs are regenerated, and any access keys for PMEKs that h
 
 <p align="center">
   <img src="./diagrams/endorse_encapsulation_pub_key.svg" alt="Endorseing a KEM Pub key" />
+</p>
+
+#### PMEK access key unwrap hierarchy (P-384)
+
+<p align="center">
+  <img src="./images/pmek_access_key_ecdh_unwrap.drawio.svg" alt="Access key unwrap" />
+</p>
+
+#### PMEK access key unwrap hierarchy (Hybrid ML-KEM + P-384)
+
+The only difference here from the above flow is how the HPKE Shared Secret is derived. Operations which produce an AES key and IV from that shared secret are identical to the prior flow, and are omitted here for brevity.
+
+<p align="center">
+  <img src="./images/pmek_access_key_hybrid_unwrap.drawio.svg" alt="Access key unwrap" />
 </p>
 
 ### Access key rotation flows
@@ -448,7 +492,7 @@ In order to achieve the security goals for KMB, KMB is limited to be the unique 
 *<p style="text-align: center;">Figure 9: KMB to Encryption SFR Interface</p>*
 
 <p align="center">
-  <img src="./images/kmb_ee.svg" alt="Encryption Engine diagram" />
+  <img src="./images/kmb_ee.drawio.svg" alt="Encryption Engine diagram" />
 </p>
 
 KMB uses Special Function Registers (SFRs) to communicate with Encryption Engine which are described in the following sections.
@@ -538,7 +582,7 @@ When an SSD stores data with address-based encryption, an MEK can be uniquely id
 *<p style="text-align: center;">Figure 12: LBA Range Based Metadata Format</p>*
 
 <p align="center">
-  <img src="./images/lba_nsid_info.jpg" alt="LBA and NSID" />
+  <img src="./images/lba_nsid_info.drawio.svg" alt="LBA and NSID" />
 </p>
 
 Address-based encryption is not however the only encryption mechanism in SSDs. For example, in TCG Key Per I/O, an MEK is selected by a key tag, which does not map to an address. Figure 13 shows an example of **METD** in such cases.
@@ -546,7 +590,7 @@ Address-based encryption is not however the only encryption mechanism in SSDs. F
 *<p style="text-align: center;">Figure 13: Key Tag Based Metadata Format</p>*
 
 <p align="center">
-  <img src="./images/key_tag_info.jpg" alt="Key Tag Info" />
+  <img src="./images/key_tag_info.drawio.svg" alt="Key Tag Info" />
 </p>
 
 The above examples are not the only possible values of **METD**. Vendors are encouraged to design and use their own **METD** if it fits better to their system.
@@ -570,7 +614,7 @@ One simple use case of the **AUX** field is to store an offset of initialization
 *<p style="text-align: center;">Figure 15: Auxiliary Data Format Example</p>*
 
 <p align="center">
-  <img src="./images/aux_info.jpg" alt="Aux Info" />
+  <img src="./images/aux_info.drawio.svg" alt="Aux Info" />
 </p>
 
 When the controller firmware instructs KMB to generate an KMB, the controller firmware can use the **AUX** value to specify which mode of operation should be used and which value should be used as an initialization vector or a nonce with the generated MEK.
@@ -597,7 +641,7 @@ Figure 17 shows a sample command execution. This is an expected sequence when th
 *<p style="text-align: center;">Figure 17: Command Execution Example</p>*
 
 <p align="center">
-  <img src="./images/cmd_exe_example.jpg" alt="Command Execution Example" />
+  <img src="./diagrams/cmd_ee_example.svg" alt="Command Execution Example" />
 </p>
 
 ## FEK fuse requirements
