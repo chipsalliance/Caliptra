@@ -60,11 +60,7 @@
     !pragma teoz true
 
     participant "Remote Key\nManagement Service" as rkms
-
-
     participant "Host" as host
-
-
     participant "Storage\nDevice\nFW" as fw
 
     box "Caliptra"
@@ -100,8 +96,5 @@
     end box
 
     hide unlinked
-    footer Filename: %filename()
-
-    header Version 1
 !endif
 

@@ -1,5 +1,15 @@
 # Documentation build instructions
 
+## Edit diagrams
+
+Many diagrams in the specification are generated using draw.io. These can be edited with the [Draw.io Integration](https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio) Visual Studio Code extension.
+
+When creating new diagrams, be sure to enable a white background. Otherwise, the diagram will not be legible to viewers with dark mode enabled.
+
+<p align="center">
+  <img src="./drawio-background.png" alt="Draw.IO background color" width="200px" style="box-shadow: 0px 2px 5px gray;" />
+</p>
+
 ## Render UML
 
 To generate SVG files from the UML diagrams, download [PlantUML](https://plantuml.com/download) and run:
