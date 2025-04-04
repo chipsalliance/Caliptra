@@ -13,8 +13,7 @@
 !if ($show_precond)
     note across
         <b>Preconditions:</b>
-        * Access Shared Secret already availble in a slot in KV
-        * unlocking key already in a slot and generated on each reset
+        * FEK in a firmware-managed KV slot
     end note
 !endif
 
@@ -107,7 +106,7 @@ alt FEK exists
     kv $sync fek: Get FEK
     kv $sync tempz: Get Access Key 1
     kv $sync kv: HMAC512 slot A and Slot Z
-    kv $sync tempw: HMAC512 result Encryption Key for old PMEK
+    kv $sync tempw: HMAC512 result Old encryption key for locked PMEK
     tempw++ $BUFFER_ACTIVATION
     !if ($show_done)
         kv $sync cfw-- : done
@@ -119,7 +118,7 @@ alt FEK exists
     kv $sync fek: Get FEK
     kv $sync tempy: Get Access Key 2
     kv $sync kv: HMAC512 slot A and Slot Y
-    kv $sync tempz: HMAC512 result New Encryption Key for PMEK
+    kv $sync tempz: HMAC512 result New encryption key for locked PMEK
     !if ($show_done)
         kv $sync cfw-- : done
     !else
@@ -128,7 +127,7 @@ alt FEK exists
 
     == Get PMEK ==
     cfw $sync kv++: Unwrap(Key : Slot W,\n            Key Data: locked_pmek\n            Destination : Slot Y)
-    kv $sync tempw: Encryption Key for old PMEK
+    kv $sync tempw: Old encryption key for locked PMEK
     kv $sync kv: Unwrap locked_pmek
     kv $sync tempy: PMEK
     !if ($show_done)
@@ -140,7 +139,7 @@ alt FEK exists
 
     == Create the locked PMEK ==
     cfw $sync kv++: Wrap(Key: Slot Z,\n             Data Key : Slot Y\n             Destination : new_locked_pmek)
-    kv $sync tempz: Get New Encryption Key
+    kv $sync tempz: Get New encryption key for locked PMEK
     kv $sync tempy: Get PMEK
     kv $sync kv: Wrap slot Y with Slot Z to\ngenerate new_encrypted_pmek
     !if ($show_done)

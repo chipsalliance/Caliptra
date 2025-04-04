@@ -13,8 +13,8 @@
 !if ($show_precond)
     note across
         <b>Preconditions:</b>
-          * FEK in a KV slot where Caliptra FW manages which slot
-          * KEM Keypair in a KV slot where Caliptra FW manages which slot
+          * FEK in a firmware-managed KV slot
+          * KEM Keypair in a firmware-managed KV slot
 
         <b>Notes:</b>
           * The sequence diagram assumes that the KV will not allow an input KV slot to also be used as an out KV slot. Caliptra FW is responsible for managing which KV slots are used and can adapt if this assumption is not correct.
@@ -71,7 +71,7 @@ tempz++ $BUFFER_ACTIVATION
 !endif
 
 
-alt pmek algorith 512 bits
+alt pmek algorithm 256 bits
     cfw $sync kv++: HMAC512_Slots(Key : Slot A,\n                         Data Key : Slot Z\n                         Destination :  Slot Y)
     kv $sync fek: Get FEK
     kv $sync tempz: Get Access Key
