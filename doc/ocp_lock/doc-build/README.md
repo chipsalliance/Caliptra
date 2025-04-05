@@ -1,5 +1,9 @@
 # Documentation build instructions
 
+## Edit diagrams
+
+Many diagrams in the specification are generated using draw.io. These can be edited with the [Draw.io Integration](https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio) Visual Studio Code extension.
+
 ## Render UML
 
 To generate SVG files from the UML diagrams, download [PlantUML](https://plantuml.com/download) and run:
