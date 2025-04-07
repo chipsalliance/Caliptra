@@ -47,7 +47,7 @@ note over cfw
 
 end note
 
-cfw $sync mb : Command\nResponse/nSet of algorithms supported
+cfw $sync mb : Command\nResponse\nSet of algorithms supported
 & mb $async fw++ : Command\nComplete
 cfw--
 !if ($show_api)
@@ -56,7 +56,7 @@ cfw--
         | <b>Field               | <b>Size | <b>Definition |
         | chksum                 | u32     | Checksum over other output arguments, computed by Caliptra. Little endian. |
         | endorsement_algorithms | u32     | Identifies the supported endorsement algorithms\n    * Byte 0 bit 0: ecdsa_secp384r1_sha384 |
-        | kem_algorithms         | u32     | Identifies the supported KEM algorithms\n    * Byte 0 bit 0: ecdh_secp384r1_aes256_gcm |
+        | kem_algorithms         | u32     | Identifies the supported KEM algorithms\n    * Byte 0 bit 0: kem_id = 0x0011, aead_id = 0x0002, kdf_id = 0x0002\n * Byte 0 bit 1: kem_id = 0x0a25, aead_id = 0x0002, kdf_id = 0x0002 |
         | pmek_algorithms        | u32     | Indicates the size of PMEKs.\n    * Byte 0 bit 0: 256 bits |
         | access_key_algorithm   | u32     | Indicates the size of access keys.\n    * Byte 0 bit 0: 256 bits |
         | Reserved               | u32[4]  | Reserved |
