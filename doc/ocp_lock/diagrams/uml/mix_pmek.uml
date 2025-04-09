@@ -7,7 +7,7 @@
 !include ocp_lock_utils.inc
 
 !if ($show_title)
-    Title "Mix PMEK into MEK seed"
+    Title "Mix PMEK into MEK Secret Seed"
 !endif
 
 !if ($show_precond)
@@ -51,10 +51,10 @@ mb $async cfw++ : Command
 alt FEK exists
 
     alt MEK is not initialized (i.e., no PMEK has yet been included)
-        cfw $sync kv++: HMAC512(Key: Slot A,\n                Key Data: "MEK Seed",\n                Destination: Slot X)
+        cfw $sync kv++: HMAC512(Key: Slot A,\n                Key Data: "MEK Secret Seed",\n                Destination: Slot X)
         kv $sync fek: Get FEK
         kv $sync kv: HMAC512 slot A with Data
-        kv $sync meks: HMAC512 result MEK Seed with FEK
+        kv $sync meks: HMAC512 result MEK Secret Seed with FEK
         !if ($show_done)
             kv $sync cfw-- : done
         !else
@@ -76,9 +76,9 @@ alt FEK exists
     !endif
 
     cfw $sync kv++: HMAC512(Key : Slot X,\n                Data String : "PMEK mix",\n                Destination : Slot Z)
-    kv $sync meks: Get MEK Seed
+    kv $sync meks: Get MEK Secret Seed
     kv $sync kv: HMAC512 Key with Data String
-    kv $sync tempz: HMAC512 result Temp MEK Seed
+    kv $sync tempz: HMAC512 result Temp MEK Secret Seed
     tempz++ $BUFFER_ACTIVATION
     !if ($show_done)
         kv $sync cfw-- : done
@@ -87,10 +87,10 @@ alt FEK exists
     !endif
 
     cfw $sync kv++: HMAC512_Slots(Key : Slot Z,\n                         Data Key  : Slot Y\n                         Destination : Slot: X)
-    kv $sync tempz: Get Temp MEK Seed
+    kv $sync tempz: Get Temp MEK Secret Seed
     kv $sync tempy: Get PMEK
     kv $sync kv: HMAC512 Key and Data Key
-    kv $sync meks: HMAC512 result MEK Seed updated with PMEK
+    kv $sync meks: HMAC512 result MEK Secret Seed updated with PMEK
     !if ($show_done)
         kv $sync cfw-- : done
     !else

@@ -7,16 +7,16 @@
 !include ocp_lock_utils.inc
 
 !if ($show_title)
-    Title "Clear the key cache in the Encryption Engine"
+    Title "Clear the key cache in the encryption engine"
 !endif
 
 !if ($show_precond)
     note across
         <b>Preconditions:</b>
-        * Keys may or may not be loaded in the Key Cache of the Encryption Engine
+        * Keys may or may not be loaded in the key cache of the encryption engine
 
         <b>Notes:</b>
-        * This sequence diagram is not showing any error reporting due to timeouts or errors reported by the Encryption Engine
+        * This sequence diagram is not showing any error reporting due to timeouts or errors reported by the encryption engine
     end note
 !endif
 
@@ -45,7 +45,7 @@ mb $async cfw++ : Command
     mb--
 !endif
 
-alt Encryption Engin has become ready
+alt Encryption engine has become ready
 
     cfw $sync sfr : Read Control Reg
 

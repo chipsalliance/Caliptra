@@ -1,5 +1,5 @@
 '
-' OCP Lock: Sequence diagram showing Caliptra FW/Encryption Engine interactions
+' OCP Lock: Sequence diagram showing Caliptra FW/encryption engine interactions
 '
 '
 @startuml
@@ -7,7 +7,7 @@
 !include ocp_lock_utils.inc
 
 !if ($show_title)
-    Title "Example of a command to the Encryption Engine Key Cache"
+    Title "Example of a command to the encryption engine to load an MEK"
 !endif
 
 ee++

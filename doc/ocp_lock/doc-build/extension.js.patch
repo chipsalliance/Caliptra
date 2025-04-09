@@ -324,7 +324,7 @@
       slugify: Slug
     }
     md.use(require('markdown-it-named-headers'), options);
-+   md.use(markdownItToc);
++   md.use(markdownItToc, {includeLevel: [1, 2, 3, 4, 5, 6], slugify: Slug});
   
     // markdown-it-container
     // https://github.com/markdown-it/markdown-it-container
