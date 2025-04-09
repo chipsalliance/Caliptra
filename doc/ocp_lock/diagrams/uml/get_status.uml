@@ -30,7 +30,7 @@ mb $async cfw++ : Command
 !endif
 
 
-cfw $sync sfr : Read Control Reg to access\nEncryption Engine Ready
+cfw $sync sfr : Read Control Reg to access\nEncryption engine Ready
 
 cfw $sync mb : Command\nResponse\nengine_ready
 & mb $async fw++ : Command\nComplete

@@ -78,16 +78,16 @@
         participant "Key Vault\nSlot F\n(DICE Alias Key)\necdsa_secp384r1_sha384" as dice
         participant "Key Vault\nSlot G\n(KEM Keypair)" as kemg
         participant "Key Vault\nSlot W\n(Temporary)" as tempw
-        participant "Key Vault\nSlot X\n(MEK Seed)" as meks
+        participant "Key Vault\nSlot X\n(MEK Secret Seed)" as meks
         participant "Key Vault\nSlot Y\n(Temporary)" as tempy
         participant "Key Vault\nSlot Z\n(Temporary)" as tempz
         participant "Key Vault\nTemp Memory" as tempmem
     end box
 
-    box "Encryption Engine"
+    box "Encryption engine"
         participant "SFR\nInterface" as sfr
         participant "Control" as ee
-        participant "Key Cache" as kc
+        participant "Key cache" as kc
     end box
 
     box "Media"

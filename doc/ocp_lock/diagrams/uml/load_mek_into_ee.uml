@@ -7,7 +7,7 @@
 !include ocp_lock_utils.inc
 
 !if ($show_title)
-    Title "Load MEK into the Key Cache of the Encryption Engine"
+    Title "Load MEK into the key cache of the encryption engine"
 !endif
 
 == Prepare for a new command ==

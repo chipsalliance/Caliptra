@@ -53,13 +53,13 @@ mb $async cfw++ : Command
 $self("cfw", "Use KV Slot X for deriving MEK")
 
 
-alt FEK exists and Encryption Engine has become ready
+alt FEK exists and the encryption engine has become ready
 
     alt MEK is not initialized (i.e., no PMEK in the final MEK)
-        cfw $sync kv++: HMAC512(Key: Slot A,\n                Key Data: "MEK Seed",\n                Destination: Slot X)
+        cfw $sync kv++: HMAC512(Key: Slot A,\n                Key Data: "MEK Secret Seed",\n                Destination: Slot X)
         kv $sync fek: Get FEK
         kv $sync kv: HMAC512 slot A with Data
-        kv $sync meks: HMAC512 result MEK Seed with FEK
+        kv $sync meks: HMAC512 result MEK Secret Seed with FEK
         meks++ $BUFFER_ACTIVATION
         !if ($show_done)
             kv $sync cfw-- : done
@@ -78,9 +78,9 @@ alt FEK exists and Encryption Engine has become ready
         kv--
     !endif
 
-    cfw $sync kv++: HMAC512(Key : pre-MEK,\n                Data: MEK seed,\n                Destination : Slot Y)
-    kv $sync meks: Get MEK Seed
-    kv $sync kv: HMAC512(pre-MEK, MEK seed)
+    cfw $sync kv++: HMAC512(Key : pre-MEK,\n                Data: MEK Secret Seed,\n                Destination : Slot Y)
+    kv $sync meks: Get MEK Secret Seed
+    kv $sync kv: HMAC512(pre-MEK, MEK Secre Seed)
     kv $sync tempy: HMAC512 result MEK
     tempy++ $BUFFER_ACTIVATION
     !if ($show_done)
@@ -108,8 +108,8 @@ alt FEK exists and Encryption Engine has become ready
         dma $sync tempy : Read MEK
         dma $sync sfr : Write MEK
         note left sfr
-            If Encryption Engine uses a MEK which is smaller then MEK
-            than the Encryption Engine truncates the MEK
+            If the encryption engine uses an MEK which is smaller than the MEK
+            then the encryption engine truncates the MEK
         end note
         dma $async cfw-- : complete
 

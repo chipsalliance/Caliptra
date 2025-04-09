@@ -7,7 +7,7 @@ Many diagrams in the specification are generated using draw.io. These can be edi
 When creating new diagrams, be sure to enable a white background. Otherwise, the diagram will not be legible to viewers with dark mode enabled.
 
 <p align="center">
-  <img src="./drawio-background.png" alt="Draw.IO background color" width="200px" style="box-shadow: 0px 2px 5px gray;" />
+  <img src="../images/drawio_background.png" alt="draw.io background color" width="200px" style="box-shadow: 0px 2px 5px gray;" />
 </p>
 
 ## Render UML
@@ -15,7 +15,7 @@ When creating new diagrams, be sure to enable a white background. Otherwise, the
 To generate SVG files from the UML diagrams, download [PlantUML](https://plantuml.com/download) and run:
 
 ```
-$ java -jar path/to/plant_uml.jar -Ddoc_gen-=1 -tsvg diagrams/*.uml
+$ java -jar path/to/plant_uml.jar -Ddoc_gen-=1 -tsvg diagrams/uml/*.uml
 ```
 
 ## Render Markdown
