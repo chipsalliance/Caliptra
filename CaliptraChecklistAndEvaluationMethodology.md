@@ -265,8 +265,8 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Debugging Controls*
 
 * **Checklist Item:**  
-  * **Requirement:** The enabling and disabling of debugging features in production MUST be controlled and documented to prevent unauthorized access or leakage of sensitive information. Specific policies regarding when and how debugging can be enabled must be defined.  
-  * **Evaluation Methodology:** Manufacturers MUST describe how debugging is managed in production, including any fuse settings, access controls, and procedures to disable debugging interfaces before deployment. Documentation must indicate whether physical presence or specific authorization is required to enable debugging.
+  * **Requirement:** The SOC Manager MUST put Caliptra into a debug state when the SOC is operating in a mode that permits the usage of code/data which differs from the measurements submitted to Caliptra.
+  * **Evaluation Methodology:** Manufacturers MUST describe how debugging is enabled for the SOC and for Caliptra, including any fuse settings, access controls, and procedures to disable debugging interfaces.
 
 #### *Flaw Remediation Process*
 
