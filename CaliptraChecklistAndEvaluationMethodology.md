@@ -226,9 +226,9 @@ The following is a consolidated list of all requirements to ensure comprehensive
 
 ### *Log Functionality in SoC*
 
-* **Checklist Item:**  
-  * **Requirement:** The SoC SHOULD implement logging functionality that records relevant events related to Caliptra operations, ensuring logs are tamper-evident and provide necessary information for attestation. The log does not need to be kept secure but should be tamper-evident to detect manipulation.  
-  * **Evaluation Methodology:** Manufacturers SHOULD describe the logging mechanism, including how logs are structured, how they are protected against tampering (e.g., using cryptographic hash extensions), and how they integrate with Caliptra's measurement processes.
+* **Checklist Item:**
+  * **Requirement:** The SoC SHOULD implement logging functionality that allows the compounded measurements stored by Caliptra to be reconstructed.
+  * **Evaluation Methodology:** Manufacturers SHOULD describe the logging mechanism, including how logs are structured and how they integrate with Caliptra's measurement processes.
 
 ## Secure Processes
 
