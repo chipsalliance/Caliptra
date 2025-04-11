@@ -57,7 +57,7 @@ cfw--
         | chksum                 | u32     | Checksum over other output arguments, computed by Caliptra. Little endian. |
         | endorsement_algorithms | u32     | Identifies the supported endorsement algorithms\n    * Byte 0 bit 0: ecdsa_secp384r1_sha384 |
         | kem_algorithms         | u32     | Identifies the supported KEM algorithms\n    * Byte 0 bit 0: kem_id = 0x0011, aead_id = 0x0002, kdf_id = 0x0002\n * Byte 0 bit 1: kem_id = 0x0a25, aead_id = 0x0002, kdf_id = 0x0002 |
-        | pmek_algorithms        | u32     | Indicates the size of PMEKs.\n    * Byte 0 bit 0: 256 bits |
+        | mpk_algorithms         | u32     | Indicates the size of MPKs.\n    * Byte 0 bit 0: 256 bits |
         | access_key_algorithm   | u32     | Indicates the size of access keys.\n    * Byte 0 bit 0: 256 bits |
         | Reserved               | u32[4]  | Reserved |
     end note

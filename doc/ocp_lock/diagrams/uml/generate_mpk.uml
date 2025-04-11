@@ -1,5 +1,5 @@
 '
-' OCP Lock: GENERATE_PMEK API sequence diagram showing Caliptra FW/HW interactions
+' OCP Lock: GENERATE_MPK API sequence diagram showing Caliptra FW/HW interactions
 '
 '
 @startuml
@@ -7,13 +7,13 @@
 !include ocp_lock_utils.inc
 
 !if ($show_title)
-    Title "Generate PMEK"
+    Title "Generate MPK"
 !endif
 
 !if ($show_precond)
     note across
         <b>Preconditions:</b>
-          * FEK in a firmware-managed KV slot
+          * HEK in a firmware-managed KV slot
           * KEM Keypair in a firmware-managed KV slot
 
         <b>Notes:</b>
@@ -23,16 +23,16 @@
 !endif
 
 ' Pre-existing state
-fek++ $BUFFER_ACTIVATION
+hek++ $BUFFER_ACTIVATION
 kemg++ $BUFFER_ACTIVATION
 
-fw $async mb++ : GENERATE_PMEK
+fw $async mb++ : GENERATE_MPK
 
 !if ($show_api)
     note right mb
         | <b>Field           | <b>Size          | <b>Definition |
         | chksum             | u32              | Little endian |
-        | pmek_algorithms    | u32              | Indicates the size of PMEKs. Only one bit shall be reported.\n   * Byte 0 bit 0: 256 bits |
+        | mpk_algorithms     | u32              | Indicates the size of MPKs. Only one bit shall be reported.\n   * Byte 0 bit 0: 256 bits |
         | wrapped_access_key | WrappedAccessKey | KEM-wrapped access key\n   * access_key_algorithm\n   * kem_handle\n   * kem_algorithm\n   * kem_ciphertext\n   * encrypted_access_key |
     end note
 !endif
@@ -71,9 +71,9 @@ tempz++ $BUFFER_ACTIVATION
 !endif
 
 
-alt pmek algorithm 256 bits
+alt mpk algorithm 256 bits
     cfw $sync kv++: HMAC512_Slots(Key : Slot A,\n                         Data Key : Slot Z\n                         Destination :  Slot Y)
-    kv $sync fek: Get FEK
+    kv $sync hek: Get HEK
     kv $sync tempz: Get Access Key
     kv $sync kv: HMAC512 slot A and Slot Z
     kv $sync tempy: Put HMAC512 result Encryption Key
@@ -84,21 +84,21 @@ alt pmek algorithm 256 bits
     !endif
 end
 
-cfw $sync kv++: new_key(len: pmek_alogorithm length,\n              Destination Slot: Z)
-    kv $sync rand: Get random limited\nto len of PMEK algorithm
-    kv $sync tempz: Put new PMEK
+cfw $sync kv++: new_key(len: mpk_alogorithm length,\n              Destination Slot: Z)
+    kv $sync rand: Get random limited\nto len of MPK algorithm
+    kv $sync tempz: Put new MPK
     !if ($show_done)
         kv $sync cfw-- : done
     !else
         kv--
     !endif
 
-cfw $sync kv++: Wrap(Key: Slot Y,\n          Data Key : Slot Z\n          Destination : locked_pmek)
+cfw $sync kv++: Wrap(Key: Slot Y,\n          Data Key : Slot Z\n          Destination : locked_mpk)
 kv $sync tempy: Get Encryption Key
-kv $sync tempz: Get new PMEK
+kv $sync tempz: Get new MPK
 kv $sync kv: Encrypt Data Key using Key
 !if ($show_done)
-    kv $sync cfw-- : Locked PMEK
+    kv $sync cfw-- : Locked MPK
 !else
     kv--
 !endif
@@ -113,7 +113,7 @@ kv $sync tempy !! : Purge
 !endif
 
 
-cfw $sync mb : Command response and\nLocked PMEK
+cfw $sync mb : Command response and\nLocked MPK
 & mb $async fw++ : Command\ncomplete
 
 !if ($show_api)
@@ -121,7 +121,7 @@ cfw $sync mb : Command response and\nLocked PMEK
         | <b>Field           | <b>Size       | <b>Definition |
         | chksum             | u32           | Little endian |
         | fips_status        | u32           | Indicates if the command is FIPS approved or an error |
-        | new_encrypted_pmek | EncryptedPmek | PMEK encrypted to access_key_2 |
+        | new_encrypted_mpk  | EncryptedMpk  | MPK encrypted to access_key_2 |
     end note
 !endif
 cfw--

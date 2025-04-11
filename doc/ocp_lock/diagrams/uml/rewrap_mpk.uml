@@ -1,5 +1,5 @@
 '
-' OCP Lock: REWRAP_PMEK API sequence diagram showing Caliptra FW/HW interactions
+' OCP Lock: REWRAP_MPK API sequence diagram showing Caliptra FW/HW interactions
 '
 '
 @startuml
@@ -7,21 +7,21 @@
 !include ocp_lock_utils.inc
 
 !if ($show_title)
-    Title "Rewrap PMEK"
+    Title "Rewrap MPK"
 !endif
 
 !if ($show_precond)
     note across
         <b>Preconditions:</b>
-        * FEK in a firmware-managed KV slot
+        * HEK in a firmware-managed KV slot
     end note
 !endif
 
-fek++ $BUFFER_ACTIVATION
+hek++ $BUFFER_ACTIVATION
 kemg++ $BUFFER_ACTIVATION
 
 
-fw $async mb++ : REWRAP_PMEK
+fw $async mb++ : REWRAP_MPK
 
 !if ($show_api)
     note right mb
@@ -29,7 +29,7 @@ fw $async mb++ : REWRAP_PMEK
         | chksum                   | u32                    | Little endian |
         | wrapped_access_key_1     | WrappedAccessKey       | KEM-wrapped access key\n   * access_key_algorithm\n   * kem_handle (X)\n   * kem_algorithm\n   * kem_ciphertext\n   * encrypted_access_key |
         | wrapped_enc_access_key_2 | DoubleWrappedAccessKey | KEM-wrapped (access_key_2 encrypted to access_key_1)\n   * double_encrypted_access_key |
-        | old_locked_pmek          | EncryptedPmek          | PMEK encrypted to access_key_1 |
+        | old_locked_mpk           | EncryptedMpk           | MPK encrypted to access_key_1 |
     end note
 !endif
 
@@ -43,7 +43,7 @@ mb $async cfw++ : Command
     mb--
 !endif
 
-alt FEK exists
+alt HEK exists
 
     == Get Access Key 1 ==
     cfw $sync kv++: Decaps(KEM Pair : kem_handle (g),\n            KEM ciphertext : kem_ciphertext from\n                                      wrapped_access_key_1\n            Destination : Slot Y)
@@ -101,12 +101,12 @@ alt FEK exists
     !endif
 
 
-    == Create PMEK wrapping/unwrapping Keys ==
+    == Create MPK wrapping/unwrapping Keys ==
     cfw $sync kv++: HMAC512_Slots(Key : Slot A,\n                         Data Key : Slot Z\n                         Destination : Slot W)
-    kv $sync fek: Get FEK
+    kv $sync hek: Get HEK
     kv $sync tempz: Get Access Key 1
     kv $sync kv: HMAC512 slot A and Slot Z
-    kv $sync tempw: HMAC512 result Old encryption key for locked PMEK
+    kv $sync tempw: HMAC512 result Old encryption key for locked MPK
     tempw++ $BUFFER_ACTIVATION
     !if ($show_done)
         kv $sync cfw-- : done
@@ -115,21 +115,21 @@ alt FEK exists
     !endif
 
     cfw $sync kv++: HMAC512_Slots(Key : Slot A,\n                         Data Key : Slot Y\n                         Destination : Slot Z)
-    kv $sync fek: Get FEK
+    kv $sync hek: Get HEK
     kv $sync tempy: Get Access Key 2
     kv $sync kv: HMAC512 slot A and Slot Y
-    kv $sync tempz: HMAC512 result New encryption key for locked PMEK
+    kv $sync tempz: HMAC512 result New encryption key for locked MPK
     !if ($show_done)
         kv $sync cfw-- : done
     !else
         kv--
     !endif
 
-    == Get PMEK ==
-    cfw $sync kv++: Unwrap(Key : Slot W,\n            Key Data: locked_pmek\n            Destination : Slot Y)
-    kv $sync tempw: Old encryption key for locked PMEK
-    kv $sync kv: Unwrap locked_pmek
-    kv $sync tempy: PMEK
+    == Get MPK ==
+    cfw $sync kv++: Unwrap(Key : Slot W,\n            Key Data: locked_mpk\n            Destination : Slot Y)
+    kv $sync tempw: Old encryption key for locked MPK
+    kv $sync kv: Unwrap locked_mpk
+    kv $sync tempy: MPK
     !if ($show_done)
         kv $sync cfw-- : done
     !else
@@ -137,13 +137,13 @@ alt FEK exists
     !endif
 
 
-    == Create the locked PMEK ==
-    cfw $sync kv++: Wrap(Key: Slot Z,\n             Data Key : Slot Y\n             Destination : new_locked_pmek)
-    kv $sync tempz: Get New encryption key for locked PMEK
-    kv $sync tempy: Get PMEK
-    kv $sync kv: Wrap slot Y with Slot Z to\ngenerate new_encrypted_pmek
+    == Create the locked MPK ==
+    cfw $sync kv++: Wrap(Key: Slot Z,\n             Data Key : Slot Y\n             Destination : new_locked_mpk)
+    kv $sync tempz: Get New encryption key for locked MPK
+    kv $sync tempy: Get MPK
+    kv $sync kv: Wrap slot Y with Slot Z to\ngenerate new_encrypted_mpk
     !if ($show_done)
-        kv $sync cfw-- : new_encrypted_pmek
+        kv $sync cfw-- : new_encrypted_mpk
     !else
         kv--
     !endif
@@ -166,7 +166,7 @@ note left tempmem
 end note
 
 
-cfw $sync mb : Command response\nnew_encrypted_pmek
+cfw $sync mb : Command response\nnew_encrypted_mpk
 & mb $async fw++ : Command\ncomplete
 
 !if ($show_api)
@@ -174,7 +174,7 @@ cfw $sync mb : Command response\nnew_encrypted_pmek
         | <b>Field           | <b>Size       | <b>Definition |
         | chksum             | u32           | Little endian |
         | fips_status        | u32           | Indicates if the command is FIPS approved or an error |
-        | new_encrypted_pmek | EncryptedPmek | PMEK encrypted to access_key_2 |
+        | new_encrypted_mpk  | EncryptedMpk  | MPK encrypted to access_key_2 |
     end note
 !endif
 cfw--

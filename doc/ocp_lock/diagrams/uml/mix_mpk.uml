@@ -1,5 +1,5 @@
 '
-' OCP Lock: MIX_PMEK API sequence diagram showing Caliptra FW/HW interactions
+' OCP Lock: MIX_MPK API sequence diagram showing Caliptra FW/HW interactions
 '
 '
 @startuml
@@ -7,14 +7,14 @@
 !include ocp_lock_utils.inc
 
 !if ($show_title)
-    Title "Mix PMEK into MEK Secret Seed"
+    Title "Mix MPK into MEK Secret Seed"
 !endif
 
 !if ($show_precond)
     note across
         <b>Preconditions:</b>
-        * Ready PMEK Encryption Key is stored in Key Vault slot B
-        * The following sequence has occurred prior: Initialize MEK then zero or more MIX_PMEK
+        * Ready MPK Encryption Key is stored in Key Vault slot B
+        * The following sequence has occurred prior: Initialize MEK then zero or more MIX_MPK
 
         <b>Notes:</b>
           * The sequence diagram assumes that the KV will not allow an input KV slot to also be used as an out KV slot. Caliptra FW is responsible for managing which KV slots are used and can adapt if this assumption is not correct.
@@ -25,16 +25,16 @@
 
 ' Pre-existing data
 meks++ $BUFFER_ACTIVATION
-pmeks++ $BUFFER_ACTIVATION
+mpks++ $BUFFER_ACTIVATION
 
 
-fw $async mb++ : MIX_PMEK
+fw $async mb++ : MIX_MPK
 
 !if ($show_api)
     note right mb
         | <b>Field   | <b>Size   | <b>Definition |
         | chksum     | u32       | Little endian |
-        | ready_pmek | 512 bytes | Ready PMEK\n * PMEK Algorithm embedded |
+        | ready_mpk  | 512 bytes | Ready MPK\n * MPK Algorithm embedded |
     end note
 !endif
 
@@ -48,13 +48,13 @@ mb $async cfw++ : Command
     mb--
 !endif
 
-alt FEK exists
+alt HEK exists
 
-    alt MEK is not initialized (i.e., no PMEK has yet been included)
+    alt MEK is not initialized (i.e., no MPK has yet been included)
         cfw $sync kv++: HMAC512(Key: Slot A,\n                Key Data: "MEK Secret Seed",\n                Destination: Slot X)
-        kv $sync fek: Get FEK
+        kv $sync hek: Get HEK
         kv $sync kv: HMAC512 slot A with Data
-        kv $sync meks: HMAC512 result MEK Secret Seed with FEK
+        kv $sync meks: HMAC512 result MEK Secret Seed with HEK
         !if ($show_done)
             kv $sync cfw-- : done
         !else
@@ -62,12 +62,12 @@ alt FEK exists
         !endif
     end
 
-    $self("cfw", "Determine Temporary slox Y for PMEK")
+    $self("cfw", "Determine Temporary slox Y for MPK")
 
-    cfw $sync kv++: Key_Unwrap(Key:  SlotB,\n                   Key Data: ready_pmek,\n                   Destination Slot: Y)
-    kv $sync pmeks: Get Ready PMEK Encryption Key
-    kv $sync kv: Key_Unwrap ready_pmek
-    kv $sync tempy: Put PMEK
+    cfw $sync kv++: Key_Unwrap(Key:  SlotB,\n                   Key Data: ready_mpk,\n                   Destination Slot: Y)
+    kv $sync mpks: Get Ready MPK Encryption Key
+    kv $sync kv: Key_Unwrap ready_mpk
+    kv $sync tempy: Put MPK
     tempy++ $BUFFER_ACTIVATION
     !if ($show_done)
         kv $sync cfw-- : done
@@ -75,7 +75,7 @@ alt FEK exists
         kv--
     !endif
 
-    cfw $sync kv++: HMAC512(Key : Slot X,\n                Data String : "PMEK mix",\n                Destination : Slot Z)
+    cfw $sync kv++: HMAC512(Key : Slot X,\n                Data String : "MPK mix",\n                Destination : Slot Z)
     kv $sync meks: Get MEK Secret Seed
     kv $sync kv: HMAC512 Key with Data String
     kv $sync tempz: HMAC512 result Temp MEK Secret Seed
@@ -88,9 +88,9 @@ alt FEK exists
 
     cfw $sync kv++: HMAC512_Slots(Key : Slot Z,\n                         Data Key  : Slot Y\n                         Destination : Slot: X)
     kv $sync tempz: Get Temp MEK Secret Seed
-    kv $sync tempy: Get PMEK
+    kv $sync tempy: Get MPK
     kv $sync kv: HMAC512 Key and Data Key
-    kv $sync meks: HMAC512 result MEK Secret Seed updated with PMEK
+    kv $sync meks: HMAC512 result MEK Secret Seed updated with MPK
     !if ($show_done)
         kv $sync cfw-- : done
     !else

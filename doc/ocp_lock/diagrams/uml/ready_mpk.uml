@@ -1,5 +1,5 @@
 '
-' OCP Lock: READY_PMEK API sequence diagram showing Caliptra FW/HW interactions
+' OCP Lock: READY_MPK API sequence diagram showing Caliptra FW/HW interactions
 '
 @startuml
 
@@ -7,30 +7,30 @@
 
 
 !if ($show_title)
-    Title "Ready PMEK"
+    Title "Ready MPK"
 !endif
 
 !if ($show_precond)
     note across
         <b>Preconditions:</b>
         * Access Shared Secret already availble in a slot in KV
-        * Ready PMEK Encryption Key already in a slot and generated on each reset
+        * Ready MPK Encryption Key already in a slot and generated on each reset
         <font color=red>Is there a separate Shared Secret per Admin User?</font>
     end note
 !endif
 
-fek++ $BUFFER_ACTIVATION
+hek++ $BUFFER_ACTIVATION
 kemg++ $BUFFER_ACTIVATION
-pmeks++ $BUFFER_ACTIVATION
+mpks++ $BUFFER_ACTIVATION
 
-fw $async mb++ : READY_PMEK
+fw $async mb++ : READY_MPK
 
 !if ($show_api)
     note right mb
         | <b>Field            | <b>Size          | <b>Definition |
         | chksum              | u32              | Little endian |
         | wrapped_access_key  | WrappedAccessKey | KEM-wrapped access key\n* kem_handle\n*kem_algorithm\n*kem_ciphertext\n* encrypted_access_key  |
-        | locked_pmek         | EncryptedPmek    | PMEK encrypted to the FEK and the access key |
+        | locked_mpk          | EncryptedMpk     | MPK encrypted to the HEK and the access key |
     end note
 !endif
 
@@ -45,7 +45,7 @@ mb $async cfw++ : Command
 !endif
 cfw $sync cfw: Determine rate of ready commands
 
-alt FEK exists
+alt HEK exists
     alt Ready command rate below threshold
 
         == Decapsulate ciphertext and decrypt the access key ==
@@ -186,36 +186,36 @@ alt FEK exists
         == Create the Encryption Key ==
 
         cfw $sync kv++: HMAC512_Slots(Key : Slot A,\n                         Data Key : Slot Z\n                         Destination Slot: Y)
-        kv $sync fek: Get FEK
+        kv $sync hek: Get HEK
         kv $sync tempz: Get Access Key
         kv $sync kv: HMAC512 Slot A with Slot Z
-        kv $sync tempy: HMAC512 result locked PMEK encryption key
+        kv $sync tempy: HMAC512 result locked MPK encryption key
         !if ($show_done)
             kv $sync cfw-- : done
         !else
             kv--
         !endif
 
-        == Decrypt PMEK with locked PMEK encryption key ==
+        == Decrypt MPK with locked MPK encryption key ==
 
-        cfw $sync kv++: Unwrap(Key : Slot Y,\n            Data: locked_pmek\n            Destination :  Slot Z)
-        kv $sync tempy: Get locked PMEK encryption key
-        kv $sync kv: Decrypt locked_pmek
-        kv $sync tempz: PMEK
+        cfw $sync kv++: Unwrap(Key : Slot Y,\n            Data: locked_mpk\n            Destination :  Slot Z)
+        kv $sync tempy: Get locked MPK encryption key
+        kv $sync kv: Decrypt locked_mpk
+        kv $sync tempz: MPK
         !if ($show_done)
             kv $sync cfw-- : done
         !else
             kv--
         !endif
 
-        == Encrypt PMEK with Ready PMEK Encryption Key ==
+        == Encrypt MPK with Ready MPK Encryption Key ==
 
-        cfw $sync kv++: Wrap(Key: Slot B,\n         Data Key : Slot Z\n         Destination : ready_pmek)
-        kv $sync pmeks: Get Ready PMEK Encryption Key
-        kv $sync tempz: Get PMEK
+        cfw $sync kv++: Wrap(Key: Slot B,\n         Data Key : Slot Z\n         Destination : ready_mpk)
+        kv $sync mpks: Get Ready MPK Encryption Key
+        kv $sync tempz: Get MPK
         kv $sync kv: Encrypt slot Z using Slot B
         !if ($show_done)
-            kv $sync cfw-- : Ready PMEK
+            kv $sync cfw-- : Ready MPK
         !else
             kv--
         !endif
@@ -229,7 +229,7 @@ alt FEK exists
             kv--
         !endif
 
-        cfw $sync mb : Command response\nReady_PMEK
+        cfw $sync mb : Command response\nReady_MPK
         & mb $async fw++ : Command\ncomplete
     end
 end
@@ -239,7 +239,7 @@ end
         | <b>Field    | <b>Size       | <b>Definition |
         | chksum      | u32           | Little endian |
         | fips_status | u32           | Indicates if the command is FIPS approved or an error |
-        | ready_pmek  | EncryptedPmek | PMEK encrypted to a key that is rotated on reset |
+        | ready_mpk   | EncryptedMpk  | MPK encrypted to a key that is rotated on reset |
     end note
 !endif
 cfw--
