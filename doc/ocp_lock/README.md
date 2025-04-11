@@ -381,8 +381,6 @@ In this flow, the DEK may be encrypted by a user's Opal C_PIN. Legacy controller
 
 In this flow, the DEK may be the imported key associated with a Key Per I/O key tag.
 
-Note: in this flow, KMB accepts 512-bit DEKs, to support derivation of AES-XTS-512 keys. There are arguments that a 256-bit DEK would be sufficient, as an AES-XTS-512 key is interpreted as a pair of 256-bit keys and therefore can be said to have a total of 256 bits of security strength. However, other interpretations hold that a 512-bit-wide AES key requires 512 bits of input key material. KMB accepts 512-bit DEKs as a conservative measure.
-
 <p align="center">
   <img src="./diagrams/dek_injection.drawio.svg" alt="DEK injection" />
 </p>
@@ -954,8 +952,6 @@ Table: GENERATE_MEK output arguments
 
 This command decrypts the given encrypted 512-bit MEK using the MEK encryption key, which is derived from the FEK, the MEK secret seed, and the given CEK and DEK.
 
-The DEK may be a value decrypted by a user-provided C_PIN in Opal.
-
 When decrypting an MEK, the MEK secret seed is initialized if no PMEK has previously been mixed into the MEK secret seed.
 
 The decrypted MEK, specified metadata, and aux_metadata are loaded into the encryption engine key cache. The metadata is specific to the storage controller and specifies the information to the encryption engine on where within the key cache the MEK is loaded.
@@ -988,8 +984,6 @@ Table: LOAD_MEK output arguments
 
 This command derives an MEK using the FEK, the MEK secret seed, and the given CEK and DEK.
 
-The DEK may be a per-MEK value in Key Per I/O. It is 512-bits to support AES-XTS-512.
-
 When deriving an MEK, the MEK secret seed is initialized if no PMEK has previously been mixed into the MEK secret seed.
 
 The derived MEK, specified metadata, and aux_metadata are loaded into the encryption engine key cache. The metadata is specific to the storage controller and specifies the information to the encryption engine on where within the key cache the MEK is loaded.
@@ -1002,7 +996,7 @@ Table: DERIVE_MEK input arguments
 | :------------ | :----- | :---------- |
 | chksum        | u32    | Checksum over other input arguments, computed by the caller. Little endian. |
 | cek           | u8[32] | "Controller epoch key". May be rotated by the controller as part of a cryptographic purge. |
-| dek           | u8[64] | "Data encryption key". May be a per-MEK value in Key Per I/O. |
+| dek           | u8[32] | "Data encryption key". |
 | metadata      | u8[20] | Metadata for MEK to load into the drive crypto engine (i.e. NSID + LBA range). |
 | aux_metadata  | u8[32] | Auxiliary metadata for the MEK (optional; i.e. operation mode). |
 | reserved      | u32    | Reserved. |
@@ -1216,6 +1210,7 @@ The following acronyms and abbreviations are used throughout this document.
 | FEK          | Fuse Epoch Key |
 | HKDF         | HMAC-based key derivation function |
 | HMAC         | Hash-Based Message Authentication Code |
+| HPKE         | Hybrid Public Key Encryption |
 | IETF EAT     | IETF Entity Attestation Token |
 | KDF          | Key Derivation Function |
 | KEM          | Key Encapsulation Mechanism |
