@@ -127,7 +127,7 @@ OCP L.O.C.K. may be integrated within a variety of self-encrypting storage devic
 
 # Background
 
-In the life of a storage device in a datacenter, the device leaves the supplier, a customer writes user data to the device, and then the device is decommissioned. Customer data is not allowed to leave the data center. The cloud service provider (CSP) needs high confidence that the storage device leaving the datacenter is secure. The current default CSP policy to ensure this level of security is to destroy the drive. Other policies may exist that leverage drive capabilities (e.g., Purge), but are not generally deemed inherently trustworthy by these CSPs[[1]]. This produces significant e-waste and inhibits any re-use/recycling.
+In the life of a storage device in a datacenter, the device leaves the supplier, a customer writes user data to the device, and then the device is decommissioned. Customer data is not allowed to leave the data center. The cloud service provider (CSP) needs high confidence that the storage device leaving the datacenter is secure. The current default CSP policy to ensure this level of security is to destroy the drive. Other policies may exist that leverage drive capabilities (e.g., Purge), but are not generally deemed inherently trustworthy by these CSPs[\[1\]](#ref-1). This produces significant e-waste and inhibits any re-use/recycling.
 
 Self-encrypting drives (SEDs) store data encrypted at rest to media encryption keys (MEKs). SEDs include the following building blocks:
 
@@ -135,7 +135,7 @@ Self-encrypting drives (SEDs) store data encrypted at rest to media encryption k
 - An encryption engine which performs line-rate encryption and decryption of data as it enters and exits the drive.
 - A controller which exposes host-side APIs for managing the lifecycle of MEKs.
 
-MEKs may be bound to user credentials, which the host must provide to the drive in order for the associated data to be readable. A given MEK may be bound to one or more credentials. This model is captured in the TCG Opal[[2]] specification.
+MEKs may be bound to user credentials, which the host must provide to the drive in order for the associated data to be readable. A given MEK may be bound to one or more credentials. This model is captured in the TCG Opal[\[2\]](#ref-2) specification.
 
 MEKs may be securely purged, to effectively purge all data which was encrypted to the MEK. To purge an MEK, it is sufficient for the controller to purge all copies of it, or a key with which it was protected.
 
@@ -173,14 +173,14 @@ The OCP L.O.C.K. KMB satisfies the following properties:
 - Prevents leakage of media keys via firmware vulnerabilities or side channels, by isolating MEKs to a trusted hardware block.
 - Binds MEKs to a given set of externally-supplied access keys, provisioned with replay-resistant transport security such that they can be injected without trusting the host.
 - Uses epoch keys for attestable epoch-based cryptographic purge.
-- Is able to be used in conjunction with the Opal or Key Per I/O[[3]] storage device specifications.
+- Is able to be used in conjunction with the Opal or Key Per I/O[\[3\]](#ref-3) storage device specifications.
 
 ## Non-goals
 
 The following areas are out of scope for this project.
 
 - Compliance with IEEE 1619 2025 requirements around key scope, i.e. restricting a given MEK to only encrypt a maximum of 2<sup>44</sup> 128-bit blocks. Controller firmware will be responsible for enforcing this.
-- Compliance with Common Criteria requirement FCS_CKM.1.1(c)[[4]] when supporting derived MEKs. Key Per I/O calls for DEKs to be injected into the device. To support OCP L.O.C.K.'s goals around enabling cryptographic purge, before the injected DEK is used to encrypt user data, it is first conditioned with an on-device secret that can be securely zeroized. FCS_CKM.1.1(c) currently does not allow injected keys to be thus conditioned and therefore does not allow for cryptographic purge under the Key Per I/O model. A storage device that integates OCP L.O.C.K. and aims to be compliant with this Common Criteria requirement may not support Key Per I/O.
+- Compliance with Common Criteria requirement FCS_CKM.1.1(c)[\[4\]](#ref-4) when supporting derived MEKs. Key Per I/O calls for DEKs to be injected into the device. To support OCP L.O.C.K.'s goals around enabling cryptographic purge, before the injected DEK is used to encrypt user data, it is first conditioned with an on-device secret that can be securely zeroized. FCS_CKM.1.1(c) currently does not allow injected keys to be thus conditioned and therefore does not allow for cryptographic purge under the Key Per I/O model. A storage device that integates OCP L.O.C.K. and aims to be compliant with this Common Criteria requirement may not support Key Per I/O.
 - Authorization for CEK/DEK/MEK rotation, or binding a given MEK to a particular locking range. The controller firmware is responsible for these.
 
 ## Integration verification
@@ -207,7 +207,7 @@ OCP L.O.C.K.'s KMB protects MEKs using the following keys:
 
 - A KMB-managed fuse epoch key (FEK), derived from secrets held in device fuses that are only accessible by the KMB. The FEK may be zeroized and regenerated a small number of times, providing assurance that an advanced adversary cannot recover key material that had been in use by the drive prior to the FEK zeroization. KMB does not allow MEKs to be loaded while the FEK is zeroized. KMB can report whether the FEK is zeroized and therefore whether the drive is clean.
 
-- Zero or more partial MEKs (PMEKs), each of which is a cryptographically-strong value randomly generated by KMB, encrypted at rest using a key derived from the FEK as well as an externally-supplied access key. The access key is never stored persistently within the device. PMEKs enable multi-party authorization flows: the access key for each PMEK to which an MEK is bound must be provided to the drive before the MEK can be loaded. Access keys are protected in transit using HPKE[[5]] keypairs. This enables use-cases where the access key is served to the drive from a remote entity, without having to trust the host to which the drive is attached. To bind a given locking range to multiple external authorities, the controller can generate multiple PMEKs and use them to load the locking range's MEK. PMEK access keys may be held at rest in a remote key management service. An MEK may be bound to zero PMEKs, which allows for legacy Opal or Key Per I/O flows.
+- Zero or more partial MEKs (PMEKs), each of which is a cryptographically-strong value randomly generated by KMB, encrypted at rest using a key derived from the FEK as well as an externally-supplied access key. The access key is never stored persistently within the device. PMEKs enable multi-party authorization flows: the access key for each PMEK to which an MEK is bound must be provided to the drive before the MEK can be loaded. Access keys are protected in transit using HPKE[\[5\]](#ref-5) keypairs. This enables use-cases where the access key is served to the drive from a remote entity, without having to trust the host to which the drive is attached. To bind a given locking range to multiple external authorities, the controller can generate multiple PMEKs and use them to load the locking range's MEK. PMEK access keys may be held at rest in a remote key management service. An MEK may be bound to zero PMEKs, which allows for legacy Opal or Key Per I/O flows.
 
 The keys listed here are used together to derive an MEK secret. The MEK secret is used in one of two flows:
 
@@ -672,7 +672,7 @@ Within KMB, loaded MEKs are only ever present in the Key Vault, so that they can
 
 ### AES-XTS key validation requirements
 
-FIPS 140-3 IG section C.I[[6]] states that in AES-XTS, the key is "parsed as the concatenation of two AES keys, denoted by *Key_1* and *Key_2*, that are 128 [or 256] bits long... The module **shall** check explicitly that *Key_1* ≠ *Key_2*, regardless of how *Key_1* and *Key_2* are obtained."
+FIPS 140-3 IG section C.I[\[6\]](#ref-6) states that in AES-XTS, the key is "parsed as the concatenation of two AES keys, denoted by *Key_1* and *Key_2*, that are 128 [or 256] bits long... The module **shall** check explicitly that *Key_1* ≠ *Key_2*, regardless of how *Key_1* and *Key_2* are obtained."
 
 The encryption engine will be responsible for performing this check when in AES-XTS mode.
 
@@ -738,8 +738,8 @@ Table: GET_ALGORITHMS output arguments
 | :--------------------- | :----- | :---------- |
 | chksum                 | u32    | Checksum over other output arguments, computed by Caliptra. Little endian. |
 | fips_status            | u32    | Indicates if the command is FIPS approved or an error. |
-| endorsement_algorithms | u32    | Identifies the supported endorsement algorithms:<ul><li>Byte 0 bit 0: ecdsa_secp384r1_sha384[[7]]</li><li>Byte 0 bit 1: ml-dsa-87[[8]]</li></ul> |
-| hpke_algorithms        | u32    | Identifies the supported HPKE algorithms:<ul><li>Byte 0 bit 0: kem_id = 0x0011, aead_id = 0x0002, kdf_id = 0x0002[[5]]</li><li>Byte 0 bit 1: bit 1: kem_id = 0x0a25, aead_id = 0x0002, kdf_id = 0x0002[[9]]</li></ul> |
+| endorsement_algorithms | u32    | Identifies the supported endorsement algorithms:<ul><li>Byte 0 bit 0: ecdsa_secp384r1_sha384[\[7\]](#ref-7)</li><li>Byte 0 bit 1: ml-dsa-87[\[8\]](#ref-8)</li></ul> |
+| hpke_algorithms        | u32    | Identifies the supported HPKE algorithms:<ul><li>Byte 0 bit 0: kem_id = 0x0011, aead_id = 0x0002, kdf_id = 0x0002[\[5\]](#ref-5)</li><li>Byte 0 bit 1: bit 1: kem_id = 0x0a25, aead_id = 0x0002, kdf_id = 0x0002[\[9\]](#ref-9)</li></ul> |
 | pmek_algorithms        | u32    | Indicates the size of PMEKs:<ul><li>Byte 0 bit 0: 256 bits</li></ul> |
 | access_key_algorithm   | u32    | Indicates the size of access keys:<ul><li>Byte 0 bit 0: 256 bits, with a 128-bit truncated SHA384 ID</li></ul> |
 | reserved               | u32\[4\] | Reserved. |
@@ -1197,6 +1197,8 @@ This section will be fleshed out with additional details as they become availabl
 
 This section will be fleshed out with additional details as they become available.
 
+<div style="page-break-after: always"></div>
+
 # Terminology
 
 The following acronyms and abbreviations are used throughout this document.
@@ -1230,6 +1232,20 @@ The following acronyms and abbreviations are used throughout this document.
 | SSD          | Solid-state drive |
 | UART         | Universal asynchronous receiver-transmitter |
 | XTS          | XEX-based tweaked-codebook mode with ciphertext stealing |
+
+<div style="page-break-after: always"></div>
+
+# References
+
+1. <a id="ref-1"></a>[Self-encrypting deception: weaknesses in the encryption of solid state drives](https://www.cs.ru.nl/~cmeijer/publications/Self_Encrypting_Deception_Weaknesses_in_the_Encryption_of_Solid_State_Drives.pdf) by Carlo Meijer and Bernard van Gastel
+2. <a id="ref-2"></a>[TCG Opal](https://trustedcomputinggroup.org/resource/storage-work-group-storage-security-subsystem-class-opal/)
+3. <a id="ref-3"></a>[TCG Key Per I/O](https://trustedcomputinggroup.org/resource/tcg-storage-security-subsystem-class-ssc-key-per-i-o/)
+4. <a id="ref-4"></a>[Collaborative Protection Profile for Full Drive Encryption - Encryption Engine, requirement FCS_CKM.1.1(c)](https://www.commoncriteriaportal.org/files/ppfiles/CPP_FDE_EE_V2.0.pdf#page=25)
+5. <a id="ref-5"></a>[RFC 9180: Hybrid Public Key Encryption](https://datatracker.ietf.org/doc/html/rfc9180)
+6. <a id="ref-6"></a>[FIPS 140-3 IG, section C.I](https://csrc.nist.gov/csrc/media/Projects/cryptographic-module-validation-program/documents/fips%20140-3/FIPS%20140-3%20IG.pdf#page=126)
+7. <a id="ref-7"></a>[RFC 8446: The Transport Layer Security (TLS) Protocol Version 1.3](https://datatracker.ietf.org/doc/html/rfc8446)
+8. <a id="ref-8"></a>[Internet X.509 Public Key Infrastructure: Algorithm Identifiers for ML-DSA](https://datatracker.ietf.org/doc/html/draft-ietf-lamps-dilithium-certificates)
+9. <a id="ref-9"></a>[Hybrid PQ/T Key Encapsulation Mechanisms](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hybrid-kems)
 
 <div style="page-break-after: always"></div>
 
@@ -1342,15 +1358,3 @@ This section will be fleshed out with additional details as they become availabl
 <p align="center">
   <img src="./diagrams/uml/clear_key_cache.svg" alt="Unloading all MEKs" />
 </p>
-
-<!-- References -->
-
-[1]: <https://www.cs.ru.nl/~cmeijer/publications/Self_Encrypting_Deception_Weaknesses_in_the_Encryption_of_Solid_State_Drives.pdf> "Self-encrypting deception: weaknesses in the encryption of solid state drives"
-[2]: <https://trustedcomputinggroup.org/resource/storage-work-group-storage-security-subsystem-class-opal/> "TCG Opal"
-[3]: <https://trustedcomputinggroup.org/resource/tcg-storage-security-subsystem-class-ssc-key-per-i-o/> "TCG Key Per I/O"
-[4]: <https://www.commoncriteriaportal.org/files/ppfiles/CPP_FDE_EE_V2.0.pdf#page=25> "Collaborative Protection Profile for Full Drive Encryption - Encryption Engine, requirement FCS_CKM.1.1(c)"
-[5]: <https://datatracker.ietf.org/doc/html/rfc9180> "RFC 9180: Hybrid Public Key Encryption"
-[6]: <https://csrc.nist.gov/csrc/media/Projects/cryptographic-module-validation-program/documents/fips%20140-3/FIPS%20140-3%20IG.pdf#page=126> "FIPS 140-3 IG, section C.I"
-[7]: <https://datatracker.ietf.org/doc/html/rfc8446> "RFC 8446: The Transport Layer Security (TLS) Protocol Version 1.3"
-[8]: <https://datatracker.ietf.org/doc/html/draft-ietf-lamps-dilithium-certificates> "Internet X.509 Public Key Infrastructure: Algorithm Identifiers for ML-DSA"
-[9]: <https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hybrid-kems> "Hybrid PQ/T Key Encapsulation Mechanisms"
