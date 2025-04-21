@@ -1,0 +1,74 @@
+references:
+  - id: "self-encrypting-deception"
+    title: "Self-encrypting deception: weaknesses in the encryption of solid state drives"
+    author:
+      - family: "Meijer"
+        given: "Carlo"
+      - family: "van Gastel"
+        given: "Bernard"
+    url: "https://www.cs.ru.nl/~cmeijer/publications/Self_Encrypting_Deception_Weaknesses_in_the_Encryption_of_Solid_State_Drives.pdf"
+  - id: "tcg-opal"
+    title: "TCG Storage Security Subsystem Class: Opal Specification"
+    publisher: "Trusted Computing Group"
+    url: "https://trustedcomputinggroup.org/resource/storage-work-group-storage-security-subsystem-class-opal/"
+  - id: "tcg-kpio"
+    title: "TCG Storage Security Subsystem Class (SSC): Key Per I/O"
+    publisher: "Trusted Computing Group"
+    url: "https://trustedcomputinggroup.org/resource/tcg-storage-security-subsystem-class-ssc-key-per-i-o/"
+  - id: "cpp-fde"
+    title: "collaborative Protection Profile for Full Drive Encryption - Encryption Engine"
+    publisher: "Common Criteria"
+    issued:
+      year: 2016
+      month: 9
+    url: "https://www.commoncriteriaportal.org/files/ppfiles/CPP_FDE_EE_V2.0.pdf"
+  - id: "ietf-rfc9180"
+    title: "Hybrid Public Key Encryption"
+    publisher: "IETF"
+    issued:
+      year: 2022
+      month: 2
+    url: "https://datatracker.ietf.org/doc/html/rfc9180"
+  - id: "fips-140-3-ig"
+    title: "Implementation Guidance for FIPS 140-3 and the Cryptographic Module Validation Program"
+    publisher: "NIST"
+    issued:
+      year: 2025
+      month: 4
+    url: "https://csrc.nist.gov/csrc/media/Projects/cryptographic-module-validation-program/documents/fips%20140-3/FIPS%20140-3%20IG.pdf"
+  - id: "ietf-rfc8446"
+    title: "The Transport Layer Security (TLS) Protocol Version 1.3"
+    publisher: "IETF"
+    issued:
+      year: 2018
+      month: 8
+    url: "https://datatracker.ietf.org/doc/html/rfc8446"
+  - id: "draft-ietf-lamps-dilithium-certificates"
+    title: "Internet X.509 Public Key Infrastructure: Algorithm Identifiers for ML-DSA"
+    author:
+      - family: "Massimo"
+        given: "J."
+        affiliation: "AWS"
+      - family: "Kampanakis"
+        given: "P."
+        affiliation: "AWS"
+      - family: "Turner"
+        given: "S."
+        affiliation: "sn3rd"
+      - family: "Westerbaan"
+        given: "B. E."
+        affiliation: "Cloudflare"
+    issued:
+      year: 2025
+      month: 2
+    url: "https://datatracker.ietf.org/doc/html/draft-ietf-lamps-dilithium-certificates"
+  - id: "draft-irtf-cfrg-hybrid-kems"
+    title: "Hybrid PQ/T Key Encapsulation Mechanisms"
+    author:
+      - family: "Connolly"
+        given: "D."
+        affiliation: "SandboxAQ"
+    issued:
+      year: 2025
+      month: 2
+    url: "https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hybrid-kems"

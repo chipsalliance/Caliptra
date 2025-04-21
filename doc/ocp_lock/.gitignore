@@ -1,0 +1,12 @@
+*.pdf
+*.docx
+*.html
+/*.tex
+*.log
+*.aux
+*.lof
+*.lot
+*.toc
+*.fdb_latexmk
+*.upa
+*.upb
