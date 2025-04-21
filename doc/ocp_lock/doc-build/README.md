@@ -14,18 +14,16 @@ When creating new diagrams, be sure to enable a white background. Otherwise, the
 
 To generate SVG files from the UML diagrams, download [PlantUML](https://plantuml.com/download) and run:
 
-```
+```sh
 $ java -jar path/to/plant_uml.jar -Ddoc_gen-=1 -tsvg diagrams/uml/*.uml
 ```
 
 ## Render Markdown
 
-To render the specification in HTML or PDF, use the [Markdown PDF](https://marketplace.visualstudio.com/items?itemName=yzane.markdown-pdf) Visual Studio Code extension.
+To render the specification in PDF, use the [OCP Spec Tools](https://github.com/opencomputeproject/ocp-spec-tools) repository.
 
-The table of contents requires [this](./extension.js.patch) patch. To apply it, first [locate](https://code.visualstudio.com/api/working-with-extensions/publishing-extension#your-extension-folder) the extension folder, and then run:
+```sh
+$ docker pull ghcr.io/trustedcomputinggroup/pandoc:latest
 
+$ path/to/ocp-spec-tools/ocp-docker-run.sh --pdf README.pdf README.ocp
 ```
-patch -b path/to/yzane.markdown-pdf/extension.js path/to/doc-build/extension.js.patch
-```
-
-Once the patch has been applied, reload Visual Studio Code for the change to take effect, by either restarting the program or opening the command pallette and executing the "Developer: Reload Window" command.
