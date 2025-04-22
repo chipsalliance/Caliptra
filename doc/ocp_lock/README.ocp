@@ -1109,7 +1109,7 @@ Table: GENERATE_MEK input arguments
 +----------+--------+----------------------------------------------+
 | reserved | u32    | Reserved.                                    |
 +----------+--------+----------------------------------------------+
-| sek      | u8[32] | "Controller epoch key". May be rotated       |
+| sek      | u8[32] | "Soft epoch key". May be rotated             |
 |          |        | by the controller as part of a cryptographic |
 |          |        | purge.                                       |
 +----------+--------+----------------------------------------------+
@@ -1157,7 +1157,7 @@ Table: LOAD_MEK input arguments
 +---------------+--------------+-----------------------------------------------+
 | reserved      | u32          | Reserved.                                     |
 +---------------+--------------+-----------------------------------------------+
-| sek           | u8[32]       | "Controller epoch key". May be rotated        |
+| sek           | u8[32]       | "Soft epoch key". May be rotated              |
 |               |              | by the controller as part of a cryptographic  |
 |               |              | purge.                                        |
 +---------------+--------------+-----------------------------------------------+
@@ -1215,7 +1215,7 @@ Table: DERIVE_MEK input arguments
 +--------------+--------+-----------------------------------------------+
 | reserved     | u32    | Reserved.                                     |
 +--------------+--------+-----------------------------------------------+
-| sek          | u8[32] | "Controller epoch key". May be rotated        |
+| sek          | u8[32] | "Soft epoch key". May be rotated              |
 |              |        | by the controller as part of a cryptographic  |
 |              |        | purge.                                        |
 +--------------+--------+-----------------------------------------------+
@@ -1636,7 +1636,7 @@ The following acronyms and abbreviations are used throughout this document.
 +--------------+----------------------------------------------------------+
 | ML-KEM       | Module-Lattice-Based Key-Encapsulation Mechanism         |
 +--------------+----------------------------------------------------------+
-| MPK          | Partial Media Encryption Key                             |
+| MPK          | Multi-party Protection Key                               |
 +--------------+----------------------------------------------------------+
 | NIST         | National Institute of Standards and Technology           |
 +--------------+----------------------------------------------------------+
