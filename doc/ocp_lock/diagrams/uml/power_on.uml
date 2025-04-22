@@ -19,7 +19,7 @@
 '        <b>Notes:</b>
 '        * <font color=red>Need to discuss Warm Reset cases
 '          - <font color=red>NVM subsystem Reset - assume reset of ASIC and ROM code re-executed
-'          - <font color=red>PCIe Warm Reset - Discuss : PMEKs maybe ready
+'          - <font color=red>PCIe Warm Reset - Discuss : MPKs maybe ready
 '             Gamil to investigate
 '          - <font color=red>Controller Reset - Discuss
     end note
@@ -29,27 +29,27 @@ fuses++ $BUFFER_ACTIVATION
 
 [-[$ASYNC_COLOR]>> crom++ : Power on
 
-== Load a KV slot with FEK  ==
+== Load a KV slot with HEK  ==
 
-crom $sync kv++: load_fek(Key: Slot A)
+crom $sync kv++: load_hek(Key: Slot A)
 loop through fuses entries until valid fuse entry found
     kv $sync fuses : get next entry
 end
 
 alt if a valid entry
-    kv $sync fek : Put FEK
-    fek++ $BUFFER_ACTIVATION
-    kv $sync kv: fek_exists = True
+    kv $sync hek : Put HEK
+    hek++ $BUFFER_ACTIVATION
+    kv $sync kv: hek_exists = True
 else No valid entry
-    kv $sync kv: fek_exists = False
+    kv $sync kv: hek_exists = False
 end
 !if ($show_done)
-    kv $sync crom-- : fek_exists
+    kv $sync crom-- : hek_exists
 !else
     kv--
 !endif
 
-crom $sync crom : Retain fek_exists
+crom $sync crom : Retain hek_exists
 
 
 == Load a KV slot with KEM for each KEM algorithm supported  ==
@@ -78,12 +78,12 @@ ROM/FMC code already created DICE keys and loaded them. Caliptra FW knows the ke
 
 end note
 
-== Load a KV slot with a Ready PMEK Encryption Key  ==
+== Load a KV slot with a Ready MPK Encryption Key  ==
 
 crom $sync kv++: new_key(len: 256,\n              Destination: Slot B)
 kv $sync rand: Get new random key of 256 bits
-kv $sync pmeks: Put Ready PMEK Encryption Key
-pmeks++ $BUFFER_ACTIVATION
+kv $sync mpks: Put Ready MPK Encryption Key
+mpks++ $BUFFER_ACTIVATION
 !if ($show_done)
     kv $sync crom-- : done
 !else
@@ -97,7 +97,7 @@ destroy crom
 note right cfw
     Currently, there is already handoff information
     from ROM to run-time FW. Need to include:
-    * If the FEK exists and if so the KV slot containing that FEK
+    * If the HEK exists and if so the KV slot containing that HEK
     * The KV Slot containing the KEM keypair
 
 end note

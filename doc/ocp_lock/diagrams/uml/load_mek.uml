@@ -13,7 +13,7 @@
 !if ($show_precond)
     note across
         <b>Preconditions:</b>
-        * The following sequence may or may not have occurred prior: Zero or more MIX_PMEK commands
+        * The following sequence may or may not have occurred prior: Zero or more MIX_MPK commands
 
         <b>Notes:</b>
           * The sequence diagram assumes that the KV will not allow an input KV slot to also be used as an out KV slot. Caliptra FW is responsible for managing which KV slots are used and can adapt if this assumption is not correct.
@@ -22,7 +22,7 @@
 !endif
 
 
-fek++ $BUFFER_ACTIVATION
+hek++ $BUFFER_ACTIVATION
 sfr++
 
 fw $async mb++ : LOAD_MEK
@@ -33,8 +33,8 @@ fw $async mb++ : LOAD_MEK
         | chksum       | u32     | Little endian |
         | metadata     | u8[20]  | Metadata for MEK to load into the drive crypto engine (i.e. NSID + LBA range) |
         | aux_metadata | u8[32]  | Auxiliary metadata for the MEK (optional; i.e. operation mode) |
-        | cek          | u8[32]  | "Controller epoch key".\nMay be rotated by the controller as part of a cryptographic purge. |
-        | dek          | u8[32]  | "Data encryption key".\nMay be a C_PIN-derived secret in Opal or a per-MEK value in KPIO. |
+        | sek          | u8[32]  | "Soft epoch key".\nMay be rotated by the controller as part of a cryptographic purge. |
+        | dpk          | u8[32]  | "Data protection key".\nMay be a C_PIN-derived secret in Opal or a per-MEK value in KPIO. |
         | rdy_timeout  | u32     | Timeout in ms for encryption engine to become ready for a new command |
         | cmd_timeout  | u32     | Timeout in ms for command to crypto engine to complete |
     end note
@@ -53,13 +53,13 @@ mb $async cfw++ : Command
 $self("cfw", "Use KV Slot X for deriving MEK")
 
 
-alt FEK exists and the encryption engine has become ready
+alt HEK exists and the encryption engine has become ready
 
-    alt MEK is not initialized (i.e., no PMEK in the final MEK)
+    alt MEK is not initialized (i.e., no MPK in the final MEK)
         cfw $sync kv++: HMAC512(Key: Slot A,\n                Key Data: "MEK Secret Seed",\n                Destination: Slot X)
-        kv $sync fek: Get FEK
+        kv $sync hek: Get HEK
         kv $sync kv: HMAC512 slot A with Data
-        kv $sync meks: HMAC512 result MEK Secret Seed with FEK
+        kv $sync meks: HMAC512 result MEK Secret Seed with HEK
         meks++ $BUFFER_ACTIVATION
         !if ($show_done)
             kv $sync cfw-- : done
@@ -68,8 +68,8 @@ alt FEK exists and the encryption engine has become ready
         !endif
     end
 
-    cfw $sync kv++: HMAC512(Key string : cek,\n                Data String: dek,\n                Destination : Slot Y)
-    kv $sync kv: HMAC512(CEK, DEK)
+    cfw $sync kv++: HMAC512(Key string : sek,\n                Data String: dpk,\n                Destination : Slot Y)
+    kv $sync kv: HMAC512(SEK, DPK)
     kv $sync tempy: HMAC512 result pre-MEK
     tempy++ $BUFFER_ACTIVATION
     !if ($show_done)
@@ -132,7 +132,7 @@ alt FEK exists and the encryption engine has become ready
     cfw $sync sfr : Write Control Reg (DN = 1b)
     note left sfr: Reset the SFR interface for next operation - not waiting for response
 
-    $self("cfw", "Mark that the sequence\nof an Initialize MEK then\nzero or more MIX_PMEK sequence\n is completed")
+    $self("cfw", "Mark that the sequence\nof an Initialize MEK then\nzero or more MIX_MPK sequence\n is completed")
 end
 
 cfw $sync kv++: Purge_key(Key: Slot X,\n                Key : Slot Y)
