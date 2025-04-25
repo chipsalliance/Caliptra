@@ -185,8 +185,8 @@ The following is a consolidated list of all requirements to ensure comprehensive
 ### *Interface Implementation*
 
 * **Checklist Item:**  
-  * **Requirement:** Interfaces to Caliptra MUST adhere to the [SoC Integration Requirements](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md#soc-integration-requirements) specified in the caliptra-rtl repo.
-  * **Evaluation Methodology:** Manufacturers MUST provide hardware schematics and documentation showing correct implementation of interfaces.
+  * **Requirement:** Interfaces to Caliptra MUST adhere to the SoC Integration Requirements of the RTL release that was used. See [RTL v1.0](https://github.com/chipsalliance/caliptra-rtl/blob/v1.0/docs/CaliptraIntegrationSpecification.md#soc-integration-requirements), [RTL v1.1](https://github.com/chipsalliance/caliptra-rtl/blob/v1.1/docs/CaliptraIntegrationSpecification.md#soc-integration-requirements).
+  * **Evaluation Methodology:** Manufacturers MUST show correct implementation of interfaces, following the definitions in the caliptra-rtl repo.
 
 ## SoC Root of Trust (RoT)
 
