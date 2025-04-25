@@ -266,6 +266,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 
 * **Checklist Item:**  
   * **Requirement:** The SOC Manager MUST put Caliptra into a debug state when the SOC is operating in a mode that permits the usage of code/data which differs from the measurements submitted to Caliptra.
+  * **Requirement:** The SOC Manager MUST put Caliptra into a debug state any time test or debug logic allows read or write access to Caliptra logic or SRAM.
   * **Evaluation Methodology:** Manufacturers MUST describe how debugging is enabled for the SOC and for Caliptra, including any fuse settings, access controls, and procedures to disable debugging interfaces.
 
 #### *Flaw Remediation Process*
