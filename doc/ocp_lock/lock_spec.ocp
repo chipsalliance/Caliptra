@@ -60,7 +60,7 @@ PLEASE VERIFY THE CORRECT CLA/FSA IS USED AND EXECUTED FOR THIS CONTRIBUTION.
 # Compliance with OCP Tenets
 
 <!---
-Please describe how this Specification complies with the OCP tenets. 
+Please describe how this Specification complies with the OCP tenets.
 A full explanation of the OCP core tenets can be seen [here](https://146a55aca6f00848c565-a7635525d40ac1c70300198708936b4e.ssl.cf1.rackcdn.com/images/bf648bb75091907147e76846cad590f402660d2e.pdf).
 -->
 
@@ -721,7 +721,7 @@ Table: GET_STATUS output arguments
 
 #### GET_ALGORITHMS
 
-Exposes a command that allows controller firmware to determine the types of algorithms supported by KMB for endorsement, KEM, MPK, and access key generation. 
+Exposes a command that allows controller firmware to determine the types of algorithms supported by KMB for endorsement, KEM, MPK, and access key generation.
 
 Command Code: 0x4741_4C47 ("GALG")
 
@@ -895,7 +895,7 @@ Table: ROTATE_ENCAPSULATION_KEY output arguments
 
 This command unwraps the specified access key, generates a random MPK, then uses the HEK and access key to encrypt the MPK which is returned for the Storage Controller to persistently store.
 
-Command Code: 0x4750_4D4B ("GPMK")
+Command Code: 0x474D_504B ("GMPK")
 
 Table: GENERATE_MPK input arguments
 
@@ -1000,7 +1000,7 @@ Table: REWRAP_MPK output arguments
 
 This command unwraps wrapped_access_key. Then the unwrapped access_key is used to decrypt locked_mpk using KDF(HEK, "MPK", access_key). A "ready" MPK is encrypted with the Ready MPK Encryption Key. The encrypted ready MPK is returned.
 
-Command Code: 0x5250_4D4B ("RPMK")
+Command Code: 0x524D_504B ("RMPK")
 
 Table: READY_MPK input arguments
 
@@ -1055,7 +1055,7 @@ This command initializes the MEK secret seed if not already initialized or if `i
 
 When generating an MEK, one or more MIX_MPK commands are processed to modify the MEK secret seed.
 
-Command Code: 0x4D50_4D4B ("MPMK")
+Command Code: 0x4D4D_504B ("MMPK")
 
 Table: MIX_MPK input arguments
 
@@ -1331,7 +1331,7 @@ Table: ENUMERATE_KEM_HANDLES output arguments
 
 This command programs all un-programmed bits in the current HEK slot, so all bits are programmed. May re-attempt a previously-failed zeroize operation.
 
-Command Code: 0x5A43_464B ("ZCFK")
+Command Code: 0x5A43_484B ("ZCHK")
 
 Table: ZEROIZE_CURRENT_HEK input arguments
 
@@ -1365,7 +1365,7 @@ Table: ZEROIZE_CURRENT_HEK output arguments
 
 This command generates a random key and programs it into the next-available HEK slot.
 
-Command Code: 504E_464B ("PNFK")
+Command Code: 0x504E_484B ("PNHK")
 
 Table: PROGRAM_NEXT_HEK input arguments
 
@@ -1399,7 +1399,7 @@ Table: PROGRAM_NEXT_HEK output arguments
 
 This command enables a state where the HEK is derived from non-ratchetable secrets. The command is only allowed once all HEK fuse slots are programmed and zeroized.
 
-Command Code: 4550_464B ("EPFK")
+Command Code: 0x4550_484B ("EPHK")
 
 Table: ENABLE_PERMANENT_HEK input arguments
 
@@ -1431,7 +1431,7 @@ Table: ENABLE_PERMANENT_HEK output arguments
 
 This command reports the state of the epoch keys. The controller indicates the state of the SEK, while KMB internally senses the state of the HEK.
 
-Command Code: 5245_4B53 ("REKS")
+Command Code: 0x5245_4B53 ("REKS")
 
 Table: REPORT_EPOCH_KEY_STATE input arguments
 
