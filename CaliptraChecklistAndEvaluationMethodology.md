@@ -134,10 +134,10 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Generation and Handling*
 
 * **Checklist Item:**  
-  * **Requirement:** The obfuscation key MUST be generated using a method that ensures sufficient entropy, such as an [ESV](https://csrc.nist.rip/Projects/cryptographic-module-validation-program/entropy-validations/esv) certified entropy source or an on-die Physically Unclonable Function (PUF) that is compliant with industry standards. 
+  * **Requirement:** The obfuscation key ([cptra_obf_key](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md#interface)) MUST be generated using a method that ensures 256 bits of entropy, such as an [ESV](https://csrc.nist.rip/Projects/cryptographic-module-validation-program/entropy-validations/esv) certified entropy source or an on-die Physically Unclonable Function (PUF) that is compliant with industry standards. 
   * **Evaluation Methodology:** Manufacturers MUST provide documentation on the obfuscation key generation method, including entropy measurements and compliance with relevant standards if applicable.  
 * **Checklist Item:**  
-  * **Requirement:** The obfuscation key MUST NOT be accessible (readable or modifiable) to firmware or any on-chip non-Caliptra entities, including preventing oracle attacks. The RTL key MUST not be on any scanaable path. 
+  * **Requirement:** The obfuscation key MUST NOT be accessible (readable or modifiable) to firmware or any on-chip non-Caliptra entities, including preventing oracle attacks. The obfuscation key MUST not be on any scannable path. 
   * **Evaluation Methodology:** Manufacturers MUST demonstrate, through architectural documentation and security analyses, that the obfuscation key is inaccessible to firmware and other unauthorized components.
 
 ### Fuses
