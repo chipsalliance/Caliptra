@@ -1529,6 +1529,119 @@ Table: Next action values {#tbl:next-action-values}
 | 5h to FFFFh | Reserved             |
 +-------------+----------------------+
 
+#### Common mailbox types
+
+This section defines common types used to interface between the controller and KMB. These types are common patterns found in both requests and responses. Types are listed in alphabetical order.
+
+Table: DoubleWrappedAccessKey contents
+
++--------------------+------------+---------------------------------------------+
+| Name               | Type       | Description                                 |
++====================+============+=============================================+
+| algorithm          | u32        | Algorithm used to wrap the key. Defines how |
+|                    |            | to intepret `double_wrapped_key`. See       |
+|                    |            | @tbl:wrappedkey-algorithm.                  |
++--------------------+------------+---------------------------------------------+
+| double_wrapped_key | WrappedKey | Encryption metadata and ciphertext of the   |
+|                    |            | access key. See @sec:wrappedkey-types.      |
++--------------------+------------+---------------------------------------------+
+
+Table: EncryptedMek contents
+
++-------------+------------+---------------------------------------------+
+| Name        | Type       | Description                                 |
++=============+============+=============================================+
+| algorithm   | u32        | Algorithm used to wrap the key. Defines how |
+|             |            | to intepret `wrapped_mek`. See              |
+|             |            | @tbl:wrappedkey-algorithm.                  |
++-------------+------------+---------------------------------------------+
+| wrapped_mek | WrappedKey | Encryption metadata and ciphertext of the   |
+|             |            | MEK. See @sec:wrappedkey-types.             |
++-------------+------------+---------------------------------------------+
+
+Table: EncryptedMpk contents
+
++--------------+------------+----------------------------------------------------+
+| Name         | Type       | Description                                        |
++==============+============+====================================================+
+| state        | u32        | State of encrypted MPK. See @tbl:mpk-state-values. |
++--------------+------------+----------------------------------------------------+
+| algorithm    | u32        | MPK algorithm (size of the MPK)                    |
++--------------+------------+----------------------------------------------------+
+| wrapping_alg | u32        | Algorithm used to wrap the key. Defines how to     |
+|              |            | intepret `wrapped_mpk`. See                        |
+|              |            | @tbl:wrappedkey-algorithm.                         |
++--------------+------------+----------------------------------------------------+
+| ak_id        | u8[16]     | Truncated Sha384 hash of the MPK's access key      |
++--------------+------------+----------------------------------------------------+
+| wrapped_mpk  | WrappedKey | Wrapped MPK. See @sec:wrappedkey-types.            |
++--------------+------------+----------------------------------------------------+
+
+Table: MPK state values {#tbl:mpk-state-values}
+
++-------+--------+-------------------------+
+| Value | Name   | Description             |
++=======+========+=========================+
+| 1h    | LOCKED | Ciphertext held at rest |
++-------+--------+-------------------------+
+| 2h    | READY  | Ciphertext held in RAM  |
++-------+--------+-------------------------+
+
+Table: KemHandle contents
+
++-----------+------+--------------------------------------------+
+| Name      | Type | Description                                |
++===========+======+============================================+
+| handle    | u32  | Handle for KEM keypair held in KMB memory. |
++-----------+------+--------------------------------------------+
+| algorithm | u32  | KEM algorithm                              |
++-----------+------+--------------------------------------------+
+
+Table: WrappedAccessKey contents
+
++----------------------+---------------+--------------------------------------------+
+| Name                 | Type          | Description                                |
++======================+===============+============================================+
+| kem_handle           | KemHandle     | KEM handle and algorithm                   |
++----------------------+---------------+--------------------------------------------+
+| access_key_algorithm | u32           | Algorithm used to wrap the key. Define how |
+|                      |               | to intepret `wrapped_key`. See             |
+|                      |               | @tbl:wrappedkey-algorithm.                 |
++----------------------+---------------+--------------------------------------------+
+| kem_ciphertext       | KemCipherText | Key encapsulation method ciphertext        |
++----------------------+---------------+--------------------------------------------+
+| wrapped_key          | WrappedKey    | Encryption metadata and ciphertext of the  |
+|                      |               | access key. See @sec:wrappedkey-types.     |
++----------------------+---------------+--------------------------------------------+
+
+##### WrappedKey types {#sec:wrappedkey-types}
+
+This section defines all of the ways to interpret a WrappedKey. This is based on the algorithm specificied.
+
+Table: WrappedKey algorithm values {#tbl:wrappedkey-algorithm}
+
++-------------+-------------+
+| Value       | Description |
++=============+=============+
+| 0h          | AES_256_GCM |
++-------------+-------------+
+| 1h to FFFFh | Reserved    |
++-------------+-------------+
+
+Table: WrappedKeyAes256 contents
+
++--------+------------+-----------------------------------------+
+| Name   | Type       | Description                             |
++========+============+=========================================+
+| iv     | u8[12]     | Initialization vector for AES operation |
++--------+------------+-----------------------------------------+
+| ct_len | u16        | Length of the ciphertext                |
++--------+------------+-----------------------------------------+
+| ct     | u8[ct_len] | Key ciphertext                          |
++--------+------------+-----------------------------------------+
+| tag    | u8[16]     | Authentication tag for AES operation    |
++--------+------------+-----------------------------------------+
+
 #### Fault handling
 
 A KMB mailbox command can fail to complete in the following ways:
