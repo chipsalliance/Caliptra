@@ -731,7 +731,7 @@ Table: GET_ALGORITHMS input arguments
 |        |      | Little endian.                                               |
 +--------+------+--------------------------------------------------------------+
 
-Table: GET_ALGORITHMS output arguments
+Table: GET_ALGORITHMS output arguments {#tbl:get-algorithms-output-args}
 
 +------------------------+--------+---------------------------------------------------+
 | Name                   | Type   | Description                                       |
@@ -759,15 +759,22 @@ Table: GET_ALGORITHMS output arguments
 |                        |        | - Byte 0 bit 1: 0x0a25, 0x0002, 0x0002            |
 |                        |        | [@{draft-irtf-cfrg-hybrid-kems}]                  |
 +------------------------+--------+---------------------------------------------------+
-| mpk_algorithms         | u32    | Indicates the size of MPKs:                       |
+| key_wrap_algorithm     | u16    | Identifies the algorithm used to encrypt MPKs and |
+|                        |        | MEKs.                                             |
 |                        |        |                                                   |
-|                        |        | - Byte 0 bit 0: 256 bits                          |
+|                        |        | - 0h: Reserved                                    |
+|                        |        | - 1h: AES-256-GCM (12-byte IV, 16-byte tag)       |
+|                        |        | - 2h to FFFFh: Reserved                           |
 +------------------------+--------+---------------------------------------------------+
-| access_key_algorithm   | u32    | Indicates the size of access keys:                |
-|                        |        |                                                   |
-|                        |        | - Byte 0 bit 0: 256 bits, with a 128-bit          |
-|                        |        | truncated SHA384 ID                               |
+| mpk_len                | u16    | Indicates the length of plaintext MPKs in bytes.  |
 +------------------------+--------+---------------------------------------------------+
+| mek_len                | u16    | Indicates the length of plaintext MEKs in bytes.  |
++------------------------+--------+---------------------------------------------------+
+| access_key_len         | u16    | Indicates the length of plaintext access keys in  |
+|                        |        | bytes.                                            |
++------------------------+--------+---------------------------------------------------+
+
+In the initial version of this specification, `mpk_len` and `access_key_len` shall be reported as 32 bytes, while `mek_len` shall be reported as 64 bytes.
 
 #### CLEAR_KEY_CACHE
 
@@ -892,47 +899,41 @@ Command Code: 0x474D_504B ("GMPK")
 
 Table: GENERATE_MPK input arguments
 
-+--------------------+------------------+----------------------------------------+
-| Name               | Type             | Description                            |
-+====================+==================+========================================+
-| chksum             | u32              | Checksum over other input arguments,   |
-|                    |                  | computed by the caller. Little endian. |
-+--------------------+------------------+----------------------------------------+
-| reserved           | u32              | Reserved.                              |
-+--------------------+------------------+----------------------------------------+
-| mpk_algorithm      | u32              | Indicates the size of MPKs.            |
-|                    |                  | Only one bit shall be reported:        |
-|                    |                  |                                        |
-|                    |                  | - Byte 0 bit 0: 256 bits               |
-+--------------------+------------------+----------------------------------------+
-| info_len           | u16              | Length of the info argument.           |
-+--------------------+------------------+----------------------------------------+
-| info               | u8[info_len]     | Info argument to use with HPKE unwrap. |
-+--------------------+------------------+----------------------------------------+
-| wrapped_access_key | WrappedAccessKey | KEM-wrapped access key:                |
-|                    |                  |                                        |
-|                    |                  | - access_key_algorithm                 |
-|                    |                  | - kem_handle                           |
-|                    |                  | - kem_algorithm                        |
-|                    |                  | - kem_ciphertext                       |
-|                    |                  | - encrypted_access_key                 |
-+--------------------+------------------+----------------------------------------+
++-------------------+-----------------+----------------------------------------+
+| Name              | Type            | Description                            |
++===================+=================+========================================+
+| chksum            | u32             | Checksum over other input arguments,   |
+|                   |                 | computed by the caller. Little endian. |
++-------------------+-----------------+----------------------------------------+
+| reserved          | u32             | Reserved.                              |
++-------------------+-----------------+----------------------------------------+
+| mpk_algorithm     | u32             | Indicates the size of MPKs.            |
+|                   |                 | Only one bit shall be reported:        |
+|                   |                 |                                        |
+|                   |                 | - Byte 0 bit 0: 256 bits               |
++-------------------+-----------------+----------------------------------------+
+| info_len          | u16             | Length of the info argument.           |
++-------------------+-----------------+----------------------------------------+
+| info              | u8[info_len]    | Info argument to use with HPKE unwrap. |
++-------------------+-----------------+----------------------------------------+
+| sealed_access_key | SealedAccessKey | HPKE-sealed access key.                |
++-------------------+-----------------+----------------------------------------+
 
 Table: GENERATE_MPK output arguments
 
-+---------------+--------------+------------------------------------------------+
-| Name          | Type         | Description                                    |
-+===============+==============+================================================+
-| chksum        | u32          | Checksum over other output arguments, computed |
-|               |              | by Caliptra. Little endian.                    |
-+---------------+--------------+------------------------------------------------+
-| fips_status   | u32          | Indicates if the command is FIPS approved or   |
-|               |              | an error.                                      |
-+---------------+--------------+------------------------------------------------+
-| reserved      | u32          | Reserved.                                      |
-+---------------+--------------+------------------------------------------------+
-| encrypted_mpk | EncryptedMpk | MPK encrypted to access_key.                   |
-+---------------+--------------+------------------------------------------------+
++---------------+------------+------------------------------------------------+
+| Name          | Type       | Description                                    |
++===============+============+================================================+
+| chksum        | u32        | Checksum over other output arguments, computed |
+|               |            | by Caliptra. Little endian.                    |
++---------------+------------+------------------------------------------------+
+| fips_status   | u32        | Indicates if the command is FIPS approved or   |
+|               |            | an error.                                      |
++---------------+------------+------------------------------------------------+
+| reserved      | u32        | Reserved.                                      |
++---------------+------------+------------------------------------------------+
+| encrypted_mpk | WrappedKey | MPK encrypted to access_key.                   |
++---------------+------------+------------------------------------------------+
 
 #### REWRAP_MPK
 
@@ -944,99 +945,87 @@ Command Code: 0x5245_5750 ("REWP")
 
 Table: REWRAP_MPK input arguments
 
-+--------------------------+------------------------+------------------------------+
-| Name                     | Type                   | Description                  |
-+==========================+========================+==============================+
-| chksum                   | u32                    | Checksum over other          |
-|                          |                        | input arguments,             |
-|                          |                        | computed by the caller.      |
-|                          |                        | Little endian.               |
-+--------------------------+------------------------+------------------------------+
-| reserved                 | u32                    | Reserved.                    |
-+--------------------------+------------------------+------------------------------+
-| info_len                 | u16                    | Length of the info argument. |
-+--------------------------+------------------------+------------------------------+
-| info                     | u8[info_len]           | Info argument to use with    |
-|                          |                        | HPKE unwrap.                 |
-+--------------------------+------------------------+------------------------------+
-| wrapped_access_key_1     | WrappedAccessKey       | KEM-wrapped access key:      |
-|                          |                        |                              |
-|                          |                        | - access_key_algorithm       |
-|                          |                        | - kem_handle                 |
-|                          |                        | - kem_algorithm              |
-|                          |                        | - kem_ciphertext             |
-|                          |                        | - encrypted_access_key       |
-+--------------------------+------------------------+------------------------------+
-| wrapped_enc_access_key_2 | DoubleWrappedAccessKey | KEM-wrapped (access_key_2    |
-|                          |                        | encrypted to access_key_1).  |
-+--------------------------+------------------------+------------------------------+
++-------------------------+--------------------------+------------------------------+
+| Name                    | Type                     | Description                  |
++=========================+==========================+==============================+
+| chksum                  | u32                      | Checksum over other          |
+|                         |                          | input arguments,             |
+|                         |                          | computed by the caller.      |
+|                         |                          | Little endian.               |
++-------------------------+--------------------------+------------------------------+
+| reserved                | u32                      | Reserved.                    |
++-------------------------+--------------------------+------------------------------+
+| info_len                | u16                      | Length of the info argument. |
++-------------------------+--------------------------+------------------------------+
+| info                    | u8[info_len]             | Info argument to use with    |
+|                         |                          | HPKE unwrap.                 |
++-------------------------+--------------------------+------------------------------+
+| sealed_access_key_1     | SealedAccessKey          | HPKE-sealed access key.      |
++-------------------------+--------------------------+------------------------------+
+| sealed_enc_access_key_2 | SealedEncryptedAccessKey | HPKE-sealed (access_key_2    |
+|                         |                          | encrypted to access_key_1).  |
++-------------------------+--------------------------+------------------------------+
 
 Table: REWRAP_MPK output arguments
 
-+-------------------+--------------+-------------------------------------------+
-| Name              | Type         | Description                               |
-+===================+==============+===========================================+
-| chksum            | u32          | Checksum over other output arguments,     |
-|                   |              | computed by Caliptra. Little endian.      |
-+-------------------+--------------+-------------------------------------------+
-| fips_status       | u32          | Indicates if the command is FIPS approved |
-|                   |              | or an error.                              |
-+-------------------+--------------+-------------------------------------------+
-| reserved          | u32          | Reserved.                                 |
-+-------------------+--------------+-------------------------------------------+
-| new_encrypted_mpk | EncryptedMpk | MPK encrypted to access_key_2.            |
-+-------------------+--------------+-------------------------------------------+
++-------------------+------------+-------------------------------------------+
+| Name              | Type       | Description                               |
++===================+============+===========================================+
+| chksum            | u32        | Checksum over other output arguments,     |
+|                   |            | computed by Caliptra. Little endian.      |
++-------------------+------------+-------------------------------------------+
+| fips_status       | u32        | Indicates if the command is FIPS approved |
+|                   |            | or an error.                              |
++-------------------+------------+-------------------------------------------+
+| reserved          | u32        | Reserved.                                 |
++-------------------+------------+-------------------------------------------+
+| new_encrypted_mpk | WrappedKey | MPK encrypted to access_key_2.            |
++-------------------+------------+-------------------------------------------+
 
 #### READY_MPK
 
-This command unwraps wrapped_access_key. Then the unwrapped access_key is used to decrypt locked_mpk using KDF(HEK, "MPK", access_key). A "ready" MPK is encrypted with the Ready MPK Encryption Key. The encrypted ready MPK is returned.
+This command decrypts `sealed_access_key`. Then the decrypted access_key is used to decrypt locked_mpk using KDF(HEK, "MPK", access_key). A "ready" MPK is encrypted with the Ready MPK Encryption Key. The encrypted ready MPK is returned.
 
 Command Code: 0x524D_504B ("RMPK")
 
 Table: READY_MPK input arguments
 
-+--------------------+------------------+------------------------------+
-| Name               | Type             | Description                  |
-+====================+==================+==============================+
-| chksum             | u32              | Checksum over other          |
-|                    |                  | input arguments,             |
-|                    |                  | computed by the caller.      |
-|                    |                  | Little endian.               |
-+--------------------+------------------+------------------------------+
-| reserved           | u32              | Reserved.                    |
-+--------------------+------------------+------------------------------+
-| info_len           | u16              | Length of the info argument. |
-+--------------------+------------------+------------------------------+
-| info               | u8[info_len]     | Info argument to use with    |
-|                    |                  | HPKE unwrap.                 |
-+--------------------+------------------+------------------------------+
-| wrapped_access_key | WrappedAccessKey | KEM-wrapped access key:      |
-|                    |                  |                              |
-|                    |                  | - access_key_algorithm       |
-|                    |                  | - kem_handle                 |
-|                    |                  | - kem_algorithm              |
-|                    |                  | - kem_ciphertext             |
-|                    |                  | - encrypted_access_key       |
-+--------------------+------------------+------------------------------+
-| locked_mpk         | EncryptedMpk     | MPK encrypted to the         |
-|                    |                  | HEK and access key.          |
-+--------------------+------------------+------------------------------+
++-------------------+-----------------+------------------------------+
+| Name              | Type            | Description                  |
++===================+=================+==============================+
+| chksum            | u32             | Checksum over other          |
+|                   |                 | input arguments,             |
+|                   |                 | computed by the caller.      |
+|                   |                 | Little endian.               |
++-------------------+-----------------+------------------------------+
+| reserved          | u32             | Reserved.                    |
++-------------------+-----------------+------------------------------+
+| info_len          | u16             | Length of the info argument. |
++-------------------+-----------------+------------------------------+
+| info              | u8[info_len]    | Info argument to use with    |
+|                   |                 | HPKE unwrap.                 |
++-------------------+-----------------+------------------------------+
+| sealed_access_key | SealedAccessKey | HPKE-sealed access key.      |
++-------------------+-----------------+------------------------------+
+| locked_mpk        | WrappedKey      | MPK encrypted to the HEK and |
+|                   |                 | access key.                  |
++-------------------+-----------------+------------------------------+
 
 Table: READY_MPK output arguments
 
-+-------------+--------------+--------------------------------------------+
-| Name        | Type         | Description                                |
-+=============+==============+============================================+
-| chksum      | u32          | Checksum over other output arguments,      |
-|             |              | computed by Caliptra. Little endian.       |
-+-------------+--------------+--------------------------------------------+
-| fips_status | u32          | Indicates if the command is FIPS approved  |
-|             |              | or an error.                               |
-+-------------+--------------+--------------------------------------------+
-| reserved    | u32          | Reserved.                                  |
-+-------------+--------------+--------------------------------------------+
-| ready_mpk   | EncryptedMpk | MPK encrypted to Ready MPK Encryption Key. |
-+-------------+--------------+--------------------------------------------+
++-------------+------------+--------------------------------------------+
+| Name        | Type       | Description                                |
++=============+============+============================================+
+| chksum      | u32        | Checksum over other output arguments,      |
+|             |            | computed by Caliptra. Little endian.       |
++-------------+------------+--------------------------------------------+
+| fips_status | u32        | Indicates if the command is FIPS approved  |
+|             |            | or an error.                               |
++-------------+------------+--------------------------------------------+
+| reserved    | u32        | Reserved.                                  |
++-------------+------------+--------------------------------------------+
+| ready_mpk   | WrappedKey | MPK encrypted to Ready MPK Encryption Key. |
++-------------+------------+--------------------------------------------+
 
 #### MIX_MPK
 
@@ -1048,20 +1037,20 @@ Command Code: 0x4D4D_504B ("MMPK")
 
 Table: MIX_MPK input arguments
 
-+------------+--------------+--------------------------------------------------+
-| Name       | Type         | Description                                      |
-+============+==============+==================================================+
-| chksum     | u32          | Checksum over other input arguments,             |
-|            |              | computed by the caller. Little endian.           |
-+------------+--------------+--------------------------------------------------+
-| reserved   | u32          | Reserved.                                        |
-+------------+--------------+--------------------------------------------------+
-| initialize | u32          | If set to 1, the MEK secret seed is              |
-|            |              | initialized before the given MPK is              |
-|            |              | mixed. All other values reserved. Little-endian. |
-+------------+--------------+--------------------------------------------------+
-| ready_mpk  | EncryptedMpk | MPK encrypted to the Ready MPK Encryption Key.   |
-+------------+--------------+--------------------------------------------------+
++------------+------------+--------------------------------------------------+
+| Name       | Type       | Description                                      |
++============+============+==================================================+
+| chksum     | u32        | Checksum over other input arguments,             |
+|            |            | computed by the caller. Little endian.           |
++------------+------------+--------------------------------------------------+
+| reserved   | u32        | Reserved.                                        |
++------------+------------+--------------------------------------------------+
+| initialize | u32        | If set to 1, the MEK secret seed is              |
+|            |            | initialized before the given MPK is              |
+|            |            | mixed. All other values reserved. Little-endian. |
++------------+------------+--------------------------------------------------+
+| ready_mpk  | WrappedKey | MPK encrypted to the Ready MPK Encryption Key.   |
++------------+------------+--------------------------------------------------+
 
 Table: MIX_MPK output arguments
 
@@ -1107,20 +1096,20 @@ Table: GENERATE_MEK input arguments
 
 Table: GENERATE_MEK output arguments
 
-+---------------+--------------+-------------------------------------------+
-| Name          | Type         | Description                               |
-+===============+==============+===========================================+
-| chksum        | u32          | Checksum over other output arguments,     |
-|               |              | computed by Caliptra. Little endian.      |
-+---------------+--------------+-------------------------------------------+
-| fips_status   | u32          | Indicates if the command is FIPS approved |
-|               |              | or an error.                              |
-+---------------+--------------+-------------------------------------------+
-| reserved      | u32          | Reserved.                                 |
-+---------------+--------------+-------------------------------------------+
-| encrypted_mek | EncryptedMek | MEK encrypted to the derived MEK          |
-|               |              | encryption key.                           |
-+---------------+--------------+-------------------------------------------+
++---------------+------------+-------------------------------------------+
+| Name          | Type       | Description                               |
++===============+============+===========================================+
+| chksum        | u32        | Checksum over other output arguments,     |
+|               |            | computed by Caliptra. Little endian.      |
++---------------+------------+-------------------------------------------+
+| fips_status   | u32        | Indicates if the command is FIPS approved |
+|               |            | or an error.                              |
++---------------+------------+-------------------------------------------+
+| reserved      | u32        | Reserved.                                 |
++---------------+------------+-------------------------------------------+
+| encrypted_mek | WrappedKey | MEK encrypted to the derived MEK          |
+|               |            | encryption key.                           |
++---------------+------------+-------------------------------------------+
 
 #### LOAD_MEK
 
@@ -1136,36 +1125,36 @@ Command Code: 0x4C4D_454B ("LMEK")
 
 Table: LOAD_MEK input arguments
 
-+---------------+--------------+-----------------------------------------------+
-| Name          | Type         | Description                                   |
-+===============+==============+===============================================+
-| chksum        | u32          | Checksum over other input arguments,          |
-|               |              | computed by the caller. Little endian.        |
-+---------------+--------------+-----------------------------------------------+
-| reserved      | u32          | Reserved.                                     |
-+---------------+--------------+-----------------------------------------------+
-| sek           | u8[32]       | "Soft epoch key". May be rotated              |
-|               |              | by the controller as part of a cryptographic  |
-|               |              | purge.                                        |
-+---------------+--------------+-----------------------------------------------+
-| dpk           | u8[32]       | "Data protection key". May be a value         |
-|               |              | decrypted by a user-provided C_PIN in Opal.   |
-+---------------+--------------+-----------------------------------------------+
-| metadata      | u8[20]       | Metadata for MEK to load into the drive       |
-|               |              | crypto engine (i.e. NSID + LBA range).        |
-+---------------+--------------+-----------------------------------------------+
-| aux_metadata  | u8[32]       | Auxiliary metadata for the MEK                |
-|               |              | (optional; i.e. operation mode).              |
-+---------------+--------------+-----------------------------------------------+
-| encrypted_mek | EncryptedMek | MEK encrypted to the derived MEK encryption   |
-|               |              | key.                                          |
-+---------------+--------------+-----------------------------------------------+
-| rdy_timeout   | u32          | Timeout in ms for encryption engine to become |
-|               |              | ready for a new command.                      |
-+---------------+--------------+-----------------------------------------------+
-| cmd_timeout   | u32          | Timeout in ms for command to crypto engine    |
-|               |              | to complete.                                  |
-+---------------+--------------+-----------------------------------------------+
++---------------+------------+-----------------------------------------------+
+| Name          | Type       | Description                                   |
++===============+============+===============================================+
+| chksum        | u32        | Checksum over other input arguments,          |
+|               |            | computed by the caller. Little endian.        |
++---------------+------------+-----------------------------------------------+
+| reserved      | u32        | Reserved.                                     |
++---------------+------------+-----------------------------------------------+
+| sek           | u8[32]     | "Soft epoch key". May be rotated              |
+|               |            | by the controller as part of a cryptographic  |
+|               |            | purge.                                        |
++---------------+------------+-----------------------------------------------+
+| dpk           | u8[32]     | "Data protection key". May be a value         |
+|               |            | decrypted by a user-provided C_PIN in Opal.   |
++---------------+------------+-----------------------------------------------+
+| metadata      | u8[20]     | Metadata for MEK to load into the drive       |
+|               |            | crypto engine (i.e. NSID + LBA range).        |
++---------------+------------+-----------------------------------------------+
+| aux_metadata  | u8[32]     | Auxiliary metadata for the MEK                |
+|               |            | (optional; i.e. operation mode).              |
++---------------+------------+-----------------------------------------------+
+| encrypted_mek | WrappedKey | MEK encrypted to the derived MEK encryption   |
+|               |            | key.                                          |
++---------------+------------+-----------------------------------------------+
+| rdy_timeout   | u32        | Timeout in ms for encryption engine to become |
+|               |            | ready for a new command.                      |
++---------------+------------+-----------------------------------------------+
+| cmd_timeout   | u32        | Timeout in ms for command to crypto engine    |
+|               |            | to complete.                                  |
++---------------+------------+-----------------------------------------------+
 
 Table: LOAD_MEK output arguments
 
@@ -1309,6 +1298,18 @@ Table: ENUMERATE_KEM_HANDLES output arguments
 | kem_handles      | KemHandle[N] | List of (KEM handle value, KEM algorithm) |
 |                  |              | tuples.                                   |
 +------------------+--------------+-------------------------------------------+
+
+Table: KemHandle contents
+
++----------------+------+--------------------------------------------+
+| Name           | Type | Description                                |
++================+======+============================================+
+| handle         | u32  | Handle for KEM keypair held in KMB memory. |
++----------------+------+--------------------------------------------+
+| hpke_algorithm | u32  | HPKE algorithm. Shall be a bit value       |
+|                |      | indicated as supported in                  |
+|                |      | @tbl:get-algorithms-output-args.           |
++----------------+------+--------------------------------------------+
 
 #### ZEROIZE_CURRENT_HEK
 
@@ -1509,116 +1510,85 @@ Table: Next action values {#tbl:next-action-values}
 
 #### Common mailbox types
 
-This section defines common types used to interface between the controller and KMB. These types are common patterns found in both requests and responses. Types are listed in alphabetical order.
+This section defines common types used to interface between the controller and KMB. These types are common patterns found in both requests and responses.
 
-Table: DoubleWrappedAccessKey contents
+Table: SealedAccessKey contents
 
-+--------------------+------------+---------------------------------------------+
-| Name               | Type       | Description                                 |
-+====================+============+=============================================+
-| algorithm          | u32        | Algorithm used to wrap the key. Defines how |
-|                    |            | to intepret `double_wrapped_key`. See       |
-|                    |            | @tbl:wrappedkey-algorithm.                  |
-+--------------------+------------+---------------------------------------------+
-| double_wrapped_key | WrappedKey | Encryption metadata and ciphertext of the   |
-|                    |            | access key. See @sec:wrappedkey-types.      |
-+--------------------+------------+---------------------------------------------+
++----------------+--------------------+--------------------------------------------------+
+| Name           | Type               | Description                                      |
++================+====================+==================================================+
+| kem_handle     | u32                | Handle for KEM keypair held in KMB memory.       |
++----------------+--------------------+--------------------------------------------------+
+| hpke_algorithm | u32                | HPKE algorithm. Must be a bit value indicated    |
+|                |                    | as supported in @tbl:get-algorithms-output-args. |
++----------------+--------------------+--------------------------------------------------+
+| access_key_len | u16                | Length of the access key. Must correspond with   |
+|                |                    | the value returned in                            |
+|                |                    | @tbl:get-algorithms-output-args.                 |
++----------------+--------------------+--------------------------------------------------+
+| kem_ciphertext | u8[Nenc]           | HPKE encapsulated key.                           |
++----------------+--------------------+--------------------------------------------------+
+| ak_ct          | u8[access_key_len] | Access key ciphertext                            |
++----------------+--------------------+--------------------------------------------------+
+| tag            | u8[Nt]             | Authentication tag for AES operation             |
++----------------+--------------------+--------------------------------------------------+
 
-Table: EncryptedMek contents
+`Nenc` and `Nt` are HPKE values associated with the `kem_id` and `aead_id` identifiers from the given `hpke_algorithm`. For example, if byte 0 bit 0 of `hpke_algorithm` is set (indicating `kem_id` 0x0011 and `aead_id` 0x0002), then according to [@{ietf-rfc9180}], `Nenc` and `Nt` would be 97 and 16, respectively.
 
-+-------------+------------+---------------------------------------------+
-| Name        | Type       | Description                                 |
-+=============+============+=============================================+
-| algorithm   | u32        | Algorithm used to wrap the key. Defines how |
-|             |            | to intepret `wrapped_mek`. See              |
-|             |            | @tbl:wrappedkey-algorithm.                  |
-+-------------+------------+---------------------------------------------+
-| wrapped_mek | WrappedKey | Encryption metadata and ciphertext of the   |
-|             |            | MEK. See @sec:wrappedkey-types.             |
-+-------------+------------+---------------------------------------------+
+Table: SealedEncryptedAccessKey contents
 
-Table: EncryptedMpk contents
++-----------------+-----------------------+----------------------------------------------+
+| Name            | Type                  | Description                                  |
++=================+=======================+==============================================+
+| ak_iv           | u8[Nn]                | IV used to decrypt the encrypted access key. |
++-----------------+-----------------------+----------------------------------------------+
+| encrypted_ak_ct | u8[access_key_len+Nt] | (Encrypted access key + tag) ciphertext.     |
++-----------------+-----------------------+----------------------------------------------+
+| tag             | u8[Nt]                | Authentication tag for AES operation         |
++-----------------+-----------------------+----------------------------------------------+
 
-+--------------+------------+----------------------------------------------------+
-| Name         | Type       | Description                                        |
-+==============+============+====================================================+
-| state        | u32        | State of encrypted MPK. See @tbl:mpk-state-values. |
-+--------------+------------+----------------------------------------------------+
-| algorithm    | u32        | MPK algorithm (size of the MPK)                    |
-+--------------+------------+----------------------------------------------------+
-| wrapping_alg | u32        | Algorithm used to wrap the key. Defines how to     |
-|              |            | intepret `wrapped_mpk`. See                        |
-|              |            | @tbl:wrappedkey-algorithm.                         |
-+--------------+------------+----------------------------------------------------+
-| ak_id        | u8[16]     | Truncated Sha384 hash of the MPK's access key      |
-+--------------+------------+----------------------------------------------------+
-| wrapped_mpk  | WrappedKey | Wrapped MPK. See @sec:wrappedkey-types.            |
-+--------------+------------+----------------------------------------------------+
+This type only ever appears in conjunction with a `SealedAccessKey` instance. Therefore `kem_handle`, `hpke_algorithm`, `ak_len`, and `kem_ciphertext`, which are present in `SealedAccessKey` and are required to decrypt `SealedEncryptedAccessKey` instances, are ommitted here.
 
-Table: MPK state values {#tbl:mpk-state-values}
+`Nn` and `Nt` are HPKE values associated with the `aead_id` identifier from the given `hpke_algorithm`.
 
-+-------+--------+-------------------------+
-| Value | Name   | Description             |
-+=======+========+=========================+
-| 1h    | LOCKED | Ciphertext held at rest |
-+-------+--------+-------------------------+
-| 2h    | READY  | Ciphertext held in RAM  |
-+-------+--------+-------------------------+
-
-Table: KemHandle contents
-
-+-----------+------+--------------------------------------------+
-| Name      | Type | Description                                |
-+===========+======+============================================+
-| handle    | u32  | Handle for KEM keypair held in KMB memory. |
-+-----------+------+--------------------------------------------+
-| algorithm | u32  | KEM algorithm                              |
-+-----------+------+--------------------------------------------+
-
-Table: WrappedAccessKey contents
-
-+----------------------+---------------+--------------------------------------------+
-| Name                 | Type          | Description                                |
-+======================+===============+============================================+
-| kem_handle           | KemHandle     | KEM handle and algorithm                   |
-+----------------------+---------------+--------------------------------------------+
-| access_key_algorithm | u32           | Algorithm used to wrap the key. Define how |
-|                      |               | to intepret `wrapped_key`. See             |
-|                      |               | @tbl:wrappedkey-algorithm.                 |
-+----------------------+---------------+--------------------------------------------+
-| kem_ciphertext       | KemCipherText | Key encapsulation method ciphertext        |
-+----------------------+---------------+--------------------------------------------+
-| wrapped_key          | WrappedKey    | Encryption metadata and ciphertext of the  |
-|                      |               | access key. See @sec:wrappedkey-types.     |
-+----------------------+---------------+--------------------------------------------+
+The outer layer of encryption of the wrapped access key is decrypted using HPKE. The inner layer is decrypted using the access key in the accompanying `SealedAccessKey` instance. Both layers use the AEAD algorithm indicated by the `aead_id` identifier from the given `hpke_algorithm`.
 
 ##### WrappedKey types {#sec:wrappedkey-types}
 
 This section defines all of the ways to interpret a WrappedKey. This is based on the algorithm specificied.
 
-Table: WrappedKey algorithm values {#tbl:wrappedkey-algorithm}
+Table: WrappedKey contents where `key_wrap_algorithm` indicates AES-256-GCM
 
-+-------------+-------------+
-| Value       | Description |
-+=============+=============+
-| 0h          | AES_256_GCM |
-+-------------+-------------+
-| 1h to FFFFh | Reserved    |
-+-------------+-------------+
-
-Table: WrappedKeyAes256 contents
-
-+--------+------------+-----------------------------------------+
-| Name   | Type       | Description                             |
-+========+============+=========================================+
-| iv     | u8[12]     | Initialization vector for AES operation |
-+--------+------------+-----------------------------------------+
-| ct_len | u16        | Length of the ciphertext                |
-+--------+------------+-----------------------------------------+
-| ct     | u8[ct_len] | Key ciphertext                          |
-+--------+------------+-----------------------------------------+
-| tag    | u8[16]     | Authentication tag for AES operation    |
-+--------+------------+-----------------------------------------+
++--------------------+------------+------------------------------------------------------------+
+| Name               | Type       | Description                                                |
++====================+============+============================================================+
+| key_wrap_algorithm | u32        | Algorithm used to wrap the key. See                        |
+|                    |            | @tbl:get-algorithms-output-args.                           |
++--------------------+------------+------------------------------------------------------------+
+| key_type           | u16        | Type of the wrapped key. This is treated                   |
+|                    |            | as AAD when the key is decrypted.                          |
+|                    |            |                                                            |
+|                    |            | - 0h: Reserved                                             |
+|                    |            | - 1h: Encrypted locked MPK (ciphertext held at rest)       |
+|                    |            | - 2h: Encrypted ready MPK (ciphertext held in RAM)         |
+|                    |            | - 3h: Encrypted MEK                                        |
+|                    |            | - 4h to FFFFh: Reserved                                    |
++--------------------+------------+------------------------------------------------------------+
+| iv                 | u8[12]     | Initialization vector for AES operation.                   |
++--------------------+------------+------------------------------------------------------------+
+| ct_len             | u16        | Length of the ciphertext. Its value depends on `key_type`: |
+|                    |            |                                                            |
+|                    |            | - If key_type=1h, ct_len=`mpk_len`                         |
+|                    |            | - If key_type=2h, ct_len=`mpk_len`                         |
+|                    |            | - If key_type=3h, ct_len=`mek_len`                         |
+|                    |            |                                                            |
+|                    |            | `mpk_len` and `mek_len` are reported in                    |
+|                    |            | @tbl:get-algorithms-output-args.                           |
++--------------------+------------+------------------------------------------------------------+
+| ct                 | u8[ct_len] | Key ciphertext.                                            |
++--------------------+------------+------------------------------------------------------------+
+| tag                | u8[16]     | Authentication tag for AES operation.                      |
++--------------------+------------+------------------------------------------------------------+
 
 #### Fault handling
 
