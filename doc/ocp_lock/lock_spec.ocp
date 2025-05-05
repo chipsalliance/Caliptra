@@ -759,22 +759,10 @@ Table: GET_ALGORITHMS output arguments {#tbl:get-algorithms-output-args}
 |                        |        | - Byte 0 bit 1: 0x0a25, 0x0002, 0x0002            |
 |                        |        | [@{draft-irtf-cfrg-hybrid-kems}]                  |
 +------------------------+--------+---------------------------------------------------+
-| key_wrap_algorithm     | u16    | Identifies the algorithm used to encrypt MPKs and |
-|                        |        | MEKs.                                             |
+| access_key_sizes       | u32    | Indicates the length of plaintext access keys:    |
 |                        |        |                                                   |
-|                        |        | - 0h: Reserved                                    |
-|                        |        | - 1h: AES-256-GCM (12-byte IV, 16-byte tag)       |
-|                        |        | - 2h to FFFFh: Reserved                           |
+|                        |        | - Byte 0 bit 0: 256 bits                          |
 +------------------------+--------+---------------------------------------------------+
-| mpk_len                | u16    | Indicates the length of plaintext MPKs in bytes.  |
-+------------------------+--------+---------------------------------------------------+
-| mek_len                | u16    | Indicates the length of plaintext MEKs in bytes.  |
-+------------------------+--------+---------------------------------------------------+
-| access_key_len         | u16    | Indicates the length of plaintext access keys in  |
-|                        |        | bytes.                                            |
-+------------------------+--------+---------------------------------------------------+
-
-In the initial version of this specification, `mpk_len` and `access_key_len` shall be reported as 32 bytes, while `mek_len` shall be reported as 64 bytes.
 
 #### CLEAR_KEY_CACHE
 
@@ -907,12 +895,7 @@ Table: GENERATE_MPK input arguments
 +-------------------+-----------------+----------------------------------------+
 | reserved          | u32             | Reserved.                              |
 +-------------------+-----------------+----------------------------------------+
-| mpk_algorithm     | u32             | Indicates the size of MPKs.            |
-|                   |                 | Only one bit shall be reported:        |
-|                   |                 |                                        |
-|                   |                 | - Byte 0 bit 0: 256 bits               |
-+-------------------+-----------------+----------------------------------------+
-| info_len          | u16             | Length of the info argument.           |
+| info_len          | u32             | Length of the info argument.           |
 +-------------------+-----------------+----------------------------------------+
 | info              | u8[info_len]    | Info argument to use with HPKE unwrap. |
 +-------------------+-----------------+----------------------------------------+
@@ -933,11 +916,13 @@ Table: GENERATE_MPK output arguments
 | reserved      | u32        | Reserved.                                      |
 +---------------+------------+------------------------------------------------+
 | encrypted_mpk | WrappedKey | MPK encrypted to access_key.                   |
+|               |            | ENCRYPTED_LOCKED_MPK with a 32 byte            |
+|               |            | ciphertext.                                    |
 +---------------+------------+------------------------------------------------+
 
 #### REWRAP_MPK
 
-This command unwraps access_key_1 and enc_access_key_2. Then access_key_1 is used to decrypt enc_access_key_2. The specified MPK is decrypted using KDF(HEK, "MPK", access_key_1). A new MPK is encrypted with the output of KDF(HEK, "MPK", access_key_2). The new encrypted MPK is returned.
+This command unwraps old_access_key and encrypted new_access_key from sealed_access_keys. Then old_access_key is used to decrypt new_access_key. The specified MPK is decrypted using KDF(HEK, "MPK", old_access_key). A new MPK is encrypted with the output of KDF(HEK, "MPK", new_access_key). The new encrypted MPK is returned.
 
 The Storage Controller stores the returned new encrypted MPK. The Storage Controller may attempt to do a trial decryption the new MPK without an error before deleting the old MPK. Controller firmware zeroizes the old encrypted MPK.
 
@@ -945,26 +930,26 @@ Command Code: 0x5245_5750 ("REWP")
 
 Table: REWRAP_MPK input arguments
 
-+-------------------------+--------------------------+------------------------------+
-| Name                    | Type                     | Description                  |
-+=========================+==========================+==============================+
-| chksum                  | u32                      | Checksum over other          |
-|                         |                          | input arguments,             |
-|                         |                          | computed by the caller.      |
-|                         |                          | Little endian.               |
-+-------------------------+--------------------------+------------------------------+
-| reserved                | u32                      | Reserved.                    |
-+-------------------------+--------------------------+------------------------------+
-| info_len                | u16                      | Length of the info argument. |
-+-------------------------+--------------------------+------------------------------+
-| info                    | u8[info_len]             | Info argument to use with    |
-|                         |                          | HPKE unwrap.                 |
-+-------------------------+--------------------------+------------------------------+
-| sealed_access_key_1     | SealedAccessKey          | HPKE-sealed access key.      |
-+-------------------------+--------------------------+------------------------------+
-| sealed_enc_access_key_2 | SealedEncryptedAccessKey | HPKE-sealed (access_key_2    |
-|                         |                          | encrypted to access_key_1).  |
-+-------------------------+--------------------------+------------------------------+
++--------------------+--------------------------+------------------------------+
+| Name               | Type                     | Description                  |
++====================+==========================+==============================+
+| chksum             | u32                      | Checksum over other          |
+|                    |                          | input arguments,             |
+|                    |                          | computed by the caller.      |
+|                    |                          | Little endian.               |
++--------------------+--------------------------+------------------------------+
+| reserved           | u32                      | Reserved.                    |
++--------------------+--------------------------+------------------------------+
+| info_len           | u32                      | Length of the info argument. |
++--------------------+--------------------------+------------------------------+
+| info               | u8[info_len]             | Info argument to use with    |
+|                    |                          | HPKE unwrap.                 |
++--------------------+--------------------------+------------------------------+
+| sealed_access_keys | SealedOldAndNewAccessKey | HPKE-sealed old_access_key.  |
+|                    |                          | HPKE-sealed (new_access_key  |
+|                    |                          | encrypted to                 |
+|                    |                          | old_access_key).             |
++--------------------+--------------------------+------------------------------+
 
 Table: REWRAP_MPK output arguments
 
@@ -980,6 +965,8 @@ Table: REWRAP_MPK output arguments
 | reserved          | u32        | Reserved.                                 |
 +-------------------+------------+-------------------------------------------+
 | new_encrypted_mpk | WrappedKey | MPK encrypted to access_key_2.            |
+|                   |            | ENCRYPTED_LOCKED_MPK with a 32 byte       |
+|                   |            | ciphertext.                               |
 +-------------------+------------+-------------------------------------------+
 
 #### READY_MPK
@@ -1000,7 +987,7 @@ Table: READY_MPK input arguments
 +-------------------+-----------------+------------------------------+
 | reserved          | u32             | Reserved.                    |
 +-------------------+-----------------+------------------------------+
-| info_len          | u16             | Length of the info argument. |
+| info_len          | u32             | Length of the info argument. |
 +-------------------+-----------------+------------------------------+
 | info              | u8[info_len]    | Info argument to use with    |
 |                   |                 | HPKE unwrap.                 |
@@ -1009,6 +996,8 @@ Table: READY_MPK input arguments
 +-------------------+-----------------+------------------------------+
 | locked_mpk        | WrappedKey      | MPK encrypted to the HEK and |
 |                   |                 | access key.                  |
+|                   |                 | ENCRYPTED_LOCKED_MPK with a  |
+|                   |                 | 32 byte ciphertext.          |
 +-------------------+-----------------+------------------------------+
 
 Table: READY_MPK output arguments
@@ -1025,6 +1014,8 @@ Table: READY_MPK output arguments
 | reserved    | u32        | Reserved.                                  |
 +-------------+------------+--------------------------------------------+
 | ready_mpk   | WrappedKey | MPK encrypted to Ready MPK Encryption Key. |
+|             |            | ENCRYPTED_READY_MPK with a 32 byte         |
+|             |            | ciphertext.                                |
 +-------------+------------+--------------------------------------------+
 
 #### MIX_MPK
@@ -1050,6 +1041,7 @@ Table: MIX_MPK input arguments
 |            |            | mixed. All other values reserved. Little-endian. |
 +------------+------------+--------------------------------------------------+
 | ready_mpk  | WrappedKey | MPK encrypted to the Ready MPK Encryption Key.   |
+|            |            | ENCRYPTED_READY_MPK with a 32 byte ciphertext.   |
 +------------+------------+--------------------------------------------------+
 
 Table: MIX_MPK output arguments
@@ -1108,7 +1100,8 @@ Table: GENERATE_MEK output arguments
 | reserved      | u32        | Reserved.                                 |
 +---------------+------------+-------------------------------------------+
 | encrypted_mek | WrappedKey | MEK encrypted to the derived MEK          |
-|               |            | encryption key.                           |
+|               |            | encryption key. ENCRYPTED_MEK with a 64   |
+|               |            | byte ciphertext.                          |
 +---------------+------------+-------------------------------------------+
 
 #### LOAD_MEK
@@ -1147,7 +1140,7 @@ Table: LOAD_MEK input arguments
 |               |            | (optional; i.e. operation mode).              |
 +---------------+------------+-----------------------------------------------+
 | encrypted_mek | WrappedKey | MEK encrypted to the derived MEK encryption   |
-|               |            | key.                                          |
+|               |            | key. ENCRYPTED_MEK with a 64 byte ciphertext. |
 +---------------+------------+-----------------------------------------------+
 | rdy_timeout   | u32        | Timeout in ms for encryption engine to become |
 |               |            | ready for a new command.                      |
@@ -1522,24 +1515,27 @@ Table: SealedAccessKey contents
 | hpke_algorithm | u32                | HPKE algorithm. Must be a bit value indicated    |
 |                |                    | as supported in @tbl:get-algorithms-output-args. |
 +----------------+--------------------+--------------------------------------------------+
-| access_key_len | u16                | Length of the access key. Must correspond with   |
-|                |                    | the value returned in                            |
-|                |                    | @tbl:get-algorithms-output-args.                 |
+| access_key_len | u32                | Access key length in bytes. Must be the scalar   |
+|                |                    | value associated with a bit value indicated as   |
+|                |                    | supported in @tbl:get-algorithms-output-args.    |
 +----------------+--------------------+--------------------------------------------------+
 | kem_ciphertext | u8[Nenc]           | HPKE encapsulated key.                           |
 +----------------+--------------------+--------------------------------------------------+
-| ak_ct          | u8[access_key_len] | Access key ciphertext                            |
+| ak_ct          | u8[access_key_len] | Access key ciphertext.                           |
 +----------------+--------------------+--------------------------------------------------+
-| tag            | u8[Nt]             | Authentication tag for AES operation             |
+| tag            | u8[Nt]             | Authentication tag for AES operation.            |
 +----------------+--------------------+--------------------------------------------------+
 
 `Nenc` and `Nt` are HPKE values associated with the `kem_id` and `aead_id` identifiers from the given `hpke_algorithm`. For example, if byte 0 bit 0 of `hpke_algorithm` is set (indicating `kem_id` 0x0011 and `aead_id` 0x0002), then according to [@{ietf-rfc9180}], `Nenc` and `Nt` would be 97 and 16, respectively.
 
-Table: SealedEncryptedAccessKey contents
+Table: SealedOldAndNewAccessKey contents
 
 +-----------------+-----------------------+----------------------------------------------+
 | Name            | Type                  | Description                                  |
 +=================+=======================+==============================================+
+| old_access_key  | SealedAccessKey       | Old access key. Used to decrypt the new      |
+|                 |                       | access key.                                  |
++-----------------+-----------------------+----------------------------------------------+
 | ak_iv           | u8[Nn]                | IV used to decrypt the encrypted access key. |
 +-----------------+-----------------------+----------------------------------------------+
 | encrypted_ak_ct | u8[access_key_len+Nt] | (Encrypted access key + tag) ciphertext.     |
@@ -1547,48 +1543,36 @@ Table: SealedEncryptedAccessKey contents
 | tag             | u8[Nt]                | Authentication tag for AES operation         |
 +-----------------+-----------------------+----------------------------------------------+
 
-This type only ever appears in conjunction with a `SealedAccessKey` instance. Therefore `kem_handle`, `hpke_algorithm`, `ak_len`, and `kem_ciphertext`, which are present in `SealedAccessKey` and are required to decrypt `SealedEncryptedAccessKey` instances, are ommitted here.
-
 `Nn` and `Nt` are HPKE values associated with the `aead_id` identifier from the given `hpke_algorithm`.
 
 The outer layer of encryption of the wrapped access key is decrypted using HPKE. The inner layer is decrypted using the access key in the accompanying `SealedAccessKey` instance. Both layers use the AEAD algorithm indicated by the `aead_id` identifier from the given `hpke_algorithm`.
 
-##### WrappedKey types {#sec:wrappedkey-types}
+##### WrappedKey type
 
-This section defines all of the ways to interpret a WrappedKey. This is based on the algorithm specificied.
+AES-256-GCM is used for all wrapping and unwrapping.
 
-Table: WrappedKey contents where `key_wrap_algorithm` indicates AES-256-GCM
+Table: WrappedKey contents
 
-+--------------------+------------+------------------------------------------------------------+
-| Name               | Type       | Description                                                |
-+====================+============+============================================================+
-| key_wrap_algorithm | u32        | Algorithm used to wrap the key. See                        |
-|                    |            | @tbl:get-algorithms-output-args.                           |
-+--------------------+------------+------------------------------------------------------------+
-| key_type           | u16        | Type of the wrapped key. This is treated                   |
-|                    |            | as AAD when the key is decrypted.                          |
-|                    |            |                                                            |
-|                    |            | - 0h: Reserved                                             |
-|                    |            | - 1h: Encrypted locked MPK (ciphertext held at rest)       |
-|                    |            | - 2h: Encrypted ready MPK (ciphertext held in RAM)         |
-|                    |            | - 3h: Encrypted MEK                                        |
-|                    |            | - 4h to FFFFh: Reserved                                    |
-+--------------------+------------+------------------------------------------------------------+
-| iv                 | u8[12]     | Initialization vector for AES operation.                   |
-+--------------------+------------+------------------------------------------------------------+
-| ct_len             | u16        | Length of the ciphertext. Its value depends on `key_type`: |
-|                    |            |                                                            |
-|                    |            | - If key_type=1h, ct_len=`mpk_len`                         |
-|                    |            | - If key_type=2h, ct_len=`mpk_len`                         |
-|                    |            | - If key_type=3h, ct_len=`mek_len`                         |
-|                    |            |                                                            |
-|                    |            | `mpk_len` and `mek_len` are reported in                    |
-|                    |            | @tbl:get-algorithms-output-args.                           |
-+--------------------+------------+------------------------------------------------------------+
-| ct                 | u8[ct_len] | Key ciphertext.                                            |
-+--------------------+------------+------------------------------------------------------------+
-| tag                | u8[16]     | Authentication tag for AES operation.                      |
-+--------------------+------------+------------------------------------------------------------+
++--------------------+------------+------------------------------------------------------+
+| Name               | Type       | Description                                          |
++====================+============+======================================================+
+| key_type           | u16        | Type of the wrapped key. This is treated             |
+|                    |            | as AAD when the key is decrypted.                    |
+|                    |            |                                                      |
+|                    |            | - 0h: Reserved                                       |
+|                    |            | - 1h: ENCRYPTED_LOCKED_MPK (ciphertext held at rest) |
+|                    |            | - 2h: ENCRYPTED_READY_MPK (ciphertext held in RAM)   |
+|                    |            | - 3h: ENCRYPTED_MEK                                  |
+|                    |            | - 4h to FFFFh: Reserved                              |
++--------------------+------------+------------------------------------------------------+
+| iv                 | u8[12]     | Initialization vector for AES operation.             |
++--------------------+------------+------------------------------------------------------+
+| ct_len             | u32        | Length of the ciphertext                             |
++--------------------+------------+------------------------------------------------------+
+| ct                 | u8[ct_len] | Key ciphertext.                                      |
++--------------------+------------+------------------------------------------------------+
+| tag                | u8[16]     | Authentication tag for AES operation.                |
++--------------------+------------+------------------------------------------------------+
 
 #### Fault handling
 
