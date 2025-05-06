@@ -519,7 +519,6 @@ Table: Offset SFR_Base + 0h: CTRL – Control {#tbl:ee-ctrl-sfr}
 |       |      |       | is set to 0b.                                             |
 +-------+------+-------+-----------------------------------------------------------+
 
-
 Table: CTRL error codes {#tbl:ee-ctrl-err-codes}
 
 +----------+--------------------+
@@ -531,7 +530,6 @@ Table: CTRL error codes {#tbl:ee-ctrl-err-codes}
 +----------+--------------------+
 | 4h to Fh | Vendor Specific    |
 +----------+--------------------+
-
 
 Table: CTRL command codes {#tbl:ee-ctrl-cmd-codes}
 
@@ -699,7 +697,6 @@ Table: GET_STATUS input arguments
 |        |      | Little endian.                                               |
 +--------+------+--------------------------------------------------------------+
 
-
 Table: GET_STATUS output arguments
 
 +--------------+--------+-------------------------------------------------------------+
@@ -733,7 +730,6 @@ Table: GET_ALGORITHMS input arguments
 | chksum | u32  | Checksum over other input arguments, computed by the caller. |
 |        |      | Little endian.                                               |
 +--------+------+--------------------------------------------------------------+
-
 
 Table: GET_ALGORITHMS output arguments
 
@@ -795,7 +791,6 @@ Table: CLEAR_KEY_CACHE input arguments
 | cmd_timeout | u32  | Timeout in ms for command to crypto engine to complete. |
 +-------------+------+---------------------------------------------------------+
 
-
 Table: CLEAR_KEY_CACHE output arguments
 
 +-------------+------+--------------------------------------------------------+
@@ -830,7 +825,6 @@ Table: ENDORSE_ENCAPSULATION_PUB_KEY input arguments
 | endorsement_algorithm | u32  | Endorsement algorithm identifier. If 0h, then just   |
 |                       |      | return public key.                                   |
 +-----------------------+------+------------------------------------------------------+
-
 
 Table: ENDORSE_ENCAPSULATION_PUB_KEY output arguments
 
@@ -873,7 +867,6 @@ Table: ROTATE_ENCAPSULATION_KEY input arguments
 +------------+------+------------------------------------------------------+
 | kem_handle | u32  | Handle for old KEM keypair held in KMB memory.       |
 +------------+------+------------------------------------------------------+
-
 
 Table: ROTATE_ENCAPSULATION_KEY output arguments
 
@@ -924,7 +917,6 @@ Table: GENERATE_MPK input arguments
 |                    |                  | - kem_ciphertext                       |
 |                    |                  | - encrypted_access_key                 |
 +--------------------+------------------+----------------------------------------+
-
 
 Table: GENERATE_MPK output arguments
 
@@ -979,7 +971,6 @@ Table: REWRAP_MPK input arguments
 |                          |                        | encrypted to access_key_1).  |
 +--------------------------+------------------------+------------------------------+
 
-
 Table: REWRAP_MPK output arguments
 
 +-------------------+--------------+-------------------------------------------+
@@ -1031,7 +1022,6 @@ Table: READY_MPK input arguments
 |                    |                  | HEK and access key.          |
 +--------------------+------------------+------------------------------+
 
-
 Table: READY_MPK output arguments
 
 +-------------+--------------+--------------------------------------------+
@@ -1047,7 +1037,6 @@ Table: READY_MPK output arguments
 +-------------+--------------+--------------------------------------------+
 | ready_mpk   | EncryptedMpk | MPK encrypted to Ready MPK Encryption Key. |
 +-------------+--------------+--------------------------------------------+
-
 
 #### MIX_MPK
 
@@ -1073,7 +1062,6 @@ Table: MIX_MPK input arguments
 +------------+--------------+--------------------------------------------------+
 | ready_mpk  | EncryptedMpk | MPK encrypted to the Ready MPK Encryption Key.   |
 +------------+--------------+--------------------------------------------------+
-
 
 Table: MIX_MPK output arguments
 
@@ -1116,7 +1104,6 @@ Table: GENERATE_MEK input arguments
 | dpk      | u8[32] | "Data protection key". May be a value        |
 |          |        | decrypted by a user-provided C_PIN in Opal.  |
 +----------+--------+----------------------------------------------+
-
 
 Table: GENERATE_MEK output arguments
 
@@ -1180,7 +1167,6 @@ Table: LOAD_MEK input arguments
 |               |              | to complete.                                  |
 +---------------+--------------+-----------------------------------------------+
 
-
 Table: LOAD_MEK output arguments
 
 +-------------+------+-------------------------------------------+
@@ -1234,7 +1220,6 @@ Table: DERIVE_MEK input arguments
 |              |        | to complete.                                  |
 +--------------+--------+-----------------------------------------------+
 
-
 Table: DERIVE_MEK output arguments
 
 +-------------+------+-------------------------------------------+
@@ -1275,7 +1260,6 @@ Table: UNLOAD_MEK input arguments
 |             |        | to complete.                                  |
 +-------------+--------+-----------------------------------------------+
 
-
 Table: UNLOAD_MEK output arguments
 
 +-------------+------+-------------------------------------------+
@@ -1306,7 +1290,6 @@ Table: ENUMERATE_KEM_HANDLES input arguments
 +----------+------+----------------------------------------+
 | reserved | u32  | Reserved.                              |
 +----------+------+----------------------------------------+
-
 
 Table: ENUMERATE_KEM_HANDLES output arguments
 
@@ -1346,7 +1329,6 @@ Table: ZEROIZE_CURRENT_HEK input arguments
 | hek_slot | u32  | Current HEK slot to zeroize.                  |
 +----------+------+-----------------------------------------------+
 
-
 Table: ZEROIZE_CURRENT_HEK output arguments
 
 +-------------+------+------------------------------------------------+
@@ -1380,7 +1362,6 @@ Table: PROGRAM_NEXT_HEK input arguments
 | hek_slot | u32  | Next HEK slot to program.              |
 +----------+------+----------------------------------------+
 
-
 Table: PROGRAM_NEXT_HEK output arguments
 
 +-------------+------+-------------------------------------------+
@@ -1411,7 +1392,6 @@ Table: ENABLE_PERMANENT_HEK input arguments
 +----------+------+----------------------------------------+
 | reserved | u32  | Reserved.                              |
 +----------+------+----------------------------------------+
-
 
 Table: ENABLE_PERMANENT_HEK output arguments
 
@@ -1448,7 +1428,6 @@ Table: REPORT_EPOCH_KEY_STATE input arguments
 | nonce     | u8[16] | Freshness nonce.                       |
 +-----------+--------+----------------------------------------+
 
-
 Table: REPORT_EPOCH_KEY_STATE output arguments
 
 +-----------------+-------------+----------------------------------------------+
@@ -1478,7 +1457,6 @@ Table: REPORT_EPOCH_KEY_STATE output arguments
 | eat             | u8[eat_len] | CBOR-encoded and signed IETF EAT.            |
 |                 |             | See @sec:eat-format for the format.          |
 +-----------------+-------------+----------------------------------------------+
-
 
 Table: SEK state values {#tbl:sek-state-values}
 
@@ -1583,7 +1561,6 @@ Table: KMB mailbox command result codes {#tbl:kmb-mailbox-codes}
 | LOCK_HEK_INVALID_SLOT  | 0x4C46_4953 | Incorrect HEK slot when  |
 |                        | ("LFIS")    | programming or zeroizing |
 +------------------------+-------------+--------------------------+
-
 
 ##### Fatal errors
 
