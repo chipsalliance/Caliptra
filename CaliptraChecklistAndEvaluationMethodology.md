@@ -265,11 +265,14 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Integrity of Firmware and Hardware*
 
 * **Checklist Item:**  
-  * **Requirement:** The Caliptra RTL MUST match an official release. Netlists, layout, and other development collateral derived from the RTL MUST maintain the same behavior as the released RTL when Caliptra is in the [Production Non-Debug state](https://github.com/chipsalliance/Caliptra/blob/main/doc/Caliptra.md#caliptra-security-states).
-  * **Evaluation Methodology:** Manufacturers MUST provide evidence of hash verification against official releases. Manufacturers MUST provide evidence that collateral derived from the released RTL has not had its behavior modified.
+  * **Requirement:** The Caliptra RTL MUST match an official release. 
+  * **Evaluation Methodology:** Manufacturers MUST demonstrate via the [provided tools](https://github.com/chipsalliance/caliptra-sw/tree/main/ci-tools/release/tools) that RTL matches an official release.
+* **Checklist Item:** 
+  * **Requirement:** Netlists, layout, and other development collateral derived from the RTL MUST maintain the same behavior as the released RTL when Caliptra is in the [Production Non-Debug state](https://github.com/chipsalliance/Caliptra/blob/main/doc/Caliptra.md#caliptra-security-states).
+  * **Evaluation Methodology:** Manufacturers MUST provide evidence that collateral derived from the released RTL has not had its behavior modified.
 * **Checklist Item:**  
-  * **Requirement:** Cryptographic hashes of the Caliptra ROM and firmware (FMC and RT) MUST match Caliptra reference hashes of official Caliptra releases.  
-  * **Evaluation Methodology:** Manufacturers MUST provide evidence of hash verification against official releases.
+  * **Requirement:** Cryptographic hashes of the Caliptra ROM and firmware (FMC and RT) MUST match reference hashes of official Caliptra releases.  
+  * **Evaluation Methodology:** Manufacturers MUST demonstrate that the SHA384 hashes of ROM and firmware match those of official releases.
 
 #### *Testing and Verification*
 
