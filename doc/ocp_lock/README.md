@@ -26,11 +26,3 @@ When creating new diagrams, be sure to enable a white background. Otherwise, the
 <p align="center">
   <img src="./images/drawio_background.png" alt="draw.io background color" width="200px" style="box-shadow: 0px 2px 5px gray;" />
 </p>
-
-### Rendering UML
-
-To generate SVG files from the UML diagrams, download [PlantUML](https://plantuml.com/download) and run:
-
-```sh
-$ java -jar path/to/plant_uml.jar -Ddoc_gen-=1 -tsvg diagrams/uml/*.uml
-```
