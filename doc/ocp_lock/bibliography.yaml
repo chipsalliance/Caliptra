@@ -72,3 +72,8 @@ references:
       year: 2025
       month: 2
     url: "https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hybrid-kems"
+  - id: "caliptra-2.0-rtl-spec"
+    title: "Caliptra 2.0 RTL Specification"
+    publisher: "CHIPS Alliance"
+    url: "https://github.com/chipsalliance/caliptra-rtl/blob/ea416cb/docs/CaliptraHardwareSpecification.md"
+  
