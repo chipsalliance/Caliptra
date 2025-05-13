@@ -6,52 +6,24 @@
 
 !include ocp_lock_utils.inc
 
-!if ($show_title)
-    Title "Load MEK"
-!endif
+note across
+    <b>Preconditions:</b>
+    * The following sequence may or may not have occurred prior: Zero or more MIX_MPK commands
 
-!if ($show_precond)
-    note across
-        <b>Preconditions:</b>
-        * The following sequence may or may not have occurred prior: Zero or more MIX_MPK commands
-
-        <b>Notes:</b>
-          * The sequence diagram assumes that the KV will not allow an input KV slot to also be used as an out KV slot. Caliptra FW is responsible for managing which KV slots are used and can adapt if this assumption is not correct.
-          * This sequence is focused on successful execution of operations by the KV.
-    end note
-!endif
-
+    <b>Notes:</b>
+        * The sequence diagram assumes that the KV will not allow an input KV slot to also be used as an out KV slot. Caliptra FW is responsible for managing which KV slots are used and can adapt if this assumption is not correct.
+        * This sequence is focused on successful execution of operations by the KV.
+end note
 
 hek++ $BUFFER_ACTIVATION
 sfr++
 
 fw $async mb++ : LOAD_MEK
 
-!if ($show_api)
-    note right mb
-        | <b>Field     | <b>Size | <b>Definition |
-        | chksum       | u32     | Little endian |
-        | metadata     | u8[20]  | Metadata for MEK to load into the drive crypto engine (i.e. NSID + LBA range) |
-        | aux_metadata | u8[32]  | Auxiliary metadata for the MEK (optional; i.e. operation mode) |
-        | sek          | u8[32]  | "Soft epoch key".\nMay be rotated by the controller as part of a cryptographic purge. |
-        | dpk          | u8[32]  | "Data protection key".\nMay be a C_PIN-derived secret in Opal or a per-MEK value in KPIO. |
-        | rdy_timeout  | u32     | Timeout in ms for encryption engine to become ready for a new command |
-        | cmd_timeout  | u32     | Timeout in ms for command to crypto engine to complete |
-    end note
-!endif
-
 mb $async cfw++ : Command
-
-!if ($show_msg_parsing)
-    cfw $sync mb : Get command
-    mb--
-    $self("cfw", "Determine command")
-!else
-    mb--
-!endif
+mb--
 
 $self("cfw", "Use KV Slot X for deriving MEK")
-
 
 alt HEK exists and the encryption engine has become ready
 
@@ -61,34 +33,21 @@ alt HEK exists and the encryption engine has become ready
         kv $sync kv: HMAC512 slot A with Data
         kv $sync meks: HMAC512 result MEK Secret Seed with HEK
         meks++ $BUFFER_ACTIVATION
-        !if ($show_done)
-            kv $sync cfw-- : done
-        !else
-            kv--
-        !endif
+        kv $sync cfw-- : done
     end
 
     cfw $sync kv++: HMAC512(Key string : sek,\n                Data String: dpk,\n                Destination : Slot Y)
     kv $sync kv: HMAC512(SEK, DPK)
     kv $sync tempy: HMAC512 result pre-MEK
     tempy++ $BUFFER_ACTIVATION
-    !if ($show_done)
-        kv $sync cfw-- : done
-    !else
-        kv--
-    !endif
+    kv $sync cfw-- : done
 
     cfw $sync kv++: HMAC512(Key : pre-MEK,\n                Data: MEK Secret Seed,\n                Destination : Slot Y)
     kv $sync meks: Get MEK Secret Seed
     kv $sync kv: HMAC512(pre-MEK, MEK Secre Seed)
     kv $sync tempy: HMAC512 result MEK
     tempy++ $BUFFER_ACTIVATION
-    !if ($show_done)
-        kv $sync cfw-- : done
-    !else
-        kv--
-    !endif
-
+    kv $sync cfw-- : done
 
     cfw $sync sfr : Read Control Reg
 
@@ -138,22 +97,10 @@ end
 cfw $sync kv++: Purge_key(Key: Slot X,\n                Key : Slot Y)
 kv $sync meks !! : Purge
 & kv $sync tempy !!
-!if ($show_done)
-    kv $sync cfw-- : done
-!else
-    kv--
-!endif
+kv $sync cfw-- : done
 
 cfw $async mb : Command\nresponse\n(Status = Control Reg\n               Error field)
 & mb $async fw++ : Command\ncomplete
 cfw--
-
-!if ($show_api)
-    note right mb
-        | <b>Field    | <b>Size | <b>Definition |
-        | chksum      | u32     | Little endian |
-        | fips_status | u32     | Indicates if the command is FIPS approved or an error |
-    end note
-!endif
 
 @enduml

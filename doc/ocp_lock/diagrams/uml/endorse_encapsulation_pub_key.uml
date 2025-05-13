@@ -6,24 +6,18 @@
 
 !include ocp_lock_utils.inc
 
-!if ($show_title)
-    Title "Endorse Encapsulation Pub Key"
-!endif
+note across
+    <b>Preconditions:</b>
+        * DICE Alias Key is available in a KV slot and FW manages the slot #
+        The DICE Alias Key in already defined by Caliptra and is not the DPE Key
+        * HPKE Keypair available in a KV slot and FW manages the slot #
 
-!if ($show_precond)
-    note across
-        <b>Preconditions:</b>
-          * DICE Alias Key is available in a KV slot and FW manages the slot #
-            The DICE Alias Key in already defined by Caliptra and is not the DPE Key
-          * HPKE Keypair available in a KV slot and FW manages the slot #
+    <b>Notes:</b>
+        * The sequence diagram assumes that the KV will not allow an input KV slot to also be used as an out KV slot. Caliptra FW is responsible for managing which KV slots are used and can adapt if this assumption is not correct.
+        * This sequence is focused on successful execution of operations by the KV. Sill need to do:
 
-        <b>Notes:</b>
-          * The sequence diagram assumes that the KV will not allow an input KV slot to also be used as an out KV slot. Caliptra FW is responsible for managing which KV slots are used and can adapt if this assumption is not correct.
-          * This sequence is focused on successful execution of operations by the KV. Sill need to do:
-
-           <font color=red> Need to add more algorithms
-    end note
-!endif
+        <font color=red> Need to add more algorithms
+end note
 
 ' Pre-existing state
 dice++ $BUFFER_ACTIVATION
@@ -32,24 +26,8 @@ kemg++ $BUFFER_ACTIVATION
 
 fw $async mb++ : ENDORSE_ENCAPSULATION_PUB_KEY
 
-!if ($show_api)
-    note right mb
-        | <b>Field              | <b>Size | <b>Definition |
-        | chksum                | u32     | Little endian |
-        | kem_handle            | u32     | Handle for KEM keypair held in KMB memory |
-        | endorsement_algorithm | u32     | Endorsement algorithm identifier\n * If 0h, then return public key |
-    end note
-!endif
-
 mb $async cfw++ : Command
-
-!if ($show_msg_parsing)
-    cfw $sync mb : Get command
-    mb--
-    $self("cfw", "Determine command")
-!else
-    mb--
-!endif
+mb--
 
 alt kem_handle (G) has a Key Pair in KV slot G
 
@@ -57,11 +35,7 @@ alt kem_handle (G) has a Key Pair in KV slot G
 
         cfw $sync kv++: Get_Pub_ecdh_secp384r1(Key: Slot G)
         kv $sync kemg: Get Public Key
-        !if ($show_done)
-            kv $sync cfw-- : pub_key
-        !else
-            kv--
-        !endif
+        kv $sync cfw-- : pub_key
         cfw $sync mb : pub_key
     end
 
@@ -72,11 +46,7 @@ alt kem_handle (G) has a Key Pair in KV slot G
         cfw $sync kv++: ecdsa_secp384r1_sha384(Key: Slot F,\n                                       Data : certificate TBS\n                                       Output: signature)
         kv $sync dice : Get DICE Alias Key
         kv $sync kv: generate signature
-        !if ($show_done)
-            kv $sync cfw-- : signature
-        !else
-            kv--
-        !endif
+        kv $sync cfw-- : signature
         cfw $sync cfw: Append signature to certificate To Be Signed (TBS)
         cfw $sync mb : signed endorsement
     end
@@ -85,18 +55,6 @@ end
 
 cfw $sync mb : Command response
 & mb $async fw++ : Command\ncomplete
-
-!if ($show_api)
-    note right mb
-        | <b>Field        | <b>Size             | <b>Definition |
-        | chksum          | u32                 | Little endian |
-        | fips_status     | u32                 | Indicates if the command is FIPS approved or an error |
-        | pub_key_len     | u32                 | Length of HPKE public key (`Npk` in RFC 9180) |
-        | endorsement_len | u32                 | Length of endorsement data |
-        | pub_key         | u8[pub_key_len]     | KEM public key |
-        | endorsement     | u8[endorsement_len] | DER-encoded X.509 certificate |
-    end note
-!endif
 cfw--
 
 @enduml

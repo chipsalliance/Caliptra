@@ -6,21 +6,15 @@
 
 !include ocp_lock_utils.inc
 
-!if ($show_title)
-    Title "Generate MPK"
-!endif
+note across
+    <b>Preconditions:</b>
+        * HEK in a firmware-managed KV slot
+        * KEM Keypair in a firmware-managed KV slot
 
-!if ($show_precond)
-    note across
-        <b>Preconditions:</b>
-          * HEK in a firmware-managed KV slot
-          * KEM Keypair in a firmware-managed KV slot
-
-        <b>Notes:</b>
-          * The sequence diagram assumes that the KV will not allow an input KV slot to also be used as an out KV slot. Caliptra FW is responsible for managing which KV slots are used and can adapt if this assumption is not correct.
-          * This sequence is focused on successful execution of operations by the KV.
-    end note
-!endif
+    <b>Notes:</b>
+        * The sequence diagram assumes that the KV will not allow an input KV slot to also be used as an out KV slot. Caliptra FW is responsible for managing which KV slots are used and can adapt if this assumption is not correct.
+        * This sequence is focused on successful execution of operations by the KV.
+end note
 
 ' Pre-existing state
 hek++ $BUFFER_ACTIVATION
@@ -28,48 +22,22 @@ kemg++ $BUFFER_ACTIVATION
 
 fw $async mb++ : GENERATE_MPK
 
-!if ($show_api)
-    note right mb
-        | <b>Field           | <b>Size          | <b>Definition |
-        | chksum             | u32              | Little endian |
-        | mpk_algorithms     | u32              | Indicates the size of MPKs. Only one bit shall be reported.\n   * Byte 0 bit 0: 256 bits |
-        | wrapped_access_key | WrappedAccessKey | KEM-wrapped access key\n   * access_key_algorithm\n   * kem_handle\n   * kem_algorithm\n   * kem_ciphertext\n   * encrypted_access_key |
-    end note
-!endif
-
 mb $async cfw++ : Command
-
-!if ($show_msg_parsing)
-    cfw $sync mb : Get command
-    mb--
-    $self("cfw", "Determine command")
-!else
-    mb--
-!endif
+mb--
 
 cfw $sync kv++: Decaps(KEM Pair : kem_handle (G),\n             KEM ciphertext : kem_ciphertext\n             Destination : Slot Y)
 kv $sync kemg: Get KEM Keypair
 kv $sync kv: Decap KEM Ciphertext with Keypair
 kv $sync tempy: Put Shared Secret
 tempy++ $BUFFER_ACTIVATION
-!if ($show_done)
-    kv $sync cfw-- : done
-!else
-    kv--
-!endif
-
+kv $sync cfw-- : done
 
 cfw $sync kv++: Key_Unwrap(Key : Slot Y,\n                   Data: encrypted_access_key\n                   Destination : Slot Z)
 kv $sync tempy: Get Shared Secret
 kv $sync kv: Key_Unwrap encrypted_access_key with Key
 kv $sync tempz: Put Access Key
 tempz++ $BUFFER_ACTIVATION
-!if ($show_done)
-    kv $sync cfw-- : done
-!else
-    kv--
-!endif
-
+kv $sync cfw-- : done
 
 alt mpk algorithm 256 bits
     cfw $sync kv++: HMAC512_Slots(Key : Slot A,\n                         Data Key : Slot Z\n                         Destination :  Slot Y)
@@ -77,53 +45,28 @@ alt mpk algorithm 256 bits
     kv $sync tempz: Get Access Key
     kv $sync kv: HMAC512 slot A and Slot Z
     kv $sync tempy: Put HMAC512 result Encryption Key
-    !if ($show_done)
-        kv $sync cfw-- : done
-    !else
-        kv--
-    !endif
+    kv $sync cfw-- : done
 end
 
 cfw $sync kv++: new_key(len: mpk_alogorithm length,\n              Destination Slot: Z)
     kv $sync rand: Get random limited\nto len of MPK algorithm
     kv $sync tempz: Put new MPK
-    !if ($show_done)
-        kv $sync cfw-- : done
-    !else
-        kv--
-    !endif
+    kv $sync cfw-- : done
 
 cfw $sync kv++: Wrap(Key: Slot Y,\n          Data Key : Slot Z\n          Destination : locked_mpk)
 kv $sync tempy: Get Encryption Key
 kv $sync tempz: Get new MPK
 kv $sync kv: Encrypt Data Key using Key
-!if ($show_done)
-    kv $sync cfw-- : Locked MPK
-!else
-    kv--
-!endif
+kv $sync cfw-- : Locked MPK
 
 cfw $sync kv++: Purge_key(Key: Slot Y,\n                Key : Slot Z)
 kv $sync tempy !! : Purge
 & kv $sync tempz !!
-!if ($show_done)
-    kv $sync cfw-- : done
-!else
-    kv--
-!endif
-
+kv $sync cfw-- : done
 
 cfw $sync mb : Command response and\nLocked MPK
 & mb $async fw++ : Command\ncomplete
 
-!if ($show_api)
-    note right mb
-        | <b>Field           | <b>Size       | <b>Definition |
-        | chksum             | u32           | Little endian |
-        | fips_status        | u32           | Indicates if the command is FIPS approved or an error |
-        | new_encrypted_mpk  | EncryptedMpk  | MPK encrypted to access_key_2 |
-    end note
-!endif
 cfw--
 kv--
 

@@ -6,10 +6,6 @@
 
 !include ocp_lock_utils.inc
 
-!if ($show_title)
-    Title "Example of a command to the encryption engine to load an MEK"
-!endif
-
 ee++
 
 note over ee
