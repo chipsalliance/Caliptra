@@ -2,7 +2,7 @@
 
 **Caliptra Trademark Audit Process**
 
-**Version 0.2**
+**Version 1.0**
 
 **Document history**
 
@@ -10,6 +10,7 @@
 | :---- | :---- | :---- |
 | 0.1 | 2024/09/30 | First draft of the report |
 | 0.2 | 2025/01/21 | Additional Changes after Feedback |
+| 1.0 | 2025/05/15 | Finalized for publishing |
 
 # Table of Contents
 - [Introduction](#introduction)

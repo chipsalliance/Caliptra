@@ -91,6 +91,13 @@ Caliptra designs must meet the standards of the Caliptra Technical Framework
 Committee, as described in the [Caliptra Workgroup Technical
 Charter](CaliptraWGTechnicalCharter.md).
 
+Please refer to the [Caliptra Trademark Audit
+Process](CaliptraTrademarkAuditProcess.md) for a description of the steps
+required to achieve technical certification. A detailed breakdown of the
+technical criteria used to meet certification guidelines is laid out in the
+[Checklist and Evlauation
+Methodology](CaliptraChecklistAndEvaluationMethodology.md) document.
+
 ## Role of the Caliptra TAC
 
 The [Caliptra Workgroup Technical Advisory
@@ -100,8 +107,8 @@ determines which pull requests may be accepted. The Caliptra Workgroup exists as
 part of the Linux Foundation’s [CHIPS Alliance](https://www.chipsalliance.org/).
 The Caliptra TAC, CHIPS Alliance leadership and The Linux Foundation work
 together on the protection and enforcement of the Caliptra Marks. The Caliptra
-TAC will set the criteria and determine eligibility for any Caliptra
-Certification.
+TAC will enforce the evaluation methodology referenced above to ensure technical
+eligibility is met for any Caliptra Certification.
 
 ## Contact Us
 
