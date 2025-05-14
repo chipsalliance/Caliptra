@@ -1,7 +1,7 @@
-CODEOWNERS @andreslagarcavilla @Bryankel @Jhprabhu @nvpachou
-MAINTAINERS.md @andreslagarcavilla @Bryankel @Jhprabhu @nvpachou
-CaliptraTrademarkPolicy.md @andreslagarcavilla @Bryankel @Jhprabhu @nvpachou
-CaliptraWGTechnicalCharter.md @andreslagarcavilla @Bryankel @Jhprabhu @nvpachou
 CaliptraChecklistAndEvaluationMethodology.md @andreslagarcavilla @Bryankel @Jhprabhu @nvpachou
 CaliptraTrademarkAuditProcess.md @andreslagarcavilla @Bryankel @Jhprabhu @nvpachou
+CaliptraTrademarkPolicy.md @andreslagarcavilla @Bryankel @Jhprabhu @nvpachou
+CaliptraWGTechnicalCharter.md @andreslagarcavilla @Bryankel @Jhprabhu @nvpachou
+CODEOWNERS @andreslagarcavilla @Bryankel @Jhprabhu @nvpachou
 LICENSE @andreslagarcavilla @Bryankel @Jhprabhu @nvpachou
+MAINTAINERS.md @andreslagarcavilla @Bryankel @Jhprabhu @nvpachou
