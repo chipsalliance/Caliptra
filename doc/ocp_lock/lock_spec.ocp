@@ -1499,41 +1499,38 @@ This section defines common types used to interface between the controller and K
 
 Table: SealedAccessKey contents
 
-+----------------+--------------------+--------------------------------------------------+
-| Name           | Type               | Description                                      |
-+================+====================+==================================================+
-| kem_handle     | u32                | Handle for KEM keypair held in KMB memory.       |
-+----------------+--------------------+--------------------------------------------------+
-| hpke_algorithm | u32                | HPKE algorithm. Must be a bit value indicated    |
-|                |                    | as supported in @tbl:get-algorithms-output-args. |
-+----------------+--------------------+--------------------------------------------------+
-| access_key_len | u32                | Access key length in bytes. Must be the scalar   |
-|                |                    | value associated with a bit value indicated as   |
-|                |                    | supported in @tbl:get-algorithms-output-args.    |
-+----------------+--------------------+--------------------------------------------------+
-| kem_ciphertext | u8[Nenc]           | HPKE encapsulated key.                           |
-+----------------+--------------------+--------------------------------------------------+
-| ak_ct          | u8[access_key_len] | Access key ciphertext.                           |
-+----------------+--------------------+--------------------------------------------------+
-| tag            | u8[Nt]             | Authentication tag for AES operation.            |
-+----------------+--------------------+--------------------------------------------------+
++----------------+-----------------------+--------------------------------------------------+
+| Name           | Type                  | Description                                      |
++================+=======================+==================================================+
+| kem_handle     | u32                   | Handle for KEM keypair held in KMB memory.       |
++----------------+-----------------------+--------------------------------------------------+
+| hpke_algorithm | u32                   | HPKE algorithm. Must be a bit value indicated    |
+|                |                       | as supported in @tbl:get-algorithms-output-args. |
++----------------+-----------------------+--------------------------------------------------+
+| access_key_len | u32                   | Access key length in bytes. Must be the scalar   |
+|                |                       | value associated with a bit value indicated as   |
+|                |                       | supported in @tbl:get-algorithms-output-args.    |
++----------------+-----------------------+--------------------------------------------------+
+| kem_ciphertext | u8[Nenc]              | HPKE encapsulated key.                           |
++----------------+-----------------------+--------------------------------------------------+
+| ak_ct          | u8[access_key_len+Nt] | Access key ciphertext and authentication tag.    |
++----------------+-----------------------+--------------------------------------------------+
 
 `Nenc` and `Nt` are HPKE values associated with the `kem_id` and `aead_id` identifiers from the given `hpke_algorithm`. For example, if byte 0 bit 0 of `hpke_algorithm` is set (indicating `kem_id` 0x0011 and `aead_id` 0x0002), then according to [@{ietf-rfc9180}], `Nenc` and `Nt` would be 97 and 16, respectively.
 
 Table: SealedOldAndNewAccessKey contents
 
-+-----------------+-----------------------+----------------------------------------------+
-| Name            | Type                  | Description                                  |
-+=================+=======================+==============================================+
-| old_access_key  | SealedAccessKey       | Old access key. Used to decrypt the new      |
-|                 |                       | access key.                                  |
-+-----------------+-----------------------+----------------------------------------------+
-| ak_iv           | u8[Nn]                | IV used to decrypt the encrypted access key. |
-+-----------------+-----------------------+----------------------------------------------+
-| encrypted_ak_ct | u8[access_key_len+Nt] | (Encrypted access key + tag) ciphertext.     |
-+-----------------+-----------------------+----------------------------------------------+
-| tag             | u8[Nt]                | Authentication tag for AES operation         |
-+-----------------+-----------------------+----------------------------------------------+
++-----------------+--------------------------+-----------------------------------------------+
+| Name            | Type                     | Description                                   |
++=================+==========================+===============================================+
+| old_access_key  | SealedAccessKey          | Old access key. Used to decrypt the new       |
+|                 |                          | access key.                                   |
++-----------------+--------------------------+-----------------------------------------------+
+| ak_iv           | u8[Nn]                   | IV used to decrypt the encrypted access key.  |
++-----------------+--------------------------+-----------------------------------------------+
+| encrypted_ak_ct | u8[access_key_len+Nt+Nt] | (Encrypted access key + inner tag) ciphertext |
+|                 |                          | and outer tag.                                |
++-----------------+--------------------------+-----------------------------------------------+
 
 `Nn` and `Nt` are HPKE values associated with the `aead_id` identifier from the given `hpke_algorithm`.
 
@@ -1557,13 +1554,11 @@ Table: WrappedKey contents
 |          |            | - 3h: WRAPPED_MEK                          |
 |          |            | - 4h to FFFFh: Reserved                    |
 +----------+------------+--------------------------------------------+
+| ct_len   | u16        | Length of the ciphertext and tag in bytes. |
++----------+------------+--------------------------------------------+
 | iv       | u8[12]     | Initialization vector for AES operation.   |
 +----------+------------+--------------------------------------------+
-| ct_len   | u32        | Length of the ciphertext in bytes.         |
-+----------+------------+--------------------------------------------+
-| ct       | u8[ct_len] | Key ciphertext.                            |
-+----------+------------+--------------------------------------------+
-| tag      | u8[16]     | Authentication tag for AES operation.      |
+| ct       | u8[ct_len] | Key ciphertext and authentication tag.     |
 +----------+------------+--------------------------------------------+
 
 Variants of WrappedKey will be used to reduce duplicating information in commands. The following names will be used for WrappedKeys of a specific `key_type` and `ct_len`:
