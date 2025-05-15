@@ -27,6 +27,8 @@ marks](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkPoli
 * [Caliptra Trademark Process definition](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkAuditProcess.md)
 * [Caliptra Trademark Checklist and Evaluation Methodology](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraChecklistAndEvaluationMethodology.md)
 
+There is also a [separate note regarding Caliptra Sybsystem trademark compliance](https://github.com/chipsalliance/Caliptra/blob/main/doc/Caliptra.md#caliptra-subsystem-trademark-compliance).
+
 ## Specifications
 
 ### Caliptra 1.x:
