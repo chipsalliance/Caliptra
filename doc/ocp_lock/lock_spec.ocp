@@ -686,6 +686,8 @@ This section provides the mailbox commands exposed by Caliptra as part of OCP L.
 
 Each of these commands returns a \`fips_status\` field. This provides an indicator of whether KMB is operating in FIPS mode. @tbl:fips-status-values provides the possible values for this field.
 
+Note: all multi-byte fields (i.e. \`u16\` and \`u32\`) that are not byte arrays are interpreted as little endian.
+
 Table: Values for the FIPS status field {#tbl:fips-status-values}
 
 +-------------+--------------------+
@@ -724,7 +726,6 @@ Table: GET_STATUS input arguments
 | Name   | Type | Description                                                  |
 +========+======+==============================================================+
 | chksum | u32  | Checksum over other input arguments, computed by the caller. |
-|        |      | Little endian.                                               |
 +--------+------+--------------------------------------------------------------+
 
 Table: GET_STATUS output arguments
@@ -733,7 +734,6 @@ Table: GET_STATUS output arguments
 | Name         | Type   | Description                                                 |
 +==============+========+=============================================================+
 | chksum       | u32    | Checksum over other output arguments, computed by Caliptra. |
-|              |        | Little endian.                                              |
 +--------------+--------+-------------------------------------------------------------+
 | fips_status  | u32    | Indicates if the command is FIPS approved or an error.      |
 +--------------+--------+-------------------------------------------------------------+
@@ -758,7 +758,6 @@ Table: GET_ALGORITHMS input arguments
 | Name   | Type | Description                                                  |
 +========+======+==============================================================+
 | chksum | u32  | Checksum over other input arguments, computed by the caller. |
-|        |      | Little endian.                                               |
 +--------+------+--------------------------------------------------------------+
 
 Table: GET_ALGORITHMS output arguments {#tbl:get-algorithms-output-args}
@@ -767,7 +766,7 @@ Table: GET_ALGORITHMS output arguments {#tbl:get-algorithms-output-args}
 | Name                   | Type   | Description                                       |
 +========================+========+===================================================+
 | chksum                 | u32    | Checksum over other output arguments, computed by |
-|                        |        | Caliptra. Little endian.                          |
+|                        |        | Caliptra.                                         |
 +------------------------+--------+---------------------------------------------------+
 | fips_status            | u32    | Indicates if the command is FIPS approved or an   |
 |                        |        | error.                                            |
@@ -808,7 +807,7 @@ Table: CLEAR_KEY_CACHE input arguments
 | Name        | Type | Description                                             |
 +=============+======+=========================================================+
 | chksum      | u32  | Checksum over other input arguments, computed by the    |
-|             |      | caller. Little endian.                                  |
+|             |      | caller.                                                 |
 +-------------+------+---------------------------------------------------------+
 | reserved    | u32  | Reserved.                                               |
 +-------------+------+---------------------------------------------------------+
@@ -825,7 +824,7 @@ Table: CLEAR_KEY_CACHE output arguments
 | Name        | Type | Description                                            |
 +=============+======+========================================================+
 | chksum      | u32  | Checksum over other output arguments, computed by      |
-|             |      | Caliptra. Little endian.                               |
+|             |      | Caliptra.                                              |
 +-------------+------+--------------------------------------------------------+
 | fips_status | u32  | Indicates if the command is FIPS approved or an error. |
 +-------------+------+--------------------------------------------------------+
@@ -844,7 +843,7 @@ Table: ENDORSE_ENCAPSULATION_PUB_KEY input arguments
 | Name                  | Type | Description                                          |
 +=======================+======+======================================================+
 | chksum                | u32  | Checksum over other input arguments, computed by the |
-|                       |      | caller. Little endian.                               |
+|                       |      | caller.                                              |
 +-----------------------+------+------------------------------------------------------+
 | reserved              | u32  | Reserved.                                            |
 +-----------------------+------+------------------------------------------------------+
@@ -860,7 +859,7 @@ Table: ENDORSE_ENCAPSULATION_PUB_KEY output arguments
 | Name            | Type                | Description                                    |
 +=================+=====================+================================================+
 | chksum          | u32                 | Checksum over other output arguments, computed |
-|                 |                     | by Caliptra. Little endian.                    |
+|                 |                     | by Caliptra.                                   |
 +-----------------+---------------------+------------------------------------------------+
 | fips_status     | u32                 | Indicates if the command is FIPS approved or   |
 |                 |                     | an error.                                      |
@@ -890,7 +889,7 @@ Table: ROTATE_ENCAPSULATION_KEY input arguments
 | Name       | Type | Description                                          |
 +============+======+======================================================+
 | chksum     | u32  | Checksum over other input arguments, computed by the |
-|            |      | caller. Little endian.                               |
+|            |      | caller.                                              |
 +------------+------+------------------------------------------------------+
 | reserved   | u32  | Reserved.                                            |
 +------------+------+------------------------------------------------------+
@@ -903,7 +902,7 @@ Table: ROTATE_ENCAPSULATION_KEY output arguments
 | Name        | Type | Description                                    |
 +=============+======+================================================+
 | chksum      | u32  | Checksum over other output arguments, computed |
-|             |      | by Caliptra. Little endian.                    |
+|             |      | by Caliptra.                                   |
 +-------------+------+------------------------------------------------+
 | fips_status | u32  | Indicates if the command is FIPS approved or   |
 |             |      | an error.                                      |
@@ -925,7 +924,7 @@ Table: GENERATE_MPK input arguments
 | Name              | Type            | Description                            |
 +===================+=================+========================================+
 | chksum            | u32             | Checksum over other input arguments,   |
-|                   |                 | computed by the caller. Little endian. |
+|                   |                 | computed by the caller.                |
 +-------------------+-----------------+----------------------------------------+
 | reserved          | u32             | Reserved.                              |
 +-------------------+-----------------+----------------------------------------+
@@ -942,7 +941,7 @@ Table: GENERATE_MPK output arguments
 | Name          | Type      | Description                                    |
 +===============+===========+================================================+
 | chksum        | u32       | Checksum over other output arguments, computed |
-|               |           | by Caliptra. Little endian.                    |
+|               |           | by Caliptra.                                   |
 +---------------+-----------+------------------------------------------------+
 | fips_status   | u32       | Indicates if the command is FIPS approved or   |
 |               |           | an error.                                      |
@@ -968,7 +967,6 @@ Table: REWRAP_MPK input arguments
 | chksum             | u32                      | Checksum over other          |
 |                    |                          | input arguments,             |
 |                    |                          | computed by the caller.      |
-|                    |                          | Little endian.               |
 +--------------------+--------------------------+------------------------------+
 | reserved           | u32                      | Reserved.                    |
 +--------------------+--------------------------+------------------------------+
@@ -991,7 +989,7 @@ Table: REWRAP_MPK output arguments
 | Name           | Type      | Description                               |
 +================+===========+===========================================+
 | chksum         | u32       | Checksum over other output arguments,     |
-|                |           | computed by Caliptra. Little endian.      |
+|                |           | computed by Caliptra.                     |
 +----------------+-----------+-------------------------------------------+
 | fips_status    | u32       | Indicates if the command is FIPS approved |
 |                |           | or an error.                              |
@@ -1015,7 +1013,6 @@ Table: READY_MPK input arguments
 | chksum            | u32             | Checksum over other          |
 |                   |                 | input arguments,             |
 |                   |                 | computed by the caller.      |
-|                   |                 | Little endian.               |
 +-------------------+-----------------+------------------------------+
 | reserved          | u32             | Reserved.                    |
 +-------------------+-----------------+------------------------------+
@@ -1036,7 +1033,7 @@ Table: READY_MPK output arguments
 | Name        | Type     | Description                                |
 +=============+==========+============================================+
 | chksum      | u32      | Checksum over other output arguments,      |
-|             |          | computed by Caliptra. Little endian.       |
+|             |          | computed by Caliptra.                      |
 +-------------+----------+--------------------------------------------+
 | fips_status | u32      | Indicates if the command is FIPS approved  |
 |             |          | or an error.                               |
@@ -1060,7 +1057,7 @@ Table: MIX_MPK input arguments
 | Name       | Type     | Description                                      |
 +============+==========+==================================================+
 | chksum     | u32      | Checksum over other input arguments,             |
-|            |          | computed by the caller. Little endian.           |
+|            |          | computed by the caller.                          |
 +------------+----------+--------------------------------------------------+
 | reserved   | u32      | Reserved.                                        |
 +------------+----------+--------------------------------------------------+
@@ -1077,7 +1074,7 @@ Table: MIX_MPK output arguments
 | Name        | Type | Description                               |
 +=============+======+===========================================+
 | chksum      | u32  | Checksum over other output arguments,     |
-|             |      | computed by Caliptra. Little endian.      |
+|             |      | computed by Caliptra.                     |
 +-------------+------+-------------------------------------------+
 | fips_status | u32  | Indicates if the command is FIPS approved |
 |             |      | or an error.                              |
@@ -1101,7 +1098,7 @@ Table: GENERATE_MEK input arguments
 | Name     | Type   | Description                                 |
 +==========+========+=============================================+
 | chksum   | u32    | Checksum over other input arguments,        |
-|          |        | computed by the caller. Little endian.      |
+|          |        | computed by the caller.                     |
 +----------+--------+---------------------------------------------+
 | reserved | u32    | Reserved.                                   |
 +----------+--------+---------------------------------------------+
@@ -1119,7 +1116,7 @@ Table: GENERATE_MEK output arguments
 | Name        | Type       | Description                               |
 +=============+============+===========================================+
 | chksum      | u32        | Checksum over other output arguments,     |
-|             |            | computed by Caliptra. Little endian.      |
+|             |            | computed by Caliptra.                     |
 +-------------+------------+-------------------------------------------+
 | fips_status | u32        | Indicates if the command is FIPS approved |
 |             |            | or an error.                              |
@@ -1148,7 +1145,7 @@ Table: LOAD_MEK input arguments
 | Name         | Type       | Description                                   |
 +==============+============+===============================================+
 | chksum       | u32        | Checksum over other input arguments,          |
-|              |            | computed by the caller. Little endian.        |
+|              |            | computed by the caller.                       |
 +--------------+------------+-----------------------------------------------+
 | reserved     | u32        | Reserved.                                     |
 +--------------+------------+-----------------------------------------------+
@@ -1181,7 +1178,7 @@ Table: LOAD_MEK output arguments
 | Name        | Type | Description                               |
 +=============+======+===========================================+
 | chksum      | u32  | Checksum over other output arguments,     |
-|             |      | computed by Caliptra. Little endian.      |
+|             |      | computed by Caliptra.                     |
 +-------------+------+-------------------------------------------+
 | fips_status | u32  | Indicates if the command is FIPS approved |
 |             |      | or an error.                              |
@@ -1205,7 +1202,7 @@ Table: DERIVE_MEK input arguments
 | Name         | Type   | Description                                   |
 +==============+========+===============================================+
 | chksum       | u32    | Checksum over other input arguments,          |
-|              |        | computed by the caller. Little endian.        |
+|              |        | computed by the caller.                       |
 +--------------+--------+-----------------------------------------------+
 | reserved     | u32    | Reserved.                                     |
 +--------------+--------+-----------------------------------------------+
@@ -1234,7 +1231,7 @@ Table: DERIVE_MEK output arguments
 | Name        | Type | Description                               |
 +=============+======+===========================================+
 | chksum      | u32  | Checksum over other output arguments,     |
-|             |      | computed by Caliptra. Little endian.      |
+|             |      | computed by Caliptra.                     |
 +-------------+------+-------------------------------------------+
 | fips_status | u32  | Indicates if the command is FIPS approved |
 |             |      | or an error.                              |
@@ -1254,7 +1251,7 @@ Table: UNLOAD_MEK input arguments
 | Name        | Type   | Description                                   |
 +=============+========+===============================================+
 | chksum      | u32    | Checksum over other input arguments,          |
-|             |        | computed by the caller. Little endian.        |
+|             |        | computed by the caller.                       |
 +-------------+--------+-----------------------------------------------+
 | reserved    | u32    | Reserved.                                     |
 +-------------+--------+-----------------------------------------------+
@@ -1274,7 +1271,7 @@ Table: UNLOAD_MEK output arguments
 | Name        | Type | Description                               |
 +=============+======+===========================================+
 | chksum      | u32  | Checksum over other output arguments,     |
-|             |      | computed by Caliptra. Little endian.      |
+|             |      | computed by Caliptra.                     |
 +-------------+------+-------------------------------------------+
 | fips_status | u32  | Indicates if the command is FIPS approved |
 |             |      | or an error.                              |
@@ -1290,14 +1287,14 @@ Command Code: 0x4548_444C ("EHDL")
 
 Table: ENUMERATE_KEM_HANDLES input arguments
 
-+----------+------+----------------------------------------+
-| Name     | Type | Description                            |
-+==========+======+========================================+
-| chksum   | u32  | Checksum over other input arguments,   |
-|          |      | computed by the caller. Little endian. |
-+----------+------+----------------------------------------+
-| reserved | u32  | Reserved.                              |
-+----------+------+----------------------------------------+
++----------+------+--------------------------------------+
+| Name     | Type | Description                          |
++==========+======+======================================+
+| chksum   | u32  | Checksum over other input arguments, |
+|          |      | computed by the caller.              |
++----------+------+--------------------------------------+
+| reserved | u32  | Reserved.                            |
++----------+------+--------------------------------------+
 
 Table: ENUMERATE_KEM_HANDLES output arguments
 
@@ -1305,7 +1302,7 @@ Table: ENUMERATE_KEM_HANDLES output arguments
 | Name             | Type         | Description                               |
 +==================+==============+===========================================+
 | chksum           | u32          | Checksum over other output arguments,     |
-|                  |              | computed by Caliptra. Little endian.      |
+|                  |              | computed by Caliptra.                     |
 +------------------+--------------+-------------------------------------------+
 | fips_status      | u32          | Indicates if the command is FIPS approved |
 |                  |              | or an error.                              |
@@ -1342,7 +1339,7 @@ Table: ZEROIZE_CURRENT_HEK input arguments
 | Name     | Type | Description                                   |
 +==========+======+===============================================+
 | chksum   | u32  | Checksum over other input arguments, computed |
-|          |      | by the caller. Little endian.                 |
+|          |      | by the caller.                                |
 +----------+------+-----------------------------------------------+
 | reserved | u32  | Reserved.                                     |
 +----------+------+-----------------------------------------------+
@@ -1355,7 +1352,7 @@ Table: ZEROIZE_CURRENT_HEK output arguments
 | Name        | Type | Description                                    |
 +=============+======+================================================+
 | chksum      | u32  | Checksum over other output arguments, computed |
-|             |      | by Caliptra. Little endian.                    |
+|             |      | by Caliptra.                                   |
 +-------------+------+------------------------------------------------+
 | reserved    | u32  | Reserved.                                      |
 +-------------+------+------------------------------------------------+
@@ -1371,16 +1368,16 @@ Command Code: 0x504E_484B ("PNHK")
 
 Table: PROGRAM_NEXT_HEK input arguments
 
-+----------+------+----------------------------------------+
-| Name     | Type | Description                            |
-+==========+======+========================================+
-| chksum   | u32  | Checksum over other input arguments,   |
-|          |      | computed by the caller. Little endian. |
-+----------+------+----------------------------------------+
-| reserved | u32  | Reserved.                              |
-+----------+------+----------------------------------------+
-| hek_slot | u32  | Next HEK slot to program.              |
-+----------+------+----------------------------------------+
++----------+------+--------------------------------------+
+| Name     | Type | Description                          |
++==========+======+======================================+
+| chksum   | u32  | Checksum over other input arguments, |
+|          |      | computed by the caller.              |
++----------+------+--------------------------------------+
+| reserved | u32  | Reserved.                            |
++----------+------+--------------------------------------+
+| hek_slot | u32  | Next HEK slot to program.            |
++----------+------+--------------------------------------+
 
 Table: PROGRAM_NEXT_HEK output arguments
 
@@ -1388,7 +1385,7 @@ Table: PROGRAM_NEXT_HEK output arguments
 | Name        | Type | Description                               |
 +=============+======+===========================================+
 | chksum      | u32  | Checksum over other output arguments,     |
-|             |      | computed by Caliptra. Little endian.      |
+|             |      | computed by Caliptra.                     |
 +-------------+------+-------------------------------------------+
 | fips_status | u32  | Indicates if the command is FIPS approved |
 |             |      | or an error.                              |
@@ -1404,14 +1401,14 @@ Command Code: 0x4550_484B ("EPHK")
 
 Table: ENABLE_PERMANENT_HEK input arguments
 
-+----------+------+----------------------------------------+
-| Name     | Type | Description                            |
-+==========+======+========================================+
-| chksum   | u32  | Checksum over other input arguments,   |
-|          |      | computed by the caller. Little endian. |
-+----------+------+----------------------------------------+
-| reserved | u32  | Reserved.                              |
-+----------+------+----------------------------------------+
++----------+------+--------------------------------------+
+| Name     | Type | Description                          |
++==========+======+======================================+
+| chksum   | u32  | Checksum over other input arguments, |
+|          |      | computed by the caller.              |
++----------+------+--------------------------------------+
+| reserved | u32  | Reserved.                            |
++----------+------+--------------------------------------+
 
 Table: ENABLE_PERMANENT_HEK output arguments
 
@@ -1419,7 +1416,7 @@ Table: ENABLE_PERMANENT_HEK output arguments
 | Name        | Type | Description                               |
 +=============+======+===========================================+
 | chksum      | u32  | Checksum over other output arguments,     |
-|             |      | computed by Caliptra. Little endian.      |
+|             |      | computed by Caliptra.                     |
 +-------------+------+-------------------------------------------+
 | fips_status | u32  | Indicates if the command is FIPS approved |
 |             |      | or an error.                              |
@@ -1435,18 +1432,18 @@ Command Code: 0x5245_4B53 ("REKS")
 
 Table: REPORT_EPOCH_KEY_STATE input arguments
 
-+-----------+--------+----------------------------------------+
-| Name      | Type   | Description                            |
-+===========+========+========================================+
-| chksum    | u32    | Checksum over other input arguments,   |
-|           |        | computed by the caller. Little endian. |
-+-----------+--------+----------------------------------------+
-| reserved  | u32    | Reserved.                              |
-+-----------+--------+----------------------------------------+
-| sek_state | u16    | SEK state. See @tbl:sek-state-values.  |
-+-----------+--------+----------------------------------------+
-| nonce     | u8[16] | Freshness nonce.                       |
-+-----------+--------+----------------------------------------+
++-----------+--------+---------------------------------------+
+| Name      | Type   | Description                           |
++===========+========+=======================================+
+| chksum    | u32    | Checksum over other input arguments,  |
+|           |        | computed by the caller.               |
++-----------+--------+---------------------------------------+
+| reserved  | u32    | Reserved.                             |
++-----------+--------+---------------------------------------+
+| sek_state | u16    | SEK state. See @tbl:sek-state-values. |
++-----------+--------+---------------------------------------+
+| nonce     | u8[16] | Freshness nonce.                      |
++-----------+--------+---------------------------------------+
 
 Table: REPORT_EPOCH_KEY_STATE output arguments
 
@@ -1454,7 +1451,7 @@ Table: REPORT_EPOCH_KEY_STATE output arguments
 | Name            | Type        | Description                                  |
 +=================+=============+==============================================+
 | chksum          | u32         | Checksum over other output arguments,        |
-|                 |             | computed by Caliptra. Little endian.         |
+|                 |             | computed by Caliptra.                        |
 +-----------------+-------------+----------------------------------------------+
 | fips_status     | u32         | Indicates if the command is FIPS approved    |
 |                 |             | or an error.                                 |
