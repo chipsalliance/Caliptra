@@ -327,11 +327,17 @@ KMB can encrypt randomly-generated MEKs, or compute derived MEKs.
 
 ![MEK generation](./diagrams/mek_generation.drawio.svg){#fig:mek-generation}
 
+^1^ see @fig:mek-secret-derivation for details
+
 ![MEK loading](./diagrams/mek_loading.drawio.svg){#fig:mek-loading}
+
+^1^ see @fig:mek-secret-derivation for details
 
 #### Deriving an MEK
 
 ![MEK derivation](./diagrams/mek_derivation.drawio.svg){#fig:mek-derivation}
+
+^1^ see @fig:mek-secret-derivation for details
 
 #### MEK secret derivation {#sec:mek-secret-derivation}
 
