@@ -6,39 +6,16 @@
 
 !include ocp_lock_utils.inc
 
-!if ($show_title)
-    Title "Unload MEK"
-!endif
-
-!if ($show_precond)
-    note across
-        <b>Preconditions:</b>
-        * None - a MEK may or may not have been loaded.
-    end note
-!endif
+note across
+    <b>Preconditions:</b>
+    * None - a MEK may or may not have been loaded.
+end note
 
 
 fw $async mb++ : UNLOAD_MEK
 
-    !if ($show_api)
-        note right mb
-            | Field        | Size  | Definition |
-            | chksum       | u32   | Little endian |
-            | metadata     | u8[20] | Metadata for MEK to load into the drive crypto engine (i.e. NSID + LBA range) |
-            | rdy_timeout  | u32   | Timeout in ms for encryption engine to become ready for a new command |
-            | cmd_timeout  | u32   | Timeout in ms for command to crypto engine to complete |
-        end note
-    !endif
-
 mb $async cfw++ : Command
-
-!if ($show_msg_parsing)
-    cfw $sync mb : Get command
-    mb--
-    $self("cfw", "Determine command")
-!else
-    mb--
-!endif
+mb--
 
 cfw $sync sfr : Read Control Reg
 
@@ -67,8 +44,6 @@ ee $sync sfr : Read Metadata
 ee $sync kc : Unload Key
 
 group loop until (cmd_timeout or DN = 1b)
-
-
     ee $async sfr-- : Write Control Reg\n(DN = 1b,\n ERR = 0b,\n EXE = 0b)
     cfw $sync sfr : Read Control Reg
 end
@@ -77,17 +52,8 @@ sfr--
 cfw $sync sfr : Write Control Reg (DN = 1b)
 note right: Reset the SFR interface for next operation - not waiting for response
 
-
 cfw $sync mb : Command\nresponse\n(Status = Control Reg\n               Error field)
 & mb $async fw++ : Command\ncomplete
 cfw--
-
-    !if ($show_api)
-        note right mb
-            | <b>Field    | <b>Size | <b>Definition |
-            | chksum      | u32     | Little endian |
-            | fips_status | u32     | Indicates if the command is FIPS approved or an error |
-        end note
-    !endif
 
 @enduml

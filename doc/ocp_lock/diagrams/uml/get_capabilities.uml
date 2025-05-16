@@ -6,10 +6,6 @@
 
 !include ocp_lock_utils.inc
 
-!if ($show_title)
-    Title "GET_CAPABILITIES command sequence"
-!endif
-
 fw $async mb++ : GET_CAPABILITIES
 
 !if ($show_api)

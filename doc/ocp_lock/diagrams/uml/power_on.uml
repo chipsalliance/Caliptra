@@ -6,25 +6,6 @@
 
 !include ocp_lock_utils.inc
 
-!$SHOW_LOAD_KEY = 0
-
-
-!if ($show_title)
-    Title "OCP L.O.C.K. Power On"
-!endif
-
-!if ($show_precond)
-    note across
-
-'        <b>Notes:</b>
-'        * <font color=red>Need to discuss Warm Reset cases
-'          - <font color=red>NVM subsystem Reset - assume reset of ASIC and ROM code re-executed
-'          - <font color=red>PCIe Warm Reset - Discuss : MPKs maybe ready
-'             Gamil to investigate
-'          - <font color=red>Controller Reset - Discuss
-    end note
-!endif
-
 fuses++ $BUFFER_ACTIVATION
 
 [-[$ASYNC_COLOR]>> crom++ : Power on
@@ -43,11 +24,7 @@ alt if a valid entry
 else No valid entry
     kv $sync kv: hek_exists = False
 end
-!if ($show_done)
-    kv $sync crom-- : hek_exists
-!else
-    kv--
-!endif
+kv $sync crom-- : hek_exists
 
 crom $sync crom : Retain hek_exists
 
@@ -63,11 +40,7 @@ alt kem_algorithm ecdh_secp384r1 supported
     end note
     kv $sync kemg : Put KEM keypair
     kemg++ $BUFFER_ACTIVATION
-    !if ($show_done)
-        kv $sync crom-- : done
-    !else
-        kv--
-    !endif
+    kv $sync crom-- : done
 end
 
 == Load a KV slot with DICE key for each KEM algorithm supported  ==
@@ -84,11 +57,7 @@ crom $sync kv++: new_key(len: 256,\n              Destination: Slot B)
 kv $sync rand: Get new random key of 256 bits
 kv $sync mpks: Put Ready MPK Encryption Key
 mpks++ $BUFFER_ACTIVATION
-!if ($show_done)
-    kv $sync crom-- : done
-!else
-    kv--
-!endif
+kv $sync crom-- : done
 
 $sometimelater()
 

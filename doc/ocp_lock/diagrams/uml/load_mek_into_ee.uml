@@ -6,10 +6,6 @@
 
 !include ocp_lock_utils.inc
 
-!if ($show_title)
-    Title "Load MEK into the key cache of the encryption engine"
-!endif
-
 == Prepare for a new command ==
 
 [$sync sfr : Write Control Reg(DONE == 1b)

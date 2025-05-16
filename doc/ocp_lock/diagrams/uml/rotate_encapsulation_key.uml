@@ -6,66 +6,30 @@
 
 !include ocp_lock_utils.inc
 
-!if ($show_title)
-    Title "Rotate Encapsulation Key"
-!endif
-
-!if ($show_precond)
-    note across
-        <b>Preconditions:</b>
-           * KEM_HANDLE value is a KV slot containing a KEM keypair
-           * KEM Keypair has been loaded into KV at power on or has been rotated by this API
-    end note
-!endif
+note across
+    <b>Preconditions:</b>
+        * KEM_HANDLE value is a KV slot containing a KEM keypair
+        * KEM Keypair has been loaded into KV at power on or has been rotated by this API
+end note
 
 kemg++ $BUFFER_ACTIVATION
 
 fw $async mb++ : ROTATE_ENCAPSULATION_KEY(X)
 
-!if ($show_api)
-    note right mb
-        | <b>Field   | <b>Size | <b>Definition |
-        | chksum     | u32     | Little endian |
-        | kem_handle | u32     | Handle for old KEM keypair held in KMB memory|
-    end note
-!endif
-
 mb $async cfw++ : Command
-
-!if ($show_msg_parsing)
-    cfw $sync mb : Get command
-    mb--
-    $self("cfw", "Determine Command")
-!else
-    mb--
-!endif
+mb--
 
 alt kem_handle (XG has a Key Pair in KV slot G
-
     alt kem_algorithm = ecdh_secp384r1
         cfw $sync kv++: generate_ecdh_secp384r1(Key: Slot G)
         kv $sync rand: Get random bytes for KEM keypair
         kv $sync kemg : New KEM keypair
-        !if ($show_done)
-            kv $sync cfw-- : done
-        !else
-            kv--
-        !endif
+        kv $sync cfw-- : done
     end
 end
 
 cfw $sync mb : Command Response\n kem_handle is set to G
 & mb $async fw++ : Command\nComplete
-
-!if ($show_api)
-    note right mb
-        | <b>Field   | <b>Size | <b>Definition |
-        | chksum     | u32     | Little endian |
-        | fips_status| u32     | Indicates if the command is FIPS approved or an error |
-        | kem_handle | u32     | Handle for new KEM keypair held in KMB memory |
-    end note
-!endif
 cfw--
-
 
 @enduml

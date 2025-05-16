@@ -6,42 +6,18 @@
 
 !include ocp_lock_utils.inc
 
-!if ($show_title)
-    Title "Rewrap MPK"
-!endif
-
-!if ($show_precond)
-    note across
-        <b>Preconditions:</b>
-        * HEK in a firmware-managed KV slot
-    end note
-!endif
+note across
+    <b>Preconditions:</b>
+    * HEK in a firmware-managed KV slot
+end note
 
 hek++ $BUFFER_ACTIVATION
 kemg++ $BUFFER_ACTIVATION
 
-
 fw $async mb++ : REWRAP_MPK
 
-!if ($show_api)
-    note right mb
-        | <b>Field                 | <b>Size                | <b>Definition |
-        | chksum                   | u32                    | Little endian |
-        | wrapped_access_key_1     | WrappedAccessKey       | KEM-wrapped access key\n   * access_key_algorithm\n   * kem_handle (X)\n   * kem_algorithm\n   * kem_ciphertext\n   * encrypted_access_key |
-        | wrapped_enc_access_key_2 | DoubleWrappedAccessKey | KEM-wrapped (access_key_2 encrypted to access_key_1)\n   * double_encrypted_access_key |
-        | old_locked_mpk           | EncryptedMpk           | MPK encrypted to access_key_1 |
-    end note
-!endif
-
 mb $async cfw++ : Command
-
-!if ($show_msg_parsing)
-    cfw $sync mb : Get command
-    mb--
-    $self("cfw", "Determine command")
-!else
-    mb--
-!endif
+mb--
 
 alt HEK exists
 
@@ -51,23 +27,14 @@ alt HEK exists
     kv $sync kv: Decap KEM Ciphertext\nwith Keypair
     kv $sync tempy: Put Shared Secret
     tempy++ $BUFFER_ACTIVATION
-    !if ($show_done)
-        kv $sync cfw-- : done
-    !else
-        kv--
-    !endif
-
+    kv $sync cfw-- : done
 
     cfw $sync kv++: Unwrap(Key : Slot Y\n            Key Data : wrapped_access_key_1,\n            Destination : Slot Z)
     kv $sync tempy: Get Shared Secret
     kv $sync kv: Unwrap\nwrapped_access_key_1
     kv $sync tempz: Put Access Key 1
     tempz++ $BUFFER_ACTIVATION
-    !if ($show_done)
-        kv $sync cfw-- : done
-    !else
-        kv--
-    !endif
+    kv $sync cfw-- : done
 
     == Get Access Key 2 ==
     cfw $sync kv++: Unwrap(Key : Slot Y,\n            Key Data: double_encrypted_access_key,\n            Destination Memory: <font color=red>Put in memory\n                                           <font color=red>as not a key)
@@ -83,22 +50,14 @@ alt HEK exists
 '      <font color=red>key and the access key 1 as associated data.
 '    end note
     tempmem++ $BUFFER_ACTIVATION
-    !if ($show_done)
-        kv $sync cfw-- : done
-    !else
-        kv--
-    !endif
+    kv $sync cfw-- : done
 
     cfw $sync kv++: Unwrap(Key : Slot Z\n            Key Data : Temp Memory,\n            Destination : Slot Y)
     kv $sync tempz: Get Access Key 1
     kv $sync tempmem: Get encrypted_access_key
     kv $sync kv: Unwrap encrypted access key 2
     kv $sync tempy: Put Access Key 2
-    !if ($show_done)
-        kv $sync cfw-- : done
-    !else
-        kv--
-    !endif
+    kv $sync cfw-- : done
 
 
     == Create MPK wrapping/unwrapping Keys ==
@@ -108,33 +67,21 @@ alt HEK exists
     kv $sync kv: HMAC512 slot A and Slot Z
     kv $sync tempw: HMAC512 result Old encryption key for locked MPK
     tempw++ $BUFFER_ACTIVATION
-    !if ($show_done)
-        kv $sync cfw-- : done
-    !else
-        kv--
-    !endif
+    kv $sync cfw-- : done
 
     cfw $sync kv++: HMAC512_Slots(Key : Slot A,\n                         Data Key : Slot Y\n                         Destination : Slot Z)
     kv $sync hek: Get HEK
     kv $sync tempy: Get Access Key 2
     kv $sync kv: HMAC512 slot A and Slot Y
     kv $sync tempz: HMAC512 result New encryption key for locked MPK
-    !if ($show_done)
-        kv $sync cfw-- : done
-    !else
-        kv--
-    !endif
+    kv $sync cfw-- : done
 
     == Get MPK ==
     cfw $sync kv++: Unwrap(Key : Slot W,\n            Key Data: locked_mpk\n            Destination : Slot Y)
     kv $sync tempw: Old encryption key for locked MPK
     kv $sync kv: Unwrap locked_mpk
     kv $sync tempy: MPK
-    !if ($show_done)
-        kv $sync cfw-- : done
-    !else
-        kv--
-    !endif
+    kv $sync cfw-- : done
 
 
     == Create the locked MPK ==
@@ -142,21 +89,13 @@ alt HEK exists
     kv $sync tempz: Get New encryption key for locked MPK
     kv $sync tempy: Get MPK
     kv $sync kv: Wrap slot Y with Slot Z to\ngenerate new_encrypted_mpk
-    !if ($show_done)
-        kv $sync cfw-- : new_encrypted_mpk
-    !else
-        kv--
-    !endif
+    kv $sync cfw-- : new_encrypted_mpk
 
     cfw $sync kv++: Purge_key(Key: Slot W,\n                Key : Slot Y,\n                Key : Slot Z)
     kv $sync tempw !! : Purge
     & kv $sync tempy !!
     & kv $sync tempz !!
-    !if ($show_done)
-        kv $sync cfw-- : done
-    !else
-        kv--
-    !endif
+    kv $sync cfw-- : done
 end
 
 note left tempmem
@@ -168,15 +107,6 @@ end note
 
 cfw $sync mb : Command response\nnew_encrypted_mpk
 & mb $async fw++ : Command\ncomplete
-
-!if ($show_api)
-    note right mb
-        | <b>Field           | <b>Size       | <b>Definition |
-        | chksum             | u32           | Little endian |
-        | fips_status        | u32           | Indicates if the command is FIPS approved or an error |
-        | new_encrypted_mpk  | EncryptedMpk  | MPK encrypted to access_key_2 |
-    end note
-!endif
 cfw--
 
 @enduml

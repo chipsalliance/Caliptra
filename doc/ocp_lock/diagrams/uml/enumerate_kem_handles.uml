@@ -6,38 +6,15 @@
 
 !include ocp_lock_utils.inc
 
-!if ($show_title)
-    Title "Enumerate KEM Handles"
-!endif
-
-!if ($show_precond)
-    note across
-        <b>Preconditions:</b>
-          * Caliptra FW manages which keys are in which slots in KV
-    end note
-!endif
+note across
+    <b>Preconditions:</b>
+        * Caliptra FW manages which keys are in which slots in KV
+end note
 
 fw $async mb++ : ENUMERATE_KEM_HANDLES
 
-!if ($show_api)
-    note over mb
-        | <b>Field | <b>Size | <b>Definition |
-        | chksum   | u32     | Little endian |
-    end note
-!endif
-
 mb $async cfw++ : Message
-
-
-
-!if ($show_msg_parsing)
-    cfw $sync mb : Get message
-    mb--
-    $self("cfw", "Determine message")
-!else
-    mb--
-!endif
-
+mb--
 
 cfw $sync cfw: Create list of valid KEM handles
 note right cfw
@@ -46,21 +23,6 @@ end note
 
 cfw $sync mb : Command response\nkem_handles
 & mb $async fw++ : Command\ncomplete
-
-
-!if ($show_api)
-    note right mb
-        | <b>Field         | <b>Size      | <b>Definition |
-        | chksum           | u32          | Little endian |
-        | fips_status      | u32          | Indicates if the command is FIPS approved or an error |
-        | kem_handle_count | u32          | Number of KEM handles (N) |
-        | kem_handles      | KEMHandle[N] | List of (KEM handle value, KEM algorithm) tuples |
-    end note
-!endif
 cfw--
-
-
-
-
 
 @enduml
