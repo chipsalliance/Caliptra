@@ -1,6 +1,6 @@
 **Caliptra Checklist and Evaluation Methodology**
 
-**Version 0.2**
+**Version 1.0**
 
 # Table of Contents
 - [Introduction](#introduction)

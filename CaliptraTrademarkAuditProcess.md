@@ -2,7 +2,7 @@
 
 **Caliptra Trademark Audit Process**
 
-**Version 0.2**
+**Version 1.0**
 
 **Document history**
 
@@ -10,6 +10,7 @@
 | :---- | :---- | :---- |
 | 0.1 | 2024/09/30 | First draft of the report |
 | 0.2 | 2025/01/21 | Additional Changes after Feedback |
+| 1.0 | 2025/05/15 | Finalized for publishing |
 
 # Table of Contents
 - [Introduction](#introduction)
@@ -122,6 +123,19 @@ For a formal certification scheme there are rules and documents of the scheme th
 
 This section considers some specific questions and suggestions for discussion on how this could be handled.
 
+* TAC handling of SHOULD requirements
+  * Many requirements in [the evaluation
+    checklist](CaliptraChecklistAndEvaluationMethodology.md) are expressed using
+    SHOULD language.
+  * The TAC _expects compliance_ to SHOULD requirements.
+  * **Suggestion**: when encountering an unmet SHOULD requirement, provide a
+    detailed written explanation for the reasons behind the non-conformance.
+  * **Rationale**: most requirements are MUST, but we understand specific vendor
+    flows may run into unique challenges in some areas. Those requirements are
+    downgraded to SHOULD and the Caliptra TAC expects good faith from
+    integrators in meeting these requirements and explaining where it becomes
+    impossible. In general the TAC expects to grant trademark licenses even with
+    unmet SHOULD requirements, but we seek a high burden of proof.
 * Updates and changed versions of device that integrates Caliptra  
   * Updates of the software or hardware of the device that integrates Caliptra that are judged by the manufacturer to **not affect the security** of the Caliptra integration.  
     * **Suggestion**: Updates that are considered for the **same product** do not affect the Caliptra Trademark usage for the device.  

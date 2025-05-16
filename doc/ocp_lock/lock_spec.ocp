@@ -2,7 +2,7 @@
 title: "OCP L.O.C.K."
 version: 0.8.1
 type: BASE
-project: NVMe
+project: NVMe^TM^
 authors: [(See Acknowledgements section)]
 contributor_cla_signers: [Google, Microsoft, Samsung, Kioxia, Solidigm]
 acknowledgements: [
@@ -74,15 +74,15 @@ OCP L.O.C.K. is used to generate and load keys for use of encrypting user data p
 
 ## Impact
 
-OCP L.O.C.K. enables consistency and transparency to a foundational area of security of media encryption keys such that no firmware in the device ever has access to a media encryption key. Furthermore, no decrypted media encryption key exists in the device when power is removed from the device.
+OCP L.O.C.K. enables consistency and transparency to a foundational area of security of media encryption keys such that no drive firmware in the device ever has access to a media encryption key. Furthermore, no decrypted media encryption key exists in the device when power is removed from the device.
 
 ## Scale
 
-OCP L.O.C.K. is a committed intercept for Cloud silicon for Google and Microsoft. This scale covers both a significant portion of the Cloud market in hyperscale and enterprise.
+OCP L.O.C.K. is a committed intercept for storage products for Google and Microsoft. This scale covers both a significant portion of the hyperscale and enterprise markets.
 
 ## Sustainability
 
-The goal of OCP L.O.C.K. is to eliminate the need to destroy storage devices (e.g., SSDs) in the Cloud market by providing a mechanism that increases the confidence that a media encryption key within the device is deleted in a crypto-erase. This enables repurposing the device and or components on the device at end of use or end of life. Given the size of the Cloud market this provides a significant reduction of e-waste.
+The goal of OCP L.O.C.K. is to eliminate the need for cloud service providers (CSPs) to destroy storage devices (e.g., SSDs) by providing a mechanism that increases the confidence that a media encryption key within the device is deleted during cryptographic erase. This enables repurposing the device and or components on the device at end of use or end of life. Given the size of the market serving CSPs, this provides a significant reduction of e-waste.
 
 # Base specification
 
@@ -92,21 +92,21 @@ OCP L.O.C.K. (Layered Open-source Cryptographic Key management) is a feature set
 
 OCP L.O.C.K. was originally created as part of the Open Compute Project (OCP). The major revisions of the OCP L.O.C.K. specifications are published as part of Caliptra at OCP, as OCP L.O.C.K. is an extension to Caliptra. The evolving source code and documentation for Caliptra are in the repository within the CHIPS Alliance Project, a Series of LF Projects, LLC.
 
-OCP L.O.C.K. may be integrated within a variety of self-encrypting storage devices, and is not restricted exclusively to NVMe.
+OCP L.O.C.K. may be integrated within a variety of self-encrypting storage devices, and is not restricted exclusively to NVMe^TM^.
 
 ## Background
 
-In the life of a storage device in a datacenter, the device leaves the supplier, a customer writes user data to the device, and then the device is decommissioned. Customer data is not allowed to leave the data center. The cloud service provider (CSP) needs high confidence that the storage device leaving the datacenter is secure. The current default CSP policy to ensure this level of security is to destroy the drive. Other policies may exist that leverage drive capabilities (e.g., Purge), but are not generally deemed inherently trustworthy by these CSPs [@{self-encrypting-deception}]. This produces significant e-waste and inhibits any re-use/recycling.
+In the life of a storage device in a datacenter, the device leaves the supplier, a customer writes user data to the device, and then the device is decommissioned. Customer data is not allowed to leave the data center. The CSP needs high confidence that the storage device leaving the datacenter is secure. The current default CSP policy to ensure this level of security is to destroy the drive. Other policies may exist that leverage drive capabilities (e.g., cryptographic erase), but are not generally deemed inherently trustworthy by these CSPs [@{self-encrypting-deception}]. This produces significant e-waste and inhibits any re-use/recycling.
 
 Self-encrypting drives (SEDs) store data encrypted at rest to media encryption keys (MEKs). SEDs include the following building blocks:
 
 - The storage media that holds data at rest.
 - An encryption engine which performs line-rate encryption and decryption of data as it enters and exits the drive.
-- A controller which exposes host-side APIs for managing the lifecycle of MEKs.
+- A drive controller which exposes host-side APIs for managing the lifecycle of MEKs.
 
 MEKs may be bound to user credentials, which the host must provide to the drive in order for the associated data to be readable. A given MEK may be bound to one or more credentials. This model is captured in the TCG Opal [@{tcg-opal}] specification.
 
-MEKs may be securely purged, to effectively purge all data which was encrypted to the MEK. To purge an MEK, it is sufficient for the controller to purge all copies of it, or a key with which it was protected.
+MEKs may be erased, to cryptographically erase all data which was encrypted to the MEK. To erase an MEK, it is sufficient for the drive to erase all copies of it, or all copies of a key with which it was protected.
 
 ## Threat model
 
@@ -122,45 +122,45 @@ Adversary capabilities include:
 - Attempting to glitch execution of code running on general-purpose cores.
 - Stealing debug core dumps or UART/serial logs from a device while it is operating in a data center, and later stealing the device.
 - Gaining access to any class secrets, global secrets, or symmetric secrets shared between the device and an external entity.
-- Executing code within a virtual machine on a multi-tenant host offered by the cloud service provider which manages an attached storage device.
+- Executing code within a virtual machine on a multi-tenant host offered by the CSP which manages an attached storage device.
 - Accessing all device design documents, code, and RTL.
 
-Given the above adversary profile, the following are a list of vulnerabilities that OCP L.O.C.K. is designed to mitigate.
+Given this adversary profile, the following are a list of vulnerabilities that OCP L.O.C.K. is designed to mitigate.
 
-- MEKs managed by storage controller firmware are compromised due to implementation bugs or side channels.
-- MEKs purged by storage controller firmware are recoverable via invasive techniques.
+- MEKs managed by storage drive firmware are compromised due to implementation bugs or side channels.
+- MEKs erased by storage drive firmware are recoverable via invasive techniques.
 - MEKs are not fully bound to user credentials due to implementation bugs.
 - MEKs are bound to user credentials which are compromised by a vulnerable host.
-- Cryptographic erasure was not performed properly due to a buggy host.
+- Cryptographic erase was not performed properly due to a buggy host.
 
 ## OCP L.O.C.K. goals
 
-OCP L.O.C.K. is being defined to improve drive security. In an SED that takes Caliptra with OCP L.O.C.K. features enabled, Caliptra will act as a Key Management Block (KMB). The KMB will be the only entity that can read MEKs and program them into the SED's cryptographic engine. The KMB will expose services to controller firmware which will allow the controller to transparently manage each MEK's lifecycle, without being able to access the raw MEK itself.
+OCP L.O.C.K. is being defined to improve drive security. In an SED that takes Caliptra with OCP L.O.C.K. features enabled, Caliptra will act as a Key Management Block (KMB). The KMB will be the only entity that can read MEKs and program them into the SED's encryption engine. The KMB will expose services to drive firmware which will allow the drive to transparently manage each MEK's lifecycle, without being able to access the raw MEK itself.
 
 The OCP L.O.C.K. KMB satisfies the following properties:
 
-- Prevents leakage of media keys via firmware vulnerabilities or side channels, by isolating MEKs to a trusted hardware block.
+- Prevents leakage of media keys via firmware vulnerabilities or side channels, by isolating MEKs to a trusted component.
 - Binds MEKs to a given set of externally-supplied access keys, provisioned with replay-resistant transport security such that they can be injected without trusting the host.
-- Uses epoch keys for attestable epoch-based cryptographic purge.
+- Uses epoch keys for attestable epoch-based cryptographic erase.
 - Is able to be used in conjunction with the Opal or Key Per I/O [@{tcg-kpio}] storage device specifications.
+
+Note that Opal in the context of this document includes the Opal Family of SSCs: Opal SSC, Opalite SSC, Ruby SSC. Pyrite is excluded as Pyrite SSDs are non-SED.
 
 ### Non-goals
 
 The following areas are out of scope for this project.
 
-- Compliance with IEEE 1619 2025 requirements around key scope, i.e. restricting a given MEK to only encrypt a maximum of 2<sup>44</sup> 128-bit blocks. Controller firmware will be responsible for enforcing this.
-- Compliance with Common Criteria requirement FCS_CKM.1.1(c) [@{cpp-fde}] when supporting derived MEKs. Key Per I/O calls for DEKs to be injected into the device. To support OCP L.O.C.K.'s goals around enabling cryptographic purge, before the injected DEK is used to encrypt user data, it is first conditioned with an on-device secret that can be securely zeroized. FCS_CKM.1.1(c) currently does not allow injected keys to be thus conditioned and therefore does not allow for cryptographic purge under the Key Per I/O model. A storage device that integates OCP L.O.C.K. and aims to be compliant with this Common Criteria requirement may not support Key Per I/O.
-- Authorization for EPK/DPK/MPK rotation, or binding a given MEK to a particular locking range. The controller firmware is responsible for these.
+- Compliance with IEEE 1619^TM^-2025 requirements around key scope, i.e. restricting a given MEK to only encrypt a maximum of 2^44^ 128-bit blocks. Drive firmware will be responsible for enforcing this.
+- Compliance with Common Criteria requirement FCS_CKM.1.1(c) [@{cpp-fde}] when supporting derived MEKs. Key Per I/O calls for DEKs to be injected into the device. To support OCP L.O.C.K.'s goals around enabling cryptographic erase, before the injected DEK is used to encrypt user data, the DEK is first conditioned with an on-device secret that can be securely zeroized. FCS_CKM.1.1(c) currently does not allow injected keys to be thus conditioned and therefore does not allow for cryptographic erase under the Key Per I/O model. A storage device that integates OCP L.O.C.K. and aims to be compliant with this Common Criteria requirement may not support Key Per I/O.
+- Authorization for EPK/DPK/MPK rotation, or binding a given MEK to a particular locking range. The drive firmware is responsible for these.
 
 ### Integration verification
 
-A product which integrates OCP L.O.C.K. will be expected to undergo an OCP S.A.F.E. review, to ensure that the controller firmware correctly invokes OCP L.O.C.K. services.
+A product which integrates OCP L.O.C.K. will be expected to undergo an OCP S.A.F.E. review, to ensure that the drive firmware correctly invokes OCP L.O.C.K. services.
 
 ---
 
 ## Architecture
-
-The following figure shows the basic high-level blocks of OCP L.O.C.K.
 
 ![OCP L.O.C.K. high level blocks](./diagrams/architecture_diagram.drawio.svg){#fig:architecture-diagram}
 
@@ -174,18 +174,18 @@ To safeguard user data stored on the drive, KMB defines a set of "protection key
   - Binding an MEK to zero MPKs allows for legacy Opal or Key Per I/O support.
 
 - A composite **epoch protection key (EPK)**, which is a concatenation of two "component epoch keys" held within the device: the **Soft Epoch Key (SEK)** and the **Hard Epoch Key (HEK)**. The EPK is managed by the storage device itself, and all MEKs in use by the device are bound to it.
-  - All MEKs in use by the drive can be purged by zeroizing either the SEK or HEK. New MEKs shall not be loadable until the zeroized epoch keys are regenerated.
-  - KMB reports the zeroization state of the SEK and HEK, and therefore whether the drive is in a purged state.
-  - The SEK is managed by controller firmware and shall be held in rewritable storage, e.g. in flash memory.
+  - All MEKs in use by the drive can be cryptographically erased by zeroizing either the SEK or HEK. New MEKs shall not be loadable until the zeroized epoch keys are regenerated.
+  - KMB reports the zeroization state of the SEK and HEK, and therefore whether the drive is in a cryptographically erased state.
+  - The SEK is managed by drive firmware and shall be held in rewritable storage, e.g. in flash memory.
   - The HEK is managed by KMB and shall be held in fuses. This provides assurance that an advanced adversary is unable to recover key material that had been in use by the drive prior to the HEK zeroization.
 
 The EPK, DPK, and set of configured MPKs are used together to derive an MEK secret, which protects a given MEK. The MEK protection is implemented as one of two methods:
 
-- **MEK encryption** - the controller obtains a random MEK from KMB, encrypted by the MEK secret, and is allowed to load that encrypted MEK into the encryption engine via KMB. This supports Opal use-cases.
+- **MEK encryption** - the drive obtains a random MEK from KMB, encrypted by the MEK secret, and is allowed to load that encrypted MEK into the encryption engine via KMB. This supports Opal use-cases.
 
-- **MEK derivation** - the controller instructs KMB to derive an MEK from the MEK secret and load the MEK into the encryption engine. This may support either Opal or Key Per I/O use-cases.
+- **MEK derivation** - the drive instructs KMB to derive an MEK from the MEK secret and load the MEK into the encryption engine. This may support either Opal or Key Per I/O use-cases.
 
-MEKs are never visible to controller firmware. Controller firmware instructs KMB to load MEKs into the key cache of the encryption engine, using standard interfaces described in @sec:interfaces. Each MEK has associated vendor-defined metadata, e.g. to identify the namespace and LBA range to be encrypted by the MEK.
+MEKs are never visible to drive firmware. Drive firmware instructs KMB to load MEKs into the key cache of the encryption engine, using standard interfaces described in @sec:interfaces. Each MEK has associated vendor-defined metadata, e.g. to identify the namespace and LBA range to be encrypted by the MEK.
 
 KMB shall not cache MEKs in memory. The encryption engine shall remove all MEKs from the encryption engine on a power cycle or during zeroization of the storage device.
 
@@ -205,23 +205,24 @@ Rotation of the HEK and SEK, management of MPKs and MPK access keys, and injecti
 
 MPKs are the mechanism by which KMB enforces multi-party authorization as a precondition to loading an MEK. MPKs exist in one of two states: locked or ready. In both these states the MPK is encrypted to a key known only to KMB.
 
-- A locked MPK's encryption key is derived from the HEK as well as an externally-supplied access key. The locked MPK is held at rest by controller firmware.
-- A ready MPK's encryption key (the Ready MPK Encryption Key) is a volatile key held within KMB which is lazily generated. Ready MPKs are held in controller firmware memory. Lazy generation allows injected host entropy to contribute to the key's generation.
+- A locked MPK's encryption key is derived from the HEK as well as an externally-supplied access key to which the MPK is bound. The locked MPK is held at rest by drive firmware.
+- The Ready MPK Encryption Key is a volatile key held within KMB which is lazily generated and is lost when the drive shuts down. Lazy generation allows injected host entropy to contribute to the key's generation. Ready MPKs are held in drive firmware memory.
 
 The externally-supplied access key is encrypted in transit using an HPKE public key held by KMB. The "ready" state allows the HPKE keypair to be rotated after the access key has been provisioned to the storage device, without removing the ability for KMB to decrypt the MPK when later loading an MEK bound to that MPK.
 
-For each MPK to which a given MEK is bound, the host is expected to invoke a command to supply the MPK's encrypted access key. Upon receipt the controller firmware passes that encrypted access key to KMB, along with the locked MPK, to produce the ready MPK which is cached in controller memory. This is done prior to the controller firmware actually loading the MEK, and is performed once for each MPK to which a given MEK is bound.
+For each MPK to which a given MEK is bound, the host is expected to invoke a command to supply the MPK's encrypted access key. Upon receipt the drive firmware passes that encrypted access key to KMB, along with the locked MPK, to produce the ready MPK which is cached in drive memory. This is done prior to the drive firmware actually loading the MEK, and is performed once for each MPK to which a given MEK is bound.
 
 #### Transport encryption for MPK access keys
 
-KMB maintains a set of HPKE keypairs, one per HPKE algorithm that KMB supports. Each HPKE public key is endorsed with a certificate that is generated by KMB and signed by Caliptra's DICE identity. HPKE keypairs are randomly generated on KMB startup, and mapped to unique handles. Keypairs may be periodically rotated and are lost when the drive resets. Controller firmware is responsible for enumerating the available HPKE public keys and exposing them to the user via a host interface.
+KMB maintains a set of HPKE keypairs, one per HPKE algorithm that KMB supports. Each HPKE public key is endorsed with a certificate that is generated by KMB and signed by Caliptra's DICE [@{tcg-dice}] identity. HPKE keypairs are randomly generated on KMB startup, and mapped to unique handles. Keypairs may be periodically rotated and are lost when the drive resets. Drive firmware is responsible for enumerating the available HPKE public keys and exposing them to the user via a host interface.
 
-When a user wishes to generate or ready a MPK (which is required prior to loading any MEKs bound to that MPK), the user performs the following steps:
+When a user wishes to generate or ready an MPK (which is required prior to loading any MEKs bound to that MPK), the user performs the following steps:
 
 1. Select the HPKE public key and obtain its certificate from the storage device.
 2. Validate the HPKE certificate and attached DICE certificate chain.
-3. Encrypt their access key to the HPKE public key.
-4. Transmit the encrypted access key to the storage device.
+3. Decode the HPKE capabilities of the storage device based on the HPKE certificate.
+4. Seal their access key using the HPKE public key.
+5. Transmit the sealed access key to the storage device.
 
 Upon receipt, KMB will unwrap the access key and proceed to generate or ready the MPK.
 
@@ -242,7 +243,7 @@ The following two diagrams illustrate the detailed cryptographic operations invo
 
 ##### MPK access key unwrap (Hybrid ML-KEM + ECDH)
 
-The only difference here from the above flow is how the HPKE Shared Secret is derived. Operations which produce an AES key and IV from that shared secret are identical to the prior flow, and are omitted here for brevity.
+The only difference here from the flow depicted in @fig:access-key-ecdh-unwrap is how the HPKE Shared Secret is derived. Operations which produce an AES key and IV from that shared secret are identical to the prior flow, and are omitted here for brevity.
 
 ![MPK access key unwrap with hybrid ML-KEM + ECDH](./diagrams/mpk_access_key_hybrid_unwrap.drawio.svg){#fig:access-key-hybrid-unwrap}
 
@@ -252,15 +253,15 @@ MPKs can be generated, made ready, and have their access keys rotated.
 
 ##### MPK generation
 
-Controller firmware may request that KMB generate a MPK, bound to a given access key. KMB performs the following steps:
+Drive firmware may request that KMB generate an MPK, bound to a given access key. KMB performs the following steps:
 
 1. Unwrap the given MPK access key using the HPKE keypair held within KMB.
-2. Randomly generate a MPK.
-3. Derive a MPK encryption key from the HEK and the decrypted access key.
+2. Randomly generate an MPK.
+3. Derive an MPK encryption key from the HEK and the decrypted access key.
 4. Encrypt the MPK to the MPK encryption key.
-5. Return the encrypted MPK to the controller firmware.
+5. Return the encrypted MPK to the drive firmware.
 
-Controller firmware may then store the encrypted MPK in persistent storage.
+Drive firmware may then store the encrypted MPK in persistent storage.
 
 To mitigate against cryptographic attacks on the HPKE keypair that rely on repeated invocations of this command, this command is rate-limited.
 
@@ -268,17 +269,17 @@ To mitigate against cryptographic attacks on the HPKE keypair that rely on repea
 
 ##### MPK readying
 
-Encrypted MPKs stored at rest in persistent storage are considered "locked", and must be made ready before they can be used to load an MEK. Ready MPKs are also encrypted when handled by controller firmware, to the Ready MPK Encryption Key. Ready MPKs do not survive across device reset.
+Encrypted MPKs stored at rest in persistent storage are considered "locked", and must be made ready before they can be used to load an MEK. Ready MPKs are also encrypted when handled by drive firmware, to the Ready MPK Encryption Key. Ready MPKs do not survive across device reset.
 
-To ready a MPK, KMB performs the following steps:
+To ready an MPK, KMB performs the following steps:
 
 1. Unwrap the given MPK access key using the HPKE keypair held within KMB.
 2. Derive the MPK encryption key from the HEK and the decrypted access key.
 3. Decrypt the MPK using the MPK encryption key.
 4. Encrypt the MPK using the Ready MPK Encryption Key.
-5. Return the re-encrypted "ready" MPK to the controller firmware.
+5. Return the re-encrypted "ready" MPK to the drive firmware.
 
-Controller firmware may then stash the encrypted ready MPK in volatile storage, and later provide it to the KMB when loading an MEK, as described in @sec:meks.
+Drive firmware may then stash the encrypted ready MPK in volatile storage, and later provide it to the KMB when loading an MEK, as described in @sec:meks.
 
 To mitigate against cryptographic attacks on the HPKE keypair that rely on repeated invocations of this command, this command is rate-limited.
 
@@ -286,7 +287,7 @@ To mitigate against cryptographic attacks on the HPKE keypair that rely on repea
 
 ##### MPK access key rotation
 
-The access key to which a MPK is bound may be rotated. The user must prove that they have knowledge of both the old and new access key before a rotation is allowed. This is accomplished using a slight variation on the usual access key import flow. When a new access key is provided to KMB during a rotation, the new access key is double-encrypted: first to the old access key, and then to the HPKE public key. KMB performs the following steps:
+The access key to which an MPK is bound may be rotated. The user must prove that they have knowledge of both the old and new access key before a rotation is allowed. This is accomplished using a slight variation on the usual access key import flow. When a new access key is provided to KMB during a rotation, the new access key is double-encrypted: first to the old access key, and then to the HPKE public key. KMB performs the following steps:
 
 1. Unwrap the given old access key and encrypted new access key using the HPKE keypair held within KMB.
 2. Decrypt the new access key using the old access key.
@@ -294,9 +295,9 @@ The access key to which a MPK is bound may be rotated. The user must prove that 
 4. Derive the new MPK encryption key from the HEK and the decrypted new access key.
 5. Decrypt the MPK using the old MPK encryption key.
 6. Encrypt the MPK using the new MPK encryption key.
-7. Return the re-encrypted MPK to the controller firmware.
+7. Return the re-encrypted MPK to the drive firmware.
 
-Controller firmware then zeroizes the old encrypted MPK and stores the new encrypted MPK in persistent storage.
+Drive firmware then zeroizes the old encrypted MPK and stores the new encrypted MPK in persistent storage.
 
 To mitigate against cryptographic attacks on the HPKE keypair that rely on repeated invocations of this command, this command is rate-limited.
 
@@ -304,27 +305,29 @@ To mitigate against cryptographic attacks on the HPKE keypair that rely on repea
 
 ### DPKs
 
-Controller firmware provides the DPK (Data Protection Key) to KMB when generating, loading, or deriving an MEK. The DPK is used in a KDF, along with the HEK, SEK, and MPKs, to derive the MEK secret, as illustrated in @sec:mek-secret-derivation.
+Drive firmware provides the DPK (Data Protection Key) to KMB when generating, loading, or deriving an MEK. The DPK is used in a KDF, along with the HEK, SEK, and MPKs, to derive the MEK secret, as illustrated in @sec:mek-secret-derivation.
 
 #### Use when generating or loading an MEK
 
-In this flow, the DPK may be encrypted by a user's Opal C_PIN. Legacy controller firmware logic which decrypts MEKs can be repurposed to produce the DPK.
+In this flow, the DPK may be encrypted by a user's Opal C_PIN. Drive firmware logic which decrypts MEKs can be repurposed to produce the DPK.
 
-![Example controller flow to decrypt a DPK based on a host-provided Opal C_PIN](./diagrams/dpk_decryption.drawio.svg){#fig:dpk-decryption}
+![Example drive flow to decrypt a DPK based on a host-provided Opal C_PIN](./diagrams/dpk_decryption.drawio.svg){#fig:dpk-decryption}
 
 #### Use when deriving an MEK
 
 In this flow, the DPK may be the imported key associated with a Key Per I/O key tag.
 
-![Example controller flow to accept an injected DPK](./diagrams/dpk_injection.drawio.svg){#fig:dpk-injection}
+![Example drive flow to accept an injected DPK](./diagrams/dpk_injection.drawio.svg){#fig:dpk-injection}
 
 ### MEKs {#sec:meks}
 
 KMB can encrypt randomly-generated MEKs, or compute derived MEKs.
 
-#### Encrypting and decrypting a randomly-generated MEK
+#### Generating and loading a random MEK
 
-![MEK encryption and decryption](./diagrams/mek_encryption.drawio.svg){#fig:mek-encryption}
+![MEK generation](./diagrams/mek_generation.drawio.svg){#fig:mek-generation}
+
+![MEK loading](./diagrams/mek_loading.drawio.svg){#fig:mek-loading}
 
 #### Deriving an MEK
 
@@ -336,33 +339,37 @@ This diagram provides additional details on how the EPK, DPK, and MPKs are mixed
 
 ![MEK secret derivation](./diagrams/mek_secret_derivation.drawio.svg){#fig:mek-secret-derivation}
 
+Note: it is the drive firmware's responsibility to ensure that MPKs are mixed in the correct order for a given MEK.
+
 ### HEKs and SEKs
 
 KMB supports a pair of epoch keys: the HEK and SEK. Both must be available, i.e. non-zeroized, in order for MEKs to be loaded.
 
 - The **HEK** is derived from secrets held in Caliptra's fuse block, and is never visible outside of Caliptra. If the HEK is zeroized, KMB does not allow MEKs to be loaded.
-- The **SEK** is managed by controller firmware, and may be stored in flash. If the SEK is zeroized, controller firmware is responsible for enforcing that MEKs are not loaded.
+- The **SEK** is managed by drive firmware, and may be stored in flash. If the SEK is zeroized, drive firmware is responsible for enforcing that MEKs are not loaded.
 
-Zeroizing either the HEK or SEK is equivalent to performing a cryptographic purge. HEK zeroization is effectively a "hard" purge, as it is highly difficult to recover secrets from a zeroized fuse bank.
+Zeroizing either the HEK or SEK is equivalent to performing a cryptographic erase. HEK zeroization is effectively a "hard" cryptographic erase, as it is highly difficult to recover secrets from a zeroized fuse bank.
 
-The HEK is derived from a series of N 256-bit ratchet secrets present in a fuse bank, dubbed R<sub>0</sub>..R<sub>N-1</sub>, where N is between 4 and 16 inclusive. The vendor is responsible for determining the number of ratchet secrets available in fuses. These ratchet secrets have the following properties:
+The HEK is derived from a series of N 256-bit ratchet secrets present in a fuse bank, dubbed R\textsubscript{0}..R\textsubscript{N-1}, where N is between 4 and 16 inclusive. The vendor is responsible for determining the number of ratchet secrets available in fuses. These ratchet secrets have the following properties:
 
-- Can individually transition from all-zeroes → randomized → all-ones. R<sub>X</sub> is only randomized once R<sub>X-1</sub> has transitioned to all-ones.
+- Can individually transition from all-zeroes → randomized → all-ones. R\textsubscript{X} is only randomized once R\textsubscript{X-1} has transitioned to all-ones.
 - Programmable via the Caliptra fuse controller.
 - Only readable by Caliptra Core, via fuse registers.
   - Internally, the fuse registers will be treated like the DICE UDS, in that their contents can only be deposited into Key Vault slots, without direct visibility by Caliptra firmware.
 
-Caliptra features a [Stable Identity](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/rom/dev/README.md#derivation-of-the-key-ladder-for-stable-identity) Key (SIK), which is a non-ratchetable secret derived from the DICE UDS, the current value of the field entropy fuse bank, as well as the current lifecycle and debug states. The SIK can be used to protect long-lived data. Caliptra's Stable Identity feature is implemented in terms of a key ladder, with different keys for different firmware SVNs, with the property that firmware whose SVN is X can only obtain Stable Identity keys bound to major versions less than or equal to X. The SIK used by KMB is the key ladder secret bound to SVN 0, ensuring that firmware of any SVN can wield it.
+Caliptra features a [Stable Identity](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/rom/dev/README.md#derivation-of-the-key-ladder-for-stable-identity) Key (SIK), which is a non-ratchetable secret derived from the DICE UDS, the current value of the field entropy fuse bank, as well as the current lifecycle and debug states. The SIK can be used to protect long-lived data. Caliptra's Stable Identity feature is implemented in terms of a key ladder, with different keys for different Caliptra firmware Security Version Numbers (SVNs), with the property that Caliptra firmware whose SVN is X can only obtain Stable Identity keys bound to SVNs less than or equal to X. The SIK used by KMB is the key ladder secret bound to SVN 0, ensuring that Caliptra firmware of any SVN can wield it.
 
-The HEK is derived from the SIK, along with the currently-active ratchet secret. In normal cases, if the currently-active ratchet secret is unprogrammed or zeroized, the HEK is disabled and no MEKs are allowed to be loaded. KMB exposes a command that allows the owner to permanently opt into an operating mode where the HEK is derived solely from the SIK. In this mode, data written to the storage device can no longer be purged via HEK zeroization.
+The HEK is derived from the SIK, along with the currently-active ratchet secret. In normal cases, if the currently-active ratchet secret is unprogrammed or zeroized, the HEK is disabled and no MEKs are allowed to be loaded. KMB exposes a command that allows the owner to permanently opt into an operating mode where the HEK is derived solely from the SIK. In this mode, data written to the storage device can no longer be cryptographically erased via HEK zeroization.
 
-To satisfy FIPS 140 zeroization requirements once the HEK can no longer be zeroized, the FIPS boundary will need to include SEK zeroization functionality in the storage controller firmware.
+To satisfy FIPS 140-3 zeroization requirements once the HEK can no longer be zeroized, the FIPS boundary will need to include SEK zeroization functionality in the storage drive firmware.
 
 ![HEK derivation](./diagrams/hek_derivation.drawio.svg){#fig:hek-derivation}
 
 #### HEK lifecycle
 
-A device out of manufacturing is required to have programmed the first HEK. KMB exposes the following commands to manage the HEK lifecycle:
+@tbl:hek-lifecycle-commands describes the commands that KMB exposes to manage the HEK lifecycle.
+
+Table: HEK lifecycle management commands {#tbl:hek-lifecycle-commands}
 
 +----------------------+----------------------------------------+
 | Command              | Description                            |
@@ -388,11 +395,13 @@ A device out of manufacturing is required to have programmed the first HEK. KMB 
 
 If an error causes the active fuse bank to be left in an invalid state, MEKs may not be loaded. If this state persists, the device is unusable.
 
+A device out of manufacturing is required to have a HEK programmed.
+
 ![HEK & SEK state machine with four ratchet slots](./diagrams/hek_sek_rotation.drawio.svg){#fig:hek-sek-rotation}
 
 #### SEK lifecycle
 
-Controller firmware is responsible for enforcing that SEK programming and zeroization follows the state machine above. Specifically:
+Drive firmware is responsible for enforcing that SEK programming and zeroization follows the state machine illustrated in @fig:hek-sek-rotation. Specifically:
 
 - The SEK may only be programmed once the HEK is available.
 - The HEK may only be zeroized once the SEK is zeroized.
@@ -403,12 +412,14 @@ KMB generates multiple kinds of random keys. It does so using randomness obtaine
 
 ![DRBG usage](./diagrams/drbg_diagram.drawio.svg){#fig:drbg-usage}
 
+Note that Caliptra hardware only supports the [DRBG_Update]{.btick} operation when Caliptra is instantiated with an internal TRNG [@{caliptra-2.0-hw-spec}].
+
 ### Boot-time initialization
 
-At initial boot, KMB firmware performs the following steps:
+At initial boot, Caliptra firmware performs the following steps:
 
-- Determines whether an HEK is available, based on the fuse configuration. If an HEK is unavailable, KMB enters a mode where MEKs are not allowed to be loaded.
-- Initializes random HPKE keypairs for each supported algorithm, and maps them to unique handles.
+- Determines whether a HEK is available, based on the fuse configuration. If a HEK is unavailable, KMB enters a mode where MEKs are not allowed to be loaded.
+- Initializes random HPKE keypairs for each supported algorithm, and assigns handles to them, reported via [ENUMERATE_KEM_HANDLES](#sec:enumerate-kem-handles).
 
 ---
 
@@ -417,17 +428,17 @@ At initial boot, KMB firmware performs the following steps:
 OCP L.O.C.K. defines two interfaces:
 
 - The **encryption engine interface** is exposed from the vendor-implemented encryption engine to KMB, and defines a standard mechanism for programming MEKs and control messages.
-- The **mailbox interface** is exposed from KMB to storage controller firmware, and enables the controller to manage MEKs and associated keys.
+- The **mailbox interface** is exposed from KMB to storage drive firmware, and enables the drive to manage MEKs and associated keys.
 
 ### KMB → encryption engine interface
 
-This section defines the interface between the Key Management Block (KMB) and an encryption engine. An encryption engine is used to encrypt/decrypt user data and its design and implementation are vendor specific. MEKs are generated or derived within KMB and used by the encryption engine to encrypt and decrypt user data. This interface is used to load MEKs from KMB to the encryption engine or to cause the encryption engine to unload (i.e., remove) loaded MEKs. The MEKs transferred between the KMB and the encryption engine shall not be accessible by the controller firmware.
+This section defines the interface between KMB and an encryption engine. An encryption engine is used to encrypt/decrypt user data. Its design and implementation are vendor specific. MEKs are generated or derived within KMB and used by the encryption engine to encrypt and decrypt user data. The interface defined in this section is used to load MEKs from KMB to the encryption engine or to cause the encryption engine to unload (i.e., remove) loaded MEKs. The MEKs transferred between KMB and the encryption engine shall not be accessible by the drive firmware.
 
 #### Overview
 
 The encryption engine uses a stored MEK to encrypt and decrypt user data. For the purposes of this specification, the entity within the encryption engine used to store the MEKs is called the key cache. Each encryption and decryption of user data is coupled to a specific MEK which is stored in the key cache bound to a unique identifier, called metadata. Each (metadata, MEK) pair is also associated with additional information, called aux, which is used neither as MEK nor an identifier, but has some additional information about the pair. Therefore, the key cache as an entity which stores (metadata, aux, MEK) tuples.
 
-To ensure that MEKs are only ever visible to KMB and the encryption engine, KMB is the only entity which can load and unload (metadata, aux, MEK) tuples. Controller firmware arbitrates all operations in the KMB to encryption engine interface, and is therefore responsible for managing which MEK is loaded in the key cache. Controller firmware has full control on metadata and optional aux. @fig:encryption-engine is an illustration of the KMB → encryption engine interface which shows:
+To ensure that MEKs are only ever visible to KMB and the encryption engine, KMB is the only entity which can load and unload (metadata, aux, MEK) tuples. Drive firmware arbitrates all operations in the KMB to encryption engine interface, and is therefore responsible for managing which MEK is loaded in the key cache. Drive firmware has full control on metadata and optional aux. @fig:encryption-engine is an illustration of the KMB → encryption engine interface which shows:
 
 - The tuple for loading an MEK.
 - The metadata for unloading an MEK.
@@ -482,9 +493,8 @@ Table: Offset SFR_Base + 0h: CTRL – Control {#tbl:ee-ctrl-sfr}
 |       |      |       | detected an error during the execution the command        |
 |       |      |       | specified by the CMD field. See @tbl:ee-ctrl-err-codes.   |
 |       |      |       |                                                           |
-|       |      |       | \smallskip                                                |
 |       |      |       | Encryption engine error codes are surfaced back to        |
-|       |      |       | controller firmware. If the DONE bit is set to 1b         |
+|       |      |       | drive firmware. If the DONE bit is set to 1b              |
 |       |      |       | by the encryption engine and this field is set to         |
 |       |      |       | 0h, then the encryption engine is indicating a            |
 |       |      |       | successful execution of a command specified by the        |
@@ -505,14 +515,14 @@ Table: Offset SFR_Base + 0h: CTRL – Control {#tbl:ee-ctrl-sfr}
 |       |      |       | to 1b, then the encryption engine has completed executing |
 |       |      |       | the command specified by the CMD field and the ERR        |
 |       |      |       | field indicates the status of the execution of that       |
-|       |      |       | command. A write of the value 1b to this bit shall        |
+|       |      |       | command. A write by KMB of the value 1b to this bit shall |
 |       |      |       | cause the encryption engine to:                           |
 |       |      |       |                                                           |
 |       |      |       | - set this bit to 0b;                                     |
 |       |      |       | - set the EXE bit to 0b; and                              |
 |       |      |       | - set the ERR field to 0000b.                             |
 +-------+------+-------+-----------------------------------------------------------+
-| 0     | RW   | 0b    | **Execute (EXE):** A write of the value 1b to this        |
+| 0     | RW   | 0b    | **Execute (EXE):** A write by KMB of the value 1b to this |
 |       |      |       | bit specifies that the encryption engine is to            |
 |       |      |       | execute the command specified by the CMD field.           |
 |       |      |       | If the DONE bit is set to 1 by KMB, then the bit          |
@@ -597,7 +607,7 @@ Table: Offset SFR_Base + 10h: METD – Metadata {#tbl:ee-metd-sfr}
 
 The KMB and the encryption engine must be the only components which have access to MEKs. Each MEK is associated with a unique identifier, which may be visible to other components, in order for the MEK to be used for any key-related operations including data I/O. The **METD** field is used as such an identifier.
 
-Instead of generating a random and unique identifier within the KMB while loading an MEK, the KMB takes an **METD** value as input from the controller firmware and write to the **METD** register without any modification for the sake of the following reasons:
+Instead of generating a random and unique identifier within the KMB while loading an MEK, the KMB takes an **METD** value as input from the drive firmware and write to the **METD** register without any modification for the sake of the following reasons:
 
 1. A vendor does not need to implement an additional algorithm to map between identifiers in its own system and in the KMB
 2. A vendor-unique key-retrieval algorithm can easily be leveraged into a **METD**-generation algorithm
@@ -629,13 +639,13 @@ Table: Offset SFR_Base + 20h: AUX – Auxiliary Data {#tbl:ee-aux-sfr}
 
 The **AUX** field supports vendor-specific features on MEKs. The KMB itself only supports fundamental functionalities in order to minimize attack surfaces on MEKs. Moreover, vendors are free to design and implement their own MEK-related functionality within the encryption engine, as long as that functionality cannot be used to exfiltrate MEKs. In order to support these functionalities, some data may be associated and stored with an MEK, and the **AUX** field facilitates this association.
 
-When the controller firmware instructs the KMB to load an MEK, the controller firmware is expected to provide an **AUX** value. Similar to the **METD** field, the KMB will write the **AUX** value into the Auxiliary Data register without any modification.
+When the drive firmware instructs the KMB to load an MEK, the drive firmware is expected to provide an **AUX** value. Similar to the **METD** field, the KMB will write the **AUX** value into the Auxiliary Data register without any modification.
 
 One simple use case of the **AUX** field is to store an offset of initialization vector or nonce. It can also be used in a more complicated use case. Here is an example. Suppose that there exists a vendor who wants to design a system which supports several modes of operation through the encryption engine while using the KMB. Then, a structure of **AUX** value as on @fig:aux-register-format-example can be used.
 
 ![Auxiliary data format example](./diagrams/aux_register_iv_nonce.drawio.svg){#fig:aux-register-format-example}
 
-When the controller firmware instructs KMB to load an MEK, the controller firmware can use the **AUX** value to specify which mode of operation should be used and which value should be used as an initialization vector or a nonce with the generated MEK.
+When the drive firmware instructs KMB to load an MEK, the drive firmware can use the **AUX** value to specify which mode of operation should be used and which value should be used as an initialization vector or a nonce with the generated MEK.
 
 ##### Media Encryption Key register
 
@@ -648,33 +658,35 @@ Table: Offset SFR_Base + 40h: MEK – Media Encryption Key {#tbl:ee-mek-sfr}
 |       |      |       | encryption key.                                          |
 +-------+------+-------+----------------------------------------------------------+
 
-The encryption engine is free to interpret the provided key in a vendor-defined manner. One sample interpretation for AES-XTS-512 is presented in @fig:mek-format-example-for-aes.
+The encryption engine is free to interpret the provided key in a vendor-defined manner. One sample interpretation for AES-XTS-256 is presented in @fig:mek-format-example-for-aes.
 
-![MEK format example for AES-XTS-512](./diagrams/mek_register_aes_xts_512.drawio.svg){#fig:mek-format-example-for-aes}
+![MEK format example for AES-XTS-256](./diagrams/mek_register_aes_xts_256.drawio.svg){#fig:mek-format-example-for-aes}
 
 If an algorithm used by the encryption engine does not require 512 bits of key material, the encryption engine is free to disregard unused bits.
 
-Within KMB, loaded MEKs are only ever present in the Key Vault, so that they can be protected against any firmware-level attacks. KMB will write MEKs into the encryption engine's key cache using the DMA engine. Given an index and a destination identifier, the DMA engine will copy the key value stored in the given key vault slot to the destination address to which the DMA engine translates the destination identifier.
+Within KMB, loaded MEKs are only ever present in the Key Vault, so that they can be protected against firmware-level attacks. KMB will write MEKs into the encryption engine's key cache using the DMA engine. Given an index and a destination identifier, the DMA engine will copy the key value stored in the given key vault slot to the destination address to which the DMA engine translates the destination identifier.
 
 #### AES-XTS key validation requirements
 
-FIPS 140-3 IG section C.I [@{fips-140-3-ig}] states that in AES-XTS, the key is "parsed as the concatenation of two AES keys, denoted by *Key_1* and *Key_2*, that are 128 [or 256] bits long... The module **shall** check explicitly that *Key_1* ≠ *Key_2*, regardless of how *Key_1* and *Key_2* are obtained."
+FIPS 140-3 IG [@{fips-140-3-ig}] section C.I states that in AES-XTS, the key is "parsed as the concatenation of two AES keys, denoted by *Key_1* and *Key_2*, that are 128 [or 256] bits long... The module **shall** check explicitly that *Key_1* ≠ *Key_2*, regardless of how *Key_1* and *Key_2* are obtained."
 
-The encryption engine will be responsible for performing this check when in AES-XTS mode.
+The encryption engine will be responsible for performing this check when in AES-XTS mode. If the check fails, the encryption engine must report a vendor-defined error. This document does not specify how drive firmware should handle this error case.
 
 #### KMB command sequence
 
-@fig:cmd-ee-example-uml shows a sample command execution. This is an expected sequence when the controller firmware instructs the KMB to load an MEK. The internal behavior of the encryption engine is one of several possible mechanisms, and can be different per vendor.
+@fig:cmd-ee-example-uml shows a sample command execution. This is an expected sequence when the drive firmware instructs the KMB to load an MEK. The internal behavior of the encryption engine is one of several possible mechanisms, and can be different per vendor.
 
 ```plantuml {caption="Command execution example for loading an MEK" #fig:cmd-ee-example-uml}
 !include diagrams/uml/cmd_ee_example.uml
 ```
 
-### Controller → KMB interface
+### Drive → KMB interface
 
 This section provides the mailbox commands exposed by Caliptra as part of OCP L.O.C.K.
 
-Each of these commands returns a `fips_status` field. This provides an indicator of whether KMB is operating in FIPS mode. The values for this field are as follows:
+Each of these commands returns a [fips_status]{.btick} field. This provides an indicator of whether KMB is operating in FIPS mode. @tbl:fips-status-values provides the possible values for this field.
+
+Table: Values for the FIPS status field {#tbl:fips-status-values}
 
 +-------------+--------------------+
 | Value       | Description        |
@@ -684,9 +696,25 @@ Each of these commands returns a `fips_status` field. This provides an indicator
 | 1h to FFFFh | Reserved.          |
 +-------------+--------------------+
 
+Each mailbox command that causes a command to execute on the encryption engine includes a pair of timeout values, specified by drive firmware. @tbl:timeout-field-descriptions describes these values.
+
+Table: Timeout field descriptions {#tbl:timeout-field-descriptions}
+
++-------------+---------------------------------------------------+
+| Value       | Description                                       |
++=============+===================================================+
+| rdy_timeout | Timeout in ms for the encryption engine to become |
+|             | ready for a new command.                          |
++-------------+---------------------------------------------------+
+| cmd_timeout | Timeout in ms for the command to the encryption   |
+|             | engine to complete                                |
++-------------+---------------------------------------------------+
+
+If either of these timeouts are exceeded, KMB aborts the command and reports a [LOCK_ENGINE_TIMEOUT]{.btick} result code.
+
 #### GET_STATUS
 
-Exposes a command that allows controller firmware to determine if the encryption engine is ready to process commands as well vendor-defined drive crypto engine status data.
+Exposes a command that allows drive firmware to determine if the encryption engine is ready to process commands as well vendor-defined drive encryption engine status data.
 
 Command Code: 0x4753_5441 ("GSTA")
 
@@ -711,7 +739,7 @@ Table: GET_STATUS output arguments
 +--------------+--------+-------------------------------------------------------------+
 | reserved     | u32[4] | Reserved.                                                   |
 +--------------+--------+-------------------------------------------------------------+
-| engine_ready | u32    | Ready status of the storage device crypto engine.           |
+| engine_ready | u32    | Ready status of the storage device encryption engine.       |
 |              |        | OCP L.O.C.K. defines the low range (0h-FFFFh),              |
 |              |        | vendor defines the high range (10000h-FFFFFFFFh).           |
 |              |        |                                                             |
@@ -720,7 +748,7 @@ Table: GET_STATUS output arguments
 
 #### GET_ALGORITHMS
 
-Exposes a command that allows controller firmware to determine the types of algorithms supported by KMB for endorsement, KEM, MPK, and access key generation.
+Exposes a command that allows drive firmware to determine the types of algorithms supported by KMB for endorsement, KEM, MPK, and access key generation.
 
 Command Code: 0x4741_4C47 ("GALG")
 
@@ -766,6 +794,8 @@ Table: GET_ALGORITHMS output arguments {#tbl:get-algorithms-output-args}
 |                        |        | - Byte 0 bit 0: 256 bits                          |
 +------------------------+--------+---------------------------------------------------+
 
+Each of the [endorsement_algorithms]{.btick}, [hpke_algorithms]{.btick}, and [access_key_sizes]{.btick} fields shall be reported as a non-zero value.
+
 #### CLEAR_KEY_CACHE
 
 This command unloads all MEKs in the encryption engine and deletes all keys in KMB.
@@ -785,7 +815,8 @@ Table: CLEAR_KEY_CACHE input arguments
 | rdy_timeout | u32  | Timeout in ms for encryption engine to become ready for |
 |             |      | a new command.                                          |
 +-------------+------+---------------------------------------------------------+
-| cmd_timeout | u32  | Timeout in ms for command to crypto engine to complete. |
+| cmd_timeout | u32  | Timeout in ms for command to encryption engine to       |
+|             |      | complete.                                               |
 +-------------+------+---------------------------------------------------------+
 
 Table: CLEAR_KEY_CACHE output arguments
@@ -836,10 +867,11 @@ Table: ENDORSE_ENCAPSULATION_PUB_KEY output arguments
 +-----------------+---------------------+------------------------------------------------+
 | reserved        | u32                 | Reserved.                                      |
 +-----------------+---------------------+------------------------------------------------+
-| pub_key_len     | u32                 | Length of HPKE public key (`Npk` in RFC 9180). |
+| pub_key_len     | u32                 | Length of HPKE public key                      |
+|                 |                     | ([Npk]{.btick} in RFC 9180).                   |
 +-----------------+---------------------+------------------------------------------------+
 | endorsement_len | u32                 | Length of endorsement data. Zero if            |
-|                 |                     | `endorsement_algorithm` is 0h.                 |
+|                 |                     | [endorsement_algorithm]{.btick} is 0h.         |
 +-----------------+---------------------+------------------------------------------------+
 | pub_key         | u8[pub_key_len]     | HPKE public key.                               |
 +-----------------+---------------------+------------------------------------------------+
@@ -883,7 +915,7 @@ Table: ROTATE_ENCAPSULATION_KEY output arguments
 
 #### GENERATE_MPK
 
-This command unwraps the specified access key, generates a random MPK, then uses the HEK and access key to encrypt the MPK which is returned for the Storage Controller to persistently store.
+This command unwraps the specified access key, generates a random MPK, then uses the HEK and access key to encrypt the MPK which is returned for the drive to persistently store.
 
 Command Code: 0x474D_504B ("GMPK")
 
@@ -924,7 +956,7 @@ Table: GENERATE_MPK output arguments
 
 This command unwraps old_access_key and encrypted new_access_key from sealed_access_keys. Then old_access_key is used to decrypt new_access_key. The specified MPK is decrypted using KDF(HEK, "MPK", old_access_key). A new MPK is encrypted with the output of KDF(HEK, "MPK", new_access_key). The new encrypted MPK is returned.
 
-The Storage Controller stores the returned new encrypted MPK. The Storage Controller may attempt to do a trial decryption the new MPK without an error before deleting the old MPK. Controller firmware zeroizes the old encrypted MPK.
+The drive stores the returned new encrypted MPK. The drive may attempt to do a trial decryption of the new MPK without an error before deleting the old MPK. Drive firmware zeroizes the old encrypted MPK.
 
 Command Code: 0x5245_5750 ("REWP")
 
@@ -971,7 +1003,7 @@ Table: REWRAP_MPK output arguments
 
 #### READY_MPK
 
-This command decrypts `sealed_access_key`. Then the decrypted access_key is used to decrypt `locked_mpk` using KDF(HEK, "MPK", access_key). A "ready" MPK is encrypted with the Ready MPK Encryption Key. The encrypted ready MPK is returned.
+This command decrypts [sealed_access_key]{.btick}. Then the decrypted access_key is used to decrypt [locked_mpk]{.btick} using KDF(HEK, "MPK", access_key). A "ready" MPK is encrypted with the Ready MPK Encryption Key. The encrypted ready MPK is returned.
 
 Command Code: 0x524D_504B ("RMPK")
 
@@ -1016,7 +1048,7 @@ Table: READY_MPK output arguments
 
 #### MIX_MPK
 
-This command initializes the MEK secret seed if not already initialized or if `initialize` is set to 1, decrypts the specified MPK with the with the Ready MPK Encryption Key, and then updates the MEK secret seed in KMB by performing a KDF with the MEK secret seed and the decrypted MPK.
+This command initializes the MEK secret seed if not already initialized or if [initialize]{.btick} is set to 1, decrypts the specified MPK with the with the Ready MPK Encryption Key, and then updates the MEK secret seed in KMB by performing a KDF with the MEK secret seed and the decrypted MPK.
 
 When generating an MEK, one or more MIX_MPK commands are processed to modify the MEK secret seed.
 
@@ -1065,21 +1097,21 @@ Command Code: 0x474D_454B ("GMEK")
 
 Table: GENERATE_MEK input arguments
 
-+----------+--------+----------------------------------------------+
-| Name     | Type   | Description                                  |
-+==========+========+==============================================+
-| chksum   | u32    | Checksum over other input arguments,         |
-|          |        | computed by the caller. Little endian.       |
-+----------+--------+----------------------------------------------+
-| reserved | u32    | Reserved.                                    |
-+----------+--------+----------------------------------------------+
-| sek      | u8[32] | "Soft epoch key". May be rotated             |
-|          |        | by the controller as part of a cryptographic |
-|          |        | purge.                                       |
-+----------+--------+----------------------------------------------+
-| dpk      | u8[32] | "Data protection key". May be a value        |
-|          |        | decrypted by a user-provided C_PIN in Opal.  |
-+----------+--------+----------------------------------------------+
++----------+--------+---------------------------------------------+
+| Name     | Type   | Description                                 |
++==========+========+=============================================+
+| chksum   | u32    | Checksum over other input arguments,        |
+|          |        | computed by the caller. Little endian.      |
++----------+--------+---------------------------------------------+
+| reserved | u32    | Reserved.                                   |
++----------+--------+---------------------------------------------+
+| sek      | u8[32] | "Soft epoch key". May be rotated            |
+|          |        | by the drive as part of a cryptographic     |
+|          |        | erase.                                      |
++----------+--------+---------------------------------------------+
+| dpk      | u8[32] | "Data protection key". May be a value       |
+|          |        | decrypted by a user-provided C_PIN in Opal. |
++----------+--------+---------------------------------------------+
 
 Table: GENERATE_MEK output arguments
 
@@ -1106,7 +1138,7 @@ The DPK may be a value decrypted by a user-provided C_PIN in Opal.
 
 When decrypting an MEK, the MEK secret seed is initialized if no MPK has previously been mixed into the MEK secret seed.
 
-The decrypted MEK, specified metadata, and aux_metadata are loaded into the encryption engine key cache. The metadata is specific to the storage controller and specifies the information to the encryption engine on where within the key cache the MEK is loaded.
+The decrypted MEK, specified metadata, and aux_metadata are loaded into the encryption engine key cache. The metadata format is vendor-defined and specifies the information to the encryption engine on where within the key cache the MEK is loaded.
 
 Command Code: 0x4C4D_454B ("LMEK")
 
@@ -1121,14 +1153,14 @@ Table: LOAD_MEK input arguments
 | reserved     | u32        | Reserved.                                     |
 +--------------+------------+-----------------------------------------------+
 | sek          | u8[32]     | "Soft epoch key". May be rotated              |
-|              |            | by the controller as part of a cryptographic  |
-|              |            | purge.                                        |
+|              |            | by the drive as part of a cryptographic       |
+|              |            | erase.                                        |
 +--------------+------------+-----------------------------------------------+
 | dpk          | u8[32]     | "Data protection key". May be a value         |
 |              |            | decrypted by a user-provided C_PIN in Opal.   |
 +--------------+------------+-----------------------------------------------+
 | metadata     | u8[20]     | Metadata for MEK to load into the drive       |
-|              |            | crypto engine (i.e. NSID + LBA range).        |
+|              |            | encryption engine (i.e. NSID + LBA range).    |
 +--------------+------------+-----------------------------------------------+
 | aux_metadata | u8[32]     | Auxiliary metadata for the MEK                |
 |              |            | (optional; i.e. operation mode).              |
@@ -1139,8 +1171,8 @@ Table: LOAD_MEK input arguments
 | rdy_timeout  | u32        | Timeout in ms for encryption engine to become |
 |              |            | ready for a new command.                      |
 +--------------+------------+-----------------------------------------------+
-| cmd_timeout  | u32        | Timeout in ms for command to crypto engine    |
-|              |            | to complete.                                  |
+| cmd_timeout  | u32        | Timeout in ms for command to encryption       |
+|              |            | engine to complete.                           |
 +--------------+------------+-----------------------------------------------+
 
 Table: LOAD_MEK output arguments
@@ -1163,7 +1195,7 @@ This command derives an MEK using the HEK, the MEK secret seed, and the given SE
 
 When deriving an MEK, the MEK secret seed is initialized if no MPK has previously been mixed into the MEK secret seed.
 
-The derived MEK, specified metadata, and aux_metadata are loaded into the encryption engine key cache. The metadata is specific to the storage controller and specifies the information to the encryption engine on where within the key cache the MEK is loaded.
+The derived MEK, specified metadata, and aux_metadata are loaded into the encryption engine key cache. The metadata format is vendor-defined and specifies the information to the encryption engine on where within the key cache the MEK is loaded.
 
 Command Code: 0x444D_454B ("DMEK")
 
@@ -1178,13 +1210,13 @@ Table: DERIVE_MEK input arguments
 | reserved     | u32    | Reserved.                                     |
 +--------------+--------+-----------------------------------------------+
 | sek          | u8[32] | "Soft epoch key". May be rotated              |
-|              |        | by the controller as part of a cryptographic  |
-|              |        | purge.                                        |
+|              |        | by the drive as part of a cryptographic       |
+|              |        | erase.                                        |
 +--------------+--------+-----------------------------------------------+
 | dpk          | u8[32] | "Data protection key".                        |
 +--------------+--------+-----------------------------------------------+
 | metadata     | u8[20] | Metadata for MEK to load into the drive       |
-|              |        | crypto engine (i.e. NSID + LBA range).        |
+|              |        | encryption engine (i.e. NSID + LBA range).    |
 +--------------+--------+-----------------------------------------------+
 | aux_metadata | u8[32] | Auxiliary metadata for the MEK                |
 |              |        | (optional; i.e. operation mode).              |
@@ -1192,8 +1224,8 @@ Table: DERIVE_MEK input arguments
 | rdy_timeout  | u32    | Timeout in ms for encryption engine to become |
 |              |        | ready for a new command.                      |
 +--------------+--------+-----------------------------------------------+
-| cmd_timeout  | u32    | Timeout in ms for command to crypto engine    |
-|              |        | to complete.                                  |
+| cmd_timeout  | u32    | Timeout in ms for command to encryption       |
+|              |        | engine to complete.                           |
 +--------------+--------+-----------------------------------------------+
 
 Table: DERIVE_MEK output arguments
@@ -1212,7 +1244,7 @@ Table: DERIVE_MEK output arguments
 
 #### UNLOAD_MEK
 
-This command causes the MEK associated to the specified metadata to be unloaded for the key cache of the encryption engine. The metadata is specific to the storage controller and specifies the information to the encryption engine on where within the key cache, the MEK is loaded.
+This command causes the MEK associated to the specified metadata to be unloaded for the key cache of the encryption engine. The metadata format is vendor-defined and specifies the information to the encryption engine on where within the key cache, the MEK is loaded.
 
 Command Code: 0x554D_454B ("UMEK")
 
@@ -1227,13 +1259,13 @@ Table: UNLOAD_MEK input arguments
 | reserved    | u32    | Reserved.                                     |
 +-------------+--------+-----------------------------------------------+
 | metadata    | u8[20] | Metadata for MEK to unload from the drive     |
-|             |        | crypto engine (i.e. NSID + LBA range).        |
+|             |        | encryption engine (i.e. NSID + LBA range).    |
 +-------------+--------+-----------------------------------------------+
 | rdy_timeout | u32    | Timeout in ms for encryption engine to become |
 |             |        | ready for a new command.                      |
 +-------------+--------+-----------------------------------------------+
-| cmd_timeout | u32    | Timeout in ms for command to crypto engine    |
-|             |        | to complete.                                  |
+| cmd_timeout | u32    | Timeout in ms for command to encryption       |
+|             |        | engine to complete.                           |
 +-------------+--------+-----------------------------------------------+
 
 Table: UNLOAD_MEK output arguments
@@ -1250,7 +1282,7 @@ Table: UNLOAD_MEK output arguments
 | reserved    | u32  | Reserved.                                 |
 +-------------+------+-------------------------------------------+
 
-#### ENUMERATE_KEM_HANDLES
+#### ENUMERATE_KEM_HANDLES {#sec:enumerate-kem-handles}
 
 This command returns a list of all currently-active KEM handles for resources held by KMB.
 
@@ -1397,7 +1429,7 @@ Table: ENABLE_PERMANENT_HEK output arguments
 
 #### REPORT_EPOCH_KEY_STATE
 
-This command reports the state of the epoch keys. The controller indicates the state of the SEK, while KMB internally senses the state of the HEK.
+This command reports the state of the epoch keys. The drive indicates the state of the SEK, while KMB internally senses the state of the HEK.
 
 Command Code: 0x5245_4B53 ("REKS")
 
@@ -1497,7 +1529,7 @@ Table: Next action values {#tbl:next-action-values}
 
 #### Common mailbox types
 
-This section defines common types used to interface between the controller and KMB. These types are common patterns found in both requests and responses.
+This section defines common types used to interface between the drive firmware and KMB. These types are common patterns found in both requests and responses.
 
 Table: SealedAccessKey contents
 
@@ -1520,7 +1552,7 @@ Table: SealedAccessKey contents
 | tag            | u8[Nt]             | Authentication tag for AES operation.            |
 +----------------+--------------------+--------------------------------------------------+
 
-`Nenc` and `Nt` are HPKE values associated with the `kem_id` and `aead_id` identifiers from the given `hpke_algorithm`. For example, if byte 0 bit 0 of `hpke_algorithm` is set (indicating `kem_id` 0x0011 and `aead_id` 0x0002), then according to [@{ietf-rfc9180}], `Nenc` and `Nt` would be 97 and 16, respectively.
+[Nenc]{.btick} and [Nt]{.btick} are HPKE values associated with the [kem_id]{.btick} and [aead_id]{.btick} identifiers from the given [hpke_algorithm]{.btick}. For example, if byte 0 bit 0 of [hpke_algorithm]{.btick} is set (indicating [kem_id]{.btick} 0x0011 and [aead_id]{.btick} 0x0002), then according to [@{ietf-rfc9180}], [Nenc]{.btick} and [Nt]{.btick} would be 97 and 16, respectively.
 
 Table: SealedOldAndNewAccessKey contents
 
@@ -1537,9 +1569,9 @@ Table: SealedOldAndNewAccessKey contents
 | tag             | u8[Nt]                | Authentication tag for AES operation         |
 +-----------------+-----------------------+----------------------------------------------+
 
-`Nn` and `Nt` are HPKE values associated with the `aead_id` identifier from the given `hpke_algorithm`.
+[Nn]{.btick} and [Nt]{.btick} are HPKE values associated with the [aead_id]{.btick} identifier from the given [hpke_algorithm]{.btick}.
 
-The outer layer of encryption of the wrapped access key is decrypted using HPKE. The inner layer is decrypted using the access key in the accompanying `SealedAccessKey` instance. Both layers use the AEAD algorithm indicated by the `aead_id` identifier from the given `hpke_algorithm`.
+The outer layer of encryption of the wrapped access key is decrypted using HPKE. The inner layer is decrypted using the access key in the accompanying [SealedAccessKey]{.btick} instance. Both layers use the AEAD algorithm indicated by the [aead_id]{.btick} identifier from the given [hpke_algorithm]{.btick}.
 
 ##### WrappedKey type
 
@@ -1568,19 +1600,19 @@ Table: WrappedKey contents
 | tag      | u8[16]     | Authentication tag for AES operation.      |
 +----------+------------+--------------------------------------------+
 
-Variants of WrappedKey will be used to reduce duplicating information in commands. The following names will be used for WrappedKeys of a specific `key_type` and `ct_len`:
+Variants of WrappedKey will be used to reduce duplicating information in commands. The following names will be used for WrappedKeys of a specific [key_type]{.btick} and [ct_len]{.btick}:
 
 Table: WrappedKey variants
 
-+------------+-------------+----------+
-| Name       | `key_type`  | `ct_len` |
-+============+=============+==========+
-| LockedMpk  | LOCKED_MPK  | 32       |
-+------------+-------------+----------+
-| ReadyMpk   | READY_MPK   | 32       |
-+------------+-------------+----------+
-| WrappedMek | WRAPPED_MEK | 64       |
-+------------+-------------+----------+
++------------+--------------------+------------------+
+| Name       | [key_type]{.btick} | [ct_len]{.btick} |
++============+====================+==================+
+| LockedMpk  | LOCKED_MPK         | 32               |
++------------+--------------------+------------------+
+| ReadyMpk   | READY_MPK          | 32               |
++------------+--------------------+------------------+
+| WrappedMek | WRAPPED_MEK        | 64               |
++------------+--------------------+------------------+
 
 #### Fault handling
 
@@ -1592,11 +1624,7 @@ A KMB mailbox command can fail to complete in the following ways:
 
 In all of these cases, the error is reported in the command return status.
 
-Depending on the type of fault, controller firmware may resubmit the mailbox command.
-
-Each mailbox command that causes a command to execute on the encryption engine includes a timeout value is specified by the command. KMB aborts the command executing on the encryption engine if the encryption engine does not complete the command within the specified timeout and reports a LOCK_ENGINE_TIMEOUT result code.
-
-@tbl:kmb-mailbox-codes defines the additional mailbox result codes that may be returned by KMB.
+Depending on the type of fault, drive firmware may resubmit the mailbox command.
 
 Table: KMB mailbox command result codes {#tbl:kmb-mailbox-codes}
 
@@ -1604,12 +1632,12 @@ Table: KMB mailbox command result codes {#tbl:kmb-mailbox-codes}
 | Name                   | Value       | Description              |
 +========================+=============+==========================+
 | LOCK_ENGINE_TIMEOUT    | 0x4C45_544F | Timeout occurred when    |
-|                        | ("LETO")    | communicatingwith the    |
-|                        |             | drive crypto engine to   |
-|                        |             | execute a command        |
+|                        | ("LETO")    | communicating with the   |
+|                        |             | drive encryption engine  |
+|                        |             | to execute a command     |
 +------------------------+-------------+--------------------------+
 | LOCK_ENGINE_CODE + u16 | 0x4443_xxxx | Vendor-specific error    |
-|                        | ("ECxx")    | code in thelow 16bits    |
+|                        | ("ECxx")    | code in the low 16 bits  |
 +------------------------+-------------+--------------------------+
 | LOCK_BAD_ALGORITHM     | 0x4C42_414C | Unsupported algorithm,   |
 |                        | ("LBAL")    | or algorithm does not    |
@@ -1647,7 +1675,7 @@ This section will be fleshed out with additional details as they become availabl
 
 ## Terminology
 
-The following acronyms and abbreviations are used throughout this document.
+Table: Acronyms and abbreviations used throughout this document {#tbl:abbreviations}
 
 +--------------+----------------------------------------------------------+
 | Abbreviation | Description                                              |
@@ -1704,12 +1732,16 @@ The following acronyms and abbreviations are used throughout this document.
 +--------------+----------------------------------------------------------+
 | SSD          | Solid-state drive                                        |
 +--------------+----------------------------------------------------------+
+| SVN          | Security Version Number                                  |
++--------------+----------------------------------------------------------+
 | UART         | Universal asynchronous receiver-transmitter              |
 +--------------+----------------------------------------------------------+
 | XTS          | XEX-based tweaked-codebook mode with ciphertext stealing |
 +--------------+----------------------------------------------------------+
 
 ## Compliance
+
+Table: Compliance requirements {#tbl:compliance-requirements}
 
 +------+--------------------------------------------------+-----------+
 | Item | Requirement                                      | Mandatory |
@@ -1764,27 +1796,27 @@ This section will be fleshed out with additional details as they become availabl
 !include diagrams/uml/rotate_encapsulation_key.uml
 ```
 
-## Sequence to generate a MPK
+## Sequence to generate an MPK
 
-```plantuml {caption="UML: Generating a MPK" #fig:generate-mpk-uml}
+```plantuml {caption="UML: Generating an MPK" #fig:generate-mpk-uml}
 !include diagrams/uml/generate_mpk.uml
 ```
 
-## Sequence to ready a MPK
+## Sequence to ready an MPK
 
-```plantuml {caption="UML: Readying a MPK" #fig:ready-mpk-uml}
+```plantuml {caption="UML: Readying an MPK" #fig:ready-mpk-uml}
 !include diagrams/uml/ready_mpk.uml
 ```
 
-## Sequence to rotate the access key of a MPK
+## Sequence to rotate the access key of an MPK
 
-```plantuml {caption="UML: Rewrapping a MPK" #fig:rewrap-mpk-uml}
+```plantuml {caption="UML: Rewrapping an MPK" #fig:rewrap-mpk-uml}
 !include diagrams/uml/rewrap_mpk.uml
 ```
 
-## Sequence to mix a MPK into the MEK secret seed
+## Sequence to mix an MPK into the MEK secret seed
 
-```plantuml {caption="UML: Mixing a MPK" #fig:mix-mpk-uml}
+```plantuml {caption="UML: Mixing an MPK" #fig:mix-mpk-uml}
 !include diagrams/uml/mix_mpk.uml
 ```
 
@@ -1806,7 +1838,7 @@ This section will be fleshed out with additional details as they become availabl
 !include diagrams/uml/unload_mek.uml
 ```
 
-## Sequence to unload all MEKs (i.e., purge) from the encryption engine key cache
+## Sequence to unload all MEKs (i.e., zeroize) from the encryption engine key cache
 
 ```plantuml {caption="UML: Unloading all MEKs" #fig:clear-key-cache-uml}
 !include diagrams/uml/clear_key_cache.uml
