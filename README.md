@@ -20,10 +20,11 @@ Project](https://chipsalliance.org/), a Series of LF Projects, LLC.
 ## Governance
 
 The [Caliptra WorkGroup Technical Charter](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraWGTechnicalCharter.md)
-sets out the charter governing the Caliptra project and [its
-marks](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkPolicy.md).
+sets out the charter governing the Caliptra project.
 
 ## Trademark
+
+* [Caliptra Trademark Policy](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkPolicy.md)
 * [Caliptra Trademark Process definition](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkAuditProcess.md)
 * [Caliptra Trademark Checklist and Evaluation Methodology](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraChecklistAndEvaluationMethodology.md)
 
