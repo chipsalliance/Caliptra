@@ -676,7 +676,9 @@ The encryption engine will be responsible for performing this check when in AES-
 
 @fig:cmd-ee-example-uml shows a sample command execution. This is an expected sequence when the drive firmware instructs the KMB to load an MEK. The internal behavior of the encryption engine is one of several possible mechanisms, and can be different per vendor.
 
-![Command execution example for loading an MEK](./diagrams/uml/cmd_ee_example.svg){#fig:cmd-ee-example-uml}
+```plantuml {caption="Command execution example for loading an MEK" #fig:cmd-ee-example-uml}
+!include diagrams/uml/cmd_ee_example.uml
+```
 
 ### Drive → KMB interface
 
@@ -1766,76 +1768,78 @@ This section will be fleshed out with additional details as they become availabl
 
 ## Sequence of events at boot
 
-![UML: Power on](./diagrams/uml/power_on.svg){#fig:power-on-uml}
-
----
+```plantuml {caption="UML: Power on" #fig:power-on-uml}
+!include diagrams/uml/power_on.uml
+```
 
 ## Sequence to obtain the current status of KMB
 
-![UML: Get Status](./diagrams/uml/get_status.svg){#fig:get-status-uml}
-
----
+```plantuml {caption="UML: Get Status" #fig:get-status-uml}
+!include diagrams/uml/get_status.uml
+```
 
 ## Sequence to obtain the supported algorithms
 
-![UML: Get Supported Algorithms](./diagrams/uml/get_algorithms.svg){#fig:get-supported-algorithms-uml}
-
----
+```plantuml {caption="UML: Get Supported Algorithms" #fig:get-supported-algorithms-uml}
+!include diagrams/uml/get_algorithms.uml
+```
 
 ## Sequence to endorse an HPKE public key
 
-![UML: Endorsing an HPKE public key](./diagrams/uml/endorse_encapsulation_pub_key.svg){#fig:endorse-encapsulation-pub-key-uml}
-
----
+```plantuml {caption="Endorsing an HPKE public key" #fig:endorse-encapsulation-pub-key-uml}
+!include diagrams/uml/endorse_encapsulation_pub_key.uml
+```
 
 ## Sequence to rotate an HPKE keypair
 
-![UML: Rotating a KEM Encapsulation Key](./diagrams/uml/rotate_encapsulation_key.svg){#fig:rotate-encapsulation-key-uml}
-
----
+```plantuml {caption="UML: Rotating a KEM Encapsulation Key" #fig:rotate-encapsulation-key-uml}
+!include diagrams/uml/rotate_encapsulation_key.uml
+```
 
 ## Sequence to generate an MPK
 
-![UML: Generating an MPK](./diagrams/uml/generate_mpk.svg){#fig:generate-mpk-uml}
-
----
+```plantuml {caption="UML: Generating an MPK" #fig:generate-mpk-uml}
+!include diagrams/uml/generate_mpk.uml
+```
 
 ## Sequence to ready an MPK
 
-![UML: Readying an MPK](./diagrams/uml/ready_mpk.svg){#fig:ready-mpk-uml}
-
----
+```plantuml {caption="UML: Readying an MPK" #fig:ready-mpk-uml}
+!include diagrams/uml/ready_mpk.uml
+```
 
 ## Sequence to rotate the access key of an MPK
 
-![UML: Rewrapping an MPK](./diagrams/uml/rewrap_mpk.svg){#fig:rewrap-mpk-uml}
-
----
+```plantuml {caption="UML: Rewrapping an MPK" #fig:rewrap-mpk-uml}
+!include diagrams/uml/rewrap_mpk.uml
+```
 
 ## Sequence to mix an MPK into the MEK secret seed
 
-![UML: Mixing an MPK](./diagrams/uml/mix_mpk.svg){#fig:mix-mpk-uml}
-
----
+```plantuml {caption="UML: Mixing an MPK" #fig:mix-mpk-uml}
+!include diagrams/uml/mix_mpk.uml
+```
 
 ## Sequence to load an MEK
 
-![UML: Loading an MEK](./diagrams/uml/load_mek.svg){#fig:load-mek-uml}
-
----
+```plantuml {caption="UML: Loading an MEK" #fig:load-mek-uml}
+!include diagrams/uml/load_mek.uml
+```
 
 ## Sequence to load MEK into the encryption engine key cache
 
-![UML: Loading an MEK into the encryption engine key cache](./diagrams/uml/load_mek_into_ee.svg){#fig:load-mek-into-ee-uml}
-
----
+```plantuml {caption="UML: Loading an MEK into the encryption engine key cache" #fig:load-mek-into-ee-uml}
+!include diagrams/uml/load_mek_into_ee.uml
+```
 
 ## Sequence to unload an MEK from the encryption engine key cache
 
-![UML: Unloading an MEK](./diagrams/uml/unload_mek.svg){#fig:unload-mek-uml}
-
----
+```plantuml {caption="UML: Unloading an MEK" #fig:unload-mek-uml}
+!include diagrams/uml/unload_mek.uml
+```
 
 ## Sequence to unload all MEKs (i.e., zeroize) from the encryption engine key cache
 
-![UML: Unloading all MEKs](./diagrams/uml/clear_key_cache.svg){#fig:clear-key-cache-uml}
+```plantuml {caption="UML: Unloading all MEKs" #fig:clear-key-cache-uml}
+!include diagrams/uml/clear_key_cache.uml
+```
