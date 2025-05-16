@@ -412,7 +412,7 @@ KMB generates multiple kinds of random keys. It does so using randomness obtaine
 
 ![DRBG usage](./diagrams/drbg_diagram.drawio.svg){#fig:drbg-usage}
 
-Note that Caliptra hardware only supports the [DRBG_Update]{.btick} operation when Caliptra is instantiated with an internal TRNG [@{caliptra-2.0-hw-spec}].
+Note that Caliptra hardware only supports the \`DRBG_Update\` operation when Caliptra is instantiated with an internal TRNG [@{caliptra-2.0-hw-spec}].
 
 ### Boot-time initialization
 
@@ -684,7 +684,7 @@ The encryption engine will be responsible for performing this check when in AES-
 
 This section provides the mailbox commands exposed by Caliptra as part of OCP L.O.C.K.
 
-Each of these commands returns a [fips_status]{.btick} field. This provides an indicator of whether KMB is operating in FIPS mode. @tbl:fips-status-values provides the possible values for this field.
+Each of these commands returns a \`fips_status\` field. This provides an indicator of whether KMB is operating in FIPS mode. @tbl:fips-status-values provides the possible values for this field.
 
 Table: Values for the FIPS status field {#tbl:fips-status-values}
 
@@ -710,7 +710,7 @@ Table: Timeout field descriptions {#tbl:timeout-field-descriptions}
 |             | engine to complete                                |
 +-------------+---------------------------------------------------+
 
-If either of these timeouts are exceeded, KMB aborts the command and reports a [LOCK_ENGINE_TIMEOUT]{.btick} result code.
+If either of these timeouts are exceeded, KMB aborts the command and reports a \`LOCK_ENGINE_TIMEOUT\` result code.
 
 #### GET_STATUS
 
@@ -794,7 +794,7 @@ Table: GET_ALGORITHMS output arguments {#tbl:get-algorithms-output-args}
 |                        |        | - Byte 0 bit 0: 256 bits                          |
 +------------------------+--------+---------------------------------------------------+
 
-Each of the [endorsement_algorithms]{.btick}, [hpke_algorithms]{.btick}, and [access_key_sizes]{.btick} fields shall be reported as a non-zero value.
+Each of the \`endorsement_algorithms\`, \`hpke_algorithms\`, and \`access_key_sizes\` fields shall be reported as a non-zero value.
 
 #### CLEAR_KEY_CACHE
 
@@ -868,10 +868,10 @@ Table: ENDORSE_ENCAPSULATION_PUB_KEY output arguments
 | reserved        | u32                 | Reserved.                                      |
 +-----------------+---------------------+------------------------------------------------+
 | pub_key_len     | u32                 | Length of HPKE public key                      |
-|                 |                     | ([Npk]{.btick} in RFC 9180).                   |
+|                 |                     | (\`Npk\` in RFC 9180).                         |
 +-----------------+---------------------+------------------------------------------------+
 | endorsement_len | u32                 | Length of endorsement data. Zero if            |
-|                 |                     | [endorsement_algorithm]{.btick} is 0h.         |
+|                 |                     | \`endorsement_algorithm\` is 0h.               |
 +-----------------+---------------------+------------------------------------------------+
 | pub_key         | u8[pub_key_len]     | HPKE public key.                               |
 +-----------------+---------------------+------------------------------------------------+
@@ -1003,7 +1003,7 @@ Table: REWRAP_MPK output arguments
 
 #### READY_MPK
 
-This command decrypts [sealed_access_key]{.btick}. Then the decrypted access_key is used to decrypt [locked_mpk]{.btick} using KDF(HEK, "MPK", access_key). A "ready" MPK is encrypted with the Ready MPK Encryption Key. The encrypted ready MPK is returned.
+This command decrypts \`sealed_access_key\`. Then the decrypted access_key is used to decrypt \`locked_mpk\` using KDF(HEK, "MPK", access_key). A "ready" MPK is encrypted with the Ready MPK Encryption Key. The encrypted ready MPK is returned.
 
 Command Code: 0x524D_504B ("RMPK")
 
@@ -1048,7 +1048,7 @@ Table: READY_MPK output arguments
 
 #### MIX_MPK
 
-This command initializes the MEK secret seed if not already initialized or if [initialize]{.btick} is set to 1, decrypts the specified MPK with the with the Ready MPK Encryption Key, and then updates the MEK secret seed in KMB by performing a KDF with the MEK secret seed and the decrypted MPK.
+This command initializes the MEK secret seed if not already initialized or if \`initialize\` is set to 1, decrypts the specified MPK with the with the Ready MPK Encryption Key, and then updates the MEK secret seed in KMB by performing a KDF with the MEK secret seed and the decrypted MPK.
 
 When generating an MEK, one or more MIX_MPK commands are processed to modify the MEK secret seed.
 
@@ -1550,7 +1550,7 @@ Table: SealedAccessKey contents
 | ak_ct          | u8[access_key_len+Nt] | Access key ciphertext and authentication tag.    |
 +----------------+-----------------------+--------------------------------------------------+
 
-[Nenc]{.btick} and [Nt]{.btick} are HPKE values associated with the [kem_id]{.btick} and [aead_id]{.btick} identifiers from the given [hpke_algorithm]{.btick}. For example, if byte 0 bit 0 of [hpke_algorithm]{.btick} is set (indicating [kem_id]{.btick} 0x0011 and [aead_id]{.btick} 0x0002), then according to [@{ietf-rfc9180}], [Nenc]{.btick} and [Nt]{.btick} would be 97 and 16, respectively.
+\`Nenc\` and \`Nt\` are HPKE values associated with the \`kem_id\` and \`aead_id\` identifiers from the given \`hpke_algorithm\`. For example, if byte 0 bit 0 of \`hpke_algorithm\` is set (indicating \`kem_id\` 0x0011 and \`aead_id\` 0x0002), then according to [@{ietf-rfc9180}], \`Nenc\` and \`Nt\` would be 97 and 16, respectively.
 
 Table: SealedOldAndNewAccessKey contents
 
@@ -1566,9 +1566,9 @@ Table: SealedOldAndNewAccessKey contents
 |                 |                          | and outer tag.                                |
 +-----------------+--------------------------+-----------------------------------------------+
 
-[Nn]{.btick} and [Nt]{.btick} are HPKE values associated with the [aead_id]{.btick} identifier from the given [hpke_algorithm]{.btick}.
+\`Nn\` and \`Nt\` are HPKE values associated with the \`aead_id\` identifier from the given \`hpke_algorithm\`.
 
-The outer layer of encryption of the wrapped access key is decrypted using HPKE. The inner layer is decrypted using the access key in the accompanying [SealedAccessKey]{.btick} instance. Both layers use the AEAD algorithm indicated by the [aead_id]{.btick} identifier from the given [hpke_algorithm]{.btick}.
+The outer layer of encryption of the wrapped access key is decrypted using HPKE. The inner layer is decrypted using the access key in the accompanying \`SealedAccessKey\` instance. Both layers use the AEAD algorithm indicated by the \`aead_id\` identifier from the given \`hpke_algorithm\`.
 
 ##### WrappedKey type
 
@@ -1595,19 +1595,19 @@ Table: WrappedKey contents
 | ct       | u8[ct_len] | Key ciphertext and authentication tag.     |
 +----------+------------+--------------------------------------------+
 
-Variants of WrappedKey will be used to reduce duplicating information in commands. The following names will be used for WrappedKeys of a specific [key_type]{.btick} and [ct_len]{.btick}:
+Variants of WrappedKey will be used to reduce duplicating information in commands. The following names will be used for WrappedKeys of a specific \`key_type\` and \`ct_len\`:
 
 Table: WrappedKey variants
 
-+------------+--------------------+------------------+
-| Name       | [key_type]{.btick} | [ct_len]{.btick} |
-+============+====================+==================+
-| LockedMpk  | LOCKED_MPK         | 32               |
-+------------+--------------------+------------------+
-| ReadyMpk   | READY_MPK          | 32               |
-+------------+--------------------+------------------+
-| WrappedMek | WRAPPED_MEK        | 64               |
-+------------+--------------------+------------------+
++------------+--------------+------------+
+| Name       | \`key_type\` | \`ct_len\` |
++============+==============+============+
+| LockedMpk  | LOCKED_MPK   | 32         |
++------------+--------------+------------+
+| ReadyMpk   | READY_MPK    | 32         |
++------------+--------------+------------+
+| WrappedMek | WRAPPED_MEK  | 64         |
++------------+--------------+------------+
 
 #### Fault handling
 
