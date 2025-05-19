@@ -305,7 +305,7 @@ To mitigate against cryptographic attacks on the HPKE keypair that rely on repea
 
 ### DPKs
 
-Drive firmware provides the DPK (Data Protection Key) to KMB when generating, loading, or deriving an MEK. The DPK is used in a KDF, along with the HEK, SEK, and MPKs, to derive the MEK secret, as illustrated in @sec:mek-secret-derivation.
+Drive firmware provides the DPK (Data Protection Key) to KMB when generating, loading, or deriving an MEK. The DPK is used in a KDF, along with the HEK, SEK, and MPKs, to derive the MEK secret, as illustrated in @sec:meks.
 
 #### Use when generating or loading an MEK
 
@@ -318,34 +318,6 @@ In this flow, the DPK may be encrypted by a user's Opal C_PIN. Drive firmware lo
 In this flow, the DPK may be the imported key associated with a Key Per I/O key tag.
 
 ![Example drive flow to accept an injected DPK](./diagrams/dpk_injection.drawio.svg){#fig:dpk-injection}
-
-### MEKs {#sec:meks}
-
-KMB can encrypt randomly-generated MEKs, or compute derived MEKs.
-
-#### Generating and loading a random MEK
-
-![MEK generation](./diagrams/mek_generation.drawio.svg){#fig:mek-generation}
-
-^1^ see @fig:mek-secret-derivation for details
-
-![MEK loading](./diagrams/mek_loading.drawio.svg){#fig:mek-loading}
-
-^1^ see @fig:mek-secret-derivation for details
-
-#### Deriving an MEK
-
-![MEK derivation](./diagrams/mek_derivation.drawio.svg){#fig:mek-derivation}
-
-^1^ see @fig:mek-secret-derivation for details
-
-#### MEK secret derivation {#sec:mek-secret-derivation}
-
-This diagram provides additional details on how the EPK, DPK, and MPKs are mixed together to produce the MEK secret, which then either encrypts/decrypts a random MEK or is used to compute a derived MEK.
-
-![MEK secret derivation](./diagrams/mek_secret_derivation.drawio.svg){#fig:mek-secret-derivation}
-
-Note: it is the drive firmware's responsibility to ensure that MPKs are mixed in the correct order for a given MEK.
 
 ### HEKs and SEKs
 
@@ -412,6 +384,24 @@ Drive firmware is responsible for enforcing that SEK programming and zeroization
 - The SEK may only be programmed once the HEK is available.
 - The HEK may only be zeroized once the SEK is zeroized.
 
+### MEKs {#sec:meks}
+
+KMB can encrypt randomly-generated MEKs, or compute derived MEKs.
+
+@fig:mek-secret-derivation provides details on how the SEK, HEK, DPK, and MPKs are used to produce the MEK secret, which then either encrypts/decrypts a random MEK or is used to compute a derived MEK.
+
+![MEK secret derivation](./diagrams/mek_secret_derivation.drawio.svg){#fig:mek-secret-derivation}
+
+Note: it is the drive firmware's responsibility to ensure that MPKs are mixed in the correct order for a given MEK.
+
+#### Generating and loading a random MEK
+
+The figures in this section elide the process of deriving the MEK secret, as those details are captured in @fig:mek-secret-derivation. When an MEK is generated or loaded, the inputs given in @fig:mek-secret-derivation are provided by drive firmware so that KMB may derive the MEK secret.
+
+![Generating an MEK](./diagrams/mek_generate.drawio.svg){#fig:mek-generate}
+
+![Loading an MEK](./diagrams/mek_load.drawio.svg){#fig:mek-load}
+
 ### Random key generation via DRBG
 
 KMB generates multiple kinds of random keys. It does so using randomness obtained from a DRBG, which is seeded from Caliptra's TRNG and which may be updated with entropy from the host.
@@ -426,6 +416,7 @@ At initial boot, Caliptra firmware performs the following steps:
 
 - Determines whether a HEK is available, based on the fuse configuration. If a HEK is unavailable, KMB enters a mode where MEKs are not allowed to be loaded.
 - Initializes random HPKE keypairs for each supported algorithm, and assigns handles to them, reported via [ENUMERATE_KEM_HANDLES](#sec:enumerate-kem-handles).
+- Initializes a random Ready MPK encryption key.
 
 ---
 
