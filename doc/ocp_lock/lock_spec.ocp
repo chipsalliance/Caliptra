@@ -201,7 +201,7 @@ Rotation of the HEK and SEK, management of MPKs and MPK access keys, and injecti
 
 ![OCP L.O.C.K. key hierarchy](./diagrams/key_hierarchy.drawio.svg){#fig:key-hierarchy}
 
-### MPKs
+### MPKs {#sec:mpks}
 
 MPKs are the mechanism by which KMB enforces multi-party authorization as a precondition to loading an MEK. MPKs exist in one of two states: locked or ready. In both these states the MPK is encrypted to a key known only to KMB.
 
@@ -381,8 +381,8 @@ A device out of manufacturing is required to have a HEK programmed.
 
 Drive firmware is responsible for enforcing that SEK programming and zeroization follows the state machine illustrated in @fig:hek-sek-rotation. Specifically:
 
-- The SEK may only be programmed once the HEK is available.
-- The HEK may only be zeroized once the SEK is zeroized.
+- The SEK shall only be programmed once the HEK is available.
+- The HEK shall only be zeroized once the SEK is zeroized.
 
 ### MEKs {#sec:meks}
 
@@ -416,7 +416,8 @@ At initial boot, Caliptra firmware performs the following steps:
 
 - Determines whether a HEK is available, based on the fuse configuration. If a HEK is unavailable, KMB enters a mode where MEKs are not allowed to be loaded.
 - Initializes random HPKE keypairs for each supported algorithm, and assigns handles to them, reported via [ENUMERATE_KEM_HANDLES](#sec:enumerate-kem-handles).
-- Initializes a random Ready MPK encryption key.
+
+The Ready MPK encryption key is not initialized at boot-up, as it is generated lazily upon first use. See @sec:mpks for details.
 
 ---
 
@@ -1683,6 +1684,8 @@ Table: Acronyms and abbreviations used throughout this document {#tbl:abbreviati
 +--------------+----------------------------------------------------------+
 | ECDSA        | Elliptic Curve Digital Signature Algorithm               |
 +--------------+----------------------------------------------------------+
+| EPK          | Epoch Protection Key                                     |
++--------------+----------------------------------------------------------+
 | HEK          | Hard Epoch Key                                           |
 +--------------+----------------------------------------------------------+
 | HKDF         | HMAC-based key derivation function                       |
@@ -1722,6 +1725,8 @@ Table: Acronyms and abbreviations used throughout this document {#tbl:abbreviati
 | SSD          | Solid-state drive                                        |
 +--------------+----------------------------------------------------------+
 | SVN          | Security Version Number                                  |
++--------------+----------------------------------------------------------+
+| TCG          | Trusted Computing Group                                  |
 +--------------+----------------------------------------------------------+
 | UART         | Universal asynchronous receiver-transmitter              |
 +--------------+----------------------------------------------------------+
