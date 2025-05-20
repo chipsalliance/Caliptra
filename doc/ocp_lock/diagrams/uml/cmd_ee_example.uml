@@ -9,7 +9,7 @@
 ee++
 
 note over ee
-    Wait for <b>EXE</b> = 1
+    Wait for Caliptra to write <b>EXE</b> = 1
 end note
 
 cfw++
@@ -19,7 +19,7 @@ cfw $sync sfr : write <b>CMD</b> = 1, <b>EXE</b>=1
 ee $sync sfr : read <b>METD</b>, <b>AUX</b> <b>MEK</b>
 
 note over cfw
-    Wait for <b>DN</b> = 1
+    Wait for encryption engine to write <b>DN</b> = 1
 end note
 
 &ee $async kc++ : <b>METD</b>, <b>AUX</b>, <b>MEK</b>
@@ -28,7 +28,7 @@ kc $async ee-- : No error
 ee $async sfr : write <b>ERR</b> = 0, <b>DN</b>=1
 
 note over ee
-    Wait for <b>DN</b> = 1
+    Wait for Caliptra to write <b>DN</b> = 1
 end note
 
 &cfw $async sfr : read <b>ERR</b>
@@ -37,12 +37,12 @@ cfw $async sfr : write <b>DN</b> = 1
 ||5||
 
 note over cfw
-    Wait for <b>DN</b> = 0
+    Wait for encryption engine to write <b>DN</b> = 0
 end note
 
 'cfw $sync cfw : Wait for <b>DN</b> = 0
 
-ee $async sfr : write <b>CMD</b> = 0, <b>ERR</b> = 0,\n        <b>DN</b> = 1, <b>EXE</b> = 0
+ee $async sfr : write <b>CMD</b> = 0, <b>ERR</b> = 0,\n        <b>DN</b> = 0, <b>EXE</b> = 0
 cfw--
 
 @enduml
