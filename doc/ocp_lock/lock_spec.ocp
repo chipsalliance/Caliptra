@@ -1106,7 +1106,7 @@ Table: MIX_MPK output arguments
 
 #### TEST_ACCESS_KEY
 
-This command is used by the host to check the correct access key is associated with the given MPK. The \`nonce\` is a random value to be included in the digest calculation to prevent response replay attacks. The output is calculated as Sha384(UID || decrypted access key || nonce). The UID is taken from the provided MPK's \`aad\` field.
+This command is used by the host to check the correct access key is associated with the given MPK. The \`nonce\` is a random value to be included in the digest calculation to prevent response replay attacks. The output is calculated as SHA2-384(UID || decrypted access key || nonce). The UID is taken from the provided MPK's \`aad\` field.
 
 Command Code: 0x5441_434B ("TACK")
 
@@ -1115,10 +1115,10 @@ Table: TEST_ACCESS_KEY input arguments
 +-------------------+-----------------+---------------------------------------+
 | Name              | Type            | Description                           |
 +===================+=================+=======================================+
-| nonce             | u8[32]          | Host provided random value            |
+| nonce             | u8[32]          | Host provided random value.           |
 +-------------------+-----------------+---------------------------------------+
 | locked_mpk        | LockedMpk       | Locked MPK associated with the access |
-|                   |                 | key                                   |
+|                   |                 | key.                                  |
 +-------------------+-----------------+---------------------------------------+
 | sealed_access_key | SealedAccessKey | HPKE-sealed access key.               |
 +-------------------+-----------------+---------------------------------------+
