@@ -950,7 +950,7 @@ Table: GENERATE_MPK input arguments
 +-------------------+------------------+----------------------------------------+
 | info_len          | u32              | Length of the info argument.           |
 +-------------------+------------------+----------------------------------------+
-| metadata          | u8[metadata_len] | Unique identifier for the MPK.         |
+| metadata          | u8[metadata_len] | Metadata for the MPK.                  |
 +-------------------+------------------+----------------------------------------+
 | info              | u8[info_len]     | Info argument to use with HPKE unwrap. |
 +-------------------+------------------+----------------------------------------+
@@ -1106,7 +1106,7 @@ Table: MIX_MPK output arguments
 
 #### TEST_ACCESS_KEY
 
-This command is used by the host to check the correct access key is associated with the given MPK. The \`nonce\` is a random value to be included in the digest calculation to prevent response replay attacks. The output is calculated as SHA2-384(metadata || decrypted access key || nonce). The metadata is taken from the provided MPK's \`metadata\` field.
+This command is used by the host to check the input access key is associated with the given MPK. The \`nonce\` is a random value to be included in the digest calculation to prevent response replay attacks. The output is calculated as SHA2-384(metadata || decrypted access key || nonce). The metadata is taken from the provided MPK's \`metadata\` field.
 
 Command Code: 0x5441_434B ("TACK")
 
@@ -1619,8 +1619,7 @@ Table: WrappedKey contents
 +--------------+------------------+--------------------------------------------+
 | Name         | Type             | Description                                |
 +==============+==================+============================================+
-| key_type     | u16              | Type of the wrapped key. This is treated   |
-|              |                  | as AAD when the key is decrypted.          |
+| key_type     | u16              | Type of the wrapped key.                   |
 |              |                  |                                            |
 |              |                  | - 0h: Reserved                             |
 |              |                  | - 1h: LOCKED_MPK (ciphertext held at rest) |
@@ -1636,11 +1635,12 @@ Table: WrappedKey contents
 +--------------+------------------+--------------------------------------------+
 | iv           | u8[12]           | Initialization vector for AES operation.   |
 +--------------+------------------+--------------------------------------------+
-| metadata     | u8[metadata_len] | Additional authenticated data to be added  |
-|              |                  | to the GCM tag calculation.                |
+| metadata     | u8[metadata_len] | Metadata associated with the wrapped key.  |
 +--------------+------------------+--------------------------------------------+
 | ct           | u8[ct_len]       | Key ciphertext and authentication tag.     |
 +--------------+------------------+--------------------------------------------+
+
+The AAD for the encrypted message is constructed as \`key_type\` || \`metadata_len\` || \`metadata\`.
 
 Variants of WrappedKey will be used to reduce duplicating information in commands. The following names will be used for WrappedKeys of a specific \`key_type\` and \`ct_len\`:
 
