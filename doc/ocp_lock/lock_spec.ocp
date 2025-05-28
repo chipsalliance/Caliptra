@@ -1501,6 +1501,8 @@ Table: REPORT_EPOCH_KEY_STATE output arguments
 | hek_state       | u16         | State of the currently-active HEK. See       |
 |                 |             | @tbl:hek-state-values.                       |
 +-----------------+-------------+----------------------------------------------+
+| sek_state       | u16         | SEK state from the input argument.           |
++-----------------+-------------+----------------------------------------------+
 | next_action     | u16         | A bit field representation of the next       |
 |                 |             | actions that can be taken on the epoch keys. |
 |                 |             | See @tbl:next-action-values.                 |
@@ -1525,22 +1527,69 @@ Table: SEK state values {#tbl:sek-state-values}
 
 Table: HEK state values {#tbl:hek-state-values}
 
-+-------------+-------------+--------------------------+
-| Value       | Description | KMB willing to load MEKs |
-|             |             | in this state            |
-+=============+=============+==========================+
-| 0h          | EMPTY       | No                       |
-+-------------+-------------+--------------------------+
-| 1h          | ZEROIZED    | No                       |
-+-------------+-------------+--------------------------+
-| 2h          | INVALID     | No                       |
-+-------------+-------------+--------------------------+
-| 3h          | PROGRAMMED  | Yes                      |
-+-------------+-------------+--------------------------+
-| 4h          | PERMANENT   | Yes                      |
-+-------------+-------------+--------------------------+
-| 5h to FFFFh | Reserved    |                          |
-+-------------+-------------+--------------------------+
++-------+-----------------------+---------------+-----------------------+
+| Value | State                 | Caliptra      | Description           |
+|       |                       | lifecycle     |                       |
+|       |                       | state         |                       |
++=======+=======================+===============+=======================+
+| 0h    | HEK_AVAIL_PREPROD     | Unprovisioned | Drive is unable to    |
+|       |                       | or            | provision ratchet     |
+|       |                       | Manufacturing | secrets. HEK is only  |
+|       |                       |               | available for         |
+|       |                       |               | pre-production        |
+|       |                       |               | testing.              |
++-------+-----------------------+---------------+-----------------------+
+| 1h    | HEK_AVAIL_PROD        | Production    | A randomized ratchet  |
+|       |                       |               | secret is provisioned |
+|       |                       |               | in the current slot.  |
++-------+-----------------------+---------------+-----------------------+
+| 2h    | HEK_AVAIL_PERMANENT   | Production    | All ratchet secrets   |
+|       |                       |               | have been zeroized    |
+|       |                       |               | and permanent HEK     |
+|       |                       |               | mode has been         |
+|       |                       |               | enabled.              |
++-------+-----------------------+---------------+-----------------------+
+| 3h    | HEK_UNAVAIL_EMPTY     | Production    | The current ratchet   |
+|       |                       |               | secret slot is        |
+|       |                       |               | unprovisioned. The    |
+|       |                       |               | PROGRAM_NEXT_HEK      |
+|       |                       |               | command can be used   |
+|       |                       |               | to provisiona new     |
+|       |                       |               | secret.               |
++-------+-----------------------+---------------+-----------------------+
+| 4h    | HEK_UNAVAIL_ZEROIZED  | Production    | All ratchet secrets   |
+|       |                       |               | have been zeroized.   |
+|       |                       |               | The                   |
+|       |                       |               | ENABLE_PERMANENT_HEK  |
+|       |                       |               | command can be used   |
+|       |                       |               | to make HEKs          |
+|       |                       |               | available but the     |
+|       |                       |               | drive can no longer   |
+|       |                       |               | be cryptographically  |
+|       |                       |               | erased via ratchet    |
+|       |                       |               | secret zeroization.   |
++-------+-----------------------+---------------+-----------------------+
+| 5h    | HEK_UNAVAIL_CORRUPTED | Production    | The current ratchet   |
+|       |                       |               | secret slot is        |
+|       |                       |               | corrupted. The        |
+|       |                       |               | ZEROIZE_CURRENT_HEK   |
+|       |                       |               | commmand should be    |
+|       |                       |               | used clear the        |
+|       |                       |               | current slot and      |
+|       |                       |               | advance to the next   |
+|       |                       |               | available slot.       |
++-------+-----------------------+---------------+-----------------------+
+| 6h to | Reserved              |               | Reserved.             |
+| FFFFh |                       |               |                       |
++-------+-----------------------+---------------+-----------------------+
+
+See @tbl:hek-lifecycle-states for more information about the relationship between HEKs and Caliptra lifecycle states.
+
+HEK_AVAILABLE_PREPRODUCTION → HEK_UNAVAILABLE_EMPTY is a one-way transition that the device vendor is expected to trigger by advancing the Caliptra lifecycle state to Production.
+
+HEK_UNAVAILABLE_ZEROIZED → HEK_AVAILABLE_PERMANENT is a one-way transition that the device owner can trigger using the ENABLE_PERMANENT_HEK command.
+
+See @fig:hek-sek-rotation for more details about the transitions between HEK states.
 
 Table: Next action values {#tbl:next-action-values}
 
@@ -1824,7 +1873,47 @@ See <https://github.com/chipsalliance/Caliptra/tree/main/doc/ocp_lock>.
 
 # EAT format for attesting to the epoch key state {#sec:eat-format}
 
-This section will be fleshed out with additional details as they become available.
+This section provides the Entity Attestation Token (EAT) claims set as defined in [@{ietf-rfc9711}]. These claims describe the state and characteristics of the device. Keys and other cryptographic identifiers are captured and attested to by DICE and are therefore excluded from these claims.
+
+For concise encoding and simplicity all claim values will be 32 bit little-endian unsigned integers. This type is define as \`#0.26\` in section 2.1 of [@{ietf-rfc7049}].
+
+- \`0\` is the CBOR major type for an unsigned integer
+- \`26\` specifies it as a uint32_t type
+
+Table: EAT claims {#tbl:eat-claims}
+
++--------+-----------------+------------------------------------+
+| mkey # | Name            | Description                        |
++========+=================+====================================+
+| 0      | EAT_VERSION     | Describes the version of this EAT  |
+|        |                 | format. This value is increased    |
+|        |                 | whenever an mkey is added,         |
+|        |                 | removed, or modified.              |
++--------+-----------------+------------------------------------+
+| 1      | TOTAL_HEK_SLOTS | Total number of HEK slots.         |
++--------+-----------------+------------------------------------+
+| 2      | ACTIVE_HEK_SLOT | Index of the currently-active HEK  |
+|        |                 | slot.                              |
++--------+-----------------+------------------------------------+
+| 3      | HEK_STATE       | State of the currently-active HEK. |
+|        |                 | See @tbl:hek-state-values for      |
+|        |                 | details.                           |
++--------+-----------------+------------------------------------+
+| 4      | SEK_STATE       | State of the SEK. See              |
+|        |                 | @tbl:sek-state-values for details. |
++--------+-----------------+------------------------------------+
+
+The following code block is an example CDDL description for the EAT:
+
+```cddl
+eat = {
+  &(eat-version: 0) => #0.26,
+  &(total-hek-slots: 2) => #0.26,
+  &(active-hek-slot: 3) => #0.26,
+  &(hek-state: 4) => #0.26,
+  &(sek-state: 5) => #0.26,
+}
+```
 
 # Sequence diagrams
 
