@@ -1999,7 +1999,48 @@ Therefore a given input secret may safely be used in at most $2^{64.5}$ precondi
 
 # EAT format for attesting to the epoch key state {#sec:eat-format}
 
-This section will be fleshed out with additional details as they become available.
+This section provides an Entity Attestation Token (EAT) claims set as defined in RFC 9711 [@{ietf-rfc9711}]. These claims, enumerated in @tbl:eat-claims, describe the sanitization and epoch key state of the device. Other characteristics of the device, such as keys and other cryptographic identifiers, are captured and attested to by DICE and are therefore excluded from these claims.
+
+For concise encoding and simplicity, all claim values are 32-bit little-endian unsigned integers. This type is define as \`#0.26\` in section 2.1 of RFC 7049 [@{ietf-rfc7049}].
+
+- \`0\` is the CBOR major type for an unsigned integer
+- \`26\` specifies it as a uint32_t type
+
+Table: EAT claims {#tbl:eat-claims}
+
++--------+-----------------+------------------------------------+
+| mkey # | Name            | Description                        |
++========+=================+====================================+
+| 0      | EAT_VERSION     | Describes the version of this EAT  |
+|        |                 | format. This value is increased    |
+|        |                 | whenever an mkey is added,         |
+|        |                 | removed, or modified. The current  |
+|        |                 | version is \`0\`.                  |
++--------+-----------------+------------------------------------+
+| 1      | TOTAL_HEK_SLOTS | Total number of HEK slots.         |
++--------+-----------------+------------------------------------+
+| 2      | ACTIVE_HEK_SLOT | Index of the currently-active HEK  |
+|        |                 | slot.                              |
++--------+-----------------+------------------------------------+
+| 3      | HEK_STATE       | State of the currently-active HEK. |
+|        |                 | See @tbl:hek-state-values for      |
+|        |                 | details.                           |
++--------+-----------------+------------------------------------+
+| 4      | SEK_STATE       | State of the SEK. See              |
+|        |                 | @tbl:sek-state-values for details. |
++--------+-----------------+------------------------------------+
+
+The following code block is an example CDDL description for the EAT:
+
+```cddl
+eat = {
+  &(eat-version: 0) => #0.26,
+  &(total-hek-slots: 1) => #0.26,
+  &(active-hek-slot: 2) => #0.26,
+  &(hek-state: 3) => #0.26,
+  &(sek-state: 4) => #0.26,
+}
+```
 
 # Sequence diagrams
 

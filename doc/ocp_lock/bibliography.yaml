@@ -68,6 +68,19 @@ references:
       year: 2010
       month: 5
     url: "https://datatracker.ietf.org/doc/html/rfc5869"
+  - id: "ietf-rfc7049"
+    title: "Concise Binary Object Representation (CBOR)"
+    author:
+      - family: "Bormann"
+        given: "C."
+        affiliation: "Universitaet Bremen TZI"
+      - family: "Hoffman"
+        given: "P."
+        affiliation: "VPN Consortium"
+    issued:
+      year: 2013
+      month: 10
+    url: "https://datatracker.ietf.org/doc/html/rfc7049"
   - id: "ietf-rfc8446"
     title: "The Transport Layer Security (TLS) Protocol Version 1.3"
     publisher: "IETF"
@@ -82,6 +95,22 @@ references:
       year: 2022
       month: 2
     url: "https://datatracker.ietf.org/doc/html/rfc9180"
+  - id: "ietf-rfc9711"
+    title: "The Entity Attestation Token (EAT)"
+    author:
+      - family: "Lundblade"
+        given: "L."
+        affiliation: "Security Theory LLC"
+      - family: "O'Donoghue"
+        given: "J."
+        affiliation: "Qualcomm Technologies Inc."
+      - family: "Wallace"
+        given: "C."
+        affiliation: "Red Hound Software Inc."
+    issued:
+      year: 2025
+      month: 4
+    url: "https://datatracker.ietf.org/doc/html/rfc9711"
   - id: "draft-ietf-lamps-dilithium-certificates"
     title: "Internet X.509 Public Key Infrastructure: Algorithm Identifiers for ML-DSA"
     author:
