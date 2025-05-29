@@ -932,7 +932,7 @@ Table: ROTATE_ENCAPSULATION_KEY output arguments
 
 #### GENERATE_MPK
 
-This command unwraps the specified access key, generates a random MPK, then uses the HEK and access key to encrypt the MPK which is returned for the drive to persistently store. The given \`metadata\` is placed in the  \`metadata\` field of the returned MPK to cryptographically tie them together.
+This command unwraps the specified access key, generates a random MPK, then uses the HEK and access key to encrypt the MPK which is returned for the drive to persistently store. The given \`metadata\` is placed in the  \`metadata\` field of the returned MPK to cryptographically tie them together. Note that "metadata" in this context refers to metadata about the MPK, and bears no relation to metadata about an MEK.
 
 Command Code: 0x474D_504B ("GMPK")
 
