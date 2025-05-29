@@ -351,32 +351,29 @@ Caliptra with L.O.C.K. features a series of n 256-bit ratchet secrets present in
 
 #### HEK derivation
 
-@tbl:hek-lifecycle-states describes the states between which the HEK transitions over the lifespan of the device. The lifecycle state of the HEK is determined by Caliptra Subsystem's [lifecycle state](https://github.com/chipsalliance/caliptra-ss/blob/9d10858/docs/CaliptraSSHardwareSpecification.md#caliptra-subsystem-lcc-state-definitions) as well as the state of the ratchet secret fuse bank.
+@tbl:hek-lifecycle-states describes the states between which the HEK transitions over the lifespan of the device. The lifecycle state of the HEK is determined by Caliptra's [lifecycle state](https://github.com/chipsalliance/Caliptra/blob/c0fa71e/doc/Caliptra.md#caliptra-security-states) as well as the state of the ratchet secret fuse bank.
 
 Table: HEK lifecycle states {#tbl:hek-lifecycle-states}
 
-+----------------------------------+-------------------------+-------------------+---------------------------------------------------+
-| Caliptra lifecycle state         | Ratchet secret state    | Derivation inputs | Description                                       |
-+==================================+=========================+===================+===================================================+
-| RAW, TEST_LOCKED, TEST_UNLOCKED, | [Any]                   | SIK               | HEK is available for pre-production testing.      |
-| or MANUF                         |                         |                   |                                                   |
-+----------------------------------+-------------------------+-------------------+---------------------------------------------------+
-| PROD, PROD_END, or RMA           | No ratchet secret is    | N/A               | HEK is unavailable.                               |
-|                                  | randomized.             |                   |                                                   |
-+----------------------------------+-------------------------+-------------------+---------------------------------------------------+
-| PROD, PROD_END, or RMA           | R~x~ is randomized.     | SIK and R~x~      | HEK is available and can be disabled by zeroizing |
-|                                  |                         |                   | R~x~.                                             |
-+----------------------------------+-------------------------+-------------------+---------------------------------------------------+
-| PROD, PROD_END, or RMA           | Every ratchet secret is | SIK               | HEK is permanently available. Owners may opt into |
-|                                  | zeroized.               |                   | this state once every ratchet secret has been     |
-|                                  |                         |                   | zeroized.                                         |
-|                                  |                         |                   |                                                   |
-|                                  |                         |                   | In this state, data written to the storage device |
-|                                  |                         |                   | can no longer be cryptographically erased via     |
-|                                  |                         |                   | ratchet secret zeroization.                       |
-+----------------------------------+-------------------------+-------------------+---------------------------------------------------+
-| SCRAP or INVALID                 | [Any]                   | N/A               | HEK is unavailable.                               |
-+----------------------------------+-------------------------+-------------------+---------------------------------------------------+
++--------------------------------+-------------------------+-------------------+---------------------------------------------------+
+| Caliptra lifecycle state       | Ratchet secret state    | Derivation inputs | Description                                       |
++================================+=========================+===================+===================================================+
+| Unprovisioned or Manufacturing | [Any]                   | SIK               | HEK is available for pre-production testing.      |
++--------------------------------+-------------------------+-------------------+---------------------------------------------------+
+| Production                     | No ratchet secret is    | N/A               | HEK is unavailable. Operations that use the HEK   |
+|                                | randomized.             |                   | are disallowed.                                   |
++--------------------------------+-------------------------+-------------------+---------------------------------------------------+
+| Production                     | R~x~ is randomized.     | SIK and R~x~      | HEK is available and can be disabled by zeroizing |
+|                                |                         |                   | R~x~.                                             |
++--------------------------------+-------------------------+-------------------+---------------------------------------------------+
+| Production                     | Every ratchet secret is | SIK               | HEK is permanently available. Owners may opt into |
+|                                | zeroized.               |                   | this state once every ratchet secret has been     |
+|                                |                         |                   | zeroized.                                         |
+|                                |                         |                   |                                                   |
+|                                |                         |                   | In this state, data written to the storage device |
+|                                |                         |                   | can no longer be cryptographically erased via     |
+|                                |                         |                   | ratchet secret zeroization.                       |
++--------------------------------+-------------------------+-------------------+---------------------------------------------------+
 
 @tbl:hek-lifecycle-commands describes the commands that KMB exposes to manage the HEK lifecycle.
 
@@ -401,8 +398,6 @@ Table: HEK lifecycle management commands {#tbl:hek-lifecycle-commands}
 
 If an error causes the active ratchet secret to be left in an invalid state, MEKs may not be loaded. If this state persists, the device is unusable.
 
-A device out of manufacturing must be in production mode with a ratchet secret programmed.
-
 @fig:hek-derivation illustrates HEK derivation, for the states where the HEK is available.
 
 ![HEK derivation](./diagrams/hek_derivation.drawio.svg){#fig:hek-derivation}
@@ -412,6 +407,8 @@ A device out of manufacturing must be in production mode with a ratchet secret p
 @fig:hek-sek-rotation illustrates the case where a drive ships with four ratchet secrets.
 
 ![HEK and SEK state machine](./diagrams/hek_sek_rotation.drawio.svg){#fig:hek-sek-rotation}
+
+A device out of manufacturing must be in the production lifecycle state and have a randomized ratchet secret.
 
 Drive firmware is responsible for enforcing that SEK programming and zeroization follows the state machine illustrated in @fig:hek-sek-rotation. Specifically:
 
@@ -1707,6 +1704,10 @@ Table: KMB mailbox command result codes {#tbl:kmb-mailbox-codes}
 | LOCK_EE_NOT_READY      | 0x4C45_4E52 | Encryption engine was    |
 |                        | ("LENR")    | not ready when the       |
 |                        |             | command was received.    |
++------------------------+-------------+--------------------------+
+| LOCK_HEK_NOT_AVAILABLE | 0x4C48_4E41 | The operation requires   |
+|                        | ("LHNA")    | the HEK, which is        |
+|                        |             | unavailable.             |
 +------------------------+-------------+--------------------------+
 
 ##### Fatal errors
