@@ -161,7 +161,7 @@ A product which integrates OCP L.O.C.K. will be expected to undergo an OCP S.A.F
 
 ---
 
-## Architecture
+## Architecture {#sec:architecture}
 
 ![OCP L.O.C.K. high level blocks](./diagrams/architecture_diagram.drawio.svg){#fig:architecture-diagram}
 
@@ -262,7 +262,7 @@ The only difference between @fig:hpke-unwrap-ecdh and @fig:hpke-unwrap-hybrid is
 
 MPKs can be generated, made ready, and have their access keys rotated.
 
-##### MPK generation
+##### MPK generation {#sec:mpk-generation}
 
 Drive firmware may request that KMB generate an MPK, bound to a given access key. KMB performs the following steps:
 
@@ -277,6 +277,8 @@ Drive firmware may then store the encrypted MPK in persistent storage.
 To mitigate against cryptographic attacks on the HPKE keypair that rely on repeated invocations of this command, this command is rate-limited.
 
 ![MPK generation](./diagrams/mpk_generate.drawio.svg){#fig:mpk-generation}
+
+To comply with SP 800-38D [@{sp800-38d}] section 8.3's stipulation that AES-GCM-Encrypt may only be invoked at most 2^32^ times with a given key, drive firmware is responsible for ensuring that no more than 2^32^ MPKs are generated for a given SEK.
 
 ##### MPK readying
 
@@ -296,7 +298,9 @@ To mitigate against cryptographic attacks on the HPKE keypair that rely on repea
 
 ![MPK readying](./diagrams/mpk_ready.drawio.svg){#fig:mpk-readying}
 
-##### MPK access key rotation
+To comply with SP 800-38D section 8.3's stipulation that AES-GCM-Encrypt may only be invoked at most 2^32^ times with a given key, KMB will ensure that no more than 2^32^ MPKs are made ready in a given boot cycle.
+
+##### MPK access key rotation {#sec:mpk-access-key-rotation}
 
 The access key to which an MPK is bound may be rotated. The user must prove that they have knowledge of both the old and new access key before a rotation is allowed. This is accomplished using a slight variation on the usual access key import flow. When a new access key is provided to KMB during a rotation, the new access key is double-encrypted: first to the old access key, and then to the HPKE public key. KMB performs the following steps:
 
@@ -314,6 +318,8 @@ To mitigate against cryptographic attacks on the HPKE keypair that rely on repea
 
 ![MPK access key rotation](./diagrams/mpk_access_key_rotation.drawio.svg){#fig:mpk-access-key-rotation}
 
+To comply with SP 800-38D section 8.3's stipulation that AES-GCM-Encrypt may only be invoked at most 2^32^ times with a given key, drive firmware is responsible for ensuring that no more than 2^32^ MPKs' access keys are rotated for a given SEK.
+
 ### DPKs
 
 Drive firmware provides the DPK (Data Protection Key) to KMB when generating, loading, or deriving an MEK. The DPK is used in a KDF, along with the HEK, SEK, and MPKs, to derive the MEK secret, as illustrated in @sec:meks.
@@ -330,7 +336,7 @@ In this flow, the DPK may be the imported key associated with a Key Per I/O key 
 
 ![Example drive flow to accept an injected DPK](./diagrams/dpk_injection.drawio.svg){#fig:dpk-injection}
 
-### HEKs and SEKs
+### HEKs and SEKs {#sec:heks-seks}
 
 KMB supports a pair of epoch keys: the HEK and SEK. Both must be available, i.e. non-zeroized, in order for MEKs to be loaded.
 
@@ -402,7 +408,7 @@ If an error causes the active ratchet secret to be left in an invalid state, MEK
 
 ![HEK derivation](./diagrams/hek_derivation.drawio.svg){#fig:hek-derivation}
 
-#### HEK and SEK lifecycle
+#### HEK and SEK lifecycle {#sec:hek-sek-lifecycle}
 
 @fig:hek-sek-rotation illustrates the case where a drive ships with four ratchet secrets.
 
@@ -425,13 +431,15 @@ KMB can encrypt randomly-generated MEKs, or compute derived MEKs.
 
 Note: it is the drive firmware's responsibility to ensure that MPKs are mixed in the correct order for a given MEK.
 
-#### Generating and loading a random MEK
+#### Generating and loading a random MEK {#sec:generating-loading-mek}
 
 The figures in this section elide the process of deriving the MEK secret, as those details are captured in @fig:mek-secret-derivation. When an MEK is generated or loaded, the inputs given in @fig:mek-secret-derivation are provided by drive firmware so that KMB may derive the MEK secret.
 
 ![Generating an MEK](./diagrams/mek_generate.drawio.svg){#fig:mek-generate}
 
 ![Loading an MEK](./diagrams/mek_load.drawio.svg){#fig:mek-load}
+
+To comply with SP 800-38D section 8.3's stipulation that AES-GCM-Encrypt may only be invoked at most 2^32^ times with a given key, drive firmware is responsible for ensuring that no more than 2^32^ MEKs are generated for a given tuple of (SEK, DPK, list of MPKs).
 
 ### Random key generation via DRBG
 
@@ -1802,18 +1810,32 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 | 2    | OCP L.O.C.K. shall be enabled.                   | Yes       |
 +------+--------------------------------------------------+-----------+
 | 3    | Media encryption keys shall only be programmable |           |
-|      | to the encryption engine via Caliptra.           | Yes       |
+|      | to the encryption engine via Caliptra. See       | Yes       |
+|      | [@{sec:architecture}].                           |           |
 +------+--------------------------------------------------+-----------+
 | 4    | The encryption engine shall remove all MEKs from | Yes       |
-|      | the encryption engine on a power cycle or during |           |
-|      | zeroization of the storage device.               |           |
+|      | the encryption engine on a power cycle or upon   |           |
+|      | request from drive firmware. See                 |           |
+|      | [@{sec:architecture}].                           |           |
 +------+--------------------------------------------------+-----------+
 | 5    | The SEK shall only be programmed once the HEK is | Yes       |
 |      | available, and the HEK shall only be zeroized    |           |
-|      | once the SEK is zeroized.                        |           |
+|      | once the SEK is zeroized. See                    |           |
+|      | [@{sec:hek-sek-lifecycle}].                      |           |
 +------+--------------------------------------------------+-----------+
 | 6    | MEKs shall not be programmed while the SEK is    | Yes       |
-|      | zeroized.                                        |           |
+|      | zeroized. See [@{sec:heks-seks}].                |           |
++------+--------------------------------------------------+-----------+
+| 7    | No more than 2^32^ MPKs shall be generated for a | Yes       |
+|      | given SEK. See [@{sec:mpk-generation}].          |           |
++------+--------------------------------------------------+-----------+
+| 8    | No more than 2^32^ MPKs' access keys shall be    | Yes       |
+|      | rotated for a given SEK. See                     |           |
+|      | [@{sec:mpk-access-key-rotation}].                |           |
++------+--------------------------------------------------+-----------+
+| 9    | No more than 2^32^ MEKs shall be generated for a | Yes       |
+|      | given tuple of (SEK, DPK, list of MPKs). See     |           |
+|      | [@{sec:generating-loading-mek}].                 |           |
 +------+--------------------------------------------------+-----------+
 
 ## Repository location
