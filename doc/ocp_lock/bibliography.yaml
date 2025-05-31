@@ -101,4 +101,42 @@ references:
     title: "Caliptra 2.0 RTL Specification"
     publisher: "CHIPS Alliance"
     url: "https://github.com/chipsalliance/caliptra-rtl/blob/ea416cb/docs/CaliptraHardwareSpecification.md"
-  
+  - id: "ietf-rfc9711"
+    title: "The Entity Attestation Token (EAT)"
+    author:
+      - family: "Lundblade"
+        given: "L."
+        affiliation: "Security Theory LLC"
+      - family: "O'Donoghue"
+        given: "J."
+        affiliation: "Qualcomm Technologies Inc."
+      - family: "Wallace"
+        given: "C."
+        affiliation: "Red Hound Software Inc."
+    issued:
+      year: 2025
+      month: 4
+    url: "https://datatracker.ietf.org/doc/html/rfc9711"
+  - id: "ietf-rfc8746"
+    title: "Concise Binary Object Representation (CBOR) Tags for Typed Arrays"
+    author:
+      - family: "Bormann"
+        given: "C."
+        affiliation: "Universität Bremen TZI"
+    issued:
+      year: 2020
+      month: 2
+    url: "https://datatracker.ietf.org/doc/html/rfc8746"
+  - id: "ietf-rfc7049"
+    title: "Concise Binary Object Representation (CBOR)"
+    author:
+      - family: "Bormann"
+        given: "C."
+        affiliation: "Universitaet Bremen TZI"
+      - family: "Hoffman"
+        given: "P."
+        affiliation: "VPN Consortium"
+    issued:
+      year: 2013
+      month: 10
+    url: "https://datatracker.ietf.org/doc/html/rfc7049"
