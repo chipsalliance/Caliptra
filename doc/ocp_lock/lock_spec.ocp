@@ -216,6 +216,18 @@ Each input key is preconditioned using a unique identifier composed from each of
 
 Subsequent diagrams will use this operation when combining keys with different scopes or lifetimes.
 
+#### Preconditioned AES {#sec:preconditioned-aes}
+
+In this specification, several flows involve deriving a key for use in AES-GCM. SP 800-38D [@{sp800-38d}] section 8.3 stipulates that AES-GCM-Encrypt may only be invoked at most 2^32^ times with a given AES key. To address this constraint, it is common to maintain counters to track the usage count of a given key. Such tracking would be difficult for Caliptra, which lacks direct access to rewritable storage which would be needed to maintain a counter that preserves its value across power cycles.
+
+To elide the need for maintaining counters, this specification defines the "preconditioned AES-Encrypt" and "preconditioned AES-Decrypt" operations, illustrated in @fig:preconditioned-aes-encrypt and @fig:preconditioned-aes-decrypt.
+
+![Preconditioned AES-Encrypt](./diagrams/preconditioned_aes_encrypt.drawio.svg){#fig:preconditioned-aes-encrypt}
+
+![Preconditioned AES-Decrypt](./diagrams/preconditioned_aes_decrypt.drawio.svg){#fig:preconditioned-aes-decrypt}
+
+Each AES secret is preconditioned using a randomly-generated 64-bit identifier, before being used with AES-GCM-Encrypt. This ensures that it will take approximately 2^97^ preconditioned AES-Encrypt operations with a given input secret before a derived key will be used in more than 2^32^ encryption operations. 2^97^ is large enough that a given storage device will experience hardware failure well before that limit is reached. See [Appendix @sec:preconditioned-aes-calculations] for additional details on the calculations behind this figure.
+
 ### MPKs {#sec:mpks}
 
 MPKs are the mechanism by which KMB enforces multi-party authorization as a precondition to loading an MEK. MPKs exist in one of two states: locked or ready. In both these states the MPK is encrypted to a key known only to KMB.
@@ -425,13 +437,21 @@ KMB can encrypt randomly-generated MEKs, or compute derived MEKs.
 
 Note: it is the drive firmware's responsibility to ensure that MPKs are mixed in the correct order for a given MEK.
 
-#### Generating and loading a random MEK
+See @sec:generate-load-random-mek for how the MEK secret is used to generate and load random MEKs. See @sec:derive-mek for how the MEK secret is used to derive deterministic MEKs.
 
-The figures in this section elide the process of deriving the MEK secret, as those details are captured in @fig:mek-secret-derivation. When an MEK is generated or loaded, the inputs given in @fig:mek-secret-derivation are provided by drive firmware so that KMB may derive the MEK secret.
+#### Generating and loading a random MEK {#sec:generate-load-random-mek}
+
+@fig:mek-generate and @fig:mek-load elide the process of deriving the MEK secret, as those details are captured in @fig:mek-secret-derivation. When an MEK is generated or loaded, the inputs given in @fig:mek-secret-derivation are provided by drive firmware so that KMB may derive the MEK secret.
 
 ![Generating an MEK](./diagrams/mek_generate.drawio.svg){#fig:mek-generate}
 
 ![Loading an MEK](./diagrams/mek_load.drawio.svg){#fig:mek-load}
+
+#### Deriving an MEK {#sec:derive-mek}
+
+@fig:mek-derive elides the process of deriving the MEK secret, as those details are captured in @fig:mek-secret-derivation. When an MEK is derived, the inputs given in @fig:mek-secret-derivation are provided by drive firmware so that KMB may derive the MEK secret.
+
+![Deriving an MEK](./diagrams/mek_derive.drawio.svg){#fig:mek-derive}
 
 ### Random key generation via DRBG
 
@@ -1611,31 +1631,33 @@ AES-256-GCM is used for all wrapping and unwrapping.
 
 Table: WrappedKey contents
 
-+--------------+------------------+--------------------------------------------+
-| Name         | Type             | Description                                |
-+==============+==================+============================================+
-| key_type     | u16              | Type of the wrapped key.                   |
-|              |                  |                                            |
-|              |                  | - 0h: Reserved                             |
-|              |                  | - 1h: LOCKED_MPK (ciphertext held at rest) |
-|              |                  | - 2h: READY_MPK (ciphertext held in RAM)   |
-|              |                  | - 3h: WRAPPED_MEK                          |
-|              |                  | - 4h to FFFFh: Reserved                    |
-+--------------+------------------+--------------------------------------------+
-| reserved     | u16              | Reserved.                                  |
-+--------------+------------------+--------------------------------------------+
-| metadata_len | u32              | Length of the metadata field.              |
-+--------------+------------------+--------------------------------------------+
-| ct_len       | u32              | Length of the ct field.                    |
-+--------------+------------------+--------------------------------------------+
-| iv           | u8[12]           | Initialization vector for AES operation.   |
-+--------------+------------------+--------------------------------------------+
-| metadata     | u8[metadata_len] | Metadata associated with the wrapped key.  |
-+--------------+------------------+--------------------------------------------+
-| ct           | u8[ct_len]       | Key ciphertext and authentication tag.     |
-+--------------+------------------+--------------------------------------------+
++--------------+------------------+----------------------------------------------+
+| Name         | Type             | Description                                  |
++==============+==================+==============================================+
+| key_type     | u16              | Type of the wrapped key.                     |
+|              |                  |                                              |
+|              |                  | - 0h: Reserved                               |
+|              |                  | - 1h: LOCKED_MPK (ciphertext held at rest)   |
+|              |                  | - 2h: READY_MPK (ciphertext held in RAM)     |
+|              |                  | - 3h: WRAPPED_MEK                            |
+|              |                  | - 4h to FFFFh: Reserved                      |
++--------------+------------------+----------------------------------------------+
+| reserved     | u16              | Reserved.                                    |
++--------------+------------------+----------------------------------------------+
+| id           | u64              | Random identifier for the given wrapped key. |
++--------------+------------------+----------------------------------------------+
+| metadata_len | u32              | Length of the metadata field.                |
++--------------+------------------+----------------------------------------------+
+| ct_len       | u32              | Length of the ct field.                      |
++--------------+------------------+----------------------------------------------+
+| iv           | u8[12]           | Initialization vector for AES operation.     |
++--------------+------------------+----------------------------------------------+
+| metadata     | u8[metadata_len] | Metadata associated with the wrapped key.    |
++--------------+------------------+----------------------------------------------+
+| ct           | u8[ct_len]       | Key ciphertext and authentication tag.       |
++--------------+------------------+----------------------------------------------+
 
-The AAD for the encrypted message is constructed as \`key_type\` || \`metadata_len\` || \`metadata\`.
+The AAD for the encrypted message is constructed as \`key_type\` || \`id\` || \`metadata_len\` || \`metadata\`.
 
 Variants of WrappedKey will be used to reduce duplicating information in commands. The following names will be used for WrappedKeys of a specific \`key_type\` and \`ct_len\`:
 
@@ -1821,6 +1843,12 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 See <https://github.com/chipsalliance/Caliptra/tree/main/doc/ocp_lock>.
 
 \beginappendices
+
+# Preconditioned AES-Encrypt calculations {#sec:preconditioned-aes-calculations}
+
+This appendix expands on @sec:preconditioned-aes and provides additional details behind the claim that approximately $2^{97}$ preconditioned AES-Encrypt operations for a given secret are needed before an AES-GCM key will be used in more than $2^{32}$ encryption operations.
+
+This can be put in terms of the "Balls into bins" problem [@{balls-into-bins}], where we are looking for the number of balls ($m$) required for the maximum load ($L$) across $2^{64}$ bins ($n$) to be $2^{32}$. An approximation for the maximum load where $m>n$ is given as $L=\frac{m}{n}+\sqrt{\frac{m·log(n)}{n}}$. Rearranging to solve for $m$ via the quadratic formula yields $m≈2^{96}$.
 
 # EAT format for attesting to the epoch key state {#sec:eat-format}
 
