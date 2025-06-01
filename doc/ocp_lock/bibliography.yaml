@@ -33,6 +33,13 @@ references:
       year: 2025
       month: 4
     url: "https://csrc.nist.gov/csrc/media/Projects/cryptographic-module-validation-program/documents/fips%20140-3/FIPS%20140-3%20IG.pdf"
+  - id: "sp800-38d"
+    title: "Recommendation for Block Cipher Modes of Operation: Galois/Counter Mode (GCM) and GMAC"
+    publisher: "NIST"
+    issued:
+      year: 2007
+      month: 11
+    url: "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf"
   - id: "sp800-133r2"
     title: "Recommendation for Cryptographic Key Generation (Rev. 2)"
     publisher: "NIST"
@@ -101,4 +108,10 @@ references:
     title: "Caliptra 2.0 RTL Specification"
     publisher: "CHIPS Alliance"
     url: "https://github.com/chipsalliance/caliptra-rtl/blob/ea416cb/docs/CaliptraHardwareSpecification.md"
-  
+  - id: "balls-into-bins"
+    title: "Balls into bins problem"
+    publisher: "Wikipedia"
+    url: "https://en.wikipedia.org/wiki/Balls_into_bins_problem"
+    accessed:
+      year: 2025
+      month: 5
