@@ -226,7 +226,7 @@ To elide the need for maintaining counters, this specification defines the "prec
 
 ![Preconditioned AES-Decrypt](./diagrams/preconditioned_aes_decrypt.drawio.svg){#fig:preconditioned-aes-decrypt}
 
-Each AES secret is preconditioned using a randomly-generated 64-bit identifier, before being used with AES-GCM-Encrypt. This ensures that it will take approximately 2^97^ preconditioned AES-Encrypt operations with a given input secret before a derived key will be used in more than 2^32^ encryption operations. 2^97^ is large enough that a given storage device will experience hardware failure well before that limit is reached. See [Appendix @sec:preconditioned-aes-calculations] for additional details on the calculations behind this figure.
+Each AES secret is preconditioned using a randomly-generated 64-bit identifier, before being used with AES-GCM-Encrypt. This ensures that it will take approximately 2^96^ preconditioned AES-Encrypt operations with a given input secret before a derived key will be used in more than 2^32^ encryption operations. 2^96^ is large enough that a given storage device will experience hardware failure well before that limit is reached. See [Appendix @sec:preconditioned-aes-calculations] for additional details on the calculations behind this figure.
 
 ### MPKs {#sec:mpks}
 
@@ -1846,7 +1846,7 @@ See <https://github.com/chipsalliance/Caliptra/tree/main/doc/ocp_lock>.
 
 # Preconditioned AES-Encrypt calculations {#sec:preconditioned-aes-calculations}
 
-This appendix expands on @sec:preconditioned-aes and provides additional details behind the claim that approximately $2^{97}$ preconditioned AES-Encrypt operations for a given secret are needed before an AES-GCM key will be used in more than $2^{32}$ encryption operations.
+This appendix expands on @sec:preconditioned-aes and provides additional details behind the claim that approximately $2^{96}$ preconditioned AES-Encrypt operations for a given secret are needed before an AES-GCM key will be used in more than $2^{32}$ encryption operations.
 
 This can be put in terms of the "Balls into bins" problem [@{balls-into-bins}], where we are looking for the number of balls ($m$) required for the maximum load ($L$) across $2^{64}$ bins ($n$) to be $2^{32}$. An approximation for the maximum load where $m>n$ is given as $L=\frac{m}{n}+\sqrt{\frac{m·log(n)}{n}}$. Rearranging to solve for $m$ via the quadratic formula yields $m≈2^{96}$.
 
