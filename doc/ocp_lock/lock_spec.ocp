@@ -4,34 +4,6 @@ version: 0.8.1
 type: BASE
 project: NVMe^TM^
 authors: [(See Acknowledgements section)]
-contributor_cla_signers: [Google, Microsoft, Samsung, Kioxia, Solidigm]
-acknowledgements: [
-  Andrés Lagar-Cavilla (Google),
-  Amber Huffman (Google)
-  Charles Kunzman (Google),
-  Chris Sabol (Google),
-  Jeff Andersen (Google),
-  Srini Narayanamurthy (Google),
-  Anjana Parthasarathy (Microsoft),
-  Ben Keen (Microsoft),
-  Bharat Pillilli (Microsoft),
-  Bryan Kelly (Microsoft),
-  Christopher Swenson (Microsoft),
-  Eric Eilertson (Microsoft),
-  Lee Prewitt (Microsoft),
-  Michael Norris (Microsoft),
-  Eric Hibbard (Samsung),
-  Gwangbae Choi (Samsung),
-  Jisoo Kim (Samsung),
-  Michael Allison (Samsung),
-  Festus Hategekimana (Solidigm),
-  Gamil Cain (Solidigm),
-  Scott Shadley (Solidigm),
-  Fred Knight (Kioxia),
-  James Borden (Kioxia),
-  John Geldman (Kioxia),
-  Paul Suhler (Kioxia),
-]
 bibliography: bibliography.yaml
 ...
 ---
@@ -48,14 +20,61 @@ bibliography: bibliography.yaml
 
 ---
 
-\openwebfoundationzeropointninelicense
+# License
+
+## Open Web Foundation (OWF) CLA
+
+Contributions to this Specification are made under the terms and conditions set forth in **Modified Open Web Foundation Agreement 0.9 (OWFa 0.9)**. (As of October 16, 2024)  (“Contribution License”) by:
+
+Google  
+Microsoft  
+Samsung  
+Kioxia  
+Solidigm
+
+Usage of this Specification is governed by the terms and conditions set forth in **Modified OWFa 0.9 Final Specification Agreement (FSA)** (As of October 16, 2024) **(“Specification License”)**.
+
+You can review the applicable Specification License(s) referenced above by the contributors to this Specification on the OCP website at <https://www.opencompute.org/contributions/templates-agreements>.
+
+For actual executed copies of either agreement, please contact OCP directly.
+
+NOTWITHSTANDING THE FOREGOING LICENSES, THIS SPECIFICATION IS PROVIDED BY OCP "AS IS" AND OCP EXPRESSLY DISCLAIMS ANY WARRANTIES (EXPRESS, IMPLIED, OR OTHERWISE), INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY, NON-INFRINGEMENT, FITNESS FOR A PARTICULAR PURPOSE, OR TITLE, RELATED TO THE SPECIFICATION. NOTICE IS HEREBY GIVEN, THAT OTHER RIGHTS NOT GRANTED AS SET FORTH ABOVE, INCLUDING WITHOUT LIMITATION, RIGHTS OF THIRD PARTIES WHO DID NOT EXECUTE THE ABOVE LICENSES, MAY BE IMPLICATED BY THE IMPLEMENTATION OF OR COMPLIANCE WITH THIS SPECIFICATION. OCP IS NOT RESPONSIBLE FOR IDENTIFYING RIGHTS FOR WHICH A LICENSE MAY BE REQUIRED IN ORDER TO IMPLEMENT THIS SPECIFICATION.  THE ENTIRE RISK AS TO IMPLEMENTING OR OTHERWISE USING THE SPECIFICATION IS ASSUMED BY YOU. IN NO EVENT WILL OCP BE LIABLE TO YOU FOR ANY MONETARY DAMAGES WITH RESPECT TO ANY CLAIMS RELATED TO, OR ARISING OUT OF YOUR USE OF THIS SPECIFICATION, INCLUDING BUT NOT LIMITED TO ANY LIABILITY FOR LOST PROFITS OR ANY CONSEQUENTIAL, INCIDENTAL, INDIRECT, SPECIAL OR PUNITIVE DAMAGES OF ANY CHARACTER FROM ANY CAUSES OF ACTION OF ANY KIND WITH RESPECT TO THIS SPECIFICATION, WHETHER BASED ON BREACH OF CONTRACT, TORT (INCLUDING NEGLIGENCE), OR OTHERWISE, AND EVEN IF OCP HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 <!---
 THE UPDATED DEFAULT CONTRIBUTOR LICENSE AGREEMENT (CLA) IS [OWFa 0.9](https://146a55aca6f00848c565-a7635525d40ac1c70300198708936b4e.ssl.cf1.rackcdn.com/images/ed0befaf86bee2568ad720ff4a9a554d1f4260f7.pdf).
 PLEASE VERIFY THE CORRECT CLA/FSA IS USED AND EXECUTED FOR THIS CONTRIBUTION.
 -->
 
-\acknowledgements
+# Acknowledgements
+
+The Contributors of this Specification would like to acknowledge the following:
+
+Andrés Lagar-Cavilla (Google)
+Amber Huffman (Google)
+Charles Kunzman (Google)
+Chris Sabol (Google)
+Jeff Andersen (Google)
+Srini Narayanamurthy (Google)
+Zach Halvorsen (Google)
+Anjana Parthasarathy (Microsoft)
+Ben Keen (Microsoft)
+Bharat Pillilli (Microsoft)
+Bryan Kelly (Microsoft)
+Christopher Swenson (Microsoft)
+Eric Eilertson (Microsoft)
+Lee Prewitt (Microsoft)
+Michael Norris (Microsoft)
+Eric Hibbard (Samsung)
+Gwangbae Choi (Samsung)
+Jisoo Kim (Samsung)
+Michael Allison (Samsung)
+Festus Hategekimana (Solidigm)
+Gamil Cain (Solidigm)
+Scott Shadley (Solidigm)
+Fred Knight (Kioxia)
+James Borden (Kioxia)
+John Geldman (Kioxia)
+Paul Suhler (Kioxia)
 
 # Compliance with OCP Tenets
 
