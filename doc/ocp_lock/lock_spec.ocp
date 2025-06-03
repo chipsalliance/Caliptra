@@ -2001,7 +2001,7 @@ Therefore a given input secret may safely be used in at most $2^{64.5}$ precondi
 
 This section provides an Entity Attestation Token (EAT) claims set as defined in RFC 9711 [@{ietf-rfc9711}]. These claims, enumerated in @tbl:eat-claims, describe the sanitization and epoch key state of the device. Other characteristics of the device, such as keys and other cryptographic identifiers, are captured and attested to by DICE and are therefore excluded from these claims.
 
-For concise encoding and simplicity, all claim values are 32-bit little-endian unsigned integers. This type is define as \`#0.26\` in section 2.1 of RFC 7049 [@{ietf-rfc7049}].
+For concise encoding and simplicity, all claim values are 32-bit little-endian unsigned integers. This type is defined as \`#0.26\` in section 2.1 of RFC 7049 [@{ietf-rfc7049}].
 
 - \`0\` is the CBOR major type for an unsigned integer
 - \`26\` specifies it as a uint32_t type
