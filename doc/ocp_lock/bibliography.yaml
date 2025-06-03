@@ -40,6 +40,13 @@ references:
       year: 2007
       month: 11
     url: "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf"
+  - id: "sp800-108r1"
+    title: "Recommendation for Key Derivation Using Pseudorandom Functions (Rev. 1)"
+    publisher: "NIST"
+    issued:
+      year: 2022
+      month: 8
+    url: "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-108r1-upd1.pdf"
   - id: "sp800-133r2"
     title: "Recommendation for Cryptographic Key Generation (Rev. 2)"
     publisher: "NIST"

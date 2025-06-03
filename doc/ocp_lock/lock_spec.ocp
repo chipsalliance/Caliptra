@@ -472,6 +472,18 @@ See @sec:generate-load-random-mek for how the MEK secret is used to generate and
 
 ![Deriving an MEK](./diagrams/mek_derive.drawio.svg){#fig:mek-derive}
 
+#### AES-XTS considerations
+
+The MEK sent to the encryption engine may be used as an AES-XTS key. FIPS 140-3 IG [@{fips-140-3-ig}] section C.I states that in AES-XTS, the key is "parsed as the concatenation of two AES keys, denoted by *Key_1* and *Key_2*, that are 128 [or 256] bits long... *Key_1* and *Key_2* shall be generated and/or established independently according to the rules for component symmetric keys from NIST **SP 800-133rev2**, Sec. 6.3. The module **shall** check explicitly that *Key_1* ≠ *Key_2*, regardless of how *Key_1* and *Key_2* are obtained."
+
+SP 800-133 [@{sp800-133r2}] section 6.3 states: "The independent generation/establishment of the component keys K~1~, ..., K~n~ is interpreted in a computational and a statistical sense; that is, the computation of any particular K~i~ value does not depend on any one or more of the other K~i~ values, and it is not feasible to use knowledge of any proper subset of the K~i~ values to obtain any information about the remaining K~i~ values."
+
+SP 800-108 [@{sp800-108r1}] states that "the output of a key-derivation function is called the derived keying material and may subsequently be segmented into multiple keys. Any disjoint segments of the derived keying material (with the required lengths) can be used as cryptographic keys for the intended algorithms."
+
+As the MEK sent to the encryption engine is either randomly or pseudorandomly generated, it satisfies the above constraints. Disjoint segments of derived keying material computed from a pseudorandom function are statistically and computationally independent.
+
+When in AES-XTS mode, the encryption engine will be responsible for performing the inequality check for Key_1 and Key_2 stipulated by FIPS 140-3 IG section C.I. If this check fails, the encryption engine must report a vendor-defined error. This document does not specify how drive firmware should handle this error case.
+
 ### Random key generation via DRBG
 
 KMB generates multiple kinds of random keys. It does so using randomness obtained from a DRBG, which is seeded from Caliptra's TRNG and which may be updated with entropy from the host.
@@ -734,12 +746,6 @@ The encryption engine is free to interpret the provided key in a vendor-defined 
 If an algorithm used by the encryption engine does not require 512 bits of key material, the encryption engine is free to disregard unused bits.
 
 Within KMB, loaded MEKs are only ever present in the Key Vault, so that they can be protected against firmware-level attacks. KMB will write MEKs into the encryption engine's key cache using the DMA engine. Given an index and a destination identifier, the DMA engine will copy the key value stored in the given key vault slot to the destination address to which the DMA engine translates the destination identifier.
-
-#### AES-XTS key validation requirements
-
-FIPS 140-3 IG [@{fips-140-3-ig}] section C.I states that in AES-XTS, the key is "parsed as the concatenation of two AES keys, denoted by *Key_1* and *Key_2*, that are 128 [or 256] bits long... The module **shall** check explicitly that *Key_1* ≠ *Key_2*, regardless of how *Key_1* and *Key_2* are obtained."
-
-The encryption engine will be responsible for performing this check when in AES-XTS mode. If the check fails, the encryption engine must report a vendor-defined error. This document does not specify how drive firmware should handle this error case.
 
 #### KMB command sequence
 
