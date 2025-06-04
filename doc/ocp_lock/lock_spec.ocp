@@ -2042,13 +2042,13 @@ eat = {
 }
 
 ; Populates the extension point that indicates that this EAT holds concice evidence.
-; `$measurements-body-cbor` is defined in RFC 9711 [@{ietf-rfc9711}]
+; `$measurements-body-cbor` is defined in RFC 9711
 ; `concise-evidence-map` is defined in TCG Concise Evidence
 
 $measurements-body-cbor /= bytes .cbor concise-evidence-map
 ```
 
-The following code block is an example EAT CBOR payload:
+The following block is an example EAT payload expressed in CBOR diagnostic notation:
 
 ```cbor-edn{.small}
 / eat / {
@@ -2058,7 +2058,7 @@ The following code block is an example EAT CBOR payload:
       / ce.ev-triples / 0 : {
         / ce.evidence-triples / 0 : [[
           / environment-map / {
-            / class / 0 : { / class-id / 0 : / tagged-oid-type / 111(h'0') }, / placeholder OID TBD/
+            / class / 0 : { / class-id / 0 : 111(h'0') }, / placeholder OID TBD/
             / instance / 1 : 560(h'0'), / Disambiguates between instances in a device. /
           },
           [
@@ -2093,7 +2093,7 @@ The following code block is an example EAT CBOR payload:
 The above example uses a number of identifiers:
 
 - \`273\` is the claim key for measurements, defined in RFC 9711 [@{ietf-rfc9711}].
-- \`10571\` is the CoAP Content ID, defined in TCG Concise Evidence.
+- \`10571\` is the \`application/ce+cbor\` CoAP Content ID, defined in TCG Concise Evidence [@{tcg-concise-evidence}].
 - \`111\` is the CBOR tag for object identifiers, defined in RFC 9090 [@{ietf-rfc9090}].
 - \`560\` is the CBOR tag for opaque byte strings, defined in CoRIM [@{draft-irtf-rats-corim}].
 
