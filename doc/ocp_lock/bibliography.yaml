@@ -114,4 +114,11 @@ references:
     url: "https://en.wikipedia.org/wiki/Balls_into_bins_problem"
     accessed:
       year: 2025
-      month: 5
+      month: 6
+  - id: "birthday-problem"
+    title: "Birthday problem"
+    publisher: "Wikipedia"
+    url: "https://en.wikipedia.org/wiki/Birthday_problem"
+    accessed:
+      year: 2025
+      month: 6

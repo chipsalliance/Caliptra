@@ -237,7 +237,7 @@ Subsequent diagrams will use this operation when combining keys with different s
 
 #### Preconditioned AES {#sec:preconditioned-aes}
 
-In this specification, several flows involve deriving a key for use in AES-GCM. SP 800-38D [@{sp800-38d}] section 8.3 stipulates that AES-GCM-Encrypt may only be invoked at most 2^32^ times with a given AES key. To address this constraint, it is common to maintain counters to track the usage count of a given key. Such tracking would be difficult for Caliptra, which lacks direct access to rewritable storage which would be needed to maintain a counter that preserves its value across power cycles.
+In this specification, several flows involve deriving a key for use in AES-GCM. In AES-GCM it is critical that IV collisions be avoided. To that end SP 800-38D [@{sp800-38d}] section 8.3 stipulates that AES-GCM-Encrypt may only be invoked at most $2^{32}$ times with a given AES key. One approach to address this constraint is to maintain counters to track the usage count of a given key. Such tracking would be difficult for Caliptra, which lacks direct access to rewritable storage which would be needed to maintain a counter that preserves its value across power cycles.
 
 To elide the need for maintaining counters, this specification defines the "preconditioned AES-Encrypt" and "preconditioned AES-Decrypt" operations, illustrated in @fig:preconditioned-aes-encrypt and @fig:preconditioned-aes-decrypt.
 
@@ -245,7 +245,7 @@ To elide the need for maintaining counters, this specification defines the "prec
 
 ![Preconditioned AES-Decrypt](./diagrams/preconditioned_aes_decrypt.drawio.svg){#fig:preconditioned-aes-decrypt}
 
-Each AES secret is preconditioned using a randomly-generated 64-bit identifier, before being used with AES-GCM-Encrypt. This ensures that it will take approximately 2^96^ preconditioned AES-Encrypt operations with a given input secret before a derived key will be used in more than 2^32^ encryption operations. 2^96^ is large enough that a given storage device will experience hardware failure well before that limit is reached. See [Appendix @sec:preconditioned-aes-calculations] for additional details on the calculations behind this figure.
+Each AES secret is preconditioned using a randomly-generated 64-bit identifier, before being used with AES-GCM-Encrypt. This ensures that it is safe to use a given input AES secret in approximately $2^{64}$ preconditioned AES-Encrypt operations before an IV collision is expected to occur with probability greater than $2^{-32}. $2^{64}$ is large enough that a given storage device will experience hardware failure well before that limit is reached. Ergo, usage counters within the drive are not needed for these keys. See [Appendix @sec:preconditioned-aes-calculations] for additional details on the calculations behind this figure.
 
 ### MPKs {#sec:mpks}
 
@@ -1865,9 +1865,15 @@ See <https://github.com/chipsalliance/Caliptra/tree/main/doc/ocp_lock>.
 
 # Preconditioned AES-Encrypt calculations {#sec:preconditioned-aes-calculations}
 
-This appendix expands on @sec:preconditioned-aes and provides additional details behind the claim that approximately $2^{96}$ preconditioned AES-Encrypt operations for a given secret are needed before an AES-GCM key will be used in more than $2^{32}$ encryption operations.
+This appendix expands on @sec:preconditioned-aes and provides additional details behind the claim that approximately $2^{64}$ preconditioned AES-Encrypt operations for a given secret are needed before an IV collision is expected to occur with probability greater than $2^{-32}$.
 
-This can be put in terms of the "Balls into bins" problem [@{balls-into-bins}], where we are looking for the number of balls ($m$) required for the maximum load ($L$) across $2^{64}$ bins ($n$) to be $2^{32}$. An approximation for the maximum load where $m>n$ is given as $L=\frac{m}{n}+\sqrt{\frac{m·log(n)}{n}}$. Rearranging to solve for $m$ via the quadratic formula yields $m≈2^{96}$.
+To satisfy FIPS, it is sufficient to demonstrate that no single AES-GCM key will be used more than $2^{32}$ times. This can be put in terms of the "Balls into bins" problem [@{balls-into-bins}], where we are looking for the number of balls ($m$) required for the maximum load across $2^{64}$ bins ($n$) to be $2^{32}$. An approximation for the maximum load where $m>n$ is given as $m/n+\sqrt{m·log(n)/n}$. Rearranging to solve for $m$ via the quadratic formula yields $m≈2^{96}$. Therefore a given input secret may be used in at most $2^{96}$ preconditioned AES-Encrypt operations before any key derived from that secret is used in more than $2^{32}$ AES-GCM-Encrypt operations.
+
+However, the $2^{32}$ encryption limit is a means to an end, namely ensuring a low probability of IV collisions. The Birthday paradox [@{birthday-problem}] implies that the probability of a collision between $n$ generated IVs where $d$ is the number of possible IVs is approximately $n^2/(2d)$. The chances of a 96-bit IV collision across $2^{32}$ IVs is therefore approximately $2^{2·32}/(2^{96+1})=2^{-33}$ for a given key. Across $2^{64}$ keys derived from an input secret, the expected number of keys that experience a collision is approximately $2^{64}·2^{-33}=2^{31}$. Clearly a limit of $2^{96}$ encryption operations for a given input secret, while meeting the letter of the FIPS requirements, is too large for safety.
+
+We can calculate the safe margin by simply considering the 64-bit ID concatenated to the 96-bit IV. What we are really after is the maximum number of preconditioned AES-Encrypt invocations with a given input secret such that the likelihood of experiencing a collision of the 160-bit (ID || IV) pair is at most $2^{-32}$. Leveraging the Birthday paradox equation, $n≈\sqrt{2^{160+1}·2^{-32}}=2^{64.5}$.
+
+Therefore a given input secret may safely be used in at most $2^{64.5}$ preconditioned AES-Encrypt operations before an IV collision is expected to occur with probability greater than $2^{-32}$ across all of the AES-GCM keys derived from the input secret.
 
 # EAT format for attesting to the epoch key state {#sec:eat-format}
 
