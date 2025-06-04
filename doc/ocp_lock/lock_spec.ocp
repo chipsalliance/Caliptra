@@ -2001,10 +2001,11 @@ Therefore a given input secret may safely be used in at most $2^{64.5}$ precondi
 
 This section provides an Entity Attestation Token (EAT) claims set as defined in RFC 9711 [@{ietf-rfc9711}]. These claims, enumerated in @tbl:eat-claims, describe the sanitization and epoch key state of the device. Other characteristics of the device, such as keys and other cryptographic identifiers, are captured and attested to by DICE and are therefore excluded from these claims.
 
-For concise encoding and simplicity, all claim values are 32-bit little-endian unsigned integers. This type is defined as \`#0.26\` in section 2.1 of RFC 7049 [@{ietf-rfc7049}].
+For concise encoding and simplicity, all claim values are expressed as &(raw-value: 4): #6.70.
 
-- \`0\` is the CBOR major type for an unsigned integer
-- \`26\` specifies it as a uint32_t type
+- \`4\` is defined by CoRIM and denotes a measurement that contains the value of the element.
+- \`6\` is defined by RFC 7049 as optional semantic tagging of other major types.
+- \`70\` is defined by RFC 8746 to be a tagged array of little-endian uint32s. All values in this claims set will have an array length of 1.
 
 Table: EAT claims {#tbl:eat-claims}
 
@@ -2030,17 +2031,72 @@ Table: EAT claims {#tbl:eat-claims}
 |        |                 | @tbl:sek-state-values for details. |
 +--------+-----------------+------------------------------------+
 
-The following code block is an example CDDL description for the EAT:
+The following code block is a CDDL description for the EAT:
 
-```cddl
+```cddl{.small}
+; Provides the top-level EAT definition.
+
+start=eat
 eat = {
-  &(eat-version: 0) => #0.26,
-  &(total-hek-slots: 1) => #0.26,
-  &(active-hek-slot: 2) => #0.26,
-  &(hek-state: 3) => #0.26,
-  &(sek-state: 4) => #0.26,
+  &(measurements: 273) => bstr,
+}
+
+; Populates the extension point that indicates that this EAT holds concice evidence.
+; `$measurements-body-cbor` is defined in RFC 9711
+; `concise-evidence-map` is defined in TCG Concise Evidence
+
+$measurements-body-cbor /= bytes .cbor concise-evidence-map
+```
+
+The following code block is an example EAT CBOR payload:
+
+```cbor-edn{.small}
+/ eat / {
+  / measurements / 273 : [[
+    10571,
+    / concise-evidence / <<{
+      / ce.ev-triples / 0 : {
+        / ce.evidence-triples / 0 : [[
+          / environment-map / {
+            / class / 0 : { / class-id / 0 : / tagged-oid-type / 111(h'[placeholder OID]') },
+            / instance / 1 : / 560(h'0'), / Disambiguates between instances in a device. /
+          },
+          [
+            / measurement-map / {
+              / mkey / 0 : 0
+              / mval / 1 : / { / raw-value / 4 : 70(h'0) }  / EAT_VERSION = 0 /
+            },
+            / measurement-map / {
+              / mkey / 0 : 1
+              / mval / 1 : / { / raw-value / 4 : 70(h'4) }  / TOTAL_HEK_SLOTS = 4 /
+            },
+            / measurement-map / {
+              / mkey / 0 : 2
+              / mval / 1 : / { / raw-value / 4 : 70(h'2) }  / ACTIVE_HEK_SLOT = 2 /
+            },
+            / measurement-map / {
+              / mkey / 0 : 3
+              / mval / 1 : / { / raw-value / 4 : 70(h'2) }  / HEK_STATE = 2 (HEK_AVAIL_PROD) /
+            },
+            / measurement-map / {
+              / mkey / 0 : 4
+              / mval / 1 : / { / raw-value / 4 : 70(h'0) }  / SEK_STATE = 0 (SEK_ZEROIZED) /
+            }
+          ]            
+        ]]
+      }
+    }>>
+  ]]
 }
 ```
+
+The above example uses a number of identifiers:
+
+- \`273\` is the claim key for measurements, defined in RFC 9711.
+- \`10571\` is the CoAP Content ID, defined in TCG Concise Evidence.
+- \`111\` is the CBOR tag for object identifiers, defined in RFC 9090.
+- \`560\` is the CBOR tag for opaque byte strings, defined in CoRIM.
+- \`70\` is the CBOR tag for tagged arrays of little-endian uint32s, defined in RFC 8746.
 
 # Sequence diagrams
 
