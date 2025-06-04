@@ -88,6 +88,28 @@ references:
       year: 2018
       month: 8
     url: "https://datatracker.ietf.org/doc/html/rfc8446"
+  - id: "ietf-rfc8746"
+    title: "Concise Binary Object Representation (CBOR) Tags for Typed Arrays"
+    author:
+      - family: "Bormann"
+        given: "C."
+        affiliation: "Universität Bremen TZI"
+    publisher: "IETF"
+    issued:
+      year: 2020
+      month: 2
+    url: "https://datatracker.ietf.org/doc/html/rfc8746"
+  - id: "ietf-rfc9090"
+    title: "Concise Binary Object Representation (CBOR) Tags for Object Identifiers"
+    author:
+      - family: "Bormann"
+        given: "C."
+        affiliation: "Universität Bremen TZI"
+    publisher: "IETF"
+    issued:
+      year: 2021
+      month: 7
+    url: "https://datatracker.ietf.org/doc/html/rfc9090"
   - id: "ietf-rfc9180"
     title: "Hybrid Public Key Encryption"
     publisher: "IETF"
@@ -140,6 +162,28 @@ references:
       year: 2025
       month: 2
     url: "https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hybrid-kems"
+  - id: "draft-irtf-rats-corim"
+    title: "Concise Reference Integrity Manifest"
+    author:
+      - family: "Birkholz"
+        given: "H."
+        affiliation: "Fraunhofer SIT"
+      - family: "Fossati"
+        given: "T."
+        affiliation: "Linaro"
+      - family: "Deshpande"
+        given: "Y."
+        affiliation: "arm"
+      - family: "Smith"
+        given: "N."
+        affiliation: "Intel"
+      - family: "Pan"
+        given: "W."
+        affiliation: "Huawei Technologies"
+    issued:
+      year: 2025
+      month: 3
+    url: "https://datatracker.ietf.org/doc/html/draft-ietf-rats-corim/"
   - id: "caliptra-2.0-hw-spec"
     title: "Caliptra 2.0 RTL Specification"
     publisher: "CHIPS Alliance"
