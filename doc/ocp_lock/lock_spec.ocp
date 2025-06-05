@@ -26,11 +26,11 @@ bibliography: bibliography.yaml
 
 Contributions to this Specification are made under the terms and conditions set forth in **Modified Open Web Foundation Agreement 0.9 (OWFa 0.9)**. (As of October 16, 2024)  (“Contribution License”) by:
 
-Google  
-Microsoft  
-Samsung  
-Kioxia  
-Solidigm
+- Google
+- Microsoft
+- Samsung
+- Kioxia
+- Solidigm
 
 Usage of this Specification is governed by the terms and conditions set forth in **Modified OWFa 0.9 Final Specification Agreement (FSA)** (As of October 16, 2024) **(“Specification License”)**.
 
@@ -49,32 +49,32 @@ PLEASE VERIFY THE CORRECT CLA/FSA IS USED AND EXECUTED FOR THIS CONTRIBUTION.
 
 The Contributors of this Specification would like to acknowledge the following:
 
-Andrés Lagar-Cavilla (Google)
-Amber Huffman (Google)
-Charles Kunzman (Google)
-Chris Sabol (Google)
-Jeff Andersen (Google)
-Srini Narayanamurthy (Google)
-Zach Halvorsen (Google)
-Anjana Parthasarathy (Microsoft)
-Ben Keen (Microsoft)
-Bharat Pillilli (Microsoft)
-Bryan Kelly (Microsoft)
-Christopher Swenson (Microsoft)
-Eric Eilertson (Microsoft)
-Lee Prewitt (Microsoft)
-Michael Norris (Microsoft)
-Eric Hibbard (Samsung)
-Gwangbae Choi (Samsung)
-Jisoo Kim (Samsung)
-Michael Allison (Samsung)
-Festus Hategekimana (Solidigm)
-Gamil Cain (Solidigm)
-Scott Shadley (Solidigm)
-Fred Knight (Kioxia)
-James Borden (Kioxia)
-John Geldman (Kioxia)
-Paul Suhler (Kioxia)
+- Andrés Lagar-Cavilla (Google)
+- Amber Huffman (Google)
+- Charles Kunzman (Google)
+- Chris Sabol (Google)
+- Jeff Andersen (Google)
+- Srini Narayanamurthy (Google)
+- Zach Halvorsen (Google)
+- Anjana Parthasarathy (Microsoft)
+- Ben Keen (Microsoft)
+- Bharat Pillilli (Microsoft)
+- Bryan Kelly (Microsoft)
+- Christopher Swenson (Microsoft)
+- Eric Eilertson (Microsoft)
+- Lee Prewitt (Microsoft)
+- Michael Norris (Microsoft)
+- Eric Hibbard (Samsung)
+- Gwangbae Choi (Samsung)
+- Jisoo Kim (Samsung)
+- Michael Allison (Samsung)
+- Festus Hategekimana (Solidigm)
+- Gamil Cain (Solidigm)
+- Scott Shadley (Solidigm)
+- Fred Knight (Kioxia)
+- James Borden (Kioxia)
+- John Geldman (Kioxia)
+- Paul Suhler (Kioxia)
 
 # Compliance with OCP Tenets
 
