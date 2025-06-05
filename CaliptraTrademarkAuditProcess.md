@@ -38,7 +38,7 @@ The main objective of the [Checklist and evaluation methodology document](https:
 
 # Caliptra Trademark Auditing Process
 
-The checklist describes the specific requirements to be reviewed by a thrid-party laboratory. 
+The checklist describes the specific requirements to be reviewed by a third-party laboratory. 
 
 The Caliptra Trademark Auditing Process defines the roles and process that third-party laboratories use to achieve the approval of the Trademark Usage.
 
@@ -140,7 +140,7 @@ This section considers some specific questions and suggestions for discussion on
   * Updates of the software or hardware of the device that integrates Caliptra that are judged by the manufacturer to **not affect the security** of the Caliptra integration.  
     * **Suggestion**: Updates that are considered for the **same product** do not affect the Caliptra Trademark usage for the device.  
       **Rationale**: Caliptra Trademark Audit Process is a low-effort scheme, updates are encouraged and adding a new audit processes for each update of the device will not be feasible. On the other hand, when publishing the granted products, the version that was considered in the audit process can be clearly stated. Any updates are the responsibility of the manufacturer.  
-    * **Suggestion**: Updates or changes that are considered large enough for a **new product** should be candidates for a new Caliptra Trademark Audit process and independently needs the TAC to consider to grand the Caliptra Trademark. Since the changes are judged not to change the security of the already audited Caliptra integration, a new Caliptra Trademark Audit process is not required. Instead, a motivation by the manufacturer to TAC of why the changes are not affecting the security of the Caliptra integration is required, before the TAC grants the Caliptra Trademark for the new product.  
+    * **Suggestion**: Updates or changes that are considered large enough for a **new product** should be candidates for a new Caliptra Trademark Audit process and independently needs the TAC to consider to grant the Caliptra Trademark. Since the changes are judged not to change the security of the already audited Caliptra integration, a new Caliptra Trademark Audit process is not required. Instead, a motivation by the manufacturer to TAC of why the changes are not affecting the security of the Caliptra integration is required, before the TAC grants the Caliptra Trademark for the new product.  
       **Rationale**: Each product that is granted the Caliptra Trademark should be listed, and it is necessary that TAC has the power to control which products are granted the Caliptra Trademark. On the other hand, if the changes are small, TAC could consider this low-effort solution for handling deltas and changes. The typical product certification schemes require a full reevaluation for any updates. However, in some schemes, in practice, heave reuse of previous evaluations can be made.  
   * Updates of the hardware of the device that integrates Caliptra that are expected to **affect the security** of the Caliptra integration.  
     * **Suggestion**: A new Caliptra Trademark Audit Process is required. If the manufacturer is using the same laboratory as for a similar previous version, it is expected that the audit process is more efficient.  
