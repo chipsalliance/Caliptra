@@ -244,7 +244,7 @@ To elide the need for maintaining counters, this specification defines the "prec
 
 ![Preconditioned AES-Decrypt](./diagrams/preconditioned_aes_decrypt.drawio.svg){#fig:preconditioned-aes-decrypt}
 
-Each AES secret is preconditioned using a randomly-generated 64-bit identifier, before being used with AES-GCM-Encrypt. This ensures that it is safe to use a given input AES secret in approximately $2^{64}$ preconditioned AES-Encrypt operations before an IV collision is expected to occur with probability greater than $2^{-32}. $2^{64}$ is large enough that a given storage device will experience hardware failure well before that limit is reached. Ergo, usage counters within the drive are not needed for these keys. See [Appendix @sec:preconditioned-aes-calculations] for additional details on the calculations behind this figure.
+Each AES secret is preconditioned using a randomly-generated 64-bit identifier, before being used with AES-GCM-Encrypt. This ensures that it is safe to use a given input AES secret in approximately $2^{64}$ preconditioned AES-Encrypt operations before an IV collision is expected to occur with probability greater than $2^{-32}$. $2^{64}$ is large enough that a given storage device will experience hardware failure well before that limit is reached. Ergo, usage counters within the drive are not needed for these keys. See [Appendix @sec:preconditioned-aes-calculations] for additional details on the calculations behind this figure.
 
 ### MPKs {#sec:mpks}
 
