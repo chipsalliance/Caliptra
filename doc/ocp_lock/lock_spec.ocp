@@ -170,7 +170,6 @@ Note that Opal in the context of this document includes the Opal Family of SSCs:
 The following areas are out of scope for this project.
 
 - Compliance with IEEE 1619^TM^-2025 [@{ieee-1619-2025}] requirements around key scope, i.e. restricting a given MEK to only encrypt a maximum of 2^44^ 128-bit blocks. Drive firmware will be responsible for enforcing this.
-- Compliance with FIPS 140-3 IG [@{fips-140-3-ig}] section C.I requirements around inequality testing for AES-XTS component keys. The encryption engine will be responsible for enforcing this.
 - Compliance with Common Criteria requirement FCS_CKM.1.1(c) [@{cpp-fde}] when supporting derived MEKs. Key Per I/O calls for DEKs to be injected into the device. To support OCP L.O.C.K.'s goals around enabling cryptographic erase, before the injected DEK is used to encrypt user data, the DEK is first conditioned with an on-device secret that can be securely zeroized. FCS_CKM.1.1(c) currently does not allow injected keys to be thus conditioned and therefore does not allow for cryptographic erase under the Key Per I/O model. A storage device that integates OCP L.O.C.K. and aims to be compliant with this Common Criteria requirement may not support Key Per I/O.
 - Authorization for EPK/DPK/MPK rotation, or binding a given MEK to a particular locking range. The drive firmware is responsible for these.
 
@@ -180,7 +179,7 @@ A product which integrates OCP L.O.C.K. will be expected to undergo an OCP S.A.F
 
 ---
 
-## Architecture
+## Architecture {#sec:architecture}
 
 ![OCP L.O.C.K. high level blocks](./diagrams/architecture_diagram.drawio.svg){#fig:architecture-diagram}
 
@@ -278,8 +277,8 @@ Upon drive reset, the HPKE keypairs are regenerated, and any access keys for MPK
 
 KMB supports the following HPKE algorithms:
 
-- P-384 ECDH
-- Hybridized ML-KEM-1024 with P-384 ECDH
+- P-384 ECDH, defined in RFC 9180 [@{ietf-rfc9180}]
+- Hybridized ML-KEM-1024 with P-384 ECDH, defined in Hybrid PQ/T Key Encapsulation Mechanisms [@{draft-irtf-cfrg-hybrid-kems}]
 
 @fig:hpke-unwrap-ecdh and @fig:hpke-unwrap-hybrid illustrate the detailed cryptographic operations involved in unwrapping the access key using each of these algorithms. Subsequent diagrams elide these details and represent the operation as "HPKE unwrap".
 
@@ -288,6 +287,8 @@ KMB supports the following HPKE algorithms:
 ![HPKE unwrap for MPK access keys with hybrid ML-KEM + ECDH](./diagrams/mpk_access_key_hybrid_unwrap.drawio.svg){#fig:hpke-unwrap-hybrid}
 
 The only difference between @fig:hpke-unwrap-ecdh and @fig:hpke-unwrap-hybrid is how the shared secret is derived. Operations which produce an AES key and IV from that shared secret are identical, and are omitted from @fig:hpke-unwrap-hybrid for brevity.
+
+The sequence number is incremented for each decryption operation performed with keys derived from a given HPKE context. With the exception of MPK access key rotation as described in @sec:mpk-access-key-rotation, all flows that accept HPKE payloads will perform a single decryption operation with the computed context. MPK access key rotation will perform two decryption operations and will increment the sequence number between them.
 
 #### MPK lifecycle
 
@@ -305,8 +306,6 @@ Drive firmware may request that KMB generate an MPK, bound to a given access key
 
 Drive firmware may then store the encrypted MPK in persistent storage.
 
-To mitigate against cryptographic attacks on the HPKE keypair that rely on repeated invocations of this command, this command is rate-limited.
-
 ![MPK generation](./diagrams/mpk_generate.drawio.svg){#fig:mpk-generation}
 
 ##### MPK readying
@@ -323,11 +322,9 @@ To ready an MPK, KMB performs the following steps:
 
 Drive firmware may then stash the encrypted ready MPK in volatile storage, and later provide it to the KMB when loading an MEK, as described in @sec:meks.
 
-To mitigate against cryptographic attacks on the HPKE keypair that rely on repeated invocations of this command, this command is rate-limited.
-
 ![MPK readying](./diagrams/mpk_ready.drawio.svg){#fig:mpk-readying}
 
-##### MPK access key rotation
+##### MPK access key rotation {#sec:mpk-access-key-rotation}
 
 The access key to which an MPK is bound may be rotated. The user must prove that they have knowledge of both the old and new access key before a rotation is allowed. This is accomplished using a slight variation on the usual access key import flow. When a new access key is provided to KMB during a rotation, the new access key is double-encrypted: first to the old access key, and then to the HPKE public key. KMB performs the following steps:
 
@@ -340,8 +337,6 @@ The access key to which an MPK is bound may be rotated. The user must prove that
 7. Return the re-encrypted MPK to the drive firmware.
 
 Drive firmware then purges the old encrypted MPK and stores the new encrypted MPK in persistent storage.
-
-To mitigate against cryptographic attacks on the HPKE keypair that rely on repeated invocations of this command, this command is rate-limited.
 
 ![MPK access key rotation](./diagrams/mpk_access_key_rotation.drawio.svg){#fig:mpk-access-key-rotation}
 
@@ -361,7 +356,7 @@ In this flow, the DPK may be the imported key associated with a Key Per I/O key 
 
 ![Example drive flow to accept an injected DPK](./diagrams/dpk_injection.drawio.svg){#fig:dpk-injection}
 
-### HEKs and SEKs
+### HEKs and SEKs {#sec:heks-seks}
 
 KMB supports a pair of epoch keys: the HEK and SEK. Both must be available, i.e. non-zeroized, in order for MEKs to be loaded.
 
@@ -433,7 +428,7 @@ If an error causes the active ratchet secret to be left in an invalid state, MEK
 
 ![HEK derivation](./diagrams/hek_derivation.drawio.svg){#fig:hek-derivation}
 
-#### HEK and SEK lifecycle
+#### HEK and SEK lifecycle {#sec:hek-sek-lifecycle}
 
 @fig:hek-sek-rotation illustrates the case where a drive ships with four ratchet secrets.
 
@@ -472,7 +467,7 @@ See @sec:generate-load-random-mek for how the MEK secret is used to generate and
 
 ![Deriving an MEK](./diagrams/mek_derive.drawio.svg){#fig:mek-derive}
 
-#### AES-XTS considerations
+#### AES-XTS considerations {#sec:aes-xts-considerations}
 
 The MEK sent to the encryption engine may be used as an AES-XTS key. FIPS 140-3 IG [@{fips-140-3-ig}] section C.I states that in AES-XTS, the key is "parsed as the concatenation of two AES keys, denoted by *Key_1* and *Key_2*, that are 128 [or 256] bits long... *Key_1* and *Key_2* shall be generated and/or established independently according to the rules for component symmetric keys from NIST **SP 800-133rev2**, Sec. 6.3. The module **shall** check explicitly that *Key_1* ≠ *Key_2*, regardless of how *Key_1* and *Key_2* are obtained."
 
@@ -500,6 +495,10 @@ At initial boot, Caliptra firmware performs the following steps:
 - Initializes random HPKE keypairs for each supported algorithm, and assigns handles to them, reported via [ENUMERATE_KEM_HANDLES](#sec:enumerate-kem-handles).
 
 The Ready MPK encryption key is not initialized at boot-up, as it is generated lazily upon first use. See @sec:mpks for details.
+
+### Authorization {#sec:authorization}
+
+KMB exposes commands that allows drive firmware to manage the lifecycle of MPKs, HEKs, and MEKs. These lifecycle events have the potential to (and are in many cases designed to) trigger user data loss. The host interface that allows the host to trigger these lifecycle events must therefore implement authorization controls to ensure user data is not improperly destroyed. Drive firmware is responsible for implementing this authorization layer, the details of which are outside the scope of this specification.
 
 ---
 
@@ -759,7 +758,9 @@ Within KMB, loaded MEKs are only ever present in the Key Vault, so that they can
 
 This section provides the mailbox commands exposed by Caliptra as part of OCP L.O.C.K.
 
-Each of these commands returns a \`fips_status\` field. This provides an indicator of whether KMB is operating in FIPS mode. @tbl:fips-status-values provides the possible values for this field.
+#### FIPS status indicator
+
+Each mailbox command returns a \`fips_status\` field. This provides an indicator of whether KMB is operating in FIPS mode. @tbl:fips-status-values provides the possible values for this field.
 
 Note: all multi-byte fields (i.e. \`u16\` and \`u32\`) that are not byte arrays are interpreted as little endian.
 
@@ -773,9 +774,15 @@ Table: Values for the FIPS status field {#tbl:fips-status-values}
 | 1h to FFFFh | Reserved.          |
 +-------------+--------------------+
 
+#### Encryption engine timeout
+
 Each mailbox command that causes a command to execute on the encryption engine includes a \`cmd_timeout\` value indicating the amount of time KMB firmware will wait until the command has completed. If this timeout is exceeded, KMB aborts the command and reports a \`LOCK_ENGINE_TIMEOUT\` result code.
 
-KMB firmware will return a \`LOCK_EE_NOT_READY\` error immediately if the encryption engine is not ready to execute a command.
+For such commands, KMB firmware will return a \`LOCK_EE_NOT_READY\` error immediately if the encryption engine is not ready to execute a command.
+
+#### Side-channel mitigations
+
+Several mailbox commands invoke ECDH and/or ML-KEM Decaps. These operations involve deterministic data-dependent operations and are potentially susceptible to timing attacks and power analysis. To mitigate such attacks, Caliptra leverages masking in hardware, and introduces random jitter delays in firmware before handling mailbox commands.
 
 #### GET_STATUS
 
@@ -986,6 +993,8 @@ Table: GENERATE_MPK input arguments
 +-------------------+------------------+----------------------------------------+
 | reserved          | u32              | Reserved.                              |
 +-------------------+------------------+----------------------------------------+
+| sek               | u8[32]           | Soft Epoch Key.                        |
++-------------------+------------------+----------------------------------------+
 | metadata_len      | u32              | Length of the metadata argument.       |
 +-------------------+------------------+----------------------------------------+
 | info_len          | u32              | Length of the info argument.           |
@@ -1017,7 +1026,7 @@ Table: GENERATE_MPK output arguments
 
 This command unwraps old_access_key and encrypted new_access_key from sealed_access_keys. Then old_access_key is used to decrypt new_access_key. The specified MPK is decrypted using KDF(HEK, "MPK", old_access_key). A new MPK is encrypted with the output of KDF(HEK, "MPK", new_access_key). The new encrypted MPK is returned.
 
-The drive stores the returned new encrypted MPK. The drive may attempt to do a trial decryption of the new MPK without an error before deleting the old MPK. Drive firmware zeroizes the old encrypted MPK.
+The drive stores the returned new encrypted MPK and zeroizes the old encrypted MPK.
 
 Command Code: 0x5245_5750 ("REWP")
 
@@ -1031,6 +1040,8 @@ Table: REWRAP_MPK input arguments
 |                    |                          | computed by the caller.      |
 +--------------------+--------------------------+------------------------------+
 | reserved           | u32                      | Reserved.                    |
++--------------------+--------------------------+------------------------------+
+| sek                | u8[32]                   | Soft Epoch Key.              |
 +--------------------+--------------------------+------------------------------+
 | info_len           | u32                      | Length of the info argument. |
 +--------------------+--------------------------+------------------------------+
@@ -1155,6 +1166,13 @@ Table: TEST_ACCESS_KEY input arguments
 +-------------------+-----------------+---------------------------------------+
 | Name              | Type            | Description                           |
 +===================+=================+=======================================+
+| chksum            | u32             | Checksum over other input arguments,  |
+|                   |                 | computed by the caller.               |
++-------------------+-----------------+---------------------------------------+
+| reserved          | u32             | Reserved.                             |
++-------------------+-----------------+---------------------------------------+
+| sek               | u8[32]          | Soft Epoch Key.                       |
++-------------------+-----------------+---------------------------------------+
 | nonce             | u8[32]          | Host provided random value.           |
 +-------------------+-----------------+---------------------------------------+
 | locked_mpk        | LockedMpk       | Locked MPK associated with the access |
@@ -1184,21 +1202,18 @@ Command Code: 0x474D_454B ("GMEK")
 
 Table: GENERATE_MEK input arguments
 
-+----------+--------+---------------------------------------------+
-| Name     | Type   | Description                                 |
-+==========+========+=============================================+
-| chksum   | u32    | Checksum over other input arguments,        |
-|          |        | computed by the caller.                     |
-+----------+--------+---------------------------------------------+
-| reserved | u32    | Reserved.                                   |
-+----------+--------+---------------------------------------------+
-| sek      | u8[32] | "Soft epoch key". May be rotated            |
-|          |        | by the drive as part of a cryptographic     |
-|          |        | erase.                                      |
-+----------+--------+---------------------------------------------+
-| dpk      | u8[32] | "Data protection key". May be a value       |
-|          |        | decrypted by a user-provided C_PIN in Opal. |
-+----------+--------+---------------------------------------------+
++----------+--------+-----------------------------------------------+
+| Name     | Type   | Description                                   |
++==========+========+===============================================+
+| chksum   | u32    | Checksum over other input arguments, computed |
+|          |        | by the caller.                                |
++----------+--------+-----------------------------------------------+
+| reserved | u32    | Reserved.                                     |
++----------+--------+-----------------------------------------------+
+| sek      | u8[32] | Soft Epoch Key.                               |
++----------+--------+-----------------------------------------------+
+| dpk      | u8[32] | Data Protection Key.                          |
++----------+--------+-----------------------------------------------+
 
 Table: GENERATE_MEK output arguments
 
@@ -1231,33 +1246,30 @@ Command Code: 0x4C4D_454B ("LMEK")
 
 Table: LOAD_MEK input arguments
 
-+--------------+------------+-----------------------------------------------+
-| Name         | Type       | Description                                   |
-+==============+============+===============================================+
-| chksum       | u32        | Checksum over other input arguments,          |
-|              |            | computed by the caller.                       |
-+--------------+------------+-----------------------------------------------+
-| reserved     | u32        | Reserved.                                     |
-+--------------+------------+-----------------------------------------------+
-| sek          | u8[32]     | "Soft epoch key". May be rotated              |
-|              |            | by the drive as part of a cryptographic       |
-|              |            | erase.                                        |
-+--------------+------------+-----------------------------------------------+
-| dpk          | u8[32]     | "Data protection key". May be a value         |
-|              |            | decrypted by a user-provided C_PIN in Opal.   |
-+--------------+------------+-----------------------------------------------+
-| metadata     | u8[20]     | Metadata for MEK to load into the drive       |
-|              |            | encryption engine (i.e. NSID + LBA range).    |
-+--------------+------------+-----------------------------------------------+
-| aux_metadata | u8[32]     | Auxiliary metadata for the MEK                |
-|              |            | (optional; i.e. operation mode).              |
-+--------------+------------+-----------------------------------------------+
-| wrapped_mek  | WrappedMek | MEK encrypted to the derived MEK encryption   |
-|              |            | key.                                          |
-+--------------+------------+-----------------------------------------------+
-| cmd_timeout  | u32        | Timeout in ms for command to encryption       |
-|              |            | engine to complete.                           |
-+--------------+------------+-----------------------------------------------+
++--------------+------------+---------------------------------------------+
+| Name         | Type       | Description                                 |
++==============+============+=============================================+
+| chksum       | u32        | Checksum over other input arguments,        |
+|              |            | computed by the caller.                     |
++--------------+------------+---------------------------------------------+
+| reserved     | u32        | Reserved.                                   |
++--------------+------------+---------------------------------------------+
+| sek          | u8[32]     | Soft Epoch Key.                             |
++--------------+------------+---------------------------------------------+
+| dpk          | u8[32]     | Data Protection Key.                        |
++--------------+------------+---------------------------------------------+
+| metadata     | u8[20]     | Metadata for MEK to load into the drive     |
+|              |            | encryption engine (i.e. NSID + LBA range).  |
++--------------+------------+---------------------------------------------+
+| aux_metadata | u8[32]     | Auxiliary metadata for the MEK              |
+|              |            | (optional; i.e. operation mode).            |
++--------------+------------+---------------------------------------------+
+| wrapped_mek  | WrappedMek | MEK encrypted to the derived MEK encryption |
+|              |            | key.                                        |
++--------------+------------+---------------------------------------------+
+| cmd_timeout  | u32        | Timeout in ms for command to encryption     |
+|              |            | engine to complete.                         |
++--------------+------------+---------------------------------------------+
 
 Table: LOAD_MEK output arguments
 
@@ -1285,29 +1297,27 @@ Command Code: 0x444D_454B ("DMEK")
 
 Table: DERIVE_MEK input arguments
 
-+--------------+--------+-----------------------------------------------+
-| Name         | Type   | Description                                   |
-+==============+========+===============================================+
-| chksum       | u32    | Checksum over other input arguments,          |
-|              |        | computed by the caller.                       |
-+--------------+--------+-----------------------------------------------+
-| reserved     | u32    | Reserved.                                     |
-+--------------+--------+-----------------------------------------------+
-| sek          | u8[32] | "Soft epoch key". May be rotated              |
-|              |        | by the drive as part of a cryptographic       |
-|              |        | erase.                                        |
-+--------------+--------+-----------------------------------------------+
-| dpk          | u8[32] | "Data protection key".                        |
-+--------------+--------+-----------------------------------------------+
-| metadata     | u8[20] | Metadata for MEK to load into the drive       |
-|              |        | encryption engine (i.e. NSID + LBA range).    |
-+--------------+--------+-----------------------------------------------+
-| aux_metadata | u8[32] | Auxiliary metadata for the MEK                |
-|              |        | (optional; i.e. operation mode).              |
-+--------------+--------+-----------------------------------------------+
-| cmd_timeout  | u32    | Timeout in ms for command to encryption       |
-|              |        | engine to complete.                           |
-+--------------+--------+-----------------------------------------------+
++--------------+--------+--------------------------------------------+
+| Name         | Type   | Description                                |
++==============+========+============================================+
+| chksum       | u32    | Checksum over other input arguments,       |
+|              |        | computed by the caller.                    |
++--------------+--------+--------------------------------------------+
+| reserved     | u32    | Reserved.                                  |
++--------------+--------+--------------------------------------------+
+| sek          | u8[32] | Soft Epoch Key.                            |
++--------------+--------+--------------------------------------------+
+| dpk          | u8[32] | Data Protection Key.                       |
++--------------+--------+--------------------------------------------+
+| metadata     | u8[20] | Metadata for MEK to load into the drive    |
+|              |        | encryption engine (i.e. NSID + LBA range). |
++--------------+--------+--------------------------------------------+
+| aux_metadata | u8[32] | Auxiliary metadata for the MEK             |
+|              |        | (optional; i.e. operation mode).           |
++--------------+--------+--------------------------------------------+
+| cmd_timeout  | u32    | Timeout in ms for command to encryption    |
+|              |        | engine to complete.                        |
++--------------+--------+--------------------------------------------+
 
 Table: DERIVE_MEK output arguments
 
@@ -1558,15 +1568,15 @@ Table: REPORT_EPOCH_KEY_STATE output arguments
 
 Table: SEK state values {#tbl:sek-state-values}
 
-+-------------+-------------+
-| Value       | Description |
-+=============+=============+
-| 0h          | ZEROIZED    |
-+-------------+-------------+
-| 1h          | PROGRAMMED  |
-+-------------+-------------+
-| 2h to FFFFh | Reserved    |
-+-------------+-------------+
++-------------+----------------+
+| Value       | Description    |
++=============+================+
+| 0h          | SEK_ZEROIZED   |
++-------------+----------------+
+| 1h          | SEK_PROGRAMMED |
++-------------+----------------+
+| 2h to FFFFh | Reserved       |
++-------------+----------------+
 
 Table: HEK state values {#tbl:hek-state-values}
 
@@ -1849,18 +1859,30 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 | 2    | OCP L.O.C.K. shall be enabled.                   | Yes       |
 +------+--------------------------------------------------+-----------+
 | 3    | Media encryption keys shall only be programmable |           |
-|      | to the encryption engine via Caliptra.           | Yes       |
+|      | to the encryption engine via Caliptra. See       | Yes       |
+|      | @sec:architecture.                               |           |
 +------+--------------------------------------------------+-----------+
 | 4    | The encryption engine shall remove all MEKs from | Yes       |
 |      | the encryption engine on a power cycle or during |           |
-|      | zeroization of the storage device.               |           |
+|      | zeroization of the storage device. See           |           |
+|      | @sec:architecture.                               |           |
 +------+--------------------------------------------------+-----------+
 | 5    | The SEK shall only be programmed once the HEK is | Yes       |
 |      | available, and the HEK shall only be zeroized    |           |
-|      | once the SEK is zeroized.                        |           |
+|      | once the SEK is zeroized. See                    |           |
+|      | @sec:hek-sek-lifecycle.                          |           |
 +------+--------------------------------------------------+-----------+
 | 6    | MEKs shall not be programmed while the SEK is    | Yes       |
-|      | zeroized.                                        |           |
+|      | zeroized. See @sec:heks-seks.                    |           |
++------+--------------------------------------------------+-----------+
+| 7    | Drive firmware shall implement authorization     | Yes       |
+|      | controls to gate lifecycle events that have the  |           |
+|      | potential to trigger data loss. See              |           |
+|      | @sec:authorization.                              |           |
++------+--------------------------------------------------+-----------+
+| 8    | The encryption engine shall ensure that AES-XTS  | Yes       |
+|      | Key_1 and Key_2 are not equal. See               |           |
+|      | @sec:aes-xts-considerations.                     |           |
 +------+--------------------------------------------------+-----------+
 
 ## Repository location
