@@ -1922,7 +1922,103 @@ Therefore a given input secret may safely be used in at most $2^{64.5}$ precondi
 
 # EAT format for attesting to the epoch key state {#sec:eat-format}
 
-This section will be fleshed out with additional details as they become available.
+This section provides an Entity Attestation Token (EAT) claims set as defined in RFC 9711 [@{ietf-rfc9711}]. These claims, enumerated in @tbl:eat-claims, describe the sanitization and epoch key state of the device. Other characteristics of the device, such as keys and other cryptographic identifiers, are captured and attested to by DICE and are therefore excluded from these claims.
+
+For concise encoding and simplicity, all claim values are expressed as &(raw-value: 4): #6.560.
+
+- \`4\` is defined by CoRIM and denotes a measurement that contains the value of the element.
+- \`6\` is defined by RFC 7049 [@{ietf-rfc7049}] as optional semantic tagging of other major types.
+- \`560\` is defined in CoRIM [@{draft-irtf-rats-corim}] to be an opaque byte string. All values in this claims set will use this type to represent a single little-endian uint32.
+
+Table: EAT claims {#tbl:eat-claims}
+
++--------+-----------------+------------------------------------+
+| mkey # | Name            | Description                        |
++========+=================+====================================+
+| 0      | EAT_VERSION     | Describes the version of this EAT  |
+|        |                 | format. This value is increased    |
+|        |                 | whenever an mkey is added,         |
+|        |                 | removed, or modified. The current  |
+|        |                 | version is \`0\`.                  |
++--------+-----------------+------------------------------------+
+| 1      | TOTAL_HEK_SLOTS | Total number of HEK slots.         |
++--------+-----------------+------------------------------------+
+| 2      | ACTIVE_HEK_SLOT | Index of the currently-active HEK  |
+|        |                 | slot.                              |
++--------+-----------------+------------------------------------+
+| 3      | HEK_STATE       | State of the currently-active HEK. |
+|        |                 | See @tbl:hek-state-values for      |
+|        |                 | details.                           |
++--------+-----------------+------------------------------------+
+| 4      | SEK_STATE       | State of the SEK. See              |
+|        |                 | @tbl:sek-state-values for details. |
++--------+-----------------+------------------------------------+
+
+The following code block is a CDDL description for the EAT:
+
+```cddl{.small}
+; Provides the top-level EAT definition.
+
+start=eat
+eat = {
+  &(measurements: 273) => bstr
+}
+
+; Populates the extension point that indicates that this EAT holds concice evidence.
+; `$measurements-body-cbor` is defined in RFC 9711
+; `concise-evidence-map` is defined in TCG Concise Evidence
+
+$measurements-body-cbor /= bytes .cbor concise-evidence-map
+```
+
+The following block is an example EAT payload expressed in CBOR diagnostic notation:
+
+```cbor-edn{.small}
+/ eat / {
+  / measurements / 273 : [[
+    10571,
+    / concise-evidence / <<{
+      / ce.ev-triples / 0 : {
+        / ce.evidence-triples / 0 : [[
+          / environment-map / {
+            / class / 0 : { / class-id / 0 : 111(h'0') }, / placeholder OID TBD/
+            / instance / 1 : 560(h'0'), / Disambiguates between instances in a device. /
+          },
+          [
+            / measurement-map / {
+              / mkey / 0 : 0
+              / mval / 1 : { / raw-value / 4 : 560(h'0') } / EAT_VERSION = 0 /
+            },
+            / measurement-map / {
+              / mkey / 0 : 1
+              / mval / 1 : { / raw-value / 4 : 560(h'4') } / TOTAL_HEK_SLOTS = 4 /
+            },
+            / measurement-map / {
+              / mkey / 0 : 2
+              / mval / 1 : { / raw-value / 4 : 560(h'2') } / ACTIVE_HEK_SLOT = 2 /
+            },
+            / measurement-map / {
+              / mkey / 0 : 3
+              / mval / 1 : { / raw-value / 4 : 560(h'2') } / HEK_STATE = 2 (HEK_AVAIL_PROD) /
+            },
+            / measurement-map / {
+              / mkey / 0 : 4
+              / mval / 1 : { / raw-value / 4 : 560(h'0') } / SEK_STATE = 0 (SEK_ZEROIZED) /
+            }
+          ]
+        ]]
+      }
+    }>>
+  ]]
+}
+```
+
+The above example uses a number of identifiers:
+
+- \`273\` is the claim key for measurements, defined in RFC 9711 [@{ietf-rfc9711}].
+- \`10571\` is the \`application/ce+cbor\` CoAP Content ID, defined in TCG Concise Evidence [@{tcg-concise-evidence}].
+- \`111\` is the CBOR tag for object identifiers, defined in RFC 9090 [@{ietf-rfc9090}].
+- \`560\` is the CBOR tag for opaque byte strings, defined in CoRIM [@{draft-irtf-rats-corim}].
 
 # Sequence diagrams
 
