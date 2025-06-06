@@ -1159,6 +1159,8 @@ Table: MIX_MPK output arguments
 
 This command is used by the host to check the input access key is associated with the given MPK. The \`nonce\` is a random value to be included in the digest calculation to prevent response replay attacks. The output is calculated as SHA2-384(metadata || decrypted access key || nonce). The metadata is taken from the provided MPK's \`metadata\` field.
 
+See @fig:test-access-key-uml for the sequence diagram.
+
 Command Code: 0x5441_434B ("TACK")
 
 Table: TEST_ACCESS_KEY input arguments
@@ -1961,6 +1963,12 @@ This section will be fleshed out with additional details as they become availabl
 
 ```plantuml {caption="UML: Mixing an MPK" #fig:mix-mpk-uml}
 !include diagrams/uml/mix_mpk.uml
+```
+
+## Sequence to test the access key of an MPK
+
+```plantuml {caption="UML: Testing an Access Key" #fig:test-access-key-uml}
+!include diagrams/uml/test_access_key.uml
 ```
 
 ## Sequence to load an MEK
