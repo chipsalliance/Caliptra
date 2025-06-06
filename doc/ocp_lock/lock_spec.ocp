@@ -402,8 +402,10 @@ Table: HEK lifecycle states {#tbl:hek-lifecycle-states}
 |               | R~x~ is corrupted.  | N/A        | HEK_UNAVAIL_CORRUPTED    |
 |               +---------------------+------------+--------------------------+
 |               | Every ratchet       | SIK        | HEK_AVAIL_PERMANENT      |
-|               | secret is zeroized. |            |                          |
-|               |                     |            |                          |
+|               | secret is zeroized, |            |                          |
+|               | and the             |            |                          |
+|               | permanent-HEK fuse  |            |                          |
+|               | bit has been set.   |            |                          |
 +---------------+---------------------+------------+--------------------------+
 
 @tbl:hek-lifecycle-commands describes the commands that KMB exposes to manage the HEK lifecycle.
@@ -1646,7 +1648,7 @@ See @tbl:hek-lifecycle-states for more information about the relationship betwee
 
 HEK_AVAIL_PREPROD → HEK_UNAVAIL_EMPTY is a one-way transition that the device vendor is expected to trigger by advancing the Caliptra lifecycle state to Production.
 
-HEK_UNAVAIL_ZEROIZED → HEK_AVAIL_PERMANENT is a one-way transition that the device owner can trigger using the ENABLE_PERMANENT_HEK command when all ratchet secret slots are zeroized.
+HEK_UNAVAIL_ZEROIZED → HEK_AVAIL_PERMANENT is a one-way transition that the device owner can trigger using the ENABLE_PERMANENT_HEK command once all ratchet secret slots have been zeroized.
 
 See @fig:hek-sek-rotation for more details about the transitions between HEK states.
 
