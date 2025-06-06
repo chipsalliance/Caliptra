@@ -250,7 +250,7 @@ Each AES secret is preconditioned using a randomly-generated 64-bit identifier, 
 
 MPKs are the mechanism by which KMB enforces multi-party authorization as a precondition to loading an MEK. MPKs exist in one of two states: locked or ready. In both these states the MPK is encrypted to a key known only to KMB.
 
-- A locked MPK's encryption key is derived from the HEK as well as an externally-supplied access key to which the MPK is bound. The locked MPK is held at rest by drive firmware.
+- A locked MPK's encryption key is derived from the HEK, SEK, and an externally-supplied access key to which the MPK is bound. The locked MPK is held at rest by drive firmware.
 - The Ready MPK Encryption Key is a volatile key held within KMB which is lazily generated and is lost when the drive shuts down. Lazy generation allows injected host entropy to contribute to the key's generation. Ready MPKs are held in drive firmware memory.
 
 The externally-supplied access key is encrypted in transit using an HPKE public key held by KMB. The "ready" state allows the HPKE keypair to be rotated after the access key has been provisioned to the storage device, without removing the ability for KMB to decrypt the MPK when later loading an MEK bound to that MPK.
@@ -300,7 +300,7 @@ Drive firmware may request that KMB generate an MPK, bound to a given access key
 
 1. Unwrap the given MPK access key using the HPKE keypair held within KMB.
 2. Randomly generate an MPK.
-3. Derive an MPK encryption key from the HEK and the decrypted access key.
+3. Derive an MPK encryption key from the HEK, SEK, and decrypted access key.
 4. Encrypt the MPK to the MPK encryption key.
 5. Return the encrypted MPK to the drive firmware.
 
@@ -315,7 +315,7 @@ Encrypted MPKs stored at rest in persistent storage are considered "locked", and
 To ready an MPK, KMB performs the following steps:
 
 1. Unwrap the given MPK access key using the HPKE keypair held within KMB.
-2. Derive the MPK encryption key from the HEK and the decrypted access key.
+2. Derive the MPK encryption key from the HEK, SEK, and decrypted access key.
 3. Decrypt the MPK using the MPK encryption key.
 4. Encrypt the MPK using the Ready MPK Encryption Key.
 5. Return the re-encrypted "ready" MPK to the drive firmware.
@@ -326,17 +326,17 @@ Drive firmware may then stash the encrypted ready MPK in volatile storage, and l
 
 ##### MPK access key rotation {#sec:mpk-access-key-rotation}
 
-The access key to which an MPK is bound may be rotated. The user must prove that they have knowledge of both the old and new access key before a rotation is allowed. This is accomplished using a slight variation on the usual access key import flow. When a new access key is provided to KMB during a rotation, the new access key is double-encrypted: first to the old access key, and then to the HPKE public key. KMB performs the following steps:
+The access key to which an MPK is bound may be rotated. The user must prove that they have knowledge of both the current and new access key before a rotation is allowed. This is accomplished using a slight variation on the usual access key import flow. When a new access key is provided to KMB during a rotation, the new access key is double-encrypted: first to the old access key, and then to the HPKE public key. KMB performs the following steps:
 
-1. Unwrap the given old access key and encrypted new access key using the HPKE keypair held within KMB.
-2. Decrypt the new access key using the old access key.
-3. Derive the old MPK encryption key from the HEK and the decrypted old access key.
-4. Derive the new MPK encryption key from the HEK and the decrypted new access key.
-5. Decrypt the MPK using the old MPK encryption key.
+1. Unwrap the given current access key and encrypted new access key using the HPKE keypair held within KMB.
+2. Decrypt the new access key using the current access key.
+3. Derive the current MPK encryption key from the HEK, SEK, and decrypted old access key.
+4. Derive the new MPK encryption key from the HEK, SEK, and decrypted new access key.
+5. Decrypt the MPK using the current MPK encryption key.
 6. Encrypt the MPK using the new MPK encryption key.
 7. Return the re-encrypted MPK to the drive firmware.
 
-Drive firmware then purges the old encrypted MPK and stores the new encrypted MPK in persistent storage.
+Drive firmware then purges the current encrypted MPK and stores the new encrypted MPK in persistent storage.
 
 ![MPK access key rotation](./diagrams/mpk_access_key_rotation.drawio.svg){#fig:mpk-access-key-rotation}
 
@@ -979,7 +979,7 @@ Table: ROTATE_ENCAPSULATION_KEY output arguments
 
 #### GENERATE_MPK
 
-This command unwraps the specified access key, generates a random MPK, then uses the HEK and access key to encrypt the MPK which is returned for the drive to persistently store. The given \`metadata\` is placed in the  \`metadata\` field of the returned MPK to cryptographically tie them together. Note that "metadata" in this context refers to metadata about the MPK, and bears no relation to metadata about an MEK.
+This command unwraps the specified access key, generates a random MPK, then encrypts the MPK with KDF(HEK || SEK || access_key, "MPK") which is returned for the drive to persistently store. The given \`metadata\` is placed in the  \`metadata\` field of the returned MPK to cryptographically tie them together. Note that "metadata" in this context refers to metadata about the MPK, and bears no relation to metadata about an MEK.
 
 Command Code: 0x474D_504B ("GMPK")
 
@@ -1024,7 +1024,7 @@ Table: GENERATE_MPK output arguments
 
 #### REWRAP_MPK
 
-This command unwraps old_access_key and encrypted new_access_key from sealed_access_keys. Then old_access_key is used to decrypt new_access_key. The specified MPK is decrypted using KDF(HEK, "MPK", old_access_key). A new MPK is encrypted with the output of KDF(HEK, "MPK", new_access_key). The new encrypted MPK is returned.
+This command unwraps current_access_key and encrypted new_access_key from sealed_access_keys. Then current_access_key is used to decrypt new_access_key. The specified MPK is decrypted using KDF(HEK || SEK || current_access_key, "MPK"). A new MPK is encrypted with the output of KDF(HEK || SEK || new_access_key, "MPK"). The new encrypted MPK is returned.
 
 The drive stores the returned new encrypted MPK and zeroizes the old encrypted MPK.
 
@@ -1032,29 +1032,32 @@ Command Code: 0x5245_5750 ("REWP")
 
 Table: REWRAP_MPK input arguments
 
-+--------------------+--------------------------+------------------------------+
-| Name               | Type                     | Description                  |
-+====================+==========================+==============================+
-| chksum             | u32                      | Checksum over other          |
-|                    |                          | input arguments,             |
-|                    |                          | computed by the caller.      |
-+--------------------+--------------------------+------------------------------+
-| reserved           | u32                      | Reserved.                    |
-+--------------------+--------------------------+------------------------------+
-| sek                | u8[32]                   | Soft Epoch Key.              |
-+--------------------+--------------------------+------------------------------+
-| info_len           | u32                      | Length of the info argument. |
-+--------------------+--------------------------+------------------------------+
-| info               | u8[info_len]             | Info argument to use with    |
-|                    |                          | HPKE unwrap.                 |
-+--------------------+--------------------------+------------------------------+
-| old_locked_mpk     | LockedMpk                | Old MPK to be rewrapped.     |
-+--------------------+--------------------------+------------------------------+
-| sealed_access_keys | SealedOldAndNewAccessKey | HPKE-sealed old_access_key.  |
-|                    |                          | HPKE-sealed (new_access_key  |
-|                    |                          | encrypted to                 |
-|                    |                          | old_access_key).             |
-+--------------------+--------------------------+------------------------------+
++--------------------+------------------------------+------------------------------+
+| Name               | Type                         | Description                  |
++====================+==============================+==============================+
+| chksum             | u32                          | Checksum over other          |
+|                    |                              | input arguments,             |
+|                    |                              | computed by the caller.      |
++--------------------+------------------------------+------------------------------+
+| reserved           | u32                          | Reserved.                    |
++--------------------+------------------------------+------------------------------+
+| sek                | u8[32]                       | Soft Epoch Key.              |
++--------------------+------------------------------+------------------------------+
+| info_len           | u32                          | Length of the info           |
+|                    |                              | argument.                    |
++--------------------+------------------------------+------------------------------+
+| info               | u8[info_len]                 | Info argument to use with    |
+|                    |                              | HPKE unwrap.                 |
++--------------------+------------------------------+------------------------------+
+| current_locked_mpk | LockedMpk                    | Current MPK to be rewrapped. |
++--------------------+------------------------------+------------------------------+
+| sealed_access_keys | SealedCurrentAndNewAccessKey | HPKE-sealed                  |
+|                    |                              | current_access_key.          |
+|                    |                              | HPKE-sealed                  |
+|                    |                              | (new_access_key              |
+|                    |                              | encrypted to                 |
+|                    |                              | current_access_key).         |
++--------------------+------------------------------+------------------------------+
 
 Table: REWRAP_MPK output arguments
 
@@ -1074,7 +1077,7 @@ Table: REWRAP_MPK output arguments
 
 #### READY_MPK
 
-This command decrypts \`sealed_access_key\`. Then the decrypted access_key is used to decrypt \`locked_mpk\` using KDF(HEK, "MPK", access_key). A "ready" MPK is encrypted with the Ready MPK Encryption Key. The encrypted ready MPK is returned.
+This command decrypts \`sealed_access_key\`. Then the decrypted access_key is used to decrypt \`locked_mpk\` using KDF(HEK || SEK || access_key, "MPK"). A "ready" MPK is encrypted with the Ready MPK Encryption Key. The encrypted ready MPK is returned.
 
 Command Code: 0x524D_504B ("RMPK")
 
@@ -1088,6 +1091,8 @@ Table: READY_MPK input arguments
 |                   |                 | computed by the caller.      |
 +-------------------+-----------------+------------------------------+
 | reserved          | u32             | Reserved.                    |
++-------------------+-----------------+------------------------------+
+| sek               | u8[32]          | Soft Epoch Key.              |
 +-------------------+-----------------+------------------------------+
 | info_len          | u32             | Length of the info argument. |
 +-------------------+-----------------+------------------------------+
@@ -1173,7 +1178,12 @@ Table: TEST_ACCESS_KEY input arguments
 +-------------------+-----------------+---------------------------------------+
 | sek               | u8[32]          | Soft Epoch Key.                       |
 +-------------------+-----------------+---------------------------------------+
-| nonce             | u8[32]          | Host provided random value.           |
+| info_len          | u32             | Length of the info argument.          |
++-------------------+-----------------+---------------------------------------+
+| info              | u8[info_len]    | Info argument to use with             |
+|                   |                 | HPKE unwrap.                          |
++-------------------+-----------------+---------------------------------------+
+| nonce             | u8[32]          | Host-provided random value.           |
 +-------------------+-----------------+---------------------------------------+
 | locked_mpk        | LockedMpk       | Locked MPK associated with the access |
 |                   |                 | key.                                  |
@@ -1183,12 +1193,18 @@ Table: TEST_ACCESS_KEY input arguments
 
 Table: TEST_ACCESS_KEY output arguments
 
-+--------+--------+------------------------------------------------------+
-| Name   | Type   | Description                                          |
-+========+========+======================================================+
-| digest | u8[48] | SHA-384 hash of the MPK's metadata, decrypted access |
-|        |        | key, and nonce.                                      |
-+--------+--------+------------------------------------------------------+
++-------------+--------+------------------------------------------------------+
+| Name        | Type   | Description                                          |
++=============+========+======================================================+
+| chksum      | u32    | Checksum over other output arguments,                |
+|             |        | computed by Caliptra.                                |
++-------------+--------+------------------------------------------------------+
+| fips_status | u32    | Indicates if the command is FIPS approved            |
+|             |        | or an error.                                         |
++-------------+--------+------------------------------------------------------+
+| digest      | u8[48] | SHA-384 hash of the MPK's metadata, decrypted access |
+|             |        | key, and nonce.                                      |
++-------------+--------+------------------------------------------------------+
 
 #### GENERATE_MEK
 
@@ -1533,7 +1549,8 @@ Table: REPORT_EPOCH_KEY_STATE input arguments
 +-----------+--------+---------------------------------------+
 | sek_state | u16    | SEK state. See @tbl:sek-state-values. |
 +-----------+--------+---------------------------------------+
-| nonce     | u8[16] | Freshness nonce.                      |
+| nonce     | u8[16] | Freshness nonce to be included in the |
+|           |        | signed IETF EAT.                      |
 +-----------+--------+---------------------------------------+
 
 Table: REPORT_EPOCH_KEY_STATE output arguments
@@ -1641,20 +1658,20 @@ Table: SealedAccessKey contents
 
 \`Nenc\` and \`Nt\` are HPKE values associated with the \`kem_id\` and \`aead_id\` identifiers from the given \`hpke_algorithm\`. For example, if byte 0 bit 0 of \`hpke_algorithm\` is set (indicating \`kem_id\` 0x0011 and \`aead_id\` 0x0002), then according to [@{ietf-rfc9180}], \`Nenc\` and \`Nt\` would be 97 and 16, respectively.
 
-Table: SealedOldAndNewAccessKey contents
+Table: SealedCurrentAndNewAccessKey contents
 
-+-----------------+--------------------------+-----------------------------------------+
-| Name            | Type                     | Description                             |
-+=================+==========================+=========================================+
-| old_access_key  | SealedAccessKey          | Old access key. Used to decrypt the new |
-|                 |                          | access key.                             |
-+-----------------+--------------------------+-----------------------------------------+
-| ak_iv           | u8[Nn]                   | IV used to decrypt the encrypted        |
-|                 |                          | access key.                             |
-+-----------------+--------------------------+-----------------------------------------+
-| encrypted_ak_ct | u8[access_key_len+Nt+Nt] | (Encrypted access key + inner tag)      |
-|                 |                          | ciphertext and outer tag.               |
-+-----------------+--------------------------+-----------------------------------------+
++--------------------+--------------------------+---------------------------------------------+
+| Name               | Type                     | Description                                 |
++====================+==========================+=============================================+
+| current_access_key | SealedAccessKey          | Current access key. Used to decrypt the new |
+|                    |                          | access key.                                 |
++--------------------+--------------------------+---------------------------------------------+
+| ak_iv              | u8[Nn]                   | IV used to decrypt the encrypted            |
+|                    |                          | access key.                                 |
++--------------------+--------------------------+---------------------------------------------+
+| encrypted_ak_ct    | u8[access_key_len+Nt+Nt] | (Encrypted access key + inner tag)          |
+|                    |                          | ciphertext and outer tag.                   |
++--------------------+--------------------------+---------------------------------------------+
 
 \`Nn\` and \`Nt\` are HPKE values associated with the \`aead_id\` identifier from the given \`hpke_algorithm\`.
 
