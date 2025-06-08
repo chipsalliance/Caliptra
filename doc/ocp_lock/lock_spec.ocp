@@ -326,17 +326,16 @@ Drive firmware may then stash the encrypted ready MPK in volatile storage, and l
 
 ##### MPK access key rotation {#sec:mpk-access-key-rotation}
 
-The access key to which an MPK is bound may be rotated. The user must prove that they have knowledge of both the current and new access key before a rotation is allowed. This is accomplished using a slight variation on the usual access key import flow. When a new access key is provided to KMB during a rotation, the new access key is double-encrypted: first to the old access key, and then to the HPKE public key. KMB performs the following steps:
+The access key to which an MPK is bound may be rotated. The user must prove that they have knowledge of both the current and new access key before a rotation is allowed. This is accomplished by the user wrapping both their current and new access key in the same HPKE payload. KMB performs the following steps:
 
-1. Unwrap the given current access key and encrypted new access key using the HPKE keypair held within KMB.
-2. Decrypt the new access key using the current access key.
-3. Derive the current MPK encryption key from the HEK, SEK, and decrypted old access key.
-4. Derive the new MPK encryption key from the HEK, SEK, and decrypted new access key.
-5. Decrypt the MPK using the current MPK encryption key.
-6. Encrypt the MPK using the new MPK encryption key.
-7. Return the re-encrypted MPK to the drive firmware.
+1. Unwrap the given current access key and new access key using the HPKE keypair held within KMB, incrementing the HPKE sequence number between each decryption operation. Note that the sequence number increment is a side-effect of the \`ContextR.Open()\` HPKE operation.
+2. Derive the current MPK encryption key from the HEK, SEK, and decrypted current access key.
+3. Derive the new MPK encryption key from the HEK, SEK, and decrypted new access key.
+4. Decrypt the MPK using the current MPK encryption key.
+5. Encrypt the MPK using the new MPK encryption key.
+6. Return the re-encrypted MPK to the drive firmware.
 
-Drive firmware then purges the current encrypted MPK and stores the new encrypted MPK in persistent storage.
+Drive firmware then zeroizes the old encrypted MPK and stores the new encrypted MPK in persistent storage.
 
 ![MPK access key rotation](./diagrams/mpk_access_key_rotation.drawio.svg){#fig:mpk-access-key-rotation}
 
@@ -1087,12 +1086,8 @@ Table: REWRAP_MPK input arguments
 +--------------------+------------------------------+------------------------------+
 | current_locked_mpk | LockedMpk                    | Current MPK to be rewrapped. |
 +--------------------+------------------------------+------------------------------+
-| sealed_access_keys | SealedCurrentAndNewAccessKey | HPKE-sealed                  |
-|                    |                              | current_access_key.          |
-|                    |                              | HPKE-sealed                  |
-|                    |                              | (new_access_key              |
-|                    |                              | encrypted to                 |
-|                    |                              | current_access_key).         |
+| sealed_access_keys | SealedCurrentAndNewAccessKey | HPKE-sealed current and new  |
+|                    |                              | access keys.                 |
 +--------------------+------------------------------+------------------------------+
 
 Table: REWRAP_MPK output arguments
@@ -1732,22 +1727,15 @@ Table: SealedAccessKey contents
 
 Table: SealedCurrentAndNewAccessKey contents
 
-+--------------------+--------------------------+---------------------------------------------+
-| Name               | Type                     | Description                                 |
-+====================+==========================+=============================================+
-| current_access_key | SealedAccessKey          | Current access key. Used to decrypt the new |
-|                    |                          | access key.                                 |
-+--------------------+--------------------------+---------------------------------------------+
-| ak_iv              | u8[Nn]                   | IV used to decrypt the encrypted            |
-|                    |                          | access key.                                 |
-+--------------------+--------------------------+---------------------------------------------+
-| encrypted_ak_ct    | u8[access_key_len+Nt+Nt] | (Encrypted access key + inner tag)          |
-|                    |                          | ciphertext and outer tag.                   |
-+--------------------+--------------------------+---------------------------------------------+
++--------------------+-----------------------+---------------------+
+| Name               | Type                  | Description         |
++====================+=======================+=====================+
+| current_access_key | SealedAccessKey       | Current access key. |
++--------------------+-----------------------+---------------------+
+| new_access_key     | u8[access_key_len+Nt] | New access key.     |
++--------------------+-----------------------+---------------------+
 
-\`Nn\` and \`Nt\` are HPKE values associated with the \`aead_id\` identifier from the given \`hpke_algorithm\`.
-
-The outer layer of encryption of the wrapped access key is decrypted using HPKE. The inner layer is decrypted using the access key in the accompanying \`SealedAccessKey\` instance. Both layers use the AEAD algorithm indicated by the \`aead_id\` identifier from the given \`hpke_algorithm\`.
+\`Nt\` is the HPKE value associated with the \`aead_id\` identifier from the SealedAccessKey's \`hpke_algorithm\`.
 
 ##### WrappedKey type
 
