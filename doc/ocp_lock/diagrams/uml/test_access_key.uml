@@ -1,0 +1,37 @@
+'
+' OCP Lock: TEST_ACCESS_KEY API sequence diagram showing Caliptra FW/HW interactions
+'
+'
+@startuml
+
+!include ocp_lock_utils.inc
+
+' Pre-existing state
+hek++ $BUFFER_ACTIVATION
+kemg++ $BUFFER_ACTIVATION
+
+fw $async mb++ : TEST_ACCESS_KEY
+
+mb $async cfw++ : Command
+mb--
+
+cfw $sync kv++: Decaps(KEM Pair : kem_handle (G),\n             KEM ciphertext : kem_ciphertext\n             Destination : Slot Y)
+kv $sync kemg: Get KEM Keypair
+kv $sync kv: Decap KEM Ciphertext with Keypair
+kv $sync tempy: Put Shared Secret
+tempy++ $BUFFER_ACTIVATION
+kv $sync cfw-- : done
+
+cfw $sync kv++: Key_Unwrap(Key : Slot Y,\n                   Data: encrypted_access_key\n                   Destination : Slot Z)
+kv $sync tempy: Get Shared Secret
+kv $sync kv: Key_Unwrap encrypted_access_key with Key
+kv $sync cfw-- : unwrapped access_key
+cfw $sync cfw : SHA384(Data: metadata,\n              Data: decrypted access key,\n              Data: nonce)
+
+cfw $sync mb : Command response\nproof of possession digest
+& mb $async fw++ : Command\ncomplete
+
+cfw--
+kv--
+
+@enduml
