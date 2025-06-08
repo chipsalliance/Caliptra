@@ -795,6 +795,8 @@ Several mailbox commands invoke ECDH and/or ML-KEM Decaps. These operations invo
 
 Exposes a command that allows drive firmware to determine if the encryption engine is ready to process commands as well vendor-defined drive encryption engine status data.
 
+See @fig:get-status-uml for the sequence diagram.
+
 Command Code: 0x4753_5441 ("GSTA")
 
 Table: GET_STATUS input arguments
@@ -824,6 +826,8 @@ Table: GET_STATUS output arguments
 #### GET_ALGORITHMS
 
 Exposes a command that allows drive firmware to determine the types of algorithms supported by KMB for endorsement, KEM, MPK, and access key generation.
+
+See @fig:get-supported-algorithms-uml for the sequence diagram.
 
 Command Code: 0x4741_4C47 ("GALG")
 
@@ -907,6 +911,8 @@ Table: CLEAR_KEY_CACHE output arguments
 
 This command generates a signed certificate for the specified KEM using the specified endorsement algorithm.
 
+See @fig:endorse-encapsulation-pub-key-uml for the sequence diagram.
+
 Command Code: 0x4E45_505B ("EEPK")
 
 Table: ENDORSE_ENCAPSULATION_PUB_KEY input arguments
@@ -953,6 +959,8 @@ Table: ENDORSE_ENCAPSULATION_PUB_KEY output arguments
 
 This command rotates the KEM keypair indicated by the specified handle and stores the new KEM keypair in volatile memory within KMB.
 
+See @fig:rotate-encapsulation-key-uml for the sequence diagram.
+
 Command Code: 0x5245_4E4B ("RENK")
 
 Table: ROTATE_ENCAPSULATION_KEY input arguments
@@ -987,6 +995,8 @@ Table: ROTATE_ENCAPSULATION_KEY output arguments
 #### GENERATE_MPK
 
 This command unwraps the specified access key, generates a random MPK, then encrypts the MPK with KDF(HEK || SEK || access_key, "MPK") which is returned for the drive to persistently store. The given \`metadata\` is placed in the  \`metadata\` field of the returned MPK to cryptographically tie them together. Note that "metadata" in this context refers to metadata about the MPK, and bears no relation to metadata about an MEK.
+
+See @fig:generate-mpk-uml for the sequence diagram.
 
 Command Code: 0x474D_504B ("GMPK")
 
@@ -1034,6 +1044,8 @@ Table: GENERATE_MPK output arguments
 This command unwraps current_access_key and encrypted new_access_key from sealed_access_keys. Then current_access_key is used to decrypt new_access_key. The specified MPK is decrypted using KDF(HEK || SEK || current_access_key, "MPK"). A new MPK is encrypted with the output of KDF(HEK || SEK || new_access_key, "MPK"). The new encrypted MPK is returned.
 
 The drive stores the returned new encrypted MPK and zeroizes the old encrypted MPK.
+
+See @fig:rewrap-mpk-uml for the sequence diagram.
 
 Command Code: 0x5245_5750 ("REWP")
 
@@ -1086,6 +1098,8 @@ Table: REWRAP_MPK output arguments
 
 This command decrypts \`sealed_access_key\`. Then the decrypted access_key is used to decrypt \`locked_mpk\` using KDF(HEK || SEK || access_key, "MPK"). A "ready" MPK is encrypted with the Ready MPK Encryption Key. The encrypted ready MPK is returned.
 
+See @fig:ready-mpk-uml for the sequence diagram.
+
 Command Code: 0x524D_504B ("RMPK")
 
 Table: READY_MPK input arguments
@@ -1133,6 +1147,8 @@ Table: READY_MPK output arguments
 This command initializes the MEK secret seed if not already initialized or if \`initialize\` is set to 1, decrypts the specified MPK with the with the Ready MPK Encryption Key, and then updates the MEK secret seed in KMB by performing a KDF with the MEK secret seed and the decrypted MPK.
 
 When generating an MEK, one or more MIX_MPK commands are processed to modify the MEK secret seed.
+
+See @fig:mix-mpk-uml for the sequence diagram.
 
 Command Code: 0x4D4D_504B ("MMPK")
 
@@ -1265,6 +1281,8 @@ When decrypting an MEK, the MEK secret seed is initialized if no MPK has previou
 
 The decrypted MEK, specified metadata, and aux_metadata are loaded into the encryption engine key cache. The metadata format is vendor-defined and specifies the information to the encryption engine on where within the key cache the MEK is loaded.
 
+See @fig:load-mek-uml for the sequence diagram.
+
 Command Code: 0x4C4D_454B ("LMEK")
 
 Table: LOAD_MEK input arguments
@@ -1359,6 +1377,8 @@ Table: DERIVE_MEK output arguments
 #### UNLOAD_MEK
 
 This command causes the MEK associated to the specified metadata to be unloaded for the key cache of the encryption engine. The metadata format is vendor-defined and specifies the information to the encryption engine on where within the key cache, the MEK is loaded.
+
+See @fig:unload-mek-uml for the sequence diagram.
 
 Command Code: 0x554D_454B ("UMEK")
 
