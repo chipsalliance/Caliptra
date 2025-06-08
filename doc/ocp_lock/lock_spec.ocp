@@ -340,6 +340,23 @@ Drive firmware then purges the current encrypted MPK and stores the new encrypte
 
 ![MPK access key rotation](./diagrams/mpk_access_key_rotation.drawio.svg){#fig:mpk-access-key-rotation}
 
+##### MPK access key testing {#sec:mpk-access-key-testing}
+
+A user that has bound an access key to an MPK may wish to confirm that their access key is in fact bound to the MPK. This can be useful after an access key rotation, to ensure that the rotation executed successfully on the storage device.
+
+To identify an MPK, at creation time the drive firmware can provide "metadata" for the MPK, which is included in the generated locked MPK and bound to the ciphertext as AAD. It is outside the scope of this specification how drive firmware populates the metadata field for the MPK. Note that "metadata" in this context refers to metadata about the MPK, and bears no relation to metadata about an MEK.
+
+To test an MPK, KMB receives a wrapped MPK, wrapped MPK access key, and freshness nonce. KMB then performs the following steps:
+
+1. Unwrap the given MPK access key using the HPKE keypair held within KMB.
+2. Derive the MPK encryption key from the HEK, SEK, and decrypted access key.
+3. Verify that the MPK can be decrypted using the MPK encryption key.
+4. Calculate and return SHA2-384(MPK metadata || access key || nonce).
+
+The user can then verify that the returned digest matches their expectation.
+
+![MPK access key testing](./diagrams/mpk_access_key_testing.drawio.svg){#fig:mpk-access-key-testing}
+
 ### DPKs
 
 Drive firmware provides the DPK (Data Protection Key) to KMB when generating, loading, or deriving an MEK. The DPK is used in a KDF, along with the HEK, SEK, and MPKs, to derive the MEK secret, as illustrated in @sec:meks.
@@ -994,7 +1011,7 @@ Table: ROTATE_ENCAPSULATION_KEY output arguments
 
 #### GENERATE_MPK
 
-This command unwraps the specified access key, generates a random MPK, then encrypts the MPK with KDF(HEK || SEK || access_key, "MPK") which is returned for the drive to persistently store. The given \`metadata\` is placed in the  \`metadata\` field of the returned MPK to cryptographically tie them together. Note that "metadata" in this context refers to metadata about the MPK, and bears no relation to metadata about an MEK.
+This command unwraps the specified access key, generates a random MPK, then encrypts the MPK with KDF(HEK || SEK || access_key, "MPK") which is returned for the drive to persistently store. The given \`metadata\` is placed in the  \`metadata\` field of the returned MPK to cryptographically tie them together.
 
 See @fig:generate-mpk-uml for the sequence diagram.
 
