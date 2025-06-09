@@ -1848,7 +1848,7 @@ Table: KMB mailbox command result codes {#tbl:kmb-mailbox-codes}
 +-------------------------+-------------+--------------------------+
 | LOCK_HEK_SLOTS_FULL     | 0x4C48_5346 | Next HEK slot cannot be  |
 |                         | ("LHSF")    | programmed because all   |
-|                         |             | slots are exhauseted.    |
+|                         |             | slots are exhausted.     |
 +-------------------------+-------------+--------------------------+
 | LOCK_HEK_SLOTS_NON_ZERO | 0x4C48_534E | Permanent-HEK mode       |
 |                         | ("LHSN")    | cannot be enabled        |
