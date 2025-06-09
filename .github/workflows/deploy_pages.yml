@@ -1,0 +1,73 @@
+name: Deploy specifications to GitHub pages
+
+on:
+  push:
+    branches: ["main"]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  ocp-lock:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/trustedcomputinggroup/pandoc:latest
+    name: Render OCP LOCK HTML
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Checkout Template dependencies
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          repository: "opencomputeproject/ocp-spec-tools"
+          ref: "45d41cc0d58edccf49d961443d52af4291db7735"
+          # The underlying tex and templates assume this exists under the "extra" folder.
+          path: "doc/ocp_lock/extra"
+
+      - name: Render OCP LOCK HTML
+        run: |
+          (cd doc/ocp_lock &&
+          /usr/bin/build.sh \
+          --crossref=tcg \
+          --csl extra/ocp-pandoc-resources/ieee.csl \
+          --nogitversion \
+          --template_html extra/ocp-pandoc-resources/html/ocp.html.template \
+          --html_stylesheet extra/ocp-pandoc-resources/html/style.css \
+          --html_stylesheet extra/ocp-pandoc-resources/html/github-markdown.css \
+          --resourcedir extra/ocp-pandoc-resources/pdf \
+          --html ocp-lock.html lock_spec.ocp)
+
+      - name: Prepare website folder
+        run: |
+          # Future "released versions" will be in their own namespace.
+          # E.g. "1.0" instead of "main".
+          mkdir -p gh-pages/ocp-lock/main
+          cp doc/ocp_lock/ocp-lock.html gh-pages/ocp-lock/main/specification.html
+
+      - name: Upload static files as artifact
+        id: deployment
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "gh-pages"
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: ocp-lock
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
