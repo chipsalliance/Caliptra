@@ -1794,67 +1794,70 @@ Depending on the type of fault, drive firmware may resubmit the mailbox command.
 
 Table: KMB mailbox command result codes {#tbl:kmb-mailbox-codes}
 
-+-------------------------+-------------+--------------------------+
-| Name                    | Value       | Description              |
-+=========================+=============+==========================+
-| LOCK_ENGINE_TIMEOUT     | 0x4C45_544F | Timeout occurred when    |
-|                         | ("LETO")    | communicating with the   |
-|                         |             | drive encryption engine  |
-|                         |             | to execute a command     |
-+-------------------------+-------------+--------------------------+
-| LOCK_ENGINE_CODE + u16  | 0x4443_xxxx | Vendor-specific error    |
-|                         | ("ECxx")    | code in the low 16 bits  |
-+-------------------------+-------------+--------------------------+
-| LOCK_BAD_ALGORITHM      | 0x4C42_414C | Unsupported algorithm,   |
-|                         | ("LBAL")    | or algorithm does not    |
-|                         |             | match the given handle   |
-+-------------------------+-------------+--------------------------+
-| LOCK_BAD_HANDLE         | 0x4C42_4841 | Unknown handle           |
-|                         | ("LBHA")    |                          |
-+-------------------------+-------------+--------------------------+
-| LOCK_NO_HANDLES         | 0x4C4E_4841 | Too many extant handles  |
-|                         | ("LNHA")    | exist                    |
-+-------------------------+-------------+--------------------------+
-| LOCK_KEM_DECAPSULATION  | 0x4C4B_4445 | Error during KEM         |
-|                         | ("LKDE")    | decapsulation            |
-+-------------------------+-------------+--------------------------+
-| LOCK_ACCESS_KEY_UNWRAP  | 0x4C41_4B55 | Error during access key  |
-|                         | ("LAKU")    | decryption               |
-+-------------------------+-------------+--------------------------+
-| LOCK_MPK_DECRYPT        | 0x4C50_4445 | Error during MPK         |
-|                         | ("LPDE")    | decryption               |
-+-------------------------+-------------+--------------------------+
-| LOCK_MEK_DECRYPT        | 0x4C4D_4445 | Error during MEK         |
-|                         | ("LMDE")    | decryption               |
-+-------------------------+-------------+--------------------------+
-| LOCK_HEK_INVALID_SLOT   | 0x4C48_4953 | Incorrect HEK slot when  |
-|                         | ("LHIS")    | programming or zeroizing |
-+-------------------------+-------------+--------------------------+
-| LOCK_EE_NOT_READY       | 0x4C45_4E52 | Encryption engine was    |
-|                         | ("LENR")    | not ready when the       |
-|                         |             | command was received.    |
-+-------------------------+-------------+--------------------------+
-| LOCK_HEK_NOT_AVAILABLE  | 0x4C48_4E41 | The operation requires   |
-|                         | ("LHNA")    | the HEK, which is        |
-|                         |             | unavailable.             |
-+-------------------------+-------------+--------------------------+
-| LOCK_HEK_NOT_ZEROIZED   | 0x4C48_4E5A | Next HEK slot cannot     |
-|                         | ("LHNZ")    | be programmed because    |
-|                         |             | the current slot         |
-|                         |             | is not zeroized.         |
-+-------------------------+-------------+--------------------------+
-| LOCK_HEK_ZEROIZED       | 0x4C48_5A44 | Current HEK slot is      |
-|                         | ("LHZD")    | already zeroized.        |
-+-------------------------+-------------+--------------------------+
-| LOCK_HEK_SLOTS_FULL     | 0x4C48_5346 | Next HEK slot cannot be  |
-|                         | ("LHSF")    | programmed because all   |
-|                         |             | slots are exhausted.     |
-+-------------------------+-------------+--------------------------+
-| LOCK_HEK_SLOTS_NON_ZERO | 0x4C48_534E | Permanent-HEK mode       |
-|                         | ("LHSN")    | cannot be enabled        |
-|                         |             | because one or more HEK  |
-|                         |             | slots are not zeroized.  |
-+-------------------------+-------------+--------------------------+
++------------------------+-------------+--------------------------+
+| Name                   | Value       | Description              |
++========================+=============+==========================+
+| LOCK_ENGINE_TIMEOUT    | 0x4C45_544F | Timeout occurred when    |
+|                        | ("LETO")    | communicating with the   |
+|                        |             | drive encryption engine  |
+|                        |             | to execute a command     |
++------------------------+-------------+--------------------------+
+| LOCK_ENGINE_CODE + u16 | 0x4443_xxxx | Vendor-specific error    |
+|                        | ("ECxx")    | code in the low 16 bits  |
++------------------------+-------------+--------------------------+
+| LOCK_BAD_ALGORITHM     | 0x4C42_414C | Unsupported algorithm,   |
+|                        | ("LBAL")    | or algorithm does not    |
+|                        |             | match the given handle   |
++------------------------+-------------+--------------------------+
+| LOCK_BAD_HANDLE        | 0x4C42_4841 | Unknown handle           |
+|                        | ("LBHA")    |                          |
++------------------------+-------------+--------------------------+
+| LOCK_NO_HANDLES        | 0x4C4E_4841 | Too many extant handles  |
+|                        | ("LNHA")    | exist                    |
++------------------------+-------------+--------------------------+
+| LOCK_KEM_DECAPSULATION | 0x4C4B_4445 | Error during KEM         |
+|                        | ("LKDE")    | decapsulation            |
++------------------------+-------------+--------------------------+
+| LOCK_ACCESS_KEY_UNWRAP | 0x4C41_4B55 | Error during access key  |
+|                        | ("LAKU")    | decryption               |
++------------------------+-------------+--------------------------+
+| LOCK_MPK_DECRYPT       | 0x4C50_4445 | Error during MPK         |
+|                        | ("LPDE")    | decryption               |
++------------------------+-------------+--------------------------+
+| LOCK_MEK_DECRYPT       | 0x4C4D_4445 | Error during MEK         |
+|                        | ("LMDE")    | decryption               |
++------------------------+-------------+--------------------------+
+| LOCK_HEK_INVALID_SLOT  | 0x4C48_4953 | Incorrect HEK slot when  |
+|                        | ("LHIS")    | programming or zeroizing |
++------------------------+-------------+--------------------------+
+| LOCK_EE_NOT_READY      | 0x4C45_4E52 | Encryption engine was    |
+|                        | ("LENR")    | not ready when the       |
+|                        |             | command was received.    |
++------------------------+-------------+--------------------------+
+| LOCK_HEK_NOT_AVAILABLE | 0x4C48_4E41 | The operation requires   |
+|                        | ("LHNA")    | the HEK, which is        |
+|                        |             | unavailable.             |
++------------------------+-------------+--------------------------+
+| LOCK_HEK_NOT_ZEROIZED  | 0x4C48_4E5A | Next HEK slot cannot     |
+|                        | ("LHNZ")    | be programmed because    |
+|                        |             | the current slot         |
+|                        |             | is programmed or         |
+|                        |             | corrupted, and must be   |
+|                        |             | zeroized.                |
++------------------------+-------------+--------------------------+
+| LOCK_HEK_ZEROIZED      | 0x4C48_5A44 | Current HEK slot cannot  |
+|                        | ("LHZD")    | be zeroized because it   |
+|                        |             | is already zeroized.     |
++------------------------+-------------+--------------------------+
+| LOCK_HEK_SLOTS_FULL    | 0x4C48_5346 | Next HEK slot cannot be  |
+|                        | ("LHSF")    | programmed because all   |
+|                        |             | slots are exhausted.     |
++------------------------+-------------+--------------------------+
+| LOCK_HEKS_UNZEROIZED   | 0x4C48_555A | Permanent-HEK mode       |
+|                        | ("LHUZ")    | cannot be enabled        |
+|                        |             | because one or more HEK  |
+|                        |             | slots are not zeroized.  |
++------------------------+-------------+--------------------------+
 
 ##### Fatal errors
 
