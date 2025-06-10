@@ -12,6 +12,9 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
+defaults:
+  run:
+    shell: bash
 jobs:
   ocp-lock:
     runs-on: ubuntu-latest
@@ -37,23 +40,36 @@ jobs:
 
       - name: Render OCP LOCK HTML
         run: |
-          (cd doc/ocp_lock &&
-          /usr/bin/build.sh \
-          --crossref=tcg \
-          --csl extra/ocp-pandoc-resources/ieee.csl \
-          --nogitversion \
-          --template_html extra/ocp-pandoc-resources/html/ocp.html.template \
-          --html_stylesheet extra/ocp-pandoc-resources/html/style.css \
-          --html_stylesheet extra/ocp-pandoc-resources/html/github-markdown.css \
-          --resourcedir extra/ocp-pandoc-resources/pdf \
-          --html ocp-lock.html lock_spec.ocp)
+          # Need to trust directory in the docker container.
+          chown -R $(id -u):$(id -g) $PWD
 
-      - name: Prepare website folder
-        run: |
-          # Future "released versions" will be in their own namespace.
-          # E.g. "1.0" instead of "main".
-          mkdir -p gh-pages/ocp-lock/main
-          cp doc/ocp_lock/ocp-lock.html gh-pages/ocp-lock/main/specification.html
+          # Publish pages for `main` and ocp-lock tags.
+          GIT_REFS=()
+          GIT_REFS+=("main")
+          GIT_REFS+=($(git tag --list 'ocp-lock-*'))
+
+          for ref in "${GIT_REFS[@]}"; do
+            echo "Building git ref $ref"
+
+            git reset --hard $ref
+
+            (cd doc/ocp_lock &&
+            /usr/bin/build.sh \
+            --crossref=tcg \
+            --csl extra/ocp-pandoc-resources/ieee.csl \
+            --nogitversion \
+            --template_html extra/ocp-pandoc-resources/html/ocp.html.template \
+            --html_stylesheet extra/ocp-pandoc-resources/html/style.css \
+            --html_stylesheet extra/ocp-pandoc-resources/html/github-markdown.css \
+            --resourcedir extra/ocp-pandoc-resources/pdf \
+            --html ocp-lock.html lock_spec.ocp)
+
+            # Trim `ocp-lock-` to avoid redundancy in the URL.
+            trimmed_ref=$(echo ${ref} | sed 's/ocp-lock-//')
+            mkdir -p "gh-pages/ocp-lock/${trimmed_ref}"
+            cp doc/ocp_lock/ocp-lock.html "gh-pages/ocp-lock/${trimmed_ref}/specification.html"
+            echo "Added webpage ocp-lock/${trimmed_ref}/specification.html"
+          done
 
       - name: Upload static files as artifact
         id: deployment
