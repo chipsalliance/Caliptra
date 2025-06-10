@@ -355,6 +355,8 @@ To test an MPK, KMB receives a wrapped MPK, wrapped MPK access key, and freshnes
 
 The user can then verify that the returned digest matches their expectation.
 
+The MPK is decrypted to a key vault slot and immediately purged because Caliptra's AES-GCM hardware does not support checking the authentication tag without decrypting a payload.
+
 ![MPK access key testing](./diagrams/mpk_access_key_testing.drawio.svg){#fig:mpk-access-key-testing}
 
 ### DPKs
