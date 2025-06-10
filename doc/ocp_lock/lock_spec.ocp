@@ -296,12 +296,16 @@ MPKs can be generated, made ready, and have their access keys rotated.
 
 ##### MPK generation
 
-Drive firmware may request that KMB generate an MPK, bound to a given access key. KMB performs the following steps:
+Drive firmware may request that KMB generate an MPK, bound to a given access key.
+
+To identify an MPK, at creation time the drive firmware can provide "metadata" for the MPK, which is included in the generated locked MPK and bound to the ciphertext as AAD. It is outside the scope of this specification how drive firmware populates the metadata field for the MPK. Note that "metadata" in this context refers to metadata about the MPK, and bears no relation to metadata about an MEK.
+
+KMB performs the following steps:
 
 1. Unwrap the given MPK access key using the HPKE keypair held within KMB.
 2. Randomly generate an MPK.
 3. Derive an MPK encryption key from the HEK, SEK, and decrypted access key.
-4. Encrypt the MPK to the MPK encryption key.
+4. Encrypt the MPK to the MPK encryption key, attaching the given metadata as AAD.
 5. Return the encrypted MPK to the drive firmware.
 
 Drive firmware may then store the encrypted MPK in persistent storage.
@@ -317,7 +321,7 @@ To ready an MPK, KMB performs the following steps:
 1. Unwrap the given MPK access key using the HPKE keypair held within KMB.
 2. Derive the MPK encryption key from the HEK, SEK, and decrypted access key.
 3. Decrypt the MPK using the MPK encryption key.
-4. Encrypt the MPK using the Ready MPK Encryption Key.
+4. Encrypt the MPK using the Ready MPK Encryption Key, preserving the MPK metadata.
 5. Return the re-encrypted "ready" MPK to the drive firmware.
 
 Drive firmware may then stash the encrypted ready MPK in volatile storage, and later provide it to the KMB when loading an MEK, as described in @sec:meks.
@@ -333,7 +337,7 @@ The access key to which an MPK is bound may be rotated. The user must prove that
 3. Derive the current MPK encryption key from the HEK, SEK, and decrypted old access key.
 4. Derive the new MPK encryption key from the HEK, SEK, and decrypted new access key.
 5. Decrypt the MPK using the current MPK encryption key.
-6. Encrypt the MPK using the new MPK encryption key.
+6. Encrypt the MPK using the new MPK encryption key, preserving the MPK metadata.
 7. Return the re-encrypted MPK to the drive firmware.
 
 Drive firmware then purges the current encrypted MPK and stores the new encrypted MPK in persistent storage.
@@ -343,8 +347,6 @@ Drive firmware then purges the current encrypted MPK and stores the new encrypte
 ##### MPK access key testing {#sec:mpk-access-key-testing}
 
 A user that has bound an access key to an MPK may wish to confirm that their access key is in fact bound to the MPK. This can be useful after an access key rotation, to ensure that the rotation executed successfully on the storage device.
-
-To identify an MPK, at creation time the drive firmware can provide "metadata" for the MPK, which is included in the generated locked MPK and bound to the ciphertext as AAD. It is outside the scope of this specification how drive firmware populates the metadata field for the MPK. Note that "metadata" in this context refers to metadata about the MPK, and bears no relation to metadata about an MEK.
 
 To test an MPK, KMB receives a wrapped MPK, wrapped MPK access key, and freshness nonce. KMB then performs the following steps:
 
