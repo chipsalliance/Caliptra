@@ -246,6 +246,8 @@ To elide the need for maintaining counters, this specification defines the "prec
 
 Each AES secret is preconditioned using a randomly-generated 64-bit identifier, before being used with AES-GCM-Encrypt. This ensures that it is safe to use a given input AES secret in approximately $2^{64}$ preconditioned AES-Encrypt operations before an IV collision is expected to occur with probability greater than $2^{-32}$. $2^{64}$ is large enough that a given storage device will experience hardware failure well before that limit is reached. Ergo, usage counters within the drive are not needed for these keys. See [Appendix @sec:preconditioned-aes-calculations] for additional details on the calculations behind this figure.
 
+In addition to a plaintext message, this operation supports optional metadata for the message, which is attached as AAD.
+
 ### MPKs {#sec:mpks}
 
 MPKs are the mechanism by which KMB enforces multi-party authorization as a precondition to loading an MEK. MPKs exist in one of two states: locked or ready. In both these states the MPK is encrypted to a key known only to KMB.
@@ -351,8 +353,8 @@ To test an MPK, KMB receives a wrapped MPK, wrapped MPK access key, and freshnes
 
 1. Unwrap the given MPK access key using the HPKE keypair held within KMB.
 2. Derive the MPK encryption key from the HEK, SEK, and decrypted access key.
-3. Verify that the MPK can be decrypted using the MPK encryption key.
-4. Calculate and return SHA2-384(MPK metadata || access key || nonce).
+3. Verify the integrity of the MPK ciphertext and AAD using the MPK encryption key, discarding the decrypted MPK in the process.
+4. Calculate and return the digest SHA2-384(MPK metadata || access key || nonce).
 
 The user can then verify that the returned digest matches their expectation.
 
