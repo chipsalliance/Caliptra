@@ -16,6 +16,7 @@ defaults:
   run:
     shell: bash
 jobs:
+  # Uploads OCP Lock specification.
   ocp-lock:
     runs-on: ubuntu-latest
     container:
@@ -71,19 +72,59 @@ jobs:
             echo "Added webpage ocp-lock/${trimmed_ref}/specification.html"
           done
 
-      - name: Upload static files as artifact
-        id: deployment
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload artifacts for ocp-lock spec
+        uses: actions/upload-artifact@v4
         with:
-          path: "gh-pages"
+          name: ocp-lock
+          path: gh-pages
+
+  # Adds README.md files as chipsalliance.github.io index files.
+  index:
+    runs-on: ubuntu-latest
+    name: Add README.md to website root
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Stage README
+        run: |
+          mkdir -p gh-pages-staging/doc
+          cp -r doc/images/ gh-pages-staging/doc/
+          cp README.md gh-pages-staging/README.md
+
+      - name: Build with jekyll
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: gh-pages-staging
+          destination: gh-pages
+      - name: Upload artifacts for index
+        uses: actions/upload-artifact@v4
+        with:
+          name: index
+          path: gh-pages
 
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: ocp-lock
+    needs: [index, ocp-lock]
     steps:
+      - name: Download index artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: index
+          path: gh-pages
+      - name: Download ocp-lock artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ocp-lock
+          path: gh-pages
+      - name: Upload static files as artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "gh-pages"
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
