@@ -9,15 +9,6 @@ Original **Date: Mar 31st 2025**
 
 Drop dead: earliest RTL integration in Sept 2025
 
-## Complete 2.0 closing items
-
-* Validation
-* Subsystem on FPGA
-* CDC
-* RDC & Synthesis
-* Lint recheck
-* Caliptra 2.0 Subsystem Release: April’25
-
 ## HW Features:
 
 * Adam's Bridge External Mu (Mostly verification)
@@ -27,24 +18,25 @@ Drop dead: earliest RTL integration in Sept 2025
         * Updates as a result of RTL updates
             * point wise mult and inverse entities
             * entity and controller block updates
-    * ML-KEM
-        * Specification and implementation
-        * FPV
+* ML-KEM
+    * Specification and implementation
+    * FPV
     * DV for external /mu
 * Standalone SHAKE256 hardware
     * Ingest of OT SHAKE256
     * FPV to be scoped and implemented
+* Add AES-GCM DMA
+* AXI streaming boot support in I3C and integration
 * KV
     * FPV for interfaces between KV and crypto engines
 * VeeR DCLS
-    * Validation pending
+    * Integration and Validation pending
 * LOCK
     * otp\_ctrl changes to support zeroization and in field programming
         * Confirm and implement changes required for fuse ratcheting
     * https://github.com/chipsalliance/caliptra-rtl/issues/808: SHAKE256 and SHA3-256
     * Add key vault slot with AES / HMAC / ECDH / ML-KEM Decaps data paths (Bharat proposal)
-    * https://github.com/chipsalliance/caliptra-rtl/issues/688: Allow some KV slots' HMAC results to be fed to firmware
-    * https://github.com/chipsalliance/caliptra-rtl/issues/848: allow HMAC operations where the message spans multiple blocks, some of which may be in KV (supports FIPS-compliant key combiners)
+    * https://github.com/chipsalliance/caliptra-rtl/issues/848: allow HMAC operations where the message spans multiple KV slots (supports FIPS-compliant key combiners)
     * https://github.com/chipsalliance/caliptra-rtl/issues/894: allow AES and HMAC engines to produce a key that is released to the storage device's line-rate encryption engine.
 
 ## Reviews, documentation, code health:
