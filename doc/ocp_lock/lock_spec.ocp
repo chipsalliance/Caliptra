@@ -1665,7 +1665,9 @@ Table: HEK state values {#tbl:hek-state-values}
 | 3h    | HEK_UNAVAIL_ZEROIZED  | The current ratchet secret has been  |
 |       |                       | zeroized. The PROGRAM_NEXT_HEK       |
 |       |                       | command can be used to provision a   |
-|       |                       | new rachet secret.                   |
+|       |                       | new rachet secret, if there remains  |
+|       |                       | at least one available blank ratchet |
+|       |                       | secret slot.                         |
 |       |                       |                                      |
 |       |                       | If all slots have been zeroized, the |
 |       |                       | ENABLE_PERMANENT_HEK command can be  |
