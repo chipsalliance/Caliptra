@@ -386,53 +386,49 @@ In this flow, the DPK may be the imported key associated with a Key Per I/O key 
 
 KMB supports a pair of epoch keys: the HEK and SEK. Both must be available, i.e. non-zeroized, in order for MEKs to be loaded.
 
-- The **HEK** is derived from secrets held in Caliptra's fuse block, and is never visible outside of Caliptra. If the HEK is zeroized, KMB does not allow MEKs to be loaded.
+- The **HEK** is held in Caliptra's fuse block, and is never visible outside of Caliptra. If the HEK is zeroized, KMB does not allow MEKs to be loaded, with edge cases detailed in @sec:hek-lifecycle.
 - The **SEK** is managed by drive firmware, and may be stored in flash. If the SEK is zeroized, drive firmware is responsible for enforcing that MEKs are not loaded.
 
 Zeroizing either the HEK or SEK is equivalent to performing a cryptographic erase. HEK zeroization is effectively a "hard" cryptographic erase, as it is highly difficult to recover secrets from a zeroized fuse bank.
 
-#### HEK derivation inputs
+#### HEK lifecycle {#sec:hek-lifecycle}
 
-##### Stable Identity Key
+Caliptra with L.O.C.K. features a series of n 256-bit HEK slots present in a fuse bank, dubbed HEK~0~..HEK~n-1~, where 4 ≤ n ≤ 16. The vendor is responsible for determining the number of HEK slots available in fuses. These HEK slots are only programmable and readable by Caliptra Core, via the Caliptra fuse controller. KMB transitions each HEK slot individually from blank → randomized → zeroized. HEK~x~ is only randomized once HEK~x-1~ has been zeroized. KMB zeroizes a HEK by blowing every bit.
 
-Caliptra features a [Stable Identity](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/rom/dev/README.md#derivation-of-the-key-ladder-for-stable-identity) Key (SIK), which is a secret derived from Caliptra's LDevID CDI as well as the current lifecycle and debug states. The SIK can be used to protect long-lived data. Caliptra's Stable Identity feature is implemented in terms of a key ladder, with different keys for different Caliptra firmware Security Version Numbers (SVNs), with the property that Caliptra firmware whose SVN is X can only obtain Stable Identity keys bound to SVNs less than or equal to X. The SIK used by KMB is the key ladder secret bound to SVN 0, ensuring that Caliptra firmware of any SVN can wield it.
+KMB firmware reads the currently-randomized HEK slot from fuses, and then passes the data through Caliptra's [deobfuscation engine](https://github.com/chipsalliance/caliptra-rtl/blob/ea416cb/docs/CaliptraHardwareSpecification.md#key-vault-de-obfuscation-block-operation) to deposit the HEK to the Key Vault. When Caliptra is in debug mode, the obfuscation secrets are programmed to debug values, ensuring that firmware running in debug mode cannot obtain HEKs used by production mode.
 
-##### Ratchet secrets
+There are two edge cases where the HEK is available even if there is no key available in the HEK fuse bank:
 
-Caliptra with L.O.C.K. features a series of n 256-bit ratchet secrets present in a fuse bank, dubbed R~0~..R~n-1~, where 4 ≤ n ≤ 16. The vendor is responsible for determining the number of ratchet secrets available in fuses. These ratchet secrets are only programmable and readable by Caliptra Core, via the Caliptra fuse controller. KMB transitions each ratchet secret individually from blank → randomized → zeroized. R~x~ is only randomized once R~x-1~ has been zeroized. KMB zeroizes a ratchet secret by blowing every bit.
+- To enable pre-production testing, if Caliptra is in the Unprovisioned or Manufacturing lifecycle state, the HEK is available and is derived from all-zeroes.
+- To enable lengthening the useful lifespan of the storage device, once all HEK slots have been zeroized, the device can be permanently transitioned into a mode where the HEK is available and is derived from all-zeroes. A field-programmable "permanent-HEK" logical fuse bit is allocated to determine whether this mode is active.
 
-#### HEK derivation
-
-@tbl:hek-lifecycle-states describes the states between which the HEK transitions over the lifespan of the device. The lifecycle state of the HEK is determined by Caliptra's [lifecycle state](https://github.com/chipsalliance/Caliptra/blob/c0fa71e/doc/Caliptra.md#caliptra-security-states) as well as the state of the ratchet secret fuse bank.
+@tbl:hek-lifecycle-states describes the states between which the HEK transitions over the lifespan of the device. The lifecycle state of the HEK is determined by Caliptra's [lifecycle state](https://github.com/chipsalliance/Caliptra/blob/c0fa71e/doc/Caliptra.md#caliptra-security-states) as well as the state of the HEK fuse bank.
 
 Table: HEK lifecycle states {#tbl:hek-lifecycle-states}
 
-+---------------+---------------------+------------+--------------------------+
-| Caliptra      | Ratchet secret      | Derivation | [Reported HEK state      |
-| lifecycle     | state, where x is   | inputs     | ](#tbl:hek-state-values) |
-| state         | the current ratchet |            |                          |
-|               | slot                |            |                          |
-+===============+=====================+============+==========================+
-| Unprovisioned | [Any]               | SIK        | HEK_AVAIL_PREPROD        |
-| or            |                     |            |                          |
-| Manufacturing |                     |            |                          |
-+---------------+---------------------+------------+--------------------------+
-| Production    | R~0~ is             | N/A        | HEK_UNAVAIL_EMPTY        |
-|               | unprogrammed.       |            |                          |
-|               +---------------------+------------+--------------------------+
-|               | R~x~ is randomized. | SIK and    | HEK_AVAIL_PROD           |
-|               |                     | R~x~       |                          |
-|               +---------------------+------------+--------------------------+
-|               | R~x~ is zeroized.   | N/A        | HEK_UNAVAIL_ZEROIZED     |
-|               +---------------------+------------+--------------------------+
-|               | R~x~ is corrupted.  | N/A        | HEK_UNAVAIL_CORRUPTED    |
-|               +---------------------+------------+--------------------------+
-|               | Every ratchet       | SIK        | HEK_AVAIL_PERMANENT      |
-|               | secret is zeroized, |            |                          |
-|               | and the             |            |                          |
-|               | permanent-HEK fuse  |            |                          |
-|               | bit has been set.   |            |                          |
-+---------------+---------------------+------------+--------------------------+
++--------------------------+--------------------------------+-----------------------+---------------------------------------------+
+| Caliptra lifecycle state | HEK fuse state, where x is the | Value used to compute | [Reported HEK state](#tbl:hek-state-values) |
+|                          | current HEK slot               | the HEK               |                                             |
++==========================+================================+=======================+=============================================+
+| Unprovisioned or         | [Any]                          | 0x0000...             | HEK_AVAIL_PREPROD                           |
+| Manufacturing            |                                |                       |                                             |
++--------------------------+--------------------------------+-----------------------+---------------------------------------------+
+| Production               | HEK slot 0 is unprogrammed.    | N/A                   | HEK_UNAVAIL_EMPTY                           |
++--------------------------+--------------------------------+-----------------------+---------------------------------------------+
+| Production               | HEK slot x is randomized.      | HEK slot x            | HEK_AVAIL_PROD                              |
++--------------------------+--------------------------------+-----------------------+---------------------------------------------+
+| Production               | HEK slot x is zeroized.        | N/A                   | HEK_UNAVAIL_ZEROIZED                        |
++--------------------------+--------------------------------+-----------------------+---------------------------------------------+
+| Production               | HEK slot x is corrupted.       | N/A                   | HEK_UNAVAIL_CORRUPTED                       |
++--------------------------+--------------------------------+-----------------------+---------------------------------------------+
+| Production               | Every HEK slot is zeroized,    | 0x0000...             | HEK_AVAIL_PERMANENT                         |
+|                          | and the permanent-HEK fuse bit |                       |                                             |
+|                          | has been set.                  |                       |                                             |
++--------------------------+--------------------------------+-----------------------+---------------------------------------------+
+
+The mechanism used to compute the HEK is described in @fig:hek-derivation. This flow is performed upon KMB startup.
+
+![HEK derivation](./diagrams/hek_derivation.drawio.svg){#fig:hek-derivation}
 
 @tbl:hek-lifecycle-commands describes the commands that KMB exposes to manage the HEK lifecycle.
 
@@ -441,33 +437,29 @@ Table: HEK lifecycle management commands {#tbl:hek-lifecycle-commands}
 +----------------------------------+------------------------------------------------------------------+
 | Command                          | Description                                                      |
 +==================================+==================================================================+
-| [PROGRAM_NEXT_HEK                | Programs a random ratchet secret into the next slot. Upon        |
+| [PROGRAM_NEXT_HEK                | Programs a random HEK into the next slot. Upon                   |
 | ](#sec:program-next-hek-cmd)     | success, if the SEK is programmed, MEKs may be loaded.           |
 +----------------------------------+------------------------------------------------------------------+
-| [ZEROIZE_CURRENT_HEK             | Sets the current ratchet secret fuses to all-ones. May be        |
-| ](#sec:zeroize-current-hek-cmd)  | re-attempted if an error caused the active ratchet secret to be  |
+| [ZEROIZE_CURRENT_HEK             | Sets the current HEK slot's fuses to all-ones. May be            |
+| ](#sec:zeroize-current-hek-cmd)  | re-attempted if an error caused the active HEK slot to be        |
 |                                  | left in an invalid state. Upon success, MEKs may not be loaded.  |
 +----------------------------------+------------------------------------------------------------------+
-| [ENABLE_PERMANENT_HEK            | Enables a mode where the HEK is derived solely from the SIK. May |
-| ](#sec:enable-permanent-hek-cmd) | only be invoked once all ratchet secrets are zeroized. May be    |
+| [ENABLE_PERMANENT_HEK            | Enables a mode where the HEK is enabled but all zeroes. May      |
+| ](#sec:enable-permanent-hek-cmd) | only be invoked once all HEK slots are zeroized. May be          |
 |                                  | re-attempted if an error caused the permanent-HEK fuse indicator |
 |                                  | to be left in an invalid state. Upon success, if the SEK is      |
 |                                  | programmed, MEKs may be loaded.                                  |
 +----------------------------------+------------------------------------------------------------------+
 
-If an error causes the active ratchet secret to be left in an invalid state, MEKs may not be loaded. If this state persists, the device is unusable.
-
-@fig:hek-derivation illustrates HEK derivation, for the states where the HEK is available.
-
-![HEK derivation](./diagrams/hek_derivation.drawio.svg){#fig:hek-derivation}
+If an error causes the active HEK slot to be left in an invalid state, MEKs may not be loaded. If this state persists, the device is unusable.
 
 #### HEK and SEK lifecycle {#sec:hek-sek-lifecycle}
 
-@fig:hek-sek-rotation illustrates the case where a drive ships with four ratchet secrets.
+@fig:hek-sek-rotation illustrates the case where a drive ships with four HEK slots.
 
 ![HEK and SEK state machine](./diagrams/hek_sek_rotation.drawio.svg){#fig:hek-sek-rotation}
 
-A device out of manufacturing must be in the production lifecycle state and have a randomized ratchet secret.
+A device out of manufacturing must be in the production lifecycle state and have a randomized HEK.
 
 Drive firmware is responsible for enforcing that SEK programming and zeroization follows the state machine illustrated in @fig:hek-sek-rotation. Specifically:
 
@@ -1520,7 +1512,7 @@ Table: ZEROIZE_CURRENT_HEK output arguments
 
 #### PROGRAM_NEXT_HEK {#sec:program-next-hek-cmd}
 
-This command generates a random key and programs it into the next-available HEK slot. The \`active_hek_slot\` reported in @sec:report-epoch-key-state-cmd is incremented after successfully programming the random key, with the exception that when this command is used to provision the first ratchet secret, the \`active_hek_slot\` is not incremented, because it is already set to the first slot.
+This command generates a random key and programs it into the next-available HEK slot. The \`active_hek_slot\` reported in @sec:report-epoch-key-state-cmd is incremented after successfully programming the random key, with the exception that when this command is used to provision the first HEK, the \`active_hek_slot\` is not incremented, because it is already set to the first slot.
 
 Command Code: 0x504E_484B ("PNHK")
 
@@ -1553,7 +1545,7 @@ Table: PROGRAM_NEXT_HEK output arguments
 
 #### ENABLE_PERMANENT_HEK {#sec:enable-permanent-hek-cmd}
 
-This command enables a state where the HEK is derived from non-ratchetable secrets. The command is only allowed once all HEK fuse slots are programmed and zeroized.
+This command enables a state where the HEK is enabled but all-zeroes. The command is only allowed once all HEK fuse slots are programmed and zeroized.
 
 Command Code: 0x4550_484B ("EPHK")
 
@@ -1658,44 +1650,40 @@ Table: HEK state values {#tbl:hek-state-values}
 +-------+-----------------------+--------------------------------------+
 | 1h    | HEK_UNAVAIL_EMPTY     | The drive has transitioned to the    |
 |       |                       | Production life cycle state and a    |
-|       |                       | ratchet secret has not yet been      |
-|       |                       | provisioned. The PROGRAM_NEXT_HEK    |
-|       |                       | command can be used to provision the |
-|       |                       | first secret.                        |
+|       |                       | HEK has not yet been provisioned.    |
+|       |                       | The PROGRAM_NEXT_HEK command can be  |
+|       |                       | used to provision the first secret.  |
 +-------+-----------------------+--------------------------------------+
-| 2h    | HEK_AVAIL_PROD        | A randomized ratchet secret is       |
-|       |                       | provisioned in the current slot. The |
+| 2h    | HEK_AVAIL_PROD        | A randomized HEK is provisioned in   |
+|       |                       | the current slot. The                |
 |       |                       | ZEROIZE_CURRENT_HEK command can be   |
 |       |                       | used to zeroized the current slot.   |
 +-------+-----------------------+--------------------------------------+
-| 3h    | HEK_UNAVAIL_ZEROIZED  | The current ratchet secret has been  |
-|       |                       | zeroized. The PROGRAM_NEXT_HEK       |
-|       |                       | command can be used to provision a   |
-|       |                       | new rachet secret, if there remains  |
-|       |                       | at least one available blank ratchet |
-|       |                       | secret slot.                         |
+| 3h    | HEK_UNAVAIL_ZEROIZED  | The current HEK has been zeroized.   |
+|       |                       | The PROGRAM_NEXT_HEK command can be  |
+|       |                       | used to provision a new HEK, if      |
+|       |                       | there remains at least one available |
+|       |                       | blank HEK slot.                      |
 |       |                       |                                      |
 |       |                       | If all slots have been zeroized, the |
 |       |                       | ENABLE_PERMANENT_HEK command can be  |
 |       |                       | used to make the HEK available.      |
 +-------+-----------------------+--------------------------------------+
-| 4h    | HEK_UNAVAIL_CORRUPTED | The current ratchet secret slot is   |
-|       |                       | corrupted. The ZEROIZE_CURRENT_HEK   |
-|       |                       | command can be used to zeroized the  |
-|       |                       | current slot.                        |
+| 4h    | HEK_UNAVAIL_CORRUPTED | The current HEK slot is corrupted.   |
+|       |                       | The ZEROIZE_CURRENT_HEK command can  |
+|       |                       | be used to zeroized the current      |
+|       |                       | slot.                                |
 +-------+-----------------------+--------------------------------------+
-| 5h    | HEK_AVAIL_PERMANENT   | All ratchet secrets have been        |
-|       |                       | zeroized and permanent HEK mode has  |
-|       |                       | been enabled.                        |
+| 5h    | HEK_AVAIL_PERMANENT   | All HEKs have been zeroized and      |
+|       |                       | permanent HEK mode has been enabled. |
 |       |                       |                                      |
 |       |                       | Owners may opt into this state once  |
-|       |                       | every ratchet secret has been        |
-|       |                       | zeroized.                            |
+|       |                       | every HEK has been zeroized.         |
 |       |                       |                                      |
 |       |                       | In this state, data written to the   |
 |       |                       | storage device can no longer be      |
-|       |                       | cryptographically erased via ratchet |
-|       |                       | secret zeroization.                  |
+|       |                       | cryptographically erased via HEK     |
+|       |                       | zeroization.                         |
 +-------+-----------------------+--------------------------------------+
 | 6h to | Reserved              | Reserved.                            |
 | FFFFh |                       |                                      |
@@ -1707,7 +1695,7 @@ See @tbl:hek-lifecycle-states for more information about the relationship betwee
 
 HEK_AVAIL_PREPROD → HEK_UNAVAIL_EMPTY is a one-way transition that the device vendor is expected to trigger by advancing the Caliptra lifecycle state to Production.
 
-HEK_UNAVAIL_ZEROIZED → HEK_AVAIL_PERMANENT is a one-way transition that the device owner can trigger using the ENABLE_PERMANENT_HEK command once all ratchet secret slots have been zeroized.
+HEK_UNAVAIL_ZEROIZED → HEK_AVAIL_PERMANENT is a one-way transition that the device owner can trigger using the ENABLE_PERMANENT_HEK command once all HEK slots have been zeroized.
 
 See @fig:hek-sek-rotation for more details about the transitions between HEK states.
 
@@ -1938,8 +1926,6 @@ Table: Acronyms and abbreviations used throughout this document {#tbl:abbreviati
 | RTL          | Register Transfer Level                                  |
 +--------------+----------------------------------------------------------+
 | SED          | Self-encrypting drive                                    |
-+--------------+----------------------------------------------------------+
-| SIK          | Stable Identity Key                                      |
 +--------------+----------------------------------------------------------+
 | SEK          | Soft Epoch Key                                           |
 +--------------+----------------------------------------------------------+
