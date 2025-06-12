@@ -38,7 +38,7 @@ Subsystem.
     * Integration and Validation pending
 * OCP LOCK
     * Implementation per the published
-      [specification](https://www.opencompute.org/documents/ocp-l-o-c-k-0-8-1-pdf-1)
+      [specification](https://github.com/chipsalliance/Caliptra/blob/main/doc/ocp_lock/Specification_v0.8.5.pdf)
 
 ## Reviews, documentation, code health:
 
