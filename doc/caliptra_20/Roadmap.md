@@ -5,9 +5,16 @@
 This document lays out our roadmap and items to get to Caliptra 2.1 Core and
 Subsystem.
 
-Original **Date: Mar 31st 2025**
+## Timeline
 
-Drop dead: earliest RTL integration in Sept 2025
+* Caliptra 2.1 SS
+    * HW release: End of August, 2025
+    * ROM release: TBD, expect 4-6 weeks after HW release
+    * FMC release: TBD
+    * RT FW release: TBD
+    * FIPS Certificate availability: TBD
+    * Audit Completion: TBD
+    * Target: earliest RTL integration in Sept 2025
 
 ## HW Features:
 
@@ -27,17 +34,11 @@ Drop dead: earliest RTL integration in Sept 2025
     * FPV to be scoped and implemented
 * Add AES-GCM DMA
 * AXI streaming boot support in I3C and integration
-* KV
-    * FPV for interfaces between KV and crypto engines
 * VeeR DCLS
     * Integration and Validation pending
-* LOCK
-    * otp\_ctrl changes to support zeroization and in field programming
-        * Confirm and implement changes required for fuse ratcheting
-    * https://github.com/chipsalliance/caliptra-rtl/issues/808: SHAKE256 and SHA3-256
-    * Add key vault slot with AES / HMAC / ECDH / ML-KEM Decaps data paths (Bharat proposal)
-    * https://github.com/chipsalliance/caliptra-rtl/issues/848: allow HMAC operations where the message spans multiple KV slots (supports FIPS-compliant key combiners)
-    * https://github.com/chipsalliance/caliptra-rtl/issues/894: allow AES and HMAC engines to produce a key that is released to the storage device's line-rate encryption engine.
+* OCP LOCK
+    * Implementation per the published
+      [specification](https://www.opencompute.org/documents/ocp-l-o-c-k-0-8-1-pdf-1)
 
 ## Reviews, documentation, code health:
 
@@ -53,3 +54,4 @@ Drop dead: earliest RTL integration in Sept 2025
     * Integrate DV coverage reports into Caliptra's block and top level.
 * Time permitting software coverage
     * Line and function coverage dashboards, generated from software emulation traces.
+
