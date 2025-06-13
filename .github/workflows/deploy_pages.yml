@@ -65,11 +65,16 @@ jobs:
             --resourcedir extra/ocp-pandoc-resources/pdf \
             --html ocp-lock.html lock_spec.ocp)
 
-            # Trim `ocp-lock-` to avoid redundancy in the URL.
-            trimmed_ref=$(echo ${ref} | sed 's/ocp-lock-//')
-            mkdir -p "gh-pages/ocp-lock/${trimmed_ref}"
-            cp doc/ocp_lock/ocp-lock.html "gh-pages/ocp-lock/${trimmed_ref}/specification.html"
-            echo "Added webpage ocp-lock/${trimmed_ref}/specification.html"
+            if [[ "${ref}" == "main" ]]; then
+              trimmed_ref="HEAD"
+            else
+              # Trim `ocp-lock-` to avoid redundancy in the URL.
+              trimmed_ref=$(echo ${ref} | sed 's/ocp-lock-//')
+            fi
+
+            mkdir -p "gh-pages/ocp-lock/specification/${trimmed_ref}"
+            cp doc/ocp_lock/ocp-lock.html "gh-pages/ocp-lock/specification/${trimmed_ref}/index.html"
+            echo "Added webpage ocp-lock/specification/${trimmed_ref}/index.html"
           done
 
       - name: Upload artifacts for ocp-lock spec
