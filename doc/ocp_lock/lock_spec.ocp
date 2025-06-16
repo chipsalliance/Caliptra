@@ -1040,11 +1040,7 @@ Table: GENERATE_MPK input arguments
 +-------------------+------------------+----------------------------------------+
 | metadata_len      | u32              | Length of the metadata argument.       |
 +-------------------+------------------+----------------------------------------+
-| info_len          | u32              | Length of the info argument.           |
-+-------------------+------------------+----------------------------------------+
 | metadata          | u8[metadata_len] | Metadata for the MPK.                  |
-+-------------------+------------------+----------------------------------------+
-| info              | u8[info_len]     | Info argument to use with HPKE unwrap. |
 +-------------------+------------------+----------------------------------------+
 | sealed_access_key | SealedAccessKey  | HPKE-sealed access key.                |
 +-------------------+------------------+----------------------------------------+
@@ -1077,28 +1073,32 @@ Command Code: 0x5245_5750 ("REWP")
 
 Table: REWRAP_MPK input arguments
 
-+--------------------+------------------------------+------------------------------+
-| Name               | Type                         | Description                  |
-+====================+==============================+==============================+
-| chksum             | u32                          | Checksum over other          |
-|                    |                              | input arguments,             |
-|                    |                              | computed by the caller.      |
-+--------------------+------------------------------+------------------------------+
-| reserved           | u32                          | Reserved.                    |
-+--------------------+------------------------------+------------------------------+
-| sek                | u8[32]                       | Soft Epoch Key.              |
-+--------------------+------------------------------+------------------------------+
-| info_len           | u32                          | Length of the info           |
-|                    |                              | argument.                    |
-+--------------------+------------------------------+------------------------------+
-| info               | u8[info_len]                 | Info argument to use with    |
-|                    |                              | HPKE unwrap.                 |
-+--------------------+------------------------------+------------------------------+
-| current_locked_mpk | LockedMpk                    | Current MPK to be rewrapped. |
-+--------------------+------------------------------+------------------------------+
-| sealed_access_keys | SealedCurrentAndNewAccessKey | HPKE-sealed current and new  |
-|                    |                              | access keys.                 |
-+--------------------+------------------------------+------------------------------+
++--------------------+-----------------------+---------------------------------+
+| Name               | Type                  | Description                     |
++====================+=======================+=================================+
+| chksum             | u32                   | Checksum over other input       |
+|                    |                       | arguments, computed by the      |
+|                    |                       | caller.                         |
++--------------------+-----------------------+---------------------------------+
+| reserved           | u32                   | Reserved.                       |
++--------------------+-----------------------+---------------------------------+
+| sek                | u8[32]                | Soft Epoch Key.                 |
++--------------------+-----------------------+---------------------------------+
+| current_locked_mpk | LockedMpk             | Current MPK to be rewrapped.    |
++--------------------+-----------------------+---------------------------------+
+| sealed_access_key  | SealedAccessKey       | HPKE-sealed access key.         |
++--------------------+-----------------------+---------------------------------+
+| new_ak_ciphertext  | u8[access_key_len+Nt] | New access key ciphertext and   |
+|                    |                       | authentication tag.             |
+|                    |                       | \`access_key_len\` is provided  |
+|                    |                       | by the SealedAccessKey. \`Nt\`  |
+|                    |                       | is the HPKE value associated    |
+|                    |                       | with the \`aead_id\` identifier |
+|                    |                       | from the SealedAccessKey's      |
+|                    |                       | \`hpke_algorithm\`. See         |
+|                    |                       | @tbl:sealed-access-key-contents |
+|                    |                       | for details.                    |
++--------------------+-----------------------+---------------------------------+
 
 Table: REWRAP_MPK output arguments
 
@@ -1136,11 +1136,6 @@ Table: READY_MPK input arguments
 | reserved          | u32             | Reserved.                    |
 +-------------------+-----------------+------------------------------+
 | sek               | u8[32]          | Soft Epoch Key.              |
-+-------------------+-----------------+------------------------------+
-| info_len          | u32             | Length of the info argument. |
-+-------------------+-----------------+------------------------------+
-| info              | u8[info_len]    | Info argument to use with    |
-|                   |                 | HPKE unwrap.                 |
 +-------------------+-----------------+------------------------------+
 | sealed_access_key | SealedAccessKey | HPKE-sealed access key.      |
 +-------------------+-----------------+------------------------------+
@@ -1224,11 +1219,6 @@ Table: TEST_ACCESS_KEY input arguments
 | reserved          | u32             | Reserved.                             |
 +-------------------+-----------------+---------------------------------------+
 | sek               | u8[32]          | Soft Epoch Key.                       |
-+-------------------+-----------------+---------------------------------------+
-| info_len          | u32             | Length of the info argument.          |
-+-------------------+-----------------+---------------------------------------+
-| info              | u8[info_len]    | Info argument to use with             |
-|                   |                 | HPKE unwrap.                          |
 +-------------------+-----------------+---------------------------------------+
 | nonce             | u8[32]          | Host-provided random value.           |
 +-------------------+-----------------+---------------------------------------+
@@ -1715,7 +1705,7 @@ See @fig:hek-sek-rotation for more details about the transitions between HEK sta
 
 This section defines common types used to interface between the drive firmware and KMB. These types are common patterns found in both requests and responses.
 
-Table: SealedAccessKey contents
+Table: SealedAccessKey contents {#tbl:sealed-access-key-contents}
 
 +----------------+-----------------------+------------------------------------------------+
 | Name           | Type                  | Description                                    |
@@ -1730,24 +1720,16 @@ Table: SealedAccessKey contents
 |                |                       | value associated with a bit value indicated as |
 |                |                       | supported in @tbl:get-algorithms-output-args.  |
 +----------------+-----------------------+------------------------------------------------+
+| info_len       | u32                   | Length of the info field.                      |
++----------------+-----------------------+------------------------------------------------+
+| info           | u8[info_len]          | Info to use with HPKE unwrap.                  |
++----------------+-----------------------+------------------------------------------------+
 | kem_ciphertext | u8[Nenc]              | HPKE encapsulated key.                         |
 +----------------+-----------------------+------------------------------------------------+
-| ak_ct          | u8[access_key_len+Nt] | Access key ciphertext and authentication tag.  |
+| ak_ciphertext  | u8[access_key_len+Nt] | Access key ciphertext and authentication tag.  |
 +----------------+-----------------------+------------------------------------------------+
 
 \`Nenc\` and \`Nt\` are HPKE values associated with the \`kem_id\` and \`aead_id\` identifiers from the given \`hpke_algorithm\`. For example, if byte 0 bit 0 of \`hpke_algorithm\` is set (indicating \`kem_id\` 0x0011 and \`aead_id\` 0x0002), then according to [@{ietf-rfc9180}], \`Nenc\` and \`Nt\` would be 97 and 16, respectively.
-
-Table: SealedCurrentAndNewAccessKey contents
-
-+--------------------+-----------------------+---------------------+
-| Name               | Type                  | Description         |
-+====================+=======================+=====================+
-| current_access_key | SealedAccessKey       | Current access key. |
-+--------------------+-----------------------+---------------------+
-| new_access_key     | u8[access_key_len+Nt] | New access key.     |
-+--------------------+-----------------------+---------------------+
-
-\`Nt\` is the HPKE value associated with the \`aead_id\` identifier from the SealedAccessKey's \`hpke_algorithm\`.
 
 ##### WrappedKey type
 
