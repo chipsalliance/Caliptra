@@ -97,6 +97,7 @@ jobs:
           mkdir -p gh-pages-staging/doc
           cp -r doc/images/ gh-pages-staging/doc/
           cp README.md gh-pages-staging/README.md
+          cp doc/Caliptra.md gh-pages-staging/doc/Caliptra.md
 
       - name: Build with jekyll
         uses: actions/jekyll-build-pages@v1
