@@ -388,7 +388,7 @@ In this flow, the DPK may be the imported key associated with a Key Per I/O key 
 
 KMB supports a pair of epoch keys: the HEK and SEK. Both must be available, i.e. non-zeroized, in order for MEKs to be loaded.
 
-- The **HEK** is held in Caliptra's fuse block, and is never visible outside of Caliptra. If the HEK is zeroized, KMB does not allow MEKs to be loaded, with edge cases detailed in @sec:hek-lifecycle.
+- The **HEK** is derived from seeds held in Caliptra's fuse block, and is never visible outside of Caliptra. If the HEK is zeroized, KMB does not allow MEKs to be loaded, with edge cases detailed in @sec:hek-lifecycle.
 - The **SEK** is managed by drive firmware, and may be stored in flash. If the SEK is zeroized, drive firmware is responsible for enforcing that MEKs are not loaded.
 
 Zeroizing either the HEK or SEK is equivalent to performing a cryptographic erase. HEK zeroization is effectively a "hard" cryptographic erase, as it is highly difficult to recover secrets from a zeroized fuse bank.
@@ -397,38 +397,39 @@ Zeroizing either the HEK or SEK is equivalent to performing a cryptographic eras
 
 Caliptra with L.O.C.K. features a series of n 256-bit HEK slots present in a fuse bank, dubbed HEK~0~..HEK~n-1~, where 4 ≤ n ≤ 16. The vendor is responsible for determining the number of HEK slots available in fuses. These HEK slots are only programmable and readable by Caliptra Core, via the Caliptra fuse controller. KMB transitions each HEK slot individually from blank → randomized → zeroized. HEK~x~ is only randomized once HEK~x-1~ has been zeroized. KMB zeroizes a HEK by blowing every bit.
 
-KMB firmware reads the currently-randomized HEK slot from fuses, and then passes the data through Caliptra's [deobfuscation engine](https://github.com/chipsalliance/caliptra-rtl/blob/ea416cb/docs/CaliptraHardwareSpecification.md#key-vault-de-obfuscation-block-operation) to deposit the HEK to the Key Vault. When Caliptra is in debug mode, the obfuscation secrets are programmed to debug values, ensuring that firmware running in debug mode cannot obtain HEKs used by production mode.
+Each HEK slot contains an obfuscated HEK seed. KMB firmware reads the currently-randomized HEK slot from fuses, and then passes the data through Caliptra's [deobfuscation engine](https://github.com/chipsalliance/caliptra-rtl/blob/ea416cb/docs/CaliptraHardwareSpecification.md#key-vault-de-obfuscation-block-operation) to deposit the deobfuscated HEK seed to the Key Vault. When Caliptra is in debug mode, the obfuscation secrets are programmed to debug values, ensuring that firmware running in debug mode cannot obtain HEKs used by production mode.
 
-There are two edge cases where the HEK is available even if there is no key available in the HEK fuse bank:
+There are two edge cases where the HEK is available even if there is no seed available in the HEK fuse bank. In both cases, the HEK is derived from an all-zeroes HEK seed.
 
-- To enable pre-production testing, if Caliptra is in the Unprovisioned or Manufacturing lifecycle state, the HEK is available and is derived from all-zeroes.
-- To enable lengthening the useful lifespan of the storage device, once all HEK slots have been zeroized, the device can be permanently transitioned into a mode where the HEK is available and is derived from all-zeroes. A field-programmable "permanent-HEK" logical fuse bit is allocated to determine whether this mode is active.
+- To enable pre-production testing, if Caliptra is in the Unprovisioned or Manufacturing lifecycle state, the HEK is available.
+
+- To enable lengthening the useful lifespan of the storage device, once all HEK slots have been zeroized, the device can be permanently transitioned into a mode where the HEK is available. A field-programmable "permanent-HEK" logical fuse bit is allocated to determine whether this mode is active.
 
 @tbl:hek-lifecycle-states describes the states between which the HEK transitions over the lifespan of the device. The lifecycle state of the HEK is determined by Caliptra's [lifecycle state](https://github.com/chipsalliance/Caliptra/blob/c0fa71e/doc/Caliptra.md#caliptra-security-states) as well as the state of the HEK fuse bank.
 
 Table: HEK lifecycle states {#tbl:hek-lifecycle-states}
 
-+--------------------------+--------------------------------+-----------------------+---------------------------------------------+
-| Caliptra lifecycle state | HEK fuse state, where x is the | Value used to compute | [Reported HEK state](#tbl:hek-state-values) |
-|                          | current HEK slot               | the HEK               |                                             |
-+==========================+================================+=======================+=============================================+
-| Unprovisioned or         | [Any]                          | 0x0000...             | HEK_AVAIL_PREPROD                           |
-| Manufacturing            |                                |                       |                                             |
-+--------------------------+--------------------------------+-----------------------+---------------------------------------------+
-| Production               | HEK slot 0 is unprogrammed.    | N/A                   | HEK_UNAVAIL_EMPTY                           |
-+--------------------------+--------------------------------+-----------------------+---------------------------------------------+
-| Production               | HEK slot x is randomized.      | HEK slot x            | HEK_AVAIL_PROD                              |
-+--------------------------+--------------------------------+-----------------------+---------------------------------------------+
-| Production               | HEK slot x is zeroized.        | N/A                   | HEK_UNAVAIL_ZEROIZED                        |
-+--------------------------+--------------------------------+-----------------------+---------------------------------------------+
-| Production               | HEK slot x is corrupted.       | N/A                   | HEK_UNAVAIL_CORRUPTED                       |
-+--------------------------+--------------------------------+-----------------------+---------------------------------------------+
-| Production               | Every HEK slot is zeroized,    | 0x0000...             | HEK_AVAIL_PERMANENT                         |
-|                          | and the permanent-HEK fuse bit |                       |                                             |
-|                          | has been set.                  |                       |                                             |
-+--------------------------+--------------------------------+-----------------------+---------------------------------------------+
++--------------------------+--------------------------------+---------------------+---------------------------------------------+
+| Caliptra lifecycle state | HEK fuse state, where x is the | Obfuscated HEK seed | [Reported HEK state](#tbl:hek-state-values) |
+|                          | current HEK slot               |                     |                                             |
++==========================+================================+=====================+=============================================+
+| Unprovisioned or         | [Any]                          | 0x0000...           | HEK_AVAIL_PREPROD                           |
+| Manufacturing            |                                |                     |                                             |
++--------------------------+--------------------------------+---------------------+---------------------------------------------+
+| Production               | HEK slot 0 is unprogrammed.    | N/A                 | HEK_UNAVAIL_EMPTY                           |
++--------------------------+--------------------------------+---------------------+---------------------------------------------+
+| Production               | HEK slot x is randomized.      | HEK slot x          | HEK_AVAIL_PROD                              |
++--------------------------+--------------------------------+---------------------+---------------------------------------------+
+| Production               | HEK slot x is zeroized.        | N/A                 | HEK_UNAVAIL_ZEROIZED                        |
++--------------------------+--------------------------------+---------------------+---------------------------------------------+
+| Production               | HEK slot x is corrupted.       | N/A                 | HEK_UNAVAIL_CORRUPTED                       |
++--------------------------+--------------------------------+---------------------+---------------------------------------------+
+| Production               | Every HEK slot is zeroized,    | 0x0000...           | HEK_AVAIL_PERMANENT                         |
+|                          | and the permanent-HEK fuse bit |                     |                                             |
+|                          | has been set.                  |                     |                                             |
++--------------------------+--------------------------------+---------------------+---------------------------------------------+
 
-The mechanism used to compute the HEK is described in @fig:hek-derivation. This flow is performed upon KMB startup.
+In addition to the HEK seed, the HEK is derived from Caliptra's DICE IDevID CDI. The mechanism used to compute the HEK is described in @fig:hek-derivation. This flow is performed upon KMB startup.
 
 ![HEK derivation](./diagrams/hek_derivation.drawio.svg){#fig:hek-derivation}
 
@@ -1944,20 +1945,24 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 |      | zeroization of the storage device. See           |           |
 |      | @sec:architecture.                               |           |
 +------+--------------------------------------------------+-----------+
-| 5    | The SEK shall only be programmed once the HEK is | Yes       |
+| 5    | When the device is shipped it must be in the     | Yes       |
+|      | production lifecycle state and have a randomized |           |
+|      | HEK. See @sec:hek-sek-lifecycle.                 |           |
++------+--------------------------------------------------+-----------+
+| 6    | The SEK shall only be programmed once the HEK is | Yes       |
 |      | available, and the HEK shall only be zeroized    |           |
 |      | once the SEK is zeroized. See                    |           |
 |      | @sec:hek-sek-lifecycle.                          |           |
 +------+--------------------------------------------------+-----------+
-| 6    | MEKs shall not be programmed while the SEK is    | Yes       |
+| 7    | MEKs shall not be programmed while the SEK is    | Yes       |
 |      | zeroized. See @sec:heks-seks.                    |           |
 +------+--------------------------------------------------+-----------+
-| 7    | Drive firmware shall implement authorization     | Yes       |
+| 8    | Drive firmware shall implement authorization     | Yes       |
 |      | controls to gate lifecycle events that have the  |           |
 |      | potential to trigger data loss. See              |           |
 |      | @sec:authorization.                              |           |
 +------+--------------------------------------------------+-----------+
-| 8    | The encryption engine shall ensure that AES-XTS  | Yes       |
+| 9    | The encryption engine shall ensure that AES-XTS  | Yes       |
 |      | Key_1 and Key_2 are not equal. See               |           |
 |      | @sec:aes-xts-considerations.                     |           |
 +------+--------------------------------------------------+-----------+
