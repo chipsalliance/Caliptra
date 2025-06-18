@@ -45,6 +45,7 @@ Subsystem.
     * Add key vault slot with AES / HMAC / ECDH / ML-KEM Decaps data paths (Bharat proposal)
     * https://github.com/chipsalliance/caliptra-rtl/issues/848: allow HMAC operations where the message spans multiple KV slots (supports FIPS-compliant key combiners)
     * https://github.com/chipsalliance/caliptra-rtl/issues/894: allow AES and HMAC engines to produce a key that is released to the storage device's line-rate encryption engine.
+    * Allow firmware to pass an HEK seed to the deobfuscation engine, where the result is sent directly to KV, similar to UDS and FE.
 
 ## Reviews, documentation, code health:
 
