@@ -1,5 +1,5 @@
 '
-' OCP Lock: READY_MPK API sequence diagram showing Caliptra FW/HW interactions
+' OCP Lock: ENABLE_MPK API sequence diagram showing Caliptra FW/HW interactions
 '
 @startuml
 
@@ -8,7 +8,7 @@
 note across
     <b>Preconditions:</b>
     * Access Shared Secret already availble in a slot in KV
-    * Ready MPK Encryption Key already in a slot and generated on each reset
+    * Enabled MPK Encryption Key already in a slot and generated on each reset
     <font color=red>Is there a separate Shared Secret per Admin User?</font>
 end note
 
@@ -16,15 +16,15 @@ hek++ $BUFFER_ACTIVATION
 kemg++ $BUFFER_ACTIVATION
 mpks++ $BUFFER_ACTIVATION
 
-fw $async mb++ : READY_MPK
+fw $async mb++ : ENABLE_MPK
 
 mb $async cfw++ : Command
 mb--
 
-cfw $sync cfw: Determine rate of ready commands
+cfw $sync cfw: Determine rate of enable commands
 
 alt HEK exists
-    alt Ready command rate below threshold
+    alt Enable command rate below threshold
 
         == Decapsulate ciphertext and decrypt the access key ==
 
@@ -138,20 +138,20 @@ alt HEK exists
         kv $sync tempz: MPK
         kv $sync cfw-- : done
 
-        == Encrypt MPK with Ready MPK Encryption Key ==
+        == Encrypt MPK with Enabled MPK Encryption Key ==
 
-        cfw $sync kv++: Wrap(Key: Slot B,\n         Data Key : Slot Z\n         Destination : ready_mpk)
-        kv $sync mpks: Get Ready MPK Encryption Key
+        cfw $sync kv++: Wrap(Key: Slot B,\n         Data Key : Slot Z\n         Destination : enabled_mpk)
+        kv $sync mpks: Get Enabled MPK Encryption Key
         kv $sync tempz: Get MPK
         kv $sync kv: Encrypt slot Z using Slot B
-        kv $sync cfw-- : Ready MPK
+        kv $sync cfw-- : Enabled MPK
 
         cfw $sync kv++: Purge_key(Key: Slot Y,\n                Key : Slot Z)
         kv $sync tempy !! : Purge
         & kv $sync tempz !!
         kv $sync cfw-- : done
 
-        cfw $sync mb : Command response\nReady_MPK
+        cfw $sync mb : Command response\nEnable_MPK
         & mb $async fw++ : Command\ncomplete
     end
 end

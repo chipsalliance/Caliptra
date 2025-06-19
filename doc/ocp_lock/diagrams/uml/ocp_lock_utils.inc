@@ -43,7 +43,7 @@
         participant "Key Vault\nFuses" as fuses
         participant "Key Vault\nHEK" as ghek
         participant "Key Vault\nSlot A\n(HEK)" as hek
-        participant "Key Vault\nSlot B\n(Ready MPK Encryption Key)" as mpks
+        participant "Key Vault\nSlot B\n(Enabled MPK Encryption Key)" as mpks
         participant "Key Vault\nSlot F\n(DICE Alias Key)\necdsa_secp384r1_sha384" as dice
         participant "Key Vault\nSlot G\n(KEM Keypair)" as kemg
         participant "Key Vault\nSlot W\n(Temporary)" as tempw
