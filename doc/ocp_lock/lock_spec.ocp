@@ -226,17 +226,19 @@ Rotation of the HEK and SEK, management of MPKs and MPK access keys, and injecti
 
 ![OCP L.O.C.K. key hierarchy](./diagrams/key_hierarchy.drawio.svg){#fig:key-hierarchy}
 
-#### Preconditioned HKDF
+#### Preconditioned Key Extract
 
-In this specification, several flows involve combining together multiple symmetric keys. These keys have different scopes and lifespans. For example, the HEK and SEK are long-lived per-drive keys, while the DPK is unique to each MEK.
+In this specification, several flows involve combining together multiple symmetric keys. NIST SP 800-133 [@{sp800-133r2}] section 6.3 provides a number of FIPS-approved methods for combining keys together; this specification leverages the HMAC-based key-extraction process detailed there.
 
-NIST SP 800-133 [@{sp800-133r2}] section 6.3 provides a number of FIPS-approved methods for combining keys together. This specification leverages HKDF-Extract [@{ietf-rfc5869}], which is equivalent to the key-extraction process detailed in SP 800-133 section 6.3. That section provides the following stipulation: "Each component key **shall** be kept secret and **shall not** be used for any purpose other than the computation of a specific symmetric key K (i.e., a given component key **shall not** be used to generate more than one key)."
+The keys being combined in this specification generally have different scopes and lifespans. For example, the HEK and SEK are long-lived per-drive keys, while the DPK is unique to each MEK.
 
-A strict reading of this requirement would preclude, for example, combining the same SEK with different DPKs to produce different per-MEK output keys. Therefore, this specification defines the "preconditioned HKDF-Extract" operation, illustrated in @fig:preconditioned-hkdf.
+Section 6.3 of [@{sp800-133r2}] provides the following stipulation: "Each component key **shall** be kept secret and **shall not** be used for any purpose other than the computation of a specific symmetric key K (i.e., a given component key **shall not** be used to generate more than one key)."
 
-![Preconditioned HKDF-Extract](./diagrams/preconditioned_hkdf.drawio.svg){#fig:preconditioned-hkdf}
+A strict reading of this requirement would preclude, for example, combining the same SEK with different DPKs to produce different per-MEK output keys. Therefore, this specification defines the "Preconditioned Key Extract" operation, illustrated in @fig:preconditioned-key-extract.
 
-Each input key is preconditioned using a unique identifier composed from each of the constituent keys, before being combined using HKDF-Extract. Therefore each key fed to HKDF-Extract is unique to the given key mixing operation and will not be re-used to produce different output keys.
+![Preconditioned Key Extract](./diagrams/preconditioned_key_extract.drawio.svg){#fig:preconditioned-key-extract}
+
+Each input key is preconditioned using a unique identifier composed from each of the constituent keys, before being combined using the SP 800-133 key-extraction process. Therefore each key fed to that process is unique to the given key mixing operation and will not be re-used to produce different output keys.
 
 Subsequent diagrams will use this operation when combining keys with different scopes or lifetimes.
 
@@ -1878,8 +1880,6 @@ Table: Acronyms and abbreviations used throughout this document {#tbl:abbreviati
 | EPK          | Epoch Protection Key                                     |
 +--------------+----------------------------------------------------------+
 | HEK          | Hard Epoch Key                                           |
-+--------------+----------------------------------------------------------+
-| HKDF         | HMAC-based key derivation function                       |
 +--------------+----------------------------------------------------------+
 | HMAC         | Hash-Based Message Authentication Code                   |
 +--------------+----------------------------------------------------------+
