@@ -1742,30 +1742,30 @@ Table: WrappedKey contents
 +--------------+------------------+----------------------------------------------+
 | metadata_len | u32              | Length of the metadata field.                |
 +--------------+------------------+----------------------------------------------+
-| ct_len       | u32              | Length of the ct field.                      |
+| key_len      | u32              | Length of the encrypted key.                 |
 +--------------+------------------+----------------------------------------------+
 | iv           | u8[12]           | Initialization vector for AES operation.     |
 +--------------+------------------+----------------------------------------------+
 | metadata     | u8[metadata_len] | Metadata associated with the wrapped key.    |
 +--------------+------------------+----------------------------------------------+
-| ct           | u8[ct_len]       | Key ciphertext and authentication tag.       |
+| ciphertext   | u8[key_len+16]   | Key ciphertext and authentication tag.       |
 +--------------+------------------+----------------------------------------------+
 
 The AAD for the encrypted message is constructed as \`key_type\` || \`id\` || \`metadata_len\` || \`metadata\`.
 
-Variants of WrappedKey will be used to reduce duplicating information in commands. The following names will be used for WrappedKeys of a specific \`key_type\` and \`ct_len\`:
+Variants of WrappedKey will be used to reduce duplicating information in commands. The following names will be used for WrappedKeys of a specific \`key_type\` and \`key_len\`:
 
 Table: WrappedKey variants
 
-+------------+--------------+------------+
-| Name       | \`key_type\` | \`ct_len\` |
-+============+==============+============+
-| LockedMpk  | LOCKED_MPK   | 32         |
-+------------+--------------+------------+
-| ReadyMpk   | READY_MPK    | 32         |
-+------------+--------------+------------+
-| WrappedMek | WRAPPED_MEK  | 64         |
-+------------+--------------+------------+
++------------+-------------+---------+
+| Name       | key_type    | key_len |
++============+=============+=========+
+| LockedMpk  | LOCKED_MPK  | 32      |
++------------+-------------+---------+
+| ReadyMpk   | READY_MPK   | 32      |
++------------+-------------+---------+
+| WrappedMek | WRAPPED_MEK | 64      |
++------------+-------------+---------+
 
 #### Fault handling
 
