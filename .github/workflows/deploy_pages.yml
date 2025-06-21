@@ -35,7 +35,7 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
           repository: "opencomputeproject/ocp-spec-tools"
-          ref: "45d41cc0d58edccf49d961443d52af4291db7735"
+          ref: "de89f8978bd7d5b344ae1aa8959218c21827c7ee"
           # The underlying tex and templates assume this exists under the "extra" folder.
           path: "doc/ocp_lock/extra"
 
@@ -54,16 +54,32 @@ jobs:
 
             git reset --hard $ref
 
-            (cd doc/ocp_lock &&
+            pushd doc/ocp_lock
+
+            if [[ "${ref}" == "main" ]]; then
+              # Label the current spec version.
+              commit_hash=$(git rev-parse --short HEAD)
+              sed -i -r "/^---$/,/^---$/s/(version: .*)/\1 (Git commit ${commit_hash})/g" lock_spec.ocp
+
+              # Also render the latest version in PDF
+              /usr/bin/build.sh \
+                --crossref=tcg \
+                --csl extra/ocp-pandoc-resources/ieee.csl \
+                --nogitversion \
+                --template extra/ocp-pandoc-resources/pdf/ocp.tex \
+                --pdf lock_spec.pdf lock_spec.ocp
+            fi
+
             /usr/bin/build.sh \
-            --crossref=tcg \
-            --csl extra/ocp-pandoc-resources/ieee.csl \
-            --nogitversion \
-            --template_html extra/ocp-pandoc-resources/html/ocp.html.template \
-            --html_stylesheet extra/ocp-pandoc-resources/html/style.css \
-            --html_stylesheet extra/ocp-pandoc-resources/html/github-markdown.css \
-            --resourcedir extra/ocp-pandoc-resources/pdf \
-            --html ocp-lock.html lock_spec.ocp)
+              --crossref=tcg \
+              --csl extra/ocp-pandoc-resources/ieee.csl \
+              --nogitversion \
+              --template_html extra/ocp-pandoc-resources/html/ocp.html.template \
+              --html_stylesheet extra/ocp-pandoc-resources/html/style.css \
+              --html_stylesheet extra/ocp-pandoc-resources/html/github-markdown.css \
+              --html lock_spec.html lock_spec.ocp
+
+            popd
 
             if [[ "${ref}" == "main" ]]; then
               trimmed_ref="HEAD"
@@ -73,8 +89,23 @@ jobs:
             fi
 
             mkdir -p "gh-pages/ocp-lock/specification/${trimmed_ref}"
-            cp doc/ocp_lock/ocp-lock.html "gh-pages/ocp-lock/specification/${trimmed_ref}/index.html"
+            cp doc/ocp_lock/lock_spec.html "gh-pages/ocp-lock/specification/${trimmed_ref}/index.html"
             echo "Added webpage ocp-lock/specification/${trimmed_ref}/index.html"
+
+            if [[ "${trimmed_ref}" == "HEAD" ]]; then
+              pdf_dir_name="gh-pages/ocp-lock/specification/HEAD/pdf"
+              pdf_name="OCP_LOCK_Specification_${commit_hash}.pdf"
+
+              mkdir -p "${pdf_dir_name}"
+              cat > "${pdf_dir_name}/index.html" << EOF
+                <html>
+                  <body style="margin:0">
+                    <iframe style="border:none" width="100%" height="100%" src="${pdf_name}"></iframe>
+                  </body>
+                </html>
+          EOF
+              cp doc/ocp_lock/lock_spec.pdf "${pdf_dir_name}/${pdf_name}"
+            fi
           done
 
       - name: Upload artifacts for ocp-lock spec

@@ -4,7 +4,10 @@
 
 ## Specification Website
 
-A version of the specification tracking the latest content in the `main` branch can be found at https://chipsalliance.github.io/Caliptra/ocp-lock/main/specification.html
+A version of the specification tracking the latest content in the `main` branch can be found at the following links:
+
+- HTML render: https://chipsalliance.github.io/Caliptra/ocp-lock/specification/HEAD/
+- PDF render: https://chipsalliance.github.io/Caliptra/ocp-lock/specification/HEAD/pdf/
 
 ## Specification source
 
