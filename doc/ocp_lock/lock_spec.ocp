@@ -258,10 +258,10 @@ In addition to a plaintext message, this operation supports optional metadata fo
 
 ### MPKs {#sec:mpks}
 
-MPKs are the mechanism by which KMB enforces multi-party authorization as a precondition to loading an MEK. MPKs exist in one of two states: locked or enabled. In both these states the MPK is encrypted to a key known only to KMB.
+MPKs are the mechanism by which KMB enforces multi-party authorization as a precondition to loading an MEK. MPKs exist in one of two states: locked or enabled. In both these states the MPK is encrypted to a secret known only to KMB.
 
-- A locked MPK's encryption key is derived from the HEK, SEK, and an externally-supplied access key to which the MPK is bound. The locked MPK is held at rest by drive firmware.
-- An enabled MPK's encryption key is a common volatile key held within KMB which is randomly generated upon first use and is lost when the drive shuts down. Lazy generation allows injected host entropy to contribute to the key's generation. Enabled MPKs are held in drive firmware memory.
+- A locked MPK's encryption secret is derived from the HEK, SEK, and an externally-supplied access key to which the MPK is bound. The locked MPK is held at rest by drive firmware.
+- An enabled MPK's encryption secret is a common volatile secret held within KMB which is randomly generated upon first use and is lost when the drive shuts down. Lazy generation allows injected host entropy to contribute to the secret's generation. Enabled MPKs are held in drive firmware memory.
 
 The externally-supplied access key is encrypted in transit using an HPKE public key held by KMB. The "enabled" state allows the HPKE keypair to be rotated after the access key has been provisioned to the storage device, without removing the ability for KMB to decrypt the MPK when later loading an MEK bound to that MPK.
 
@@ -314,8 +314,8 @@ KMB performs the following steps:
 
 1. Unwrap the given MPK access key using the HPKE keypair held within KMB.
 2. Randomly generate an MPK.
-3. Derive an MPK encryption key from the HEK, SEK, and decrypted access key.
-4. Encrypt the MPK to the MPK encryption key, attaching the given metadata as AAD.
+3. Derive an MPK encryption secret from the HEK, SEK, and decrypted access key.
+4. Encrypt the MPK to the MPK encryption secret, attaching the given metadata as AAD.
 5. Return the encrypted MPK to the drive firmware.
 
 Drive firmware may then store the encrypted MPK in persistent storage.
@@ -324,14 +324,14 @@ Drive firmware may then store the encrypted MPK in persistent storage.
 
 ##### MPK enabling
 
-Encrypted MPKs stored at rest in persistent storage are considered "locked", and must be enabled before they can be used to load an MEK. Enabled MPKs are also encrypted when handled by drive firmware, to the Enabled MPK Encryption Key. Enabled MPKs do not survive across device reset.
+Encrypted MPKs stored at rest in persistent storage are considered "locked", and must be enabled before they can be used to load an MEK. Enabled MPKs are also encrypted when handled by drive firmware, to the Enabled MPK Encryption Secret. Enabled MPKs do not survive across device reset.
 
 To enable an MPK, KMB performs the following steps:
 
 1. Unwrap the given MPK access key using the HPKE keypair held within KMB.
-2. Derive the MPK encryption key from the HEK, SEK, and decrypted access key.
-3. Decrypt the MPK using the MPK encryption key.
-4. Encrypt the MPK using the Enabled MPK Encryption Key, preserving the MPK metadata.
+2. Derive the MPK encryption secret from the HEK, SEK, and decrypted access key.
+3. Decrypt the MPK using the MPK encryption secret.
+4. Encrypt the MPK using the Enabled MPK Encryption Secret, preserving the MPK metadata.
 5. Return the re-encrypted "enabled" MPK to the drive firmware.
 
 Drive firmware may then stash the encrypted enabled MPK in volatile storage, and later provide it to the KMB when loading an MEK, as described in @sec:meks.
@@ -343,10 +343,10 @@ Drive firmware may then stash the encrypted enabled MPK in volatile storage, and
 The access key to which an MPK is bound may be rotated. The user must prove that they have knowledge of both the current and new access key before a rotation is allowed. This is accomplished by the user wrapping both their current and new access key in the same HPKE payload. KMB performs the following steps:
 
 1. Unwrap the given current access key and new access key using the HPKE keypair held within KMB, incrementing the HPKE sequence number between each decryption operation. Note that the sequence number increment is a side-effect of the \`ContextR.Open()\` HPKE operation.
-2. Derive the current MPK encryption key from the HEK, SEK, and decrypted current access key.
-3. Derive the new MPK encryption key from the HEK, SEK, and decrypted new access key.
-4. Decrypt the MPK using the current MPK encryption key.
-5. Encrypt the MPK using the new MPK encryption key, preserving the MPK metadata.
+2. Derive the current MPK encryption secret from the HEK, SEK, and decrypted current access key.
+3. Derive the new MPK encryption secret from the HEK, SEK, and decrypted new access key.
+4. Decrypt the MPK using the current MPK encryption secret.
+5. Encrypt the MPK using the new MPK encryption secret, preserving the MPK metadata.
 6. Return the re-encrypted MPK to the drive firmware.
 
 Drive firmware then zeroizes the old encrypted MPK and stores the new encrypted MPK in persistent storage.
@@ -360,8 +360,8 @@ A user that has bound an access key to an MPK may wish to confirm that their acc
 To test an MPK, KMB receives a wrapped MPK, wrapped MPK access key, and freshness nonce. KMB then performs the following steps:
 
 1. Unwrap the given MPK access key using the HPKE keypair held within KMB.
-2. Derive the MPK encryption key from the HEK, SEK, and decrypted access key.
-3. Verify the integrity of the MPK ciphertext and AAD using the MPK encryption key, discarding the decrypted MPK in the process.
+2. Derive the MPK encryption secret from the HEK, SEK, and decrypted access key.
+3. Verify the integrity of the MPK ciphertext and AAD using the MPK encryption secret, discarding the decrypted MPK in the process.
 4. Calculate and return the digest SHA2-384(MPK metadata || access key || nonce).
 
 The user can then verify that the returned digest matches their expectation.
@@ -522,7 +522,7 @@ At initial boot, Caliptra firmware performs the following steps:
 - Determines whether a HEK is available, based on the fuse configuration. If a HEK is unavailable, KMB enters a mode where MEKs are not allowed to be loaded.
 - Initializes random HPKE keypairs for each supported algorithm, and assigns handles to them, reported via [ENUMERATE_KEM_HANDLES](#sec:enumerate-kem-handles).
 
-The Enabled MPK Encryption Key is not initialized at boot-up, as it is generated lazily upon first use. See @sec:mpks for details.
+The Enabled MPK Encryption Secret is not initialized at boot-up, as it is generated lazily upon first use. See @sec:mpks for details.
 
 ### Authorization {#sec:authorization}
 
@@ -1140,23 +1140,23 @@ Table: ENABLE_MPK input arguments
 
 Table: ENABLE_MPK output arguments
 
-+-------------+------------+----------------------------------------------+
-| Name        | Type       | Description                                  |
-+=============+============+==============================================+
-| chksum      | u32        | Checksum over other output arguments,        |
-|             |            | computed by Caliptra.                        |
-+-------------+------------+----------------------------------------------+
-| fips_status | u32        | Indicates if the command is FIPS approved    |
-|             |            | or an error.                                 |
-+-------------+------------+----------------------------------------------+
-| reserved    | u32        | Reserved.                                    |
-+-------------+------------+----------------------------------------------+
-| enabled_mpk | EnabledMpk | MPK encrypted to Enabled MPK Encryption Key. |
-+-------------+------------+----------------------------------------------+
++-------------+------------+-------------------------------------------------+
+| Name        | Type       | Description                                     |
++=============+============+=================================================+
+| chksum      | u32        | Checksum over other output arguments,           |
+|             |            | computed by Caliptra.                           |
++-------------+------------+-------------------------------------------------+
+| fips_status | u32        | Indicates if the command is FIPS approved       |
+|             |            | or an error.                                    |
++-------------+------------+-------------------------------------------------+
+| reserved    | u32        | Reserved.                                       |
++-------------+------------+-------------------------------------------------+
+| enabled_mpk | EnabledMpk | MPK encrypted to Enabled MPK Encryption Secret. |
++-------------+------------+-------------------------------------------------+
 
 #### MIX_MPK
 
-This command initializes the MEK secret seed if not already initialized or if \`initialize\` is set to 1, decrypts the specified MPK with the with the Enabled MPK Encryption Key, and then updates the MEK secret seed in KMB by performing a KDF with the MEK secret seed and the decrypted MPK.
+This command initializes the MEK secret seed if not already initialized or if \`initialize\` is set to 1, decrypts the specified MPK with the with the Enabled MPK Encryption Secret, and then updates the MEK secret seed in KMB by performing a KDF with the MEK secret seed and the decrypted MPK.
 
 When generating an MEK, one or more MIX_MPK commands are processed to modify the MEK secret seed.
 
@@ -1166,20 +1166,20 @@ Command Code: 0x4D4D_504B ("MMPK")
 
 Table: MIX_MPK input arguments
 
-+-------------+------------+--------------------------------------------------+
-| Name        | Type       | Description                                      |
-+=============+============+==================================================+
-| chksum      | u32        | Checksum over other input arguments,             |
-|             |            | computed by the caller.                          |
-+-------------+------------+--------------------------------------------------+
-| reserved    | u32        | Reserved.                                        |
-+-------------+------------+--------------------------------------------------+
-| initialize  | u32        | If set to 1, the MEK secret seed is              |
-|             |            | initialized before the given MPK is              |
-|             |            | mixed. All other values reserved. Little-endian. |
-+-------------+------------+--------------------------------------------------+
-| enabled_mpk | EnabledMpk | MPK encrypted to the Enabled MPK Encryption Key. |
-+-------------+------------+--------------------------------------------------+
++-------------+------------+-----------------------------------------------------+
+| Name        | Type       | Description                                         |
++=============+============+=====================================================+
+| chksum      | u32        | Checksum over other input arguments,                |
+|             |            | computed by the caller.                             |
++-------------+------------+-----------------------------------------------------+
+| reserved    | u32        | Reserved.                                           |
++-------------+------------+-----------------------------------------------------+
+| initialize  | u32        | If set to 1, the MEK secret seed is                 |
+|             |            | initialized before the given MPK is                 |
+|             |            | mixed. All other values reserved. Little-endian.    |
++-------------+------------+-----------------------------------------------------+
+| enabled_mpk | EnabledMpk | MPK encrypted to the Enabled MPK Encryption Secret. |
++-------------+------------+-----------------------------------------------------+
 
 Table: MIX_MPK output arguments
 
@@ -1240,7 +1240,7 @@ Table: TEST_ACCESS_KEY output arguments
 
 #### GENERATE_MEK
 
-This command generates a random 512-bit MEK and encrypts it using the MEK encryption key, which is derived from the HEK, the MEK secret seed, and the given SEK and DPK.
+This command generates a random 512-bit MEK and encrypts it using the MEK encryption secret, which is derived from the HEK, the MEK secret seed, and the given SEK and DPK.
 
 The DPK may be a value decrypted by a user-provided C_PIN in Opal.
 
@@ -1277,12 +1277,12 @@ Table: GENERATE_MEK output arguments
 | reserved    | u32        | Reserved.                                 |
 +-------------+------------+-------------------------------------------+
 | wrapped_mek | WrappedMek | MEK encrypted to the derived MEK          |
-|             |            | encryption key.                           |
+|             |            | encryption secret.                        |
 +-------------+------------+-------------------------------------------+
 
 #### LOAD_MEK {#sec:load-mek-cmd}
 
-This command decrypts the given encrypted 512-bit MEK using the MEK encryption key, which is derived from the HEK, the MEK secret seed, and the given SEK and DPK.
+This command decrypts the given encrypted 512-bit MEK using the MEK encryption secret, which is derived from the HEK, the MEK secret seed, and the given SEK and DPK.
 
 The DPK may be a value decrypted by a user-provided C_PIN in Opal.
 
