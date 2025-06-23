@@ -8,7 +8,7 @@
 
 note across
     <b>Preconditions:</b>
-    * Ready MPK Encryption Key is stored in Key Vault slot B
+    * Enabled MPK Encryption Key is stored in Key Vault slot B
     * The following sequence has occurred prior: Initialize MEK then zero or more MIX_MPK
 
     <b>Notes:</b>
@@ -39,9 +39,9 @@ alt HEK exists
 
     $self("cfw", "Determine Temporary slox Y for MPK")
 
-    cfw $sync kv++: Key_Unwrap(Key:  SlotB,\n                   Key Data: ready_mpk,\n                   Destination Slot: Y)
-    kv $sync mpks: Get Ready MPK Encryption Key
-    kv $sync kv: Key_Unwrap ready_mpk
+    cfw $sync kv++: Key_Unwrap(Key:  SlotB,\n                   Key Data: enabled_mpk,\n                   Destination Slot: Y)
+    kv $sync mpks: Get Enabled MPK Encryption Key
+    kv $sync kv: Key_Unwrap enabled_mpk
     kv $sync tempy: Put MPK
     tempy++ $BUFFER_ACTIVATION
     kv $sync cfw-- : done
