@@ -128,7 +128,7 @@ Compatible Configurations:
 
 ## Repositories
 
-The Caliptra code base and documentation are split across five repositories:
+The Caliptra code base and documentation are split across several repositories:
 
 | Repository | Areas of interest | Description |
 | ---------- | ---- | ----------- |
@@ -141,6 +141,7 @@ The Caliptra code base and documentation are split across five repositories:
 | [Caliptra U-Reg](https://github.com/chipsalliance/caliptra-ureg)  | [Issues](https://github.com/chipsalliance/caliptra-ureg/issues), [PRs](https://github.com/chipsalliance/caliptra-ureg/pulls), [Security advisories](https://github.com/chipsalliance/caliptra-ureg/security/advisories) | General-purpose libraries and tools for manipulating MMIO registers from Rust |
 | [Caliptra Subsystem](https://github.com/chipsalliance/caliptra-ss)| [Issues](https://github.com/chipsalliance/caliptra-ss/issues), [PRs](https://github.com/chipsalliance/caliptra-ss/pulls), [Security advisories](https://github.com/chipsalliance/caliptra-ss/security/advisories) | Caliptra Subsystem including Manufacturer Control Unit (MCU) and peripherals |
 | [Caliptra MCU Software](https://github.com/chipsalliance/caliptra-mcu-sw)| [Issues](https://github.com/chipsalliance/caliptra-mcu-sw/issues), [PRs](https://github.com/chipsalliance/caliptra-mcu-sw/pulls), [Security advisories](https://github.com/chipsalliance/caliptra-mcu-sw/security/advisories) | Caliptra MCU Firmware and SDK and specification |
+| [I3C Core](https://github.com/chipsalliance/i3c-core/)            | [Issues](https://github.com/chipsalliance/i3c-core/issues), [PRs](https://github.com/chipsalliance/i3c-core//pulls), [Security advisories](https://github.com/chipsalliance/i3c-core/security/advisories) | I3C target core developed for Caliptra |
 
 The GitHub config parameters for all of the branches are documented in a [local
 file](https://github.com/chipsalliance/Caliptra/blob/main/GitHubRules.md).
