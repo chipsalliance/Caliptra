@@ -287,18 +287,18 @@ Upon drive reset, the HPKE keypairs are regenerated, and any access keys for MPK
 
 KMB supports the following HPKE algorithms:
 
-- P-384 ECDH, defined in RFC 9180 [@{ietf-rfc9180}]
-- Hybridized ML-KEM-1024 with P-384 ECDH, defined in Hybrid PQ/T Key Encapsulation Mechanisms [@{draft-irtf-cfrg-hybrid-kems}]
+- P-384 ECDH, defined in RFC 9180 [@{ietf-rfc9180}] and illustrated in @fig:hpke-kem-ecdh.
+- Hybridized ML-KEM-1024 with P-384 ECDH, defined in Hybrid PQ/T Key Encapsulation Mechanisms [@{draft-irtf-cfrg-hybrid-kems}] and illustrated in @fig:hpke-kem-hybrid.
 
-@fig:hpke-unwrap-ecdh and @fig:hpke-unwrap-hybrid illustrate the detailed cryptographic operations involved in unwrapping the access key using each of these algorithms. Subsequent diagrams elide these details and represent the operation as "HPKE unwrap".
+![HPKE unwrap for access keys with ECDH](./diagrams/hpke_kem_ecdh.drawio.svg){#fig:hpke-kem-ecdh}
 
-![HPKE unwrap for MPK access keys with ECDH](./diagrams/mpk_access_key_ecdh_unwrap.drawio.svg){#fig:hpke-unwrap-ecdh}
+![HPKE unwrap for access keys with hybrid ML-KEM + ECDH](./diagrams/hpke_kem_hybrid.drawio.svg){#fig:hpke-kem-hybrid}
 
-![HPKE unwrap for MPK access keys with hybrid ML-KEM + ECDH](./diagrams/mpk_access_key_hybrid_unwrap.drawio.svg){#fig:hpke-unwrap-hybrid}
+The details of how the AES-GCM key and IV are derived are illustrated in @fig:hpke-key-derivation.
 
-The only difference between @fig:hpke-unwrap-ecdh and @fig:hpke-unwrap-hybrid is how the shared secret is derived. Operations which produce an AES key and IV from that shared secret are identical, and are omitted from @fig:hpke-unwrap-hybrid for brevity.
+![HPKE AES-GCM key and IV derivation](./diagrams/hpke_key_derivation.drawio.svg){#fig:hpke-key-derivation}
 
-The sequence number is incremented for each decryption operation performed with keys derived from a given HPKE context. With the exception of MPK access key rotation as described in @sec:mpk-access-key-rotation, all flows that accept HPKE payloads will perform a single decryption operation with the computed context. MPK access key rotation will perform two decryption operations and will increment the sequence number between them.
+The HPKE sequence number is incremented for each decryption operation performed with keys derived from a given HPKE context. With the exception of MPK access key rotation as described in @sec:mpk-access-key-rotation, all flows that accept HPKE payloads will perform a single decryption operation with the computed context. MPK access key rotation will perform two decryption operations and will increment the sequence number between them.
 
 #### MPK lifecycle
 
