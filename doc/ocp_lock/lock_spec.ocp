@@ -2,7 +2,7 @@
 title: "OCP L.O.C.K."
 version: 0.8.5
 type: BASE
-project: NVMe^TM^
+project: NVMe™
 authors: [(See Acknowledgements section)]
 bibliography: bibliography.yaml
 ...
@@ -117,7 +117,9 @@ OCP L.O.C.K. (Layered Open-source Cryptographic Key management) is a feature set
 
 OCP L.O.C.K. was originally created as part of the Open Compute Project (OCP). The major revisions of the OCP L.O.C.K. specifications are published as part of Caliptra at OCP, as OCP L.O.C.K. is an extension to Caliptra. The evolving source code and documentation for Caliptra are in the repository within the CHIPS Alliance Project, a Series of LF Projects, LLC.
 
-OCP L.O.C.K. may be integrated within a variety of self-encrypting storage devices, and is not restricted exclusively to NVMe^TM^.
+OCP L.O.C.K. may be integrated within a variety of self-encrypting storage devices, and is not restricted exclusively to NVMe™. OCP L.O.C.K. is designed for compatibility with the TCG Opal[^opal] [@{tcg-opal}] or Key Per I/O [@{tcg-kpio}] storage device specifications.
+
+[^opal]: Opal in the context of this document includes the Opal Family of SSCs: Opal SSC, Opalite SSC, Ruby SSC. Pyrite is excluded as Pyrite SSDs are non-SED.
 
 ## Background
 
@@ -129,7 +131,7 @@ Self-encrypting drives (SEDs) store data encrypted at rest to media encryption k
 - An encryption engine which performs line-rate encryption and decryption of data as it enters and exits the drive.
 - A drive controller which exposes host-side APIs for managing the lifecycle of MEKs.
 
-MEKs may be bound to user credentials, which the host must provide to the drive in order for the associated data to be readable. A given MEK may be bound to one or more credentials. This model is captured in the TCG Opal [@{tcg-opal}] specification.
+MEKs may be bound to user credentials, which the host must provide to the drive in order for the associated data to be readable. A given MEK may be bound to one or more credentials. This model is captured in the TCG Opal specification.
 
 MEKs may be erased, to cryptographically erase all data which was encrypted to the MEK. To erase an MEK, it is sufficient for the drive to erase all copies of it, or all copies of a key with which it was protected.
 
@@ -167,9 +169,6 @@ The OCP L.O.C.K. KMB satisfies the following properties:
 - Prevents leakage of media keys via firmware vulnerabilities or side channels, by isolating MEKs to a trusted component.
 - Binds MEKs to a given set of externally-supplied access keys, provisioned with replay-resistant transport security such that they can be injected without trusting the host.
 - Uses epoch keys for attestable epoch-based cryptographic erase.
-- Is able to be used in conjunction with the Opal or Key Per I/O [@{tcg-kpio}] storage device specifications.
-
-Note that Opal in the context of this document includes the Opal Family of SSCs: Opal SSC, Opalite SSC, Ruby SSC. Pyrite is excluded as Pyrite SSDs are non-SED.
 
 ### Non-goals
 
@@ -263,15 +262,15 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 |                   | See @fig:mpk-generation for one of   |                                                             |               |
 |                   | several flows where this is done.    | Rendered irrecoverable if the SEK, HEK seed, or DICE UDS    |               |
 |                   |                                      | are zeroized.                                               |               |
-|                   | Contributes to the derivation of an  |                                                             |               |
-|                   | MEK secret. See                      |                                                             |               |
+|                   | Contributes to the derivation of     |                                                             |               |
+|                   | each MEK secret. See                 |                                                             |               |
 |                   | @fig:mek-secret-derivation.          |                                                             |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
 | HPKE private key  | Provides transport encryption for    | Randomly generated on startup. Held in volatile memory,     | No            |
 | seed              | injected access keys. See            | rotated on demand, and lost on cold reset.                  |               |
 |                   | @sec:hpke-transport-encryption.      |                                                             |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
-| Access keys       | Contributes to the derivation of a   | Managed outside of Caliptra. Asymmetrically encrypted       | Yes           |
+| Access keys       | Contributes to the derivation of a   | Managed outside of Caliptra. Asymmetrically encrypted       | Yes[^ak_kv]   |
 |                   | Locked MPK encryption secret. See    | using the HPKE public key. When held by Caliptra, each      |               |
 |                   | @fig:mpk-generation for one of       | access key is held in the Key Vault and is zeroized after   |               |
 |                   | several flows where this is done.    | each use.                                                   |               |
@@ -314,7 +313,7 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 |                   |                                      | are zeroized.                                               |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
 
-Note: the access key is generally held in the Key Vault when it is decrypted within Caliptra. The one exception to this is during access key testing, when the decrypted access key is hashed along with other data. Since the Key Vault hardware does not presently support hashing keys, during this flow the decrypted access key is held in Caliptra's main memory. See @sec:mpk-access-key-testing for more details.
+[^ak_kv]: Access keys are generally held in the Key Vault when they are decrypted within Caliptra. The one exception to this is during access key testing, when the decrypted access key is hashed along with other data. Since the Key Vault hardware does not presently support hashing keys, during this flow the decrypted access key is held in Caliptra's main memory. See @sec:mpk-access-key-testing for more details.
 
 #### Key Vault
 
@@ -340,17 +339,26 @@ The input key is preconditioned using a unique identifier derived from the salt,
 
 Subsequent diagrams will use this operation when combining keys with different scopes or lifetimes.
 
+The design of this operation is informed by a number of constraints on Caliptra hardware. Keys in the Key Vault support the following symmetric cryptographic operations:
+
+  - Use as an AES key or message
+  - Use as an HMAC key or message
+
+Notably, if a key in the Key Vault is used as an HMAC message, it constitutes the entirety of the HMAC message. No concatenation with other data is possible. Therefore a key in the Key Vault cannot be used as e.g. an SP 800-108 KDF's context string, which must be concatenated with other values such as the block counter.
+
+The AES engine is used to compute the salt checksum because that is the only supported path for extracting an identifier from a key in Key Vault.
+
 #### Preconditioned AES {#sec:preconditioned-aes}
 
 In this specification, several flows involve deriving a key for use in AES-GCM. In AES-GCM it is critical that IV collisions be avoided. To that end SP 800-38D [@{sp800-38d}] section 8.3 stipulates that AES-GCM-Encrypt may only be invoked at most $2^{32}$ times with a given AES key. One approach to address this constraint is to maintain counters to track the usage count of a given key. Such tracking would be difficult for Caliptra, which lacks direct access to rewritable storage which would be needed to maintain a counter that preserves its value across power cycles.
 
-To elide the need for maintaining counters, this specification defines the "preconditioned AES-Encrypt" and "preconditioned AES-Decrypt" operations, illustrated in @fig:preconditioned-aes-encrypt and @fig:preconditioned-aes-decrypt.
+To elide the need for maintaining counters, this specification defines the "preconditioned AES-Encrypt" and "preconditioned AES-Decrypt" operations, illustrated in Figures [-@fig:preconditioned-aes-encrypt] and [-@fig:preconditioned-aes-decrypt].
 
 ![Preconditioned AES-Encrypt](./diagrams/preconditioned_aes_encrypt.drawio.svg){#fig:preconditioned-aes-encrypt}
 
 ![Preconditioned AES-Decrypt](./diagrams/preconditioned_aes_decrypt.drawio.svg){#fig:preconditioned-aes-decrypt}
 
-Each AES secret is preconditioned using a randomly-generated 64-bit identifier, before being used with AES-GCM-Encrypt. This ensures that it is safe to use a given input AES secret in approximately $2^{64}$ preconditioned AES-Encrypt operations before an IV collision is expected to occur with probability greater than $2^{-32}$. $2^{64}$ is large enough that a given storage device will experience hardware failure well before that limit is reached. Ergo, usage counters within the drive are not needed for these keys. See [Appendix @sec:preconditioned-aes-calculations] for additional details on the calculations behind this figure.
+Each AES secret is preconditioned using a randomly-generated 64-bit salt, before being used with AES-GCM-Encrypt. This ensures that it is safe to use a given input AES secret in approximately $2^{64}$ preconditioned AES-Encrypt operations before an IV collision is expected to occur with probability greater than $2^{-32}$. The $2^{64}$ limit is large enough that a given storage device will experience hardware failure well before that limit is reached. Ergo, usage counters within the drive are not needed for these keys. See [Appendix @sec:preconditioned-aes-calculations] for additional details on the calculations behind this figure.
 
 In addition to a plaintext message, this operation supports optional metadata for the message, which is attached as AAD.
 
@@ -597,7 +605,7 @@ See @sec:generate-load-random-mek for how the MEK secret is used to generate and
 
 #### Generating and loading a random MEK {#sec:generate-load-random-mek}
 
-@fig:mek-generate and @fig:mek-load elide the process of deriving the MEK secret, as those details are captured in @fig:mek-secret-derivation. When an MEK is generated or loaded, the inputs given in @fig:mek-secret-derivation are provided by drive firmware so that KMB may derive the MEK secret.
+Figures [-@fig:mek-generate] and [-@fig:mek-load] elide the process of deriving the MEK secret, as those details are captured in @fig:mek-secret-derivation. When an MEK is generated or loaded, the inputs given in @fig:mek-secret-derivation are provided by drive firmware so that KMB may derive the MEK secret.
 
 ![Generating an MEK](./diagrams/mek_generate.drawio.svg){#fig:mek-generate}
 
