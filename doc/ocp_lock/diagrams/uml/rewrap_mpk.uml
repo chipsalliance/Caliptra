@@ -4,109 +4,37 @@
 '
 @startuml
 
-!include ocp_lock_utils.inc
+!include utils.inc
 
 note across
     <b>Preconditions:</b>
-    * HEK in a firmware-managed KV slot
+        * The HEK is present in a KV slot
 end note
 
-hek++ $BUFFER_ACTIVATION
-kemg++ $BUFFER_ACTIVATION
+' Pre-existing state
+$activate(hek)
+$activate(hpke)
 
-fw $async mb++ : REWRAP_MPK
+dfw -> cfw++ : REWRAP_MPK
 
-mb $async cfw++ : Command
-mb--
+$preconditioned_key_extract(HEK, hek, SEK, cfw, EPK, epk)
 
-alt HEK exists
+$hpke_unwrap(kv_ak, kv_ak2)
 
-    == Get Access Key 1 ==
-    cfw $sync kv++: Decaps(KEM Pair : kem_handle (g),\n            KEM ciphertext : kem_ciphertext from\n                                      wrapped_access_key_1\n            Destination : Slot Y)
-    kv $sync kemg: Get KEM Keypair
-    kv $sync kv: Decap KEM Ciphertext\nwith Keypair
-    kv $sync tempy: Put Shared Secret
-    tempy++ $BUFFER_ACTIVATION
-    kv $sync cfw-- : done
+$preconditioned_key_extract(Current access key, kv_ak, EPK, epk, current-access-key Locked MPK Encryption Secret, encryption_secret)
 
-    cfw $sync kv++: Unwrap(Key : Slot Y\n            Key Data : wrapped_access_key_1,\n            Destination : Slot Z)
-    kv $sync tempy: Get Shared Secret
-    kv $sync kv: Unwrap\nwrapped_access_key_1
-    kv $sync tempz: Put Access Key 1
-    tempz++ $BUFFER_ACTIVATION
-    kv $sync cfw-- : done
+$zeroize(kv_ak)
 
-    == Get Access Key 2 ==
-    cfw $sync kv++: Unwrap(Key : Slot Y,\n            Key Data: double_encrypted_access_key,\n            Destination Memory: <font color=red>Put in memory\n                                           <font color=red>as not a key)
-    kv $sync tempy: Get Shared Secret
-    kv $sync kv: Unwrap\ndouble_encrypted_access_key\nwith Slot Y
-    kv $sync tempmem: Encrypted Access Key 2
-'    note left
-'      <font color=red>We are encrypting the access key 2 twice, first
-'      <font color=red>with the access key 1 and then second with the
-'      <font color=red>shared secret. If we limit our access key encryption
-'      <font color=red>algorihtm to AEAD, such as AES-GCM, we can replace
-'      <font color=red>it by a single encryption with the shared secret as
-'      <font color=red>key and the access key 1 as associated data.
-'    end note
-    tempmem++ $BUFFER_ACTIVATION
-    kv $sync cfw-- : done
+$preconditioned_key_extract(New access key, kv_ak2, EPK, epk, new-access-key Locked MPK Encryption Secret, encryption_secret2)
 
-    cfw $sync kv++: Unwrap(Key : Slot Z\n            Key Data : Temp Memory,\n            Destination : Slot Y)
-    kv $sync tempz: Get Access Key 1
-    kv $sync tempmem: Get encrypted_access_key
-    kv $sync kv: Unwrap encrypted access key 2
-    kv $sync tempy: Put Access Key 2
-    kv $sync cfw-- : done
+$zeroize(epk)
+$zeroize(kv_ak2)
 
+$preconditioned_aes_decrypt(encryption_secret, encryption_key, MPK bound to current access key, mpk)
 
-    == Create MPK wrapping/unwrapping Keys ==
-    cfw $sync kv++: HMAC512_Slots(Key : Slot A,\n                         Data Key : Slot Z\n                         Destination : Slot W)
-    kv $sync hek: Get HEK
-    kv $sync tempz: Get Access Key 1
-    kv $sync kv: HMAC512 slot A and Slot Z
-    kv $sync tempw: HMAC512 result Old encryption key for locked MPK
-    tempw++ $BUFFER_ACTIVATION
-    kv $sync cfw-- : done
+$preconditioned_aes_encrypt(encryption_secret2, encryption_key2, MPK bound to new access key, mpk)
 
-    cfw $sync kv++: HMAC512_Slots(Key : Slot A,\n                         Data Key : Slot Y\n                         Destination : Slot Z)
-    kv $sync hek: Get HEK
-    kv $sync tempy: Get Access Key 2
-    kv $sync kv: HMAC512 slot A and Slot Y
-    kv $sync tempz: HMAC512 result New encryption key for locked MPK
-    kv $sync cfw-- : done
-
-    == Get MPK ==
-    cfw $sync kv++: Unwrap(Key : Slot W,\n            Key Data: locked_mpk\n            Destination : Slot Y)
-    kv $sync tempw: Old encryption key for locked MPK
-    kv $sync kv: Unwrap locked_mpk
-    kv $sync tempy: MPK
-    kv $sync cfw-- : done
-
-
-    == Create the locked MPK ==
-    cfw $sync kv++: Wrap(Key: Slot Z,\n             Data Key : Slot Y\n             Destination : new_locked_mpk)
-    kv $sync tempz: Get New encryption key for locked MPK
-    kv $sync tempy: Get MPK
-    kv $sync kv: Wrap slot Y with Slot Z to\ngenerate new_encrypted_mpk
-    kv $sync cfw-- : new_encrypted_mpk
-
-    cfw $sync kv++: Purge_key(Key: Slot W,\n                Key : Slot Y,\n                Key : Slot Z)
-    kv $sync tempw !! : Purge
-    & kv $sync tempy !!
-    & kv $sync tempz !!
-    kv $sync cfw-- : done
-end
-
-note left tempmem
-    <font color=red>Did not purge temp memory
-    <font color=red>as it contains encrypted object
-    purge
-end note
-
-
-cfw $sync mb : Command response\nnew_encrypted_mpk
-& mb $async fw++ : Command\ncomplete
+cfw -> dfw: Command response\nand Rewrapped MPK
 cfw--
 
 @enduml

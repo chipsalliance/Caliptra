@@ -4,32 +4,17 @@
 '
 @startuml
 
-!include ocp_lock_utils.inc
+!include utils.inc
 
-note across
-    <b>Preconditions:</b>
-        * KEM_HANDLE value is a KV slot containing a KEM keypair
-        * KEM Keypair has been loaded into KV at power on or has been rotated by this API
-end note
+' Pre-existing state
+$activate(hpke)
 
-kemg++ $BUFFER_ACTIVATION
+dfw -> cfw++ : ROTATE_ENCAPSULATION_KEY(X)
 
-fw $async mb++ : ROTATE_ENCAPSULATION_KEY(X)
+cfw -> drbg: Get random seed
+cfw -> hpke: Stash random seed
 
-mb $async cfw++ : Command
-mb--
-
-alt kem_handle (XG has a Key Pair in KV slot G
-    alt kem_algorithm = ecdh_secp384r1
-        cfw $sync kv++: generate_ecdh_secp384r1(Key: Slot G)
-        kv $sync rand: Get random bytes for KEM keypair
-        kv $sync kemg : New KEM keypair
-        kv $sync cfw-- : done
-    end
-end
-
-cfw $sync mb : Command Response\n kem_handle is set to G
-& mb $async fw++ : Command\nComplete
+cfw -> dfw: Command Response
 cfw--
 
 @enduml

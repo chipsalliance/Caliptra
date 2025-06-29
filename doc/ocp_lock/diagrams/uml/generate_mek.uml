@@ -1,0 +1,37 @@
+'
+' OCP Lock: GENERATE_MEK API sequence diagram showing Caliptra FW/HW interactions
+'
+'
+@startuml
+
+!include utils.inc
+
+note across
+    <b>Preconditions:</b>
+    * The HEK is present in a KV slot
+    * The following sequence has occurred prior: INITIALIZE_MEK_SECRET, then zero or more MIX_MPK
+end note
+
+' Pre-existing state
+$activate(hek)
+$activate(mpk_secret)
+
+$preconditioned_key_extract(HEK, hek, SEK, cfw, EPK, epk)
+
+$preconditioned_key_extract(EPK, epk, DPK, cfw, MEK secret seed, mek_secret_seed)
+
+$zeroize(epk)
+
+$preconditioned_key_extract(MPK secret, mpk_secret, MEK secret seed, mek_secret_seed, MEK secret, mek_secret)
+
+$zeroize(mek_secret_seed)
+$zeroize(mpk_secret)
+
+cfw -> drbg: Get random 512-bit MEK
+
+$preconditioned_aes_encrypt(mek_secret, encryption_key, MEK, cfw)
+
+cfw -> dfw: Command response\nand Locked MPK
+cfw--
+
+@enduml

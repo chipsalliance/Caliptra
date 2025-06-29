@@ -4,70 +4,33 @@
 '
 @startuml
 
-!include ocp_lock_utils.inc
+!include utils.inc
 
 note across
     <b>Preconditions:</b>
-        * HEK in a firmware-managed KV slot
-        * KEM Keypair in a firmware-managed KV slot
-
-    <b>Notes:</b>
-        * The sequence diagram assumes that the KV will not allow an input KV slot to also be used as an out KV slot. Caliptra FW is responsible for managing which KV slots are used and can adapt if this assumption is not correct.
-        * This sequence is focused on successful execution of operations by the KV.
+        * The HEK is present in a KV slot
 end note
 
 ' Pre-existing state
-hek++ $BUFFER_ACTIVATION
-kemg++ $BUFFER_ACTIVATION
+$activate(hek)
+$activate(hpke)
 
-fw $async mb++ : GENERATE_MPK
+dfw -> cfw++ : GENERATE_MPK
 
-mb $async cfw++ : Command
-mb--
+$preconditioned_key_extract(HEK, hek, SEK, cfw, EPK, epk)
 
-cfw $sync kv++: Decaps(KEM Pair : kem_handle (G),\n             KEM ciphertext : kem_ciphertext\n             Destination : Slot Y)
-kv $sync kemg: Get KEM Keypair
-kv $sync kv: Decap KEM Ciphertext with Keypair
-kv $sync tempy: Put Shared Secret
-tempy++ $BUFFER_ACTIVATION
-kv $sync cfw-- : done
+$hpke_unwrap(kv_ak, "")
 
-cfw $sync kv++: Key_Unwrap(Key : Slot Y,\n                   Data: encrypted_access_key\n                   Destination : Slot Z)
-kv $sync tempy: Get Shared Secret
-kv $sync kv: Key_Unwrap encrypted_access_key with Key
-kv $sync tempz: Put Access Key
-tempz++ $BUFFER_ACTIVATION
-kv $sync cfw-- : done
+$preconditioned_key_extract(Access key, kv_ak, EPK, epk, Locked MPK Encryption Secret, encryption_secret)
 
-alt mpk algorithm 256 bits
-    cfw $sync kv++: HMAC512_Slots(Key : Slot A,\n                         Data Key : Slot Z\n                         Destination :  Slot Y)
-    kv $sync hek: Get HEK
-    kv $sync tempz: Get Access Key
-    kv $sync kv: HMAC512 slot A and Slot Z
-    kv $sync tempy: Put HMAC512 result Encryption Key
-    kv $sync cfw-- : done
-end
+$zeroize(epk)
+$zeroize(kv_ak)
 
-cfw $sync kv++: new_key(len: mpk_alogorithm length,\n              Destination Slot: Z)
-    kv $sync rand: Get random limited\nto len of MPK algorithm
-    kv $sync tempz: Put new MPK
-    kv $sync cfw-- : done
+cfw -> drbg: Get random 256-bit MEK
 
-cfw $sync kv++: Wrap(Key: Slot Y,\n          Data Key : Slot Z\n          Destination : locked_mpk)
-kv $sync tempy: Get Encryption Key
-kv $sync tempz: Get new MPK
-kv $sync kv: Encrypt Data Key using Key
-kv $sync cfw-- : Locked MPK
+$preconditioned_aes_encrypt(encryption_secret, encryption_key, MPK, cfw)
 
-cfw $sync kv++: Purge_key(Key: Slot Y,\n                Key : Slot Z)
-kv $sync tempy !! : Purge
-& kv $sync tempz !!
-kv $sync cfw-- : done
-
-cfw $sync mb : Command response and\nLocked MPK
-& mb $async fw++ : Command\ncomplete
-
+cfw -> dfw: Command response\nand Locked MPK
 cfw--
-kv--
 
 @enduml
