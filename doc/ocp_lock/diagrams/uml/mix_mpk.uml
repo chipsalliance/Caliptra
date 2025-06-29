@@ -4,71 +4,27 @@
 '
 @startuml
 
-!include ocp_lock_utils.inc
+!include utils.inc
 
 note across
     <b>Preconditions:</b>
-    * Enabled MPK Encryption Key is stored in Key Vault slot B
-    * The following sequence has occurred prior: Initialize MEK then zero or more MIX_MPK
-
-    <b>Notes:</b>
-        * The sequence diagram assumes that the KV will not allow an input KV slot to also be used as an out KV slot. Caliptra FW is responsible for managing which KV slots are used and can adapt if this assumption is not correct.
-        * This sequence is focused on successful execution of operations by the KV.
-
+    * Enabled MPK Encryption Secret is initialized.
+    * The following sequence has occurred prior: INITIALIZE_MEK_SECRET, then zero or more MIX_MPK
 end note
 
 ' Pre-existing data
-meks++ $BUFFER_ACTIVATION
-mpks++ $BUFFER_ACTIVATION
+$activate(enabled_mpk_encryption_secret)
+$activate(mpk_secret)
 
+dfw -> cfw++ : MIX_MPK
 
-fw $async mb++ : MIX_MPK
+$preconditioned_aes_decrypt(enabled_mpk_encryption_secret, encryption_key, enabled MPK, mpk)
 
-mb $async cfw++ : Command
-mb--
+$preconditioned_key_extract(MPK secret, mpk_secret, MPK, mpk, MPK secret, mpk_secret)
 
-alt HEK exists
+$zeroize(mpk)
 
-    alt MEK is not initialized (i.e., no MPK has yet been included)
-        cfw $sync kv++: HMAC512(Key: Slot A,\n                Key Data: "MEK Secret Seed",\n                Destination: Slot X)
-        kv $sync hek: Get HEK
-        kv $sync kv: HMAC512 slot A with Data
-        kv $sync meks: HMAC512 result MEK Secret Seed with HEK
-        kv $sync cfw-- : done
-    end
-
-    $self("cfw", "Determine Temporary slox Y for MPK")
-
-    cfw $sync kv++: Key_Unwrap(Key:  SlotB,\n                   Key Data: enabled_mpk,\n                   Destination Slot: Y)
-    kv $sync mpks: Get Enabled MPK Encryption Key
-    kv $sync kv: Key_Unwrap enabled_mpk
-    kv $sync tempy: Put MPK
-    tempy++ $BUFFER_ACTIVATION
-    kv $sync cfw-- : done
-
-    cfw $sync kv++: HMAC512(Key : Slot X,\n                Data String : "MPK mix",\n                Destination : Slot Z)
-    kv $sync meks: Get MEK Secret Seed
-    kv $sync kv: HMAC512 Key with Data String
-    kv $sync tempz: HMAC512 result Temp MEK Secret Seed
-    tempz++ $BUFFER_ACTIVATION
-    kv $sync cfw-- : done
-
-    cfw $sync kv++: HMAC512_Slots(Key : Slot Z,\n                         Data Key  : Slot Y\n                         Destination : Slot: X)
-    kv $sync tempz: Get Temp MEK Secret Seed
-    kv $sync tempy: Get MPK
-    kv $sync kv: HMAC512 Key and Data Key
-    kv $sync meks: HMAC512 result MEK Secret Seed updated with MPK
-    kv $sync cfw-- : done
-
-    cfw $sync kv++: Purge_key(Key: Slot Y,\n                Key : Slot Z)
-    kv $sync tempy !! : Purge
-    & kv $sync tempz !!
-    kv $sync cfw-- : done
-end
-
-
-cfw $async mb : Command\nresponse
-& mb $async fw++ : Command\ncomplete
+cfw -> dfw : Command response
 cfw--
 
 @enduml

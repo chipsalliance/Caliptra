@@ -4,76 +4,80 @@
 '
 @startuml
 
-!include ocp_lock_utils.inc
+!include utils.inc
 
-fuses++ $BUFFER_ACTIVATION
+[->> crom++ : Power on
 
-[-[$ASYNC_COLOR]>> crom++ : Power on
+crom -> aes++: Deobfuscate UDS
+crom -> aes: Write UDS IV
+aes -> fuses: Read obfuscated UDS seed
+aes -> uds ** : Write AES-CBC-Decrypt(obfuscation key, IV, obfuscated seed)
+$activate(uds)
+aes -> crom: Done
+aes--
 
-== Load a KV slot with HEK  ==
+$kdf(crom, DICE UDS, uds, derivation constant, IDevID CDI, idev)
 
-crom $sync kv++: load_hek(Key: Slot A)
-loop through fuses entries until valid fuse entry found
-    kv $sync fuses : get next entry
+$kdf(crom, IDevID CDI, idev, derivation constant, Caliptra Stable Key, c_stable_key)
+
+== Deobfucate the HEK seed ==
+
+crom -> fuses: Read HEK mode from fuses
+
+alt if in pre-production mode
+    crom -> crom: HEK IV = PREPRODUCTION_HEK_IV
+    crom -> crom: obfuscated HEK seed = 0x0000...
+else if in perma-HEK mode
+    crom -> crom: HEK IV = PERMA_HEK_IV
+    crom -> crom: obfuscated HEK seed = 0x0000...
+else if randomized HEK seed is present in fuses
+    crom -> crom: HEK IV = PERMA_HEK_IV
+    crom -> fuses: Read obfuscated HEK seed from fuses
+else No HEK seed is available
+    crom -> crom: Note the absence of the HEK
 end
 
-alt if a valid entry
-    kv $sync hek : Put HEK
-    hek++ $BUFFER_ACTIVATION
-    kv $sync kv: hek_exists = True
-else No valid entry
-    kv $sync kv: hek_exists = False
-end
-kv $sync crom-- : hek_exists
-
-crom $sync crom : Retain hek_exists
-
-
-== Load a KV slot with KEM for each KEM algorithm supported  ==
-
-alt kem_algorithm ecdh_secp384r1 supported
-    crom $sync kv++: generate_ecdh_secp384r1(Key: Slot G)
-    kv $sync rand: Get random bytes for KEM keypair
-    note right
-        <font color=red>move to FW
-        <font color=red>add note to indiacte would be nice in HW
-    end note
-    kv $sync kemg : Put KEM keypair
-    kemg++ $BUFFER_ACTIVATION
-    kv $sync crom-- : done
+alt obfuscated HEK seed is available
+    crom -> aes++: Deobfuscate HEK seed
+    crom -> aes: Write HEK IV
+    crom -> aes: Write obfuscated HEK seed
+    aes -> hek_seed ** : Write AES-CBC-Decrypt(obfuscation key, IV, obfuscated seed)
+    $activate(hek_seed)
+    aes -> crom: Done
+    aes--
 end
 
-== Load a KV slot with DICE key for each KEM algorithm supported  ==
+crom -> cfw++ : FMC and runtime firmware boots
+crom--
 
-note right crom
+== Initialize the HEK if available ==
 
-ROM/FMC code already created DICE keys and loaded them. Caliptra FW knows the key so no work to do.
+alt deobfuscated HEK seed is available
+    $kdf(cfw, Caliptra stable key, c_stable_key, derivation constant, L.O.C.K. Stable Key, l_stable_key)
 
-end note
+    $preconditioned_key_extract(HEK seed, hek_seed, L.O.C.K. Stable Key, l_stable_key, HEK, hek)
 
-== Load a KV slot with an Enabled MPK Encryption Key  ==
+    cfw -> l_stable_key !! : Zeroize
+    cfw -> hek_seed !! : Zeroize
+    l_stable_key--
+    hek_seed--
+end
 
-crom $sync kv++: new_key(len: 256,\n              Destination: Slot B)
-kv $sync rand: Get new random key of 256 bits
-kv $sync mpks: Put Enabled MPK Encryption Key
-mpks++ $BUFFER_ACTIVATION
-kv $sync crom-- : done
+== Initialize an HPKE keypair for each algorithm supported ==
 
-$sometimelater()
+cfw -> drbg: Get a random 384-bit\n\
+ private key seed for\n\
+ DHKEM(P-384, HKDF-SHA384)
+cfw -> drbg: Get a random 384-bit\n\
+ private key seed for\n\
+ the ECDH portion of\n\
+ QSF-KEM(ML-KEM-1024, P-384)
+cfw -> drbg: Get a random 512-bit\n\
+ private key seed for\n\
+ the ML-KEM portion of\n\
+ QSF-KEM(ML-KEM-1024, P-384)
 
-crom $sync cfw++ : Hand-off information
-destroy crom
-note right cfw
-    Currently, there is already handoff information
-    from ROM to run-time FW. Need to include:
-    * If the HEK exists and if so the KV slot containing that HEK
-    * The KV Slot containing the KEM keypair
-
-end note
-
-cfw $sync cfw: Mark that no MEK sequence has started
-||5||
-cfw--
-
+cfw -> hpke **: Stash random seeds in memory
+$activate(hpke)
 
 @enduml

@@ -4,34 +4,35 @@
 '
 @startuml
 
-!include ocp_lock_utils.inc
+!include utils.inc
+
+note across
+    <b>Preconditions:</b>
+        * The HEK is present in a KV slot
+end note
 
 ' Pre-existing state
-hek++ $BUFFER_ACTIVATION
-kemg++ $BUFFER_ACTIVATION
+$activate(hek)
+$activate(hpke)
 
-fw $async mb++ : TEST_ACCESS_KEY
+dfw -> cfw++ : TEST_ACCESS_KEY
 
-mb $async cfw++ : Command
-mb--
+$preconditioned_key_extract(HEK, hek, SEK, cfw, EPK, epk)
 
-cfw $sync kv++: Decaps(KEM Pair : kem_handle (G),\n             KEM ciphertext : kem_ciphertext\n             Destination : Slot Y)
-kv $sync kemg: Get KEM Keypair
-kv $sync kv: Decap KEM Ciphertext with Keypair
-kv $sync tempy: Put Shared Secret
-tempy++ $BUFFER_ACTIVATION
-kv $sync cfw-- : done
+$hpke_unwrap(cfw, "")
 
-cfw $sync kv++: Key_Unwrap(Key : Slot Y,\n                   Data: encrypted_access_key\n                   Destination : Slot Z)
-kv $sync tempy: Get Shared Secret
-kv $sync kv: Key_Unwrap encrypted_access_key with Key
-kv $sync cfw-- : unwrapped access_key
-cfw $sync cfw : SHA384(Data: metadata,\n              Data: decrypted access key,\n              Data: nonce)
+$preconditioned_key_extract(Access key, cfw, EPK, epk, Locked MPK Encryption Secret, encryption_secret)
 
-cfw $sync mb : Command response\nproof of possession digest
-& mb $async fw++ : Command\ncomplete
+$zeroize(epk)
 
+$preconditioned_aes_decrypt(encryption_secret, encryption_key, locked MPK, mpk)
+
+$zeroize(mpk)
+
+cfw -> cfw: Compute SHA2-384(MPK metadata from AAD || access key || nonce)
+cfw -> cfw: Zeroize access key
+
+cfw -> dfw: Command response\nand computed digest
 cfw--
-kv--
 
 @enduml

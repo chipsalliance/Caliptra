@@ -1,5 +1,5 @@
 '
-' OCP Lock: LOAD_MEK API sequence diagram showing Caliptra FW/HW interactions
+' OCP Lock: DERIVE_MEK API sequence diagram showing Caliptra FW/HW interactions
 '
 '
 @startuml
@@ -16,7 +16,7 @@ end note
 $activate(hek)
 $activate(mpk_secret)
 
-dfw -> cfw++ : LOAD_MEK
+dfw -> cfw++ : DERIVE_MEK
 
 $preconditioned_key_extract(HEK, hek, SEK, cfw, EPK, epk)
 
@@ -29,7 +29,9 @@ $preconditioned_key_extract(MPK secret, mpk_secret, MEK secret seed, mek_secret_
 $zeroize(mek_secret_seed)
 $zeroize(mpk_secret)
 
-$preconditioned_aes_decrypt(mek_secret, encryption_key, encrypted MEK, mek)
+$kdf(cfw, MEK secret, mek_secret, derivation constant, MEK, mek)
+
+$zeroize(mek_secret)
 
 cfw -> sfr : Read Control Reg
 

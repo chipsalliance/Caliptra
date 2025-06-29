@@ -1344,6 +1344,8 @@ The DPK may be a value decrypted by a user-provided C_PIN in Opal.
 
 When generating an MEK, the MEK secret seed is initialized if no MPK has previously been mixed into the MEK secret seed.
 
+See @fig:generate-mek-uml for the sequence diagram.
+
 Command Code: 0x474D_454B ("GMEK")
 
 Table: GENERATE_MEK input arguments
@@ -1441,6 +1443,8 @@ When deriving an MEK, the MEK secret seed is initialized if no MPK has previousl
 
 The derived MEK, specified metadata, and aux_metadata are loaded into the encryption engine key cache. The metadata format is vendor-defined and specifies the information to the encryption engine on where within the key cache the MEK is loaded.
 
+See @fig:derive-mek-uml for the sequence diagram.
+
 Command Code: 0x444D_454B ("DMEK")
 
 Table: DERIVE_MEK input arguments
@@ -1523,6 +1527,8 @@ Table: UNLOAD_MEK output arguments
 #### ENUMERATE_KEM_HANDLES {#sec:enumerate-kem-handles}
 
 This command returns a list of all currently-active KEM handles for resources held by KMB.
+
+See @fig:enumerate-kem-handles-uml for the sequence diagram.
 
 Command Code: 0x4548_444C ("EHDL")
 
@@ -2089,6 +2095,8 @@ This section will be fleshed out with additional details as they become availabl
 
 # Sequence diagrams
 
+Note: for brevity, these sequence diagrams do not illustrate error paths.
+
 ## Sequence of events at boot
 
 ```plantuml {caption="UML: Power on" #fig:power-on-uml}
@@ -2105,6 +2113,12 @@ This section will be fleshed out with additional details as they become availabl
 
 ```plantuml {caption="UML: Get Supported Algorithms" #fig:get-supported-algorithms-uml}
 !include diagrams/uml/get_algorithms.uml
+```
+
+## Sequence to enumerate KEM handles
+
+```plantuml {caption="UML: Enumerating KEM handles" #fig:enumerate-kem-handles-uml}
+!include diagrams/uml/enumerate_kem_handles.uml
 ```
 
 ## Sequence to endorse an HPKE public key
@@ -2149,16 +2163,22 @@ This section will be fleshed out with additional details as they become availabl
 !include diagrams/uml/test_access_key.uml
 ```
 
+## Sequence to generate an MEK
+
+```plantuml {caption="UML: Generating an MEK" #fig:generate-mek-uml}
+!include diagrams/uml/generate_mek.uml
+```
+
 ## Sequence to load an MEK
 
 ```plantuml {caption="UML: Loading an MEK" #fig:load-mek-uml}
 !include diagrams/uml/load_mek.uml
 ```
 
-## Sequence to load MEK into the encryption engine key cache
+## Sequence to derive an MEK
 
-```plantuml {caption="UML: Loading an MEK into the encryption engine key cache" #fig:load-mek-into-ee-uml}
-!include diagrams/uml/load_mek_into_ee.uml
+```plantuml {caption="UML: Deriving an MEK" #fig:derive-mek-uml}
+!include diagrams/uml/derive_mek.uml
 ```
 
 ## Sequence to unload an MEK from the encryption engine key cache

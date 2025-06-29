@@ -4,57 +4,19 @@
 '
 @startuml
 
-!include ocp_lock_utils.inc
-
-note across
-    <b>Preconditions:</b>
-        * DICE Alias Key is available in a KV slot and FW manages the slot #
-        The DICE Alias Key in already defined by Caliptra and is not the DPE Key
-        * HPKE Keypair available in a KV slot and FW manages the slot #
-
-    <b>Notes:</b>
-        * The sequence diagram assumes that the KV will not allow an input KV slot to also be used as an out KV slot. Caliptra FW is responsible for managing which KV slots are used and can adapt if this assumption is not correct.
-        * This sequence is focused on successful execution of operations by the KV. Sill need to do:
-
-        <font color=red> Need to add more algorithms
-end note
+!include utils.inc
 
 ' Pre-existing state
-dice++ $BUFFER_ACTIVATION
-kemg++ $BUFFER_ACTIVATION
+$activate(dice)
+$activate(hpke)
 
+dfw -> cfw++ : ENDORSE_ENCAPSULATION_PUB_KEY
 
-fw $async mb++ : ENDORSE_ENCAPSULATION_PUB_KEY
+cfw -> cfw: Build the certificate TBS
+cfw -> hpke: Read the HPKE public key
+cfw -> dice: Generate the signature with the DICE key
 
-mb $async cfw++ : Command
-mb--
-
-alt kem_handle (G) has a Key Pair in KV slot G
-
-    alt Slot X algorithm type
-
-        cfw $sync kv++: Get_Pub_ecdh_secp384r1(Key: Slot G)
-        kv $sync kemg: Get Public Key
-        kv $sync cfw-- : pub_key
-        cfw $sync mb : pub_key
-    end
-
-    alt endorsement algorithm Byte 0 bit 0 set
-
-        cfw $sync cfw: Build the certificate TBS
-
-        cfw $sync kv++: ecdsa_secp384r1_sha384(Key: Slot F,\n                                       Data : certificate TBS\n                                       Output: signature)
-        kv $sync dice : Get DICE Alias Key
-        kv $sync kv: generate signature
-        kv $sync cfw-- : signature
-        cfw $sync cfw: Append signature to certificate To Be Signed (TBS)
-        cfw $sync mb : signed endorsement
-    end
-end
-
-
-cfw $sync mb : Command response
-& mb $async fw++ : Command\ncomplete
+cfw -> dfw : Command response\nand Endorsement
 cfw--
 
 @enduml

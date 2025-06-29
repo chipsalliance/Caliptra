@@ -4,25 +4,13 @@
 '
 @startuml
 
-!include ocp_lock_utils.inc
+!include utils.inc
 
-note across
-    <b>Preconditions:</b>
-        * Caliptra FW manages which keys are in which slots in KV
-end note
+dfw -> cfw++ : ENUMERATE_KEM_HANDLES
 
-fw $async mb++ : ENUMERATE_KEM_HANDLES
+cfw -> cfw: Create list of valid KEM handles,\none per KEM algorithm supported
 
-mb $async cfw++ : Message
-mb--
-
-cfw $sync cfw: Create list of valid KEM handles
-note right cfw
-    One handle for each KEM algorithm supported
-end note
-
-cfw $sync mb : Command response\nkem_handles
-& mb $async fw++ : Command\ncomplete
+cfw -> dfw : Command response\nkem_handles
 cfw--
 
 @enduml
