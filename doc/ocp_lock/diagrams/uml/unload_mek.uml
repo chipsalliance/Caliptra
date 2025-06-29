@@ -4,56 +4,48 @@
 '
 @startuml
 
-!include ocp_lock_utils.inc
+!include utils.inc
 
-note across
-    <b>Preconditions:</b>
-    * None - a MEK may or may not have been loaded.
-end note
+dfw -> cfw++ : UNLOAD_MEK
 
-
-fw $async mb++ : UNLOAD_MEK
-
-mb $async cfw++ : Command
-mb--
-
-cfw $sync sfr : Read Control Reg
+cfw -> sfr : Read Control Reg
 
 alt (DN == 1b || ERR == 1b || EXE == 1b)
-    cfw $sync sfr : Write Control Reg (DN = 1b)
+    cfw -> sfr : Write Control Reg (DN = 1b)
 
-    cfw $sync cfw : Start timeout
-    cfw $sync sfr : Read Control Reg
+    cfw -> cfw : Start timeout
+    cfw -> sfr : Read Control Reg
     group loop until (rdy_timeout or (DN == 0b && ERR == 0b && EXE == 0b)
-
-        cfw $sync sfr : Read Control Reg
+        cfw -> sfr : Read Control Reg
     end
 end
 
 sfr--
-cfw $sync sfr : Write Metadata
+cfw -> sfr : Write Metadata
 
-cfw $sync sfr : Write Control Reg (CMD = Unload_MEK, DN = 0, EXE = 1)
-& sfr $async ee++
+cfw -> sfr : Write Control Reg (CMD = Unload_MEK, DN = 0, EXE = 1)
+& sfr -> ee++
 
-cfw $sync cfw : Start timeout
+cfw -> cfw : Start timeout
 
-cfw $sync sfr : Read Control Reg
+cfw -> sfr : Read Control Reg
 
-ee $sync sfr : Read Metadata
-ee $sync kc : Unload Key
+ee -> sfr : Read Metadata
+ee -> kc : Unload Key
 
 group loop until (cmd_timeout or DN = 1b)
-    ee $async sfr-- : Write Control Reg\n(DN = 1b,\n ERR = 0b,\n EXE = 0b)
-    cfw $sync sfr : Read Control Reg
+    ee -> sfr-- : Write Control Reg\n(DN = 1b,\n ERR = 0b,\n EXE = 0b)
+    cfw -> sfr : Read Control Reg
 end
 sfr--
 
-cfw $sync sfr : Write Control Reg (DN = 1b)
+cfw -> sfr : Write Control Reg (DN = 1b)
 note right: Reset the SFR interface for next operation - not waiting for response
 
-cfw $sync mb : Command\nresponse\n(Status = Control Reg\n               Error field)
-& mb $async fw++ : Command\ncomplete
+cfw -> dfw : Command\n\
+  response\n\
+  (Status = Control Reg\n\
+                Error field)
 cfw--
 
 @enduml

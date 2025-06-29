@@ -4,16 +4,13 @@
 '
 @startuml
 
-!include ocp_lock_utils.inc
+!include utils.inc
 
-fw $async mb++ : GET_ALGORITHMS
+dfw -> cfw++ : GET_ALGORITHMS
 
-mb $async cfw++ : Command
-mb--
+cfw -> cfw: Fill the set of algorithms supported
 
-$self("cfw", "Fill the set of algorithms supported ")
 note over cfw
-
     The Algorithms to support
 
     From the HPKE base spec:
@@ -22,15 +19,13 @@ note over cfw
     * aead_id = 0x0002: AES-256-GCM
     * kdf_id = 0x0002: HKDF-SHA384
 
-    For post-quantum crypto, from [Hybrid PQ/T Key Encapsulation Mechanisms](https://datatracker.ietf.org/doc/draft-irtf-cfrg-hybrid-kems/):
+    For post-quantum crypto, from [[https://datatracker.ietf.org/doc/draft-irtf-cfrg-hybrid-kems/ Hybrid PQ/T Key Encapsulation Mechanisms]]:
 
     * kem_id = 0x0a25: ML-KEM-1024 + P-384
     * aead_id and kdf_id will be the same as from the base spec.
-
 end note
 
-cfw $sync mb : Command\nResponse\nSet of algorithms supported
-& mb $async fw++ : Command\nComplete
+cfw -> dfw : Command\nResponse\nSet of algorithms supported
 cfw--
 
 @enduml

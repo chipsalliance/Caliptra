@@ -4,63 +4,48 @@
 '
 @startuml
 
-!include ocp_lock_utils.inc
+!include utils.inc
 
 note across
     <b>Preconditions:</b>
-    * Keys may or may not be loaded in the key cache of the encryption engine
-
-    <b>Notes:</b>
-    * This sequence diagram is not showing any error reporting due to timeouts or errors reported by the encryption engine
+    * Encryption engine has become ready
 end note
 
-' Pre-existing state
-
-
 ' API call
-fw $async mb++ : CLEAR_KEY_CACHE
+dfw -> cfw++ : CLEAR_KEY_CACHE
 
-mb $async cfw++ : Command
-mb--
+cfw -> sfr : Read Control Reg
 
-alt Encryption engine has become ready
+alt (DN == 1b || ERR == 1b || EXE == 1b)
+    cfw -> sfr : Write Control Reg (DN = 1b)
 
-    cfw $sync sfr : Read Control Reg
+    cfw -> cfw : Start timeout
+    cfw -> sfr : Read Control Reg
+    group loop until (rdy_timeout or (DN == 0b && ERR == 0b && EXE == 0b)
 
-    alt (DN == 1b || ERR == 1b || EXE == 1b)
-        cfw $sync sfr : Write Control Reg (DN = 1b)
-
-        cfw $sync cfw : Start timeout
-        cfw $sync sfr : Read Control Reg
-        group loop until (rdy_timeout or (DN == 0b && ERR == 0b && EXE == 0b)
-
-            cfw $sync sfr : Read Control Reg
-        end
+        cfw -> sfr : Read Control Reg
     end
-
-    cfw $sync sfr : Write Control Reg (CMD = Sanitize, DN = 0b, EXE = 1b)
-    & sfr $async ee++
-
-    ee $sync kc : Purge
-
-    cfw $sync cfw : Start timeout
-
-    cfw $sync sfr : Read Control Reg
-    group loop until (cmd_timeout or DN == 1b)
-
-        cfw $sync sfr : Read Control Reg
-
-        ee $sync sfr-- : Write Control Reg\n(Done = 1b,\n Error = 0,\n EXE = 0)
-    end
-    sfr--
-
-    cfw $sync sfr : Write Control Reg (DN = 1b)
-    note left sfr : Reset the SFR interface for next operation - not waiting for response
-
 end
 
-cfw $sync mb : Command\nResponse
-& mb $async fw++ : Command\nComplete
+cfw -> sfr : Write Control Reg (CMD = Sanitize, DN = 0b, EXE = 1b)
+& sfr -> ee++
+
+ee -> kc : Purge
+
+cfw -> cfw : Start timeout
+
+cfw -> sfr : Read Control Reg
+group loop until (cmd_timeout or DN == 1b)
+
+    cfw -> sfr : Read Control Reg
+
+    ee -> sfr : Write Control Reg\n(Done = 1b,\n Error = 0,\n EXE = 0)
+end
+
+cfw -> sfr : Write Control Reg (DN = 1b)
+note left sfr : Reset the SFR interface for next operation - not waiting for response
+
+cfw -> dfw : Command\nResponse
 cfw--
 
 @enduml

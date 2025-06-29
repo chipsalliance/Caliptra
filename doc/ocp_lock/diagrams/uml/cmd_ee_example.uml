@@ -4,7 +4,7 @@
 '
 @startuml
 
-!include ocp_lock_utils.inc
+!include utils.inc
 
 ee++
 
@@ -13,36 +13,34 @@ note over ee
 end note
 
 cfw++
-cfw $sync sfr : write <b>METD</b>, <b>AUX</b>, <b>MEK</b>
-cfw $sync sfr : write <b>CMD</b> = 1, <b>EXE</b>=1
+cfw -> sfr : write <b>METD</b>, <b>AUX</b>, <b>MEK</b>
+cfw -> sfr : write <b>CMD</b> = 1, <b>EXE</b>=1
 
-ee $sync sfr : read <b>METD</b>, <b>AUX</b> <b>MEK</b>
+ee -> sfr : read <b>METD</b>, <b>AUX</b> <b>MEK</b>
 
 note over cfw
     Wait for encryption engine to write <b>DN</b> = 1
 end note
 
-&ee $async kc++ : <b>METD</b>, <b>AUX</b>, <b>MEK</b>
-kc $sync kc : Store <b>METD</b>, <b>AUX</b>, <b>MEK</b>
-kc $async ee-- : No error
-ee $async sfr : write <b>ERR</b> = 0, <b>DN</b>=1
+&ee -> kc++ : <b>METD</b>, <b>AUX</b>, <b>MEK</b>
+kc -> kc : Store <b>METD</b>, <b>AUX</b>, <b>MEK</b>
+kc -> ee-- : No error
+ee -> sfr : write <b>ERR</b> = 0, <b>DN</b>=1
 
 note over ee
     Wait for Caliptra to write <b>DN</b> = 1
 end note
 
-&cfw $async sfr : read <b>ERR</b>
+&cfw -> sfr : read <b>ERR</b>
 
-cfw $async sfr : write <b>DN</b> = 1
+cfw -> sfr : write <b>DN</b> = 1
 ||5||
 
 note over cfw
     Wait for encryption engine to write <b>DN</b> = 0
 end note
 
-'cfw $sync cfw : Wait for <b>DN</b> = 0
-
-ee $async sfr : write <b>CMD</b> = 0, <b>ERR</b> = 0,\n        <b>DN</b> = 0, <b>EXE</b> = 0
+ee -> sfr : write <b>CMD</b> = 0, <b>ERR</b> = 0,\n        <b>DN</b> = 0, <b>EXE</b> = 0
 cfw--
 
 @enduml
