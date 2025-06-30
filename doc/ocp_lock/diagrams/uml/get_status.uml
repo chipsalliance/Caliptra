@@ -4,17 +4,13 @@
 '
 @startuml
 
-!include ocp_lock_utils.inc
+!include utils.inc
 
-fw $async mb++ : GET_STATUS
+dfw -> cfw++ : GET_STATUS
 
-mb $async cfw++ : Command
-mb--
+cfw -> sfr : Read Control Reg to access\nEncryption engine Ready
 
-cfw $sync sfr : Read Control Reg to access\nEncryption engine Ready
-
-cfw $sync mb : Command\nResponse\nengine_ready
-& mb $async fw++ : Command\nComplete
+cfw -> dfw : Command\nResponse\nengine_ready
 cfw--
 
 @enduml
