@@ -381,18 +381,34 @@ Upon receipt, KMB will unwrap the access key and proceed to generate or enable t
 
 Upon drive reset, the HPKE keypairs are regenerated, and any access keys for MPKs that had been enabled prior to the reset will need to be re-provisioned in order to transition those MPKs to an enabled state again.
 
-##### Algorithm support
+##### HPKE algorithm support
 
-KMB supports the following HPKE algorithms:
+An HPKE variant relies on three types of algorithms: KEM, KDF, and AEAD. KMB supports the following algorithms for use in HPKE:
 
-- P-384 ECDH, defined in RFC 9180 [@{ietf-rfc9180}] and illustrated in @fig:hpke-kem-ecdh.
-- Hybridized ML-KEM-1024 with P-384 ECDH, defined in Hybrid PQ/T Key Encapsulation Mechanisms [@{draft-irtf-cfrg-hybrid-kems}] and illustrated in @fig:hpke-kem-hybrid.
++----------------+--------------------------+-----------------+-------------------------------------------+
+| Algorithm type | Algorithm                | IANA code point | Reference document                        |
++================+==========================+=================+===========================================+
+| KEM            | P-384 ECDH               | 0x0011          | RFC 9180 [@{ietf-rfc9180}]                |
+|                +--------------------------+-----------------+-------------------------------------------+
+|                | ML-KEM-1024              | 0x0042          | Post-Quantum and Post-Quantum/Traditional |
+|                |                          |                 | Hybrid Algorithms for HPKE                |
+|                |                          |                 | [@{draft-ietf-hpke-pq}]                   |
+|                +--------------------------+-----------------+-------------------------------------------+
+|                | ML-KEM-1024 + P-384 ECDH | 0x0a25          | Hybrid PQ/T Key Encapsulation Mechanisms  |
+|                |                          |                 | [@{draft-irtf-cfrg-hybrid-kems}]          |
++----------------+--------------------------+-----------------+-------------------------------------------+
+| KDF            | HKDF-SHA384              | 0x0002          | RFC 9180 [@{ietf-rfc9180}]                |
++----------------+--------------------------+-----------------+-------------------------------------------+
+| AEAD           | AES-256-GCM              | 0x0002          | RFC 9180 [@{ietf-rfc9180}]                |
++----------------+--------------------------+-----------------+-------------------------------------------+
 
-![HPKE unwrap for access keys with ECDH](./diagrams/hpke_kem_ecdh.drawio.svg){#fig:hpke-kem-ecdh}
+Figures [-@fig:hpke-kem-ecdh], [-@fig:hpke-kem-mlkem], and [-@fig:hpke-kem-hybrid] illustrate each KEM algorithm. The details of how the AES-GCM key and IV are derived are illustrated in @fig:hpke-key-derivation.
 
-![HPKE unwrap for access keys with hybrid ML-KEM + ECDH](./diagrams/hpke_kem_hybrid.drawio.svg){#fig:hpke-kem-hybrid}
+![HPKE unwrap for access keys with P-384 ECDH](./diagrams/hpke_kem_ecdh.drawio.svg){#fig:hpke-kem-ecdh}
 
-The details of how the AES-GCM key and IV are derived are illustrated in @fig:hpke-key-derivation.
+![HPKE unwrap for access keys with ML-KEM-1024](./diagrams/hpke_kem_mlkem.drawio.svg){#fig:hpke-kem-mlkem}
+
+![HPKE unwrap for access keys with hybrid ML-KEM-1024 + P-384 ECDH](./diagrams/hpke_kem_hybrid.drawio.svg){#fig:hpke-kem-hybrid}
 
 ![HPKE AES-GCM key and IV derivation](./diagrams/hpke_key_derivation.drawio.svg){#fig:hpke-key-derivation}
 
@@ -983,7 +999,9 @@ Table: GET_ALGORITHMS output arguments {#tbl:get-algorithms-output-args}
 |                        |        |                                                   |
 |                        |        | - Byte 0 bit 0: 0x0011, 0x0002, 0x0002            |
 |                        |        | [@{ietf-rfc9180}]                                 |
-|                        |        | - Byte 0 bit 1: 0x0a25, 0x0002, 0x0002            |
+|                        |        | - Byte 0 bit 1: 0x0042, 0x0002, 0x0002            |
+|                        |        | [@{draft-ietf-hpke-pq}]                           |
+|                        |        | - Byte 0 bit 2: 0x0a25, 0x0002, 0x0002            |
 |                        |        | [@{draft-irtf-cfrg-hybrid-kems}]                  |
 +------------------------+--------+---------------------------------------------------+
 | access_key_sizes       | u32    | Indicates the length of plaintext access keys:    |
