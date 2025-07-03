@@ -12,27 +12,32 @@ note across
 end note
 
 ' Pre-existing state
-$activate(hek)
+$activate_kv(hek)
 $activate(hpke)
 
 dfw -> cfw++ : REWRAP_MPK
 
-$preconditioned_key_extract(HEK, hek, SEK, cfw, EPK, epk)
+cfw -> sek **: Populate SEK from mailbox command
+$activate(sek)
 
-$hpke_unwrap(kv_ak, kv_ak2)
+$preconditioned_key_extract(HEK, hek, SEK, sek, EPK, epk)
 
-$preconditioned_key_extract(Current access key, kv_ak, EPK, epk, current-access-key Locked MPK Encryption Secret, encryption_secret)
+$zeroize(sek)
 
-$zeroize(kv_ak)
+$hpke_unwrap(c_ak, n_ak)
 
-$preconditioned_key_extract(New access key, kv_ak2, EPK, epk, new-access-key Locked MPK Encryption Secret, encryption_secret2)
+$preconditioned_key_extract(Current access key, c_ak, EPK, epk, current-access-key Locked MPK Encryption Secret, c_encryption_secret)
+
+$zeroize(c_ak)
+
+$preconditioned_key_extract(New access key, n_ak, EPK, epk, new-access-key Locked MPK Encryption Secret, n_encryption_secret)
 
 $zeroize(epk)
-$zeroize(kv_ak2)
+$zeroize(n_ak)
 
-$preconditioned_aes_decrypt(encryption_secret, encryption_key, MPK bound to current access key, mpk)
+$preconditioned_aes_decrypt(c_encryption_secret, c_encryption_key, MPK bound to current access key, mpk)
 
-$preconditioned_aes_encrypt(encryption_secret2, encryption_key2, MPK bound to new access key, mpk)
+$preconditioned_aes_encrypt(n_encryption_secret, n_encryption_key, MPK bound to new access key, mpk)
 
 cfw -> dfw: Command response\nand Rewrapped MPK
 cfw--

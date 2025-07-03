@@ -12,16 +12,21 @@ note across
 end note
 
 ' Pre-existing state
-$activate(hek)
+$activate_kv(hek)
 $activate(hpke)
 
 dfw -> cfw++ : TEST_ACCESS_KEY
 
-$preconditioned_key_extract(HEK, hek, SEK, cfw, EPK, epk)
+cfw -> sek **: Populate SEK from mailbox command
+$activate(sek)
 
-$hpke_unwrap(cfw, "")
+$preconditioned_key_extract(HEK, hek, SEK, sek, EPK, epk)
 
-$preconditioned_key_extract(Access key, cfw, EPK, epk, Locked MPK Encryption Secret, encryption_secret)
+$zeroize(sek)
+
+$hpke_unwrap(ak, "")
+
+$preconditioned_key_extract(Access key, ak, EPK, epk, Locked MPK Encryption Secret, encryption_secret)
 
 $zeroize(epk)
 
