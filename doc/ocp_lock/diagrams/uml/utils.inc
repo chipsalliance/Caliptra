@@ -9,6 +9,10 @@
         $who++ #lightblue
     !endprocedure
 
+    !unquoted procedure $activate_kv($who)
+        $who++ #lightgreen
+    !endprocedure
+
     !unquoted procedure $zeroize($who)
         cfw -> $who !! : Zeroize
         $who--
@@ -17,15 +21,15 @@
     !unquoted procedure $kdf($who, $key_name, $key_from, $label, $output_name, $output_to)
         $who -> hmac++: Derive $output_name
         $who -> hmac: Write $label as KDF label/context
+        hmac -> $key_from: Read $key_name
 
-        !if ($key_from != "cfw")
-            hmac -> $key_from: Read $key_name
+        !if ($output_to == "dkey")
+            ' Don't create dkey, it is used across multiple operations.
+            hmac -> $output_to: Write HMAC($key_name, [KDF label & context])
         !else
-            cfw -> hmac: Write $key_name
+            hmac -> $output_to ** : Write HMAC($key_name, [KDF label & context])
         !endif
-
-        hmac -> $output_to ** : Write HMAC($key_name, [KDF label & context])
-        $activate($output_to)
+        $activate_kv($output_to)
         hmac -> $who: Done
         hmac--
     !endprocedure
@@ -40,12 +44,8 @@
             !endif
             cfw -> aes++: Decrypt access key
             cfw -> aes: Write ciphertext, decryption key, and IV
-            !if ($ak_dest != "cfw")
-                aes -> $ak_dest **: Decrypt access key
-                $activate($ak_dest)
-            !else
-                aes -> cfw: Decrypt access key
-            !endif
+            aes -> $ak_dest **: Decrypt access key
+            $activate($ak_dest)
             aes -> cfw: Done
             aes--
 
@@ -63,41 +63,22 @@
     !unquoted procedure $preconditioned_key_extract($salt_name, $salt_from, $key_name, $key_from, $output_name, $output_to)
         group Preconditioned Key Extract
             cfw -> aes++: Compute salt checksum
-            !if ($salt_from != "cfw")
-                aes -> $salt_from: Read $salt_name
-            !else
-                cfw -> aes: Write $salt_name as salt
-            !endif
-
+            aes -> $salt_from: Read $salt_name
             aes -> cfw: Write AES-ECB-Encrypt($salt_name, 0x0000...)
             aes -> cfw: Done
             aes--
 
-            !if ($output_to != "mpk_secret")
-                $kdf(cfw, $key_name, $key_from, salt checksum, preconditioned key, $output_to)
-            !else
-                ' Special-case for MPK secret, which already exists.
-                $kdf(cfw, $key_name, $key_from, salt checksum, preconditioned key, pkey)
-            !endif
+            $kdf(cfw, $key_name, $key_from, salt checksum, preconditioned key, dkey)
 
             cfw -> hmac++: Derive $output_name
-            !if ($salt_from != "cfw")
-                hmac -> $salt_from: Read $salt_name
-            !else
-                cfw -> hmac: Write $salt_name as salt
-            !endif
-            !if ($output_to != "mpk_secret")
-                hmac -> $output_to: Read preconditioned key
-            !else
-                hmac -> pkey: Read preconditioned key
-            !endif
-            hmac -> $output_to: Write HMAC($salt_name, preconditioned key)
+            hmac -> $salt_from: Read $salt_name
+            hmac -> dkey: Read preconditioned key
+            hmac -> $output_to **: Write HMAC($salt_name, preconditioned key)
+            $activate_kv($output_to)
             hmac -> cfw: Done
             hmac--
 
-            !if ($output_to == "mpk_secret")
-                $zeroize(pkey)
-            !endif
+            $zeroize(dkey)
         end
 
     !endprocedure
@@ -147,12 +128,67 @@
             cfw -> aes: Write $ciphertext_name, AAD, and IV
             aes -> $key: Read encryption key
             aes -> $ciphertext_to **: Write AES-GCM-Decrypt(encryption key, IV, AAD, ciphertext)
-            $activate($ciphertext_to)
+
+            ' MEKs are the only secrets that are decrypted into KV
+            !if ($ciphertext_to == "mek")
+                $activate_kv($ciphertext_to)
+            !else
+                $activate($ciphertext_to)
+            !endif
+
             aes -> cfw: Done
             aes--
 
             $zeroize($key)
         end
+    !endprocedure
+
+    !unquoted procedure $program_mek()
+        cfw -> sfr : Read Control Reg
+
+        alt (DN == 1b || ERR == 1b || EXE == 1b)
+            cfw -> sfr : Write Control Reg (DN = 1b)
+
+            cfw -> cfw : Start timeout
+            cfw -> sfr : Read Control Reg
+            group loop until (rdy_timeout or (DN == 0b && ERR == 0b && EXE == 0b))
+                cfw -> sfr : Read Control Reg
+            end
+        end
+
+        group in any order
+            cfw -> dma++ : MEK Write
+            dma -> mek : Read MEK
+            dma -> sfr : Write MEK
+            note left sfr
+                If the MEK is larger than the encryption engine requires,
+                then the encryption engine truncates the MEK
+            end note
+            dma -> cfw-- : complete
+
+            cfw -> sfr : Write Aux
+            cfw -> sfr : Write Metadata
+        end
+
+        cfw -> sfr : Write Control Reg (CMD = Load_MEK, DN = 0, EXE = 1)
+        cfw -> cfw : Start timeout
+
+        group in any oder
+            ee -> sfr : Read MEK
+            ee -> sfr : Read AUX
+            ee -> sfr : Read Metadata
+        end
+
+        ee -> kc : Store MEK
+
+        group loop until (cmd_timeout or DN = 1b)
+            ee -> sfr-- : Write Control Reg\n(DN = 1b,\n ERR = 0b,\n EXE = 0b)
+            cfw -> sfr : Read Control Reg
+        end
+        sfr--
+
+        cfw -> sfr : Write Control Reg (DN = 1b)
+        note left sfr: Reset the SFR interface for next operation - not waiting for response
     !endprocedure
 
     autonumber 1 1  "<b>[000]"
@@ -172,24 +208,30 @@
         participant "DICE UDS\n(Key Vault)" as uds
         participant "DICE IDevID CDI\n(Key Vault)" as idev
         participant "DICE Runtime Alias Key\n(Key Vault)" as dice
-        participant "HPKE keypair" as hpke
+        participant "HPKE keypair\n(in memory)" as hpke
         participant "Caliptra\nStable Key\n(Key Vault)" as c_stable_key
-        participant "L.O.C.K.\nStable Key\n(Key Vault)" as l_stable_key
         participant "HEK Seed\n(Key Vault)" as hek_seed
-        participant "Enabled MPK Encryption Secret\n(Key Vault)" as enabled_mpk_encryption_secret
+        participant "L.O.C.K.\nStable Key\n(Key Vault)" as l_stable_key
         participant "HEK\n(Key Vault)" as hek
+        participant "Firmware DICE CDI\n(Key Vault)" as fw_cdi
+        participant "Derived key\n(Key Vault)" as dkey
+        participant "Enabled MPK Encryption Secret\n(Key Vault)" as enabled_mpk_encryption_secret
         participant "MPK Secret\n(Key Vault)" as mpk_secret
+        participant "SEK\n(in memory)" as sek
+        participant "DPK\n(in memory)" as dpk
         participant "EPK\n(Key Vault)" as epk
         participant "MEK Secret Seed\n(Key Vault)" as mek_secret_seed
         participant "MEK Secret\n(Key Vault)" as mek_secret
-        participant "Access key\n(Key Vault)" as kv_ak
-        participant "New access key\n(Key Vault)" as kv_ak2
+        participant "Access key\n(in memory)" as ak
+        participant "Current Access key\n(in memory)" as c_ak
+        participant "New access key\n(in memory)" as n_ak
         participant "Encryption Secret\n(Key Vault)" as encryption_secret
-        participant "New Encryption Secret\n(Key Vault)" as encryption_secret2
+        participant "Current Encryption Secret\n(Key Vault)" as c_encryption_secret
+        participant "New Encryption Secret\n(Key Vault)" as n_encryption_secret
         participant "Encryption Key\n(Key Vault)" as encryption_key
-        participant "MPK\n(Key Vault)" as mpk
-        participant "Preconditioned key\n(Key Vault)" as pkey
-        participant "New Encryption Key\n(Key Vault)" as encryption_key2
+        participant "Current Encryption Key\n(Key Vault)" as c_encryption_key
+        participant "MPK\n(in memory)" as mpk
+        participant "New Encryption Key\n(Key Vault)" as n_encryption_key
         participant "Enabled MPK Encryption Key\n(Key Vault)" as enabled_mpk_encryption_key
         participant "MEK\n(Key Vault)" as mek
     end box

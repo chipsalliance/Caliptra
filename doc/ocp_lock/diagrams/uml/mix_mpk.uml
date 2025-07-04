@@ -13,8 +13,8 @@ note across
 end note
 
 ' Pre-existing data
-$activate(enabled_mpk_encryption_secret)
-$activate(mpk_secret)
+$activate_kv(enabled_mpk_encryption_secret)
+$activate_kv(mpk_secret)
 
 dfw -> cfw++ : MIX_MPK
 

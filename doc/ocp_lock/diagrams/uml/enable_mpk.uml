@@ -11,29 +11,41 @@ note across
 end note
 
 ' Pre-existing state
-$activate(hek)
+$activate_kv(hek)
 $activate(hpke)
+$activate_kv(fw_cdi)
 
 dfw -> cfw++ : ENABLE_MPK
 
-alt Enabled MPK encryption secret not initialized
-    cfw -> drbg: Get random 256-bit Enabled MPK encryption seed
+alt Enabled MPK Encryption Secret not yet initialized
+    cfw -> drbg: Get random 256-bit seed
+
+    $kdf(cfw, "Firmware DICE CDI", fw_cdi, derivation constant, derivation key, dkey)
+
     cfw -> hmac++: Derive Enabled MPK Encryption Secret
-    cfw -> hmac: Write Enabled MPK encryption seed
-    hmac -> enabled_mpk_encryption_secret: Write HMAC(0x0000..., Enabled MPK encryption seed)
-    $activate(enabled_mpk_encryption_secret)
+    cfw -> hmac: Write random seed
+    hmac -> dkey: Read derivation key
+    hmac -> enabled_mpk_encryption_secret ** : Write HMAC(derivation key, random seed)
+    $activate_kv(enabled_mpk_encryption_secret)
     hmac -> cfw: Done
     hmac--
+
+    $zeroize(dkey)
 end
 
-$preconditioned_key_extract(HEK, hek, SEK, cfw, EPK, epk)
+cfw -> sek **: Populate SEK from mailbox command
+$activate(sek)
 
-$hpke_unwrap(kv_ak, "")
+$preconditioned_key_extract(HEK, hek, SEK, sek, EPK, epk)
 
-$preconditioned_key_extract(Access key, kv_ak, EPK, epk, Locked MPK Encryption Secret, encryption_secret)
+$zeroize(sek)
+
+$hpke_unwrap(ak, "")
+
+$preconditioned_key_extract(Access key, ak, EPK, epk, Locked MPK Encryption Secret, encryption_secret)
 
 $zeroize(epk)
-$zeroize(kv_ak)
+$zeroize(ak)
 
 $preconditioned_aes_decrypt(encryption_secret, encryption_key, locked MPK, mpk)
 

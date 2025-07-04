@@ -12,7 +12,7 @@ crom -> aes++: Deobfuscate UDS
 crom -> aes: Write UDS IV
 aes -> fuses: Read obfuscated UDS seed
 aes -> uds ** : Write AES-CBC-Decrypt(obfuscation key, IV, obfuscated seed)
-$activate(uds)
+$activate_kv(uds)
 aes -> crom: Done
 aes--
 
@@ -42,7 +42,7 @@ alt obfuscated HEK seed is available
     crom -> aes: Write HEK IV
     crom -> aes: Write obfuscated HEK seed
     aes -> hek_seed ** : Write AES-CBC-Decrypt(obfuscation key, IV, obfuscated seed)
-    $activate(hek_seed)
+    $activate_kv(hek_seed)
     aes -> crom: Done
     aes--
 end
