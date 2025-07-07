@@ -184,7 +184,7 @@ OCP L.O.C.K. is a feature set conditionally compiled into Caliptra Subsystem 2.1
 
 ### Integration verification
 
-A product which integrates OCP L.O.C.K. will be expected to undergo an OCP S.A.F.E. review, to ensure that L.O.C.K. is correctly integrated and that drive firmware correctly invokes L.O.C.K. services.
+A product that integrates OCP L.O.C.K. will be expected to undergo an OCP S.A.F.E. review to ensure that L.O.C.K. is correctly integrated and that the drive firmware correctly invokes L.O.C.K. services.
 
 ---
 
