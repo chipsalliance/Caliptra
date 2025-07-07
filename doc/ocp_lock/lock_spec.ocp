@@ -337,7 +337,7 @@ In this specification, several flows involve combining together multiple symmetr
 
 The keys being combined in this specification generally have different scopes and lifespans. For example, the HEK and SEK are long-lived per-drive keys, while the DPK is unique to each MEK.
 
-Section 6.3 of [@{sp800-133r2}] provides the following stipulation: "Each component key ... **shall not** be used for any purpose other than the computation of a specific symmetric key K (i.e., a given component key **shall not** be used to generate more than one key)."
+Section 6.3 of [@{sp800-133r2}] stipulates that each component key "**shall not** be used for any purpose other than the computation of a specific symmetric key K (i.e., a given component key **shall not** be used to generate more than one key)."
 
 A strict reading of this requirement would preclude, for example, combining the same EPK with different DPKs to produce different MEK secrets. Therefore, this specification defines the "Preconditioned Key Extract" operation, illustrated in @fig:preconditioned-key-extract.
 
