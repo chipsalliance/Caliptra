@@ -432,7 +432,7 @@ The HPKE sequence number is incremented for each decryption operation performed 
 
 #### Enabled MPK Encryption Secret generation {#sec:enabled-mpk-encryption-key-generation}
 
-The Enabled MPK Encryption Secret is lazily generated upon first use, and is lost when the drive shuts down. Lazy generation allows injected host entropy to contribute to the secret's generation. 
+The Enabled MPK Encryption Secret is lazily generated upon first use and is lost when the drive shuts down. Lazy generation allows injected host entropy to contribute to the secret's generation. 
 
 The Enabled MPK Encryption Secret is randomly generated and held in a Key Vault slot. There does not exist a hardware data path directly between Caliptra's DRBG and Key Vault. Therefore, KMB firmware will be responsible for reading random data from the DRBG and sending it to the Key Vault. To prevent KMB firmware from seeing the actual Enabled MPK Encryption Secret, the randomness obtained by firmware is permuted using a DICE secret already present in the Key Vault, as illustrated in @fig:enabled-mpk-secret-generation.
 
