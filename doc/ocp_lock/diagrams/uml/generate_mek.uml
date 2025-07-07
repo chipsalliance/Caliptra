@@ -13,13 +13,24 @@ note across
 end note
 
 ' Pre-existing state
-$activate(hek)
-$activate(mpk_secret)
+$activate_kv(hek)
+$activate_kv(mpk_secret)
 
-$preconditioned_key_extract(HEK, hek, SEK, cfw, EPK, epk)
+dfw -> cfw++ : GENERATE_MEK
 
-$preconditioned_key_extract(EPK, epk, DPK, cfw, MEK secret seed, mek_secret_seed)
+cfw -> sek **: Populate SEK from mailbox command
+$activate(sek)
 
+cfw -> dpk **: Populate DPK from mailbox command
+$activate(dpk)
+
+$preconditioned_key_extract(HEK, hek, SEK, sek, EPK, epk)
+
+$zeroize(sek)
+
+$preconditioned_key_extract(EPK, epk, DPK, dpk, MEK secret seed, mek_secret_seed)
+
+$zeroize(dpk)
 $zeroize(epk)
 
 $preconditioned_key_extract(MPK secret, mpk_secret, MEK secret seed, mek_secret_seed, MEK secret, mek_secret)

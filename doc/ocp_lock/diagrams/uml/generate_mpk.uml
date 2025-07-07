@@ -12,19 +12,24 @@ note across
 end note
 
 ' Pre-existing state
-$activate(hek)
+$activate_kv(hek)
 $activate(hpke)
 
 dfw -> cfw++ : GENERATE_MPK
 
-$preconditioned_key_extract(HEK, hek, SEK, cfw, EPK, epk)
+cfw -> sek **: Populate SEK from mailbox command
+$activate(sek)
 
-$hpke_unwrap(kv_ak, "")
+$preconditioned_key_extract(HEK, hek, SEK, sek, EPK, epk)
 
-$preconditioned_key_extract(Access key, kv_ak, EPK, epk, Locked MPK Encryption Secret, encryption_secret)
+$zeroize(sek)
+
+$hpke_unwrap(ak, "")
+
+$preconditioned_key_extract(Access key, ak, EPK, epk, Locked MPK Encryption Secret, encryption_secret)
 
 $zeroize(epk)
-$zeroize(kv_ak)
+$zeroize(ak)
 
 cfw -> drbg: Get random 256-bit MEK
 

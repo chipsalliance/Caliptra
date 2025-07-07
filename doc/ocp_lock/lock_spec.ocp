@@ -113,7 +113,7 @@ The goal of OCP L.O.C.K. is to eliminate the need for cloud service providers (C
 
 ## Introduction
 
-OCP L.O.C.K. (Layered Open-source Cryptographic Key management) is a feature set conditionally compiled into Caliptra Subsystem 2.1+, which provides secure key management for Data-At-Rest protection in self-encrypting storage devices.
+OCP L.O.C.K. (Layered Open-source Cryptographic Key management) provides secure key management for Data-At-Rest protection in self-encrypting storage devices.
 
 OCP L.O.C.K. was originally created as part of the Open Compute Project (OCP). The major revisions of the OCP L.O.C.K. specifications are published as part of Caliptra at OCP, as OCP L.O.C.K. is an extension to Caliptra. The evolving source code and documentation for Caliptra are in the repository within the CHIPS Alliance Project, a Series of LF Projects, LLC.
 
@@ -178,9 +178,13 @@ The following areas are out of scope for this project.
 - Compliance with Common Criteria requirement FCS_CKM.1.1(c) [@{cpp-fde}] when supporting derived MEKs. Key Per I/O calls for DEKs to be injected into the device. To support OCP L.O.C.K.'s goals around enabling cryptographic erase, before the injected DEK is used to encrypt user data, the DEK is first conditioned with an on-device secret that can be securely zeroized. FCS_CKM.1.1(c) currently does not allow injected keys to be thus conditioned and therefore does not allow for cryptographic erase under the Key Per I/O model. A storage device that integates OCP L.O.C.K. and aims to be compliant with this Common Criteria requirement may not support Key Per I/O.
 - Authorization for EPK/DPK/MPK rotation, or binding a given MEK to a particular locking range. The drive firmware is responsible for these.
 
+## Integrating OCP L.O.C.K.
+
+OCP L.O.C.K. is a feature set conditionally compiled into Caliptra Subsystem 2.1+. It consists of functionality in Caliptra ROM and Runtime Firmware along with a hardware interface from Caliptra Core to a vendor-implemented encryption engine, which is the path by which Caliptra Core programs MEKs. This hardware interface leverages the AXI Manager which is only available in Caliptra Subsystem.
+
 ### Integration verification
 
-A product which integrates OCP L.O.C.K. will be expected to undergo an OCP S.A.F.E. review, to ensure that the drive firmware correctly invokes OCP L.O.C.K. services.
+A product that integrates OCP L.O.C.K. will be expected to undergo an OCP S.A.F.E. review to ensure that L.O.C.K. is correctly integrated and that the drive firmware correctly invokes L.O.C.K. services.
 
 ---
 
@@ -266,14 +270,14 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 |                   | each MEK secret. See                 |                                                             |               |
 |                   | @fig:mek-secret-derivation.          |                                                             |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
-| HPKE private key  | Provides transport encryption for    | Randomly generated on startup. Held in volatile memory,     | No            |
-| seed              | injected access keys. See            | rotated on demand, and lost on cold reset.                  |               |
+| HPKE private keys | Provides transport encryption for    | Randomly generated on startup. Held in volatile memory,     | No            |
+|                   | injected access keys. See            | rotated on demand, and lost on cold reset.                  |               |
 |                   | @sec:hpke-transport-encryption.      |                                                             |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
-| Access keys       | Contributes to the derivation of a   | Managed outside of Caliptra. Asymmetrically encrypted       | Yes[^ak_kv]   |
+| Access keys       | Contributes to the derivation of a   | Managed outside of Caliptra. Asymmetrically encrypted       | No            |
 |                   | Locked MPK encryption secret. See    | using the HPKE public key. When held by Caliptra, each      |               |
-|                   | @fig:mpk-generation for one of       | access key is held in the Key Vault and is zeroized after   |               |
-|                   | several flows where this is done.    | each use.                                                   |               |
+|                   | @fig:mpk-generation for one of       | access key is held in ephemeral memory and is zeroized      |               |
+|                   | several flows where this is done.    | after each use.                                             |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
 | Locked MPK        | Encrypts/decrypts a Locked MPK. See  | Derived from the EPK and an injected access key. Held in    | Yes           |
 | encryption        | @fig:mpk-generation for one of       | the Key Vault and zeroized after each use.                  |               |
@@ -285,10 +289,10 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 | Encryption Secret | Figures [-@fig:mpk-enabling] and     | the Key Vault and lost on cold reset.                       |               |
 |                   | [-@fig:mek-secret-derivation].       |                                                             |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
-| MPKs              | Contributes to the derivation of an  | Randomly generated on demand. Encrypted with a Locked MPK   | Yes           |
+| MPKs              | Contributes to the derivation of an  | Randomly generated on demand. Encrypted with a Locked MPK   | No            |
 |                   | MEK secret. See                      | encryption secret or the Enabled MPK Encryption Secret      |               |
 |                   | @fig:mek-secret-derivation.          | (depending on whether the MPK is locked or enabled). When   |               |
-|                   |                                      | decrypted, the MPK is held in the Key Vault and is          |               |
+|                   |                                      | decrypted, the MPK is held in ephemeral memory and is       |               |
 |                   |                                      | zeroized after each use.                                    |               |
 |                   |                                      |                                                             |               |
 |                   |                                      | Rendered irrecoverable if the SEK, HEK seed, or DICE UDS    |               |
@@ -313,8 +317,6 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 |                   |                                      | are zeroized.                                               |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
 
-[^ak_kv]: Access keys are generally held in the Key Vault when they are decrypted within Caliptra. The one exception to this is during access key testing, when the decrypted access key is hashed along with other data. Since the Key Vault hardware does not presently support hashing keys, during this flow the decrypted access key is held in Caliptra's main memory. See @sec:mpk-access-key-testing for more details.
-
 #### Key Vault
 
 Some elements of the OCP L.O.C.K. key hierarchy are held in the [Caliptra Key Vault](https://github.com/chipsalliance/caliptra-rtl/blob/ea416cb/docs/CaliptraHardwareSpecification.md#key-vault). Such keys are wielded directly by hardware and cannot be read by firmware.
@@ -323,13 +325,19 @@ In cases where a key managed by KMB is not held in the Key Vault, it is generall
 
 All keys held by KMB firmware are protected by Caliptra, and cannot be viewed by drive firmware.
 
-#### Preconditioned Key Extract
+#### Key Derivation
+
+In this specification, several flows involve deriving keys via a key derivation function (KDF). This specification leverages the KDF in Counter Mode defined in NIST SP 800-108 [@{sp800-108r1}] section 4.1, where the PRF is HMAC512. As each key produced by this KDF is no larger than 512 bits, a single invocation of the underlying PRF is needed. Therefore, each instance of \`SP 800-108 KDF\` in subsequent flows deconstructs to the following operation:
+
+$K_{OUT}$ = HMAC($K_{IN}$, 0x01 || Label [ || 0x00 || Context])
+
+#### Key Extraction
 
 In this specification, several flows involve combining together multiple symmetric keys. NIST SP 800-133 [@{sp800-133r2}] section 6.3 provides a number of FIPS-approved methods for combining keys together; this specification leverages the HMAC-based key-extraction process detailed there.
 
 The keys being combined in this specification generally have different scopes and lifespans. For example, the HEK and SEK are long-lived per-drive keys, while the DPK is unique to each MEK.
 
-Section 6.3 of [@{sp800-133r2}] provides the following stipulation: "Each component key **shall** be kept secret and **shall not** be used for any purpose other than the computation of a specific symmetric key K (i.e., a given component key **shall not** be used to generate more than one key)."
+Section 6.3 of [@{sp800-133r2}] stipulates that each component key "**shall not** be used for any purpose other than the computation of a specific symmetric key K (i.e., a given component key **shall not** be used to generate more than one key)."
 
 A strict reading of this requirement would preclude, for example, combining the same EPK with different DPKs to produce different MEK secrets. Therefore, this specification defines the "Preconditioned Key Extract" operation, illustrated in @fig:preconditioned-key-extract.
 
@@ -341,7 +349,7 @@ Subsequent diagrams will use this operation when combining keys with different s
 
 The design of this operation is informed by a number of constraints on Caliptra hardware. Keys in the Key Vault support the following symmetric cryptographic operations:
 
-  - Use as an AES key or message
+  - Use as an AES key
   - Use as an HMAC key or message
 
 Notably, if a key in the Key Vault is used as an HMAC message, it constitutes the entirety of the HMAC message. No concatenation with other data is possible. Therefore a key in the Key Vault cannot be used as e.g. an SP 800-108 KDF's context string, which must be concatenated with other values such as the block counter.
@@ -367,7 +375,7 @@ In addition to a plaintext message, this operation supports optional metadata fo
 MPKs are the mechanism by which KMB enforces multi-party authorization as a precondition to loading an MEK. MPKs exist in one of two states: locked or enabled. In both these states the MPK is encrypted to a secret known only to KMB.
 
 - A locked MPK's encryption secret is derived from the HEK, SEK, and an externally-supplied access key to which the MPK is bound. The locked MPK is held at rest by drive firmware.
-- An enabled MPK's encryption secret is a common volatile secret held within KMB which is randomly generated upon first use and is lost when the drive shuts down. Lazy generation allows injected host entropy to contribute to the secret's generation. Enabled MPKs are held in drive firmware memory.
+- An enabled MPK's encryption secret is a common volatile secret held within KMB which is randomly generated and is lost when the drive shuts down. See @sec:enabled-mpk-encryption-key-generation for details on how this key is generated. Enabled MPKs are held in drive firmware memory.
 
 The externally-supplied access key is encrypted in transit using an HPKE public key held by KMB. The "enabled" state allows the HPKE keypair to be rotated after the access key has been provisioned to the storage device, without removing the ability for KMB to decrypt the MPK when later loading an MEK bound to that MPK.
 
@@ -421,6 +429,14 @@ Figures [-@fig:hpke-kem-ecdh], [-@fig:hpke-kem-mlkem], and [-@fig:hpke-kem-hybri
 ![HPKE AES-GCM key and IV derivation](./diagrams/hpke_key_derivation.drawio.svg){#fig:hpke-key-derivation}
 
 The HPKE sequence number is incremented for each decryption operation performed with keys derived from a given HPKE context. With the exception of MPK access key rotation as described in @sec:mpk-access-key-rotation, all flows that accept HPKE payloads will perform a single decryption operation with the computed context. MPK access key rotation will perform two decryption operations and will increment the sequence number between them.
+
+#### Enabled MPK Encryption Secret generation {#sec:enabled-mpk-encryption-key-generation}
+
+The Enabled MPK Encryption Secret is lazily generated upon first use and is lost when the drive shuts down. Lazy generation allows injected host entropy to contribute to the secret's generation. 
+
+The Enabled MPK Encryption Secret is randomly generated and held in a Key Vault slot. There does not exist a hardware data path directly between Caliptra's DRBG and Key Vault. Therefore, KMB firmware will be responsible for reading random data from the DRBG and sending it to the Key Vault. To prevent KMB firmware from seeing the actual Enabled MPK Encryption Secret, the randomness obtained by firmware is permuted using a DICE secret already present in the Key Vault, as illustrated in @fig:enabled-mpk-secret-generation.
+
+![Enabled MPK Secret Generation](./diagrams/enabled_mpk_secret_generation.drawio.svg){#fig:enabled-mpk-secret-generation}
 
 #### MPK lifecycle
 
@@ -623,7 +639,7 @@ The MEK sent to the encryption engine may be used as an AES-XTS key. FIPS 140-3 
 
 SP 800-133 [@{sp800-133r2}] section 6.3 states: "The independent generation/establishment of the component keys K~1~, ..., K~n~ is interpreted in a computational and a statistical sense; that is, the computation of any particular K~i~ value does not depend on any one or more of the other K~i~ values, and it is not feasible to use knowledge of any proper subset of the K~i~ values to obtain any information about the remaining K~i~ values."
 
-SP 800-108 [@{sp800-108r1}] states that "the output of a key-derivation function is called the derived keying material and may subsequently be segmented into multiple keys. Any disjoint segments of the derived keying material (with the required lengths) can be used as cryptographic keys for the intended algorithms."
+SP 800-108 [@{sp800-108r1}] section 4 states that "the output of a key-derivation function is called the derived keying material and may subsequently be segmented into multiple keys. Any disjoint segments of the derived keying material (with the required lengths) can be used as cryptographic keys for the intended algorithms."
 
 As the MEK sent to the encryption engine is either randomly or pseudorandomly generated, it satisfies the above constraints. Disjoint segments of derived keying material computed from a pseudorandom function are statistically and computationally independent.
 
@@ -2121,7 +2137,9 @@ This section will be fleshed out with additional details as they become availabl
 
 # Sequence diagrams
 
-Note: for brevity, these sequence diagrams do not illustrate error paths.
+For brevity, these sequence diagrams do not illustrate error paths.
+
+Participants that represent keys in the Key Vault are given green lifelines while keys held by firmware are given blue lifelines.
 
 ## Sequence of events at boot
 

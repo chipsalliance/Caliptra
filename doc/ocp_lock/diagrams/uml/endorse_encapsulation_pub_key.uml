@@ -7,7 +7,7 @@
 !include utils.inc
 
 ' Pre-existing state
-$activate(dice)
+$activate_kv(dice)
 $activate(hpke)
 
 dfw -> cfw++ : ENDORSE_ENCAPSULATION_PUB_KEY

@@ -13,15 +13,24 @@ note across
 end note
 
 ' Pre-existing state
-$activate(hek)
-$activate(mpk_secret)
+$activate_kv(hek)
+$activate_kv(mpk_secret)
 
 dfw -> cfw++ : LOAD_MEK
 
-$preconditioned_key_extract(HEK, hek, SEK, cfw, EPK, epk)
+cfw -> sek **: Populate SEK from mailbox command
+$activate(sek)
 
-$preconditioned_key_extract(EPK, epk, DPK, cfw, MEK secret seed, mek_secret_seed)
+cfw -> dpk **: Populate DPK from mailbox command
+$activate(dpk)
 
+$preconditioned_key_extract(HEK, hek, SEK, sek, EPK, epk)
+
+$zeroize(sek)
+
+$preconditioned_key_extract(EPK, epk, DPK, dpk, MEK secret seed, mek_secret_seed)
+
+$zeroize(dpk)
 $zeroize(epk)
 
 $preconditioned_key_extract(MPK secret, mpk_secret, MEK secret seed, mek_secret_seed, MEK secret, mek_secret)
@@ -31,51 +40,7 @@ $zeroize(mpk_secret)
 
 $preconditioned_aes_decrypt(mek_secret, encryption_key, encrypted MEK, mek)
 
-cfw -> sfr : Read Control Reg
-
-alt (DN == 1b || ERR == 1b || EXE == 1b)
-    cfw -> sfr : Write Control Reg (DN = 1b)
-
-    cfw -> cfw : Start timeout
-    cfw -> sfr : Read Control Reg
-    group loop until (rdy_timeout or (DN == 0b && ERR == 0b && EXE == 0b))
-        cfw -> sfr : Read Control Reg
-    end
-end
-
-group in any order
-    cfw -> dma++ : MEK Write (Slot: Y)
-    dma -> mek : Read MEK
-    dma -> sfr : Write MEK
-    note left sfr
-        If the MEK is larger than the encryption engine requires,
-        then the encryption engine truncates the MEK
-    end note
-    dma -> cfw-- : complete
-
-    cfw -> sfr : Write Aux
-    cfw -> sfr : Write Metadata
-end
-
-cfw -> sfr : Write Control Reg (CMD = Load_MEK, DN = 0, EXE = 1)
-cfw -> cfw : Start timeout
-
-group in any oder
-    ee -> sfr : Read MEK
-    ee -> sfr : Read AUX
-    ee -> sfr : Read Metadata
-end
-
-ee -> kc : Store MEK
-
-group loop until (cmd_timeout or DN = 1b)
-    ee -> sfr-- : Write Control Reg\n(DN = 1b,\n ERR = 0b,\n EXE = 0b)
-    cfw -> sfr : Read Control Reg
-end
-sfr--
-
-cfw -> sfr : Write Control Reg (DN = 1b)
-note left sfr: Reset the SFR interface for next operation - not waiting for response
+$program_mek()
 
 $zeroize(mek)
 
