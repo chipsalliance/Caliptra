@@ -292,7 +292,7 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 | MPKs              | Contributes to the derivation of an  | Randomly generated on demand. Encrypted with a Locked MPK   | No            |
 |                   | MEK secret. See                      | encryption secret or the Enabled MPK Encryption Secret      |               |
 |                   | @fig:mek-secret-derivation.          | (depending on whether the MPK is locked or enabled). When   |               |
-|                   |                                      | decrypted, the MPK is held in ephemeral memory and is       |               |
+|                   |                                      | decrypted, each MPK is held in ephemeral memory and is      |               |
 |                   |                                      | zeroized after each use.                                    |               |
 |                   |                                      |                                                             |               |
 |                   |                                      | Rendered irrecoverable if the SEK, HEK seed, or DICE UDS    |               |
@@ -321,7 +321,39 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 
 Some elements of the OCP L.O.C.K. key hierarchy are held in the [Caliptra Key Vault](https://github.com/chipsalliance/caliptra-rtl/blob/ea416cb/docs/CaliptraHardwareSpecification.md#key-vault). Such keys are wielded directly by hardware and cannot be read by firmware.
 
-In cases where a key managed by KMB is not held in the Key Vault, it is generally due to the Key Vault not supporting the particular cryptographic operation with which the key must be used. For example, the HPKE private keys are held in KMB memory instead of in Key Vault. To mitigate side channel attacks, the ECDH and ML-KEM engines mandate that any operation whose source includes a key from Key Vault must place the result back in Key Vault. @fig:hpke-kem-hybrid illustrates ECDH and ML-KEM Decaps results being concatenated and used to compute a SHA3 digest. Caliptra's Key vault hardware does not presently support computing SHA3 digests of keys held in the Key Vault. Therefore the HPKE private keys must be held outside of the Key Vault.
+Other elements of the key hierarcy are not thus protected. @tbl:fw-managed-csps describes why each firmware-managed CSP is held outside of the Key Vault.
+
+Table: Firmware-managed CSPs {#tbl:fw-managed-csps}
+
++----------------------+--------------------------------------------------------------------------+
+| Firmware-managed CSP | Reason for being firmware-managed                                        |
++======================+==========================================================================+
+| SEK                  | Managed by drive firmware.                                               |
++----------------------+--------------------------------------------------------------------------+
+| DPKs                 | Managed by drive firmware.                                               |
++----------------------+--------------------------------------------------------------------------+
+| HPKE private keys    | To mitigate side channel attacks, the ECDH and ML-KEM engines mandate    |
+|                      | that any operation whose source includes a key from the Key Vault must   |
+|                      | place the result back in the Key Vault. If the HPKE private keys were    |
+|                      | held in the Key Vault, then the ECDH and ML-KEM Decaps results would be  |
+|                      | held in the Key Vault as well. @sec:hpke-algorithms illustrates that     |
+|                      | these results are used to compute an HMAC message, a SHA3 digest, and an |
+|                      | AES-GCM IV. Caliptra's Key vault hardware does not presently support     |
+|                      | these operations. Therefore the ECDH and ML-KEM Decaps results cannot be |
+|                      | held in the Key Vault; ergo, the HPKE private keys also cannot be held   |
+|                      | in the Key Vault.                                                        |
++----------------------+--------------------------------------------------------------------------+
+| Access keys          | Each access key is encrypted using an HPKE private key. Since firmware   |
+|                      | manages the HPKE private keys, it is not meaningful to decrypt the       |
+|                      | access key into the Key Vault.                                           |
++----------------------+--------------------------------------------------------------------------+
+| MPKs                 | MPKs are encrypted at rest. The encryption key for a given MPK may be    |
+|                      | periodically rotated. To effectuate this, the MPK is decrypted using the |
+|                      | old encryption key, and re-encrypted with the new encryption key. The    |
+|                      | AES engine does not presently suppport using keys in the Key Vault as    |
+|                      | messages to encrypt. Therefore, MPKs must be decrypted into memory when  |
+|                      | their encryption keys are rotated.                                       |
++----------------------+--------------------------------------------------------------------------+
 
 All keys held by KMB firmware are protected by Caliptra, and cannot be viewed by drive firmware.
 
@@ -397,9 +429,11 @@ Upon receipt, KMB will unwrap the access key and proceed to generate or enable t
 
 Upon drive reset, the HPKE keypairs are regenerated, and any access keys for MPKs that had been enabled prior to the reset will need to be re-provisioned in order to transition those MPKs to an enabled state again.
 
-##### HPKE algorithm support
+##### HPKE algorithm support {#sec:hpke-algorithms}
 
-An HPKE variant relies on three types of algorithms: KEM, KDF, and AEAD. KMB supports the following algorithms for use in HPKE:
+An HPKE variant relies on three types of algorithms: KEM, KDF, and AEAD. @tbl:hpke-algorithm-support describes the HPKE algorithms that KMB supports.
+
+Table: HPKE algorithm support {#tbl:hpke-algorithm-support}
 
 +----------------+--------------------------+-----------------+-------------------------------------------+
 | Algorithm type | Algorithm                | IANA code point | Reference document                        |
@@ -510,17 +544,17 @@ The user can then verify that the returned digest matches their expectation.
 
 Drive firmware provides the DPK (Data Protection Key) to KMB when generating, loading, or deriving an MEK. The DPK is used in a KDF, along with the HEK, SEK, and MPKs, to derive the MEK secret, as illustrated in @sec:meks.
 
-#### Use when generating or loading an MEK
+#### Example flow when generating or loading an MEK
 
 In this flow, the DPK may be encrypted by a user's Opal C_PIN. Drive firmware logic which decrypts MEKs can be repurposed to produce the DPK.
 
-![Example drive flow to decrypt a DPK based on a host-provided Opal C_PIN](./diagrams/dpk_decryption.drawio.svg){#fig:dpk-decryption}
+![Example drive flow to decrypt a DPK based on a host-provided Opal C_PIN](./diagrams/dpk_decryption_example.drawio.svg){#fig:dpk-decryption}
 
-#### Use when deriving an MEK
+#### Example flow when deriving an MEK
 
 In this flow, the DPK may be the imported key associated with a Key Per I/O key tag.
 
-![Example drive flow to accept an injected DPK](./diagrams/dpk_injection.drawio.svg){#fig:dpk-injection}
+![Example drive flow to accept an injected DPK](./diagrams/dpk_injection_example.drawio.svg){#fig:dpk-injection}
 
 ### HEKs and SEKs {#sec:heks-seks}
 
@@ -2139,7 +2173,13 @@ This section will be fleshed out with additional details as they become availabl
 
 For brevity, these sequence diagrams do not illustrate error paths.
 
-Participants that represent keys in the Key Vault are given green lifelines while keys held by firmware are given blue lifelines.
+Sequence diagram participants that represent keys in firmware and the Key Vault are given blue and green lifelines, respectively.
+
+@fig:legend-uml portrays a simple example sequence which illustrates using the HMAC engine to populate a key in the Key Vault.
+
+```plantuml {caption="UML: Simple example sequence" #fig:legend-uml}
+!include diagrams/uml/legend.uml
+```
 
 ## Sequence of events at boot
 
