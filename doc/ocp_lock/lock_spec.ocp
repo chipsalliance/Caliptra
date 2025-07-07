@@ -2139,7 +2139,7 @@ This section will be fleshed out with additional details as they become availabl
 
 For brevity, these sequence diagrams do not illustrate error paths.
 
-Participants that represent keys in the Key Vault are given green lifelines, while keys held by firmware are given blue lifelines.
+Participants that represent keys in the Key Vault are given green lifelines while keys held by firmware are given blue lifelines.
 
 ## Sequence of events at boot
 
