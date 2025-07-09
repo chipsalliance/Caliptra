@@ -717,6 +717,8 @@ Table: KMB to encryption engine SFRs {#tbl:kmb-ee-sfrs}
 
 SFR_BASE is an address that is configured within KMB. The integrator should make sure that KMB can access these SFRs through these addresses.
 
+For alignment, offsets SFR_BASE + 4h..10h (inclusive) and 24h..30h (inclusive) are intentionally unallocated.
+
 ##### Control register {#sec:control-register}
 
 @tbl:ee-ctrl-sfr defines the Control register used to sequence the execution of a command and obtain the status of that command.
@@ -874,7 +876,7 @@ The above examples are not the only possible values of **METD**. Vendors are enc
 
 @tbl:ee-aux-sfr defines the Auxiliary Data register used to pass additional vendor-specific data related to the MEK.
 
-Table: Offset SFR_Base + 20h: AUX – Auxiliary Data {#tbl:ee-aux-sfr}
+Table: Offset SFR_Base + 30h: AUX – Auxiliary Data {#tbl:ee-aux-sfr}
 
 +-------+------+-------+----------------------------------------------------------+
 | Bytes | Type | Reset | Description                                              |
@@ -895,7 +897,7 @@ When the drive firmware instructs KMB to load an MEK, the drive firmware can use
 
 ##### Media Encryption Key register
 
-Table: Offset SFR_Base + 40h: MEK – Media Encryption Key {#tbl:ee-mek-sfr}
+Table: Offset SFR_Base + 50h: MEK – Media Encryption Key {#tbl:ee-mek-sfr}
 
 +-------+------+-------+----------------------------------------------------------+
 | Bytes | Type | Reset | Description                                              |
