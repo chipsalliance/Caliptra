@@ -20,7 +20,7 @@ dfw -> cfw++ : TEST_ACCESS_KEY
 cfw -> sek **: Populate SEK from mailbox command
 $activate(sek)
 
-$preconditioned_key_extract(HEK, hek, SEK, sek, EPK, epk)
+$preconditioned_key_extract(SEK, sek, HEK, hek, EPK, epk)
 
 $zeroize(sek)
 

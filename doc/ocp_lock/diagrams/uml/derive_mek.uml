@@ -24,7 +24,7 @@ $activate(sek)
 cfw -> dpk **: Populate DPK from mailbox command
 $activate(dpk)
 
-$preconditioned_key_extract(HEK, hek, SEK, sek, EPK, epk)
+$preconditioned_key_extract(SEK, sek, HEK, hek, EPK, epk)
 
 $zeroize(sek)
 

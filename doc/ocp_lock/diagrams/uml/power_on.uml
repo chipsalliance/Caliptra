@@ -6,6 +6,11 @@
 
 !include utils.inc
 
+!unquoted procedure $zeroize_from_rom($who)
+    crom -> $who !! : Zeroize
+    $who--
+!endprocedure
+
 [->> crom++ : Power on
 
 crom -> aes++: Deobfuscate UDS
@@ -47,6 +52,11 @@ alt obfuscated HEK seed is available
     aes--
 end
 
+crom -> crom: Continue with deriving other DICE secrets
+
+$zeroize_from_rom(uds)
+$zeroize_from_rom(idev)
+
 crom -> cfw++ : FMC and runtime firmware boots
 crom--
 
@@ -57,11 +67,10 @@ alt deobfuscated HEK seed is available
 
     $preconditioned_key_extract(HEK seed, hek_seed, L.O.C.K. Stable Key, l_stable_key, HEK, hek)
 
-    cfw -> l_stable_key !! : Zeroize
-    cfw -> hek_seed !! : Zeroize
-    l_stable_key--
-    hek_seed--
+    $zeroize_from_rom(l_stable_key)
 end
+
+$zeroize_from_rom(hek_seed)
 
 == Initialize an HPKE keypair for each algorithm supported ==
 

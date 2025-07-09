@@ -234,6 +234,10 @@
         participant "New Encryption Key\n(Key Vault)" as n_encryption_key
         participant "Enabled MPK Encryption Key\n(Key Vault)" as enabled_mpk_encryption_key
         participant "MEK\n(Key Vault)" as mek
+
+        ' Legend participants
+        participant "Firmware-visible key\n(in memory)" as legend_fw_key
+        participant "Key Vault key" as legend_kv_key
     end box
 
     box "Encryption engine"
