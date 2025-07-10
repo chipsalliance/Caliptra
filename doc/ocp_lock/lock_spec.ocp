@@ -739,21 +739,21 @@ MCU ROM is responsible for configuring OCP_LOCK_MEK_ADDRESS and OCP_LOCK_MEK_LEN
 
 Table: KMB to encryption engine SFRs {#tbl:kmb-ee-sfrs}
 
-+------------------+----------------------------------------------------+---------------------------+--------------------------+
-|     Register     |                      Address                       |         Byte Size         |       Description        |
-+==================+====================================================+===========================+==========================+
-| Media Encryption | OCP_LOCK_MEK_ADDRESS                               | OCP_LOCK_MEK_LENGTH (40h) | Register to provide MEK. |
-| Key (MEK)        |                                                    |                           |                          |
-+------------------+----------------------------------------------------+---------------------------+--------------------------+
-| Metadata         | OCP_LOCK_MEK_ADDRESS + OCP_LOCK_MEK_LENGTH         | 14h                       | Register to provide      |
-| (METD)           |                                                    |                           | metadata                 |
-+------------------+----------------------------------------------------+---------------------------+--------------------------+
-| Auxiliary Data   | OCP_LOCK_MEK_ADDRESS + OCP_LOCK_MEK_LENGTH  + 20h  | 20h                       | Register to provide      |
-| (AUX)            |                                                    |                           | auxiliary values         |
-+------------------+----------------------------------------------------+---------------------------+--------------------------+
-| Control          | OCP_LOCK_MEK_ADDRESS + OCP_LOCK_MEK_LENGTH   + 40h | 4h                        | Register to handle       |
-|                  |                                                    |                           | commands                 |
-+------------------+----------------------------------------------------+---------------------------+--------------------------+
++------------------+----------------------------+-----------+--------------------------+
+|     Register     |          Address           | Byte Size |       Description        |
++==================+============================+===========+==========================+
+| Media Encryption | OCP_LOCK_MEK_ADDRESS       | 40h       | Register to provide MEK. |
+| Key (MEK)        |                            |           |                          |
++------------------+----------------------------+-----------+--------------------------+
+| Metadata         | OCP_LOCK_MEK_ADDRESS + 40h | 14h       | Register to provide      |
+| (METD)           |                            |           | metadata                 |
++------------------+----------------------------+-----------+--------------------------+
+| Auxiliary Data   | OCP_LOCK_MEK_ADDRESS + 60h | 20h       | Register to provide      |
+| (AUX)            |                            |           | auxiliary values         |
++------------------+----------------------------+-----------+--------------------------+
+| Control          | OCP_LOCK_MEK_ADDRESS + 80h | 4h        | Register to handle       |
+|                  |                            |           | commands                 |
++------------------+----------------------------+-----------+--------------------------+
 
 OCP_LOCK_MEK_ADDRESS contains the base address for the SFRs shown in @tbl:kmb-ee-sfrs. The vendor is responsible for ensuring that KMB can access these SFRs through these addresses.
 
@@ -783,7 +783,7 @@ Within KMB, loaded MEKs are only ever present in the Key Vault, so that they can
 
 @tbl:ee-metd-sfr defines the Metadata register used to pass additional data related to the MEK.
 
-Table: Offset OCP_LOCK_MEK_ADDRESS + OCP_LOCK_MEK_LENGTH + 14h: METD – Metadata {#tbl:ee-metd-sfr}
+Table: Offset OCP_LOCK_MEK_ADDRESS + 40h: METD – Metadata {#tbl:ee-metd-sfr}
 
 +-------+------+-------+--------------------------------------------------------------+
 | Bytes | Type | Reset | Description                                                  |
@@ -816,7 +816,7 @@ The above examples are not the only possible values of **METD**. Vendors are enc
 
 @tbl:ee-aux-sfr defines the Auxiliary Data register used to pass additional vendor-specific data related to the MEK.
 
-Table: OCP_LOCK_MEK_ADDRESS + OCP_LOCK_MEK_LENGTH + 20h: AUX – Auxiliary Data {#tbl:ee-aux-sfr}
+Table: OCP_LOCK_MEK_ADDRESS + 60h: AUX – Auxiliary Data {#tbl:ee-aux-sfr}
 
 +-------+------+-------+----------------------------------------------------------+
 | Bytes | Type | Reset | Description                                              |
@@ -839,7 +839,7 @@ When the drive firmware instructs KMB to load an MEK, the drive firmware can use
 
 @tbl:ee-ctrl-sfr defines the Control register used to sequence the execution of a command and obtain the status of that command.
 
-Table: Offset OCP_LOCK_MEK_ADDRESS + OCP_LOCK_MEK_LENGTH + 40h: CTRL – Control {#tbl:ee-ctrl-sfr}
+Table: Offset OCP_LOCK_MEK_ADDRESS + 80h: CTRL – Control {#tbl:ee-ctrl-sfr}
 
 +-------+------+-------+-----------------------------------------------------------+
 | Bits  | Type | Reset | Description                                               |
@@ -2118,45 +2118,52 @@ This section enumerates requirements for devices that integrate OCP L.O.C.K.
 
 Table: Compliance requirements {#tbl:compliance-requirements}
 
-+------+--------------------------------------------------------------------------------------------------------------------------------------+-----------+
-| Item |                                                             Requirement                                                              | Mandatory |
-+======+======================================================================================================================================+===========+
-| 1    | The device shall integrate Caliptra.                                                                                                 | Yes       |
-+------+--------------------------------------------------------------------------------------------------------------------------------------+-----------+
-| 2    | OCP L.O.C.K. shall be enabled.                                                                                                       | Yes       |
-+------+--------------------------------------------------------------------------------------------------------------------------------------+-----------+
-| 3    | Media encryption keys shall only be programmable                                                                                     |           |
-|      | to the encryption engine via Caliptra. See                                                                                           | Yes       |
-|      | @sec:architecture.                                                                                                                   |           |
-+------+--------------------------------------------------------------------------------------------------------------------------------------+-----------+
-| 4    | The encryption engine shall remove all MEKs from                                                                                     | Yes       |
-|      | the encryption engine on a power cycle or during                                                                                     |           |
-|      | zeroization of the storage device. See                                                                                               |           |
-|      | @sec:architecture.                                                                                                                   |           |
-+------+--------------------------------------------------------------------------------------------------------------------------------------+-----------+
-| 5    | When the device is shipped it must be in the                                                                                         | Yes       |
-|      | production lifecycle state and have a randomized                                                                                     |           |
-|      | HEK. See @sec:hek-sek-lifecycle.                                                                                                     |           |
-+------+--------------------------------------------------------------------------------------------------------------------------------------+-----------+
-| 6    | The SEK shall only be programmed once the HEK is                                                                                     | Yes       |
-|      | available, and the HEK shall only be zeroized                                                                                        |           |
-|      | once the SEK is zeroized. See                                                                                                        |           |
-|      | @sec:hek-sek-lifecycle.                                                                                                              |           |
-+------+--------------------------------------------------------------------------------------------------------------------------------------+-----------+
-| 7    | MEKs shall not be programmed while the SEK is                                                                                        | Yes       |
-|      | zeroized. See @sec:heks-seks.                                                                                                        |           |
-+------+--------------------------------------------------------------------------------------------------------------------------------------+-----------+
-| 8    | Drive firmware shall implement authorization                                                                                         | Yes       |
-|      | controls to gate lifecycle events that have the                                                                                      |           |
-|      | potential to trigger data loss. See                                                                                                  |           |
-|      | @sec:authorization.                                                                                                                  |           |
-+------+--------------------------------------------------------------------------------------------------------------------------------------+-----------+
-| 9    | The encryption engine shall ensure that AES-XTS                                                                                      | Yes       |
-|      | Key_1 and Key_2 are not equal. See                                                                                                   |           |
-|      | @sec:aes-xts-considerations.                                                                                                         |           |
-+------+--------------------------------------------------------------------------------------------------------------------------------------+-----------+
-| 10   | KMB shall have access to the SFRs defined in @tbl:kmb-ee-sfrs through the address defined by [OCP_LOCK_MEK_ADDRESS]((#sec:sfrs). | Yes       |
-+------+--------------------------------------------------------------------------------------------------------------------------------------+-----------+
++------+----------------------------------------------------------+-----------+
+| Item |                       Requirement                        | Mandatory |
++======+==========================================================+===========+
+| 1    | The device shall integrate Caliptra.                     | Yes       |
++------+----------------------------------------------------------+-----------+
+| 2    | OCP L.O.C.K. shall be enabled.                           | Yes       |
++------+----------------------------------------------------------+-----------+
+| 3    | Media encryption keys shall only be programmable         |           |
+|      | to the encryption engine via Caliptra. See               | Yes       |
+|      | @sec:architecture.                                       |           |
++------+----------------------------------------------------------+-----------+
+| 4    | The encryption engine shall remove all MEKs from         | Yes       |
+|      | the encryption engine on a power cycle or during         |           |
+|      | zeroization of the storage device. See                   |           |
+|      | @sec:architecture.                                       |           |
++------+----------------------------------------------------------+-----------+
+| 5    | When the device is shipped it must be in the             | Yes       |
+|      | production lifecycle state and have a randomized         |           |
+|      | HEK. See @sec:hek-sek-lifecycle.                         |           |
++------+----------------------------------------------------------+-----------+
+| 6    | The SEK shall only be programmed once the HEK is         | Yes       |
+|      | available, and the HEK shall only be zeroized            |           |
+|      | once the SEK is zeroized. See                            |           |
+|      | @sec:hek-sek-lifecycle.                                  |           |
++------+----------------------------------------------------------+-----------+
+| 7    | MEKs shall not be programmed while the SEK is            | Yes       |
+|      | zeroized. See @sec:heks-seks.                            |           |
++------+----------------------------------------------------------+-----------+
+| 8    | Drive firmware shall implement authorization             | Yes       |
+|      | controls to gate lifecycle events that have the          |           |
+|      | potential to trigger data loss. See                      |           |
+|      | @sec:authorization.                                      |           |
++------+----------------------------------------------------------+-----------+
+| 9    | The encryption engine shall ensure that AES-XTS          | Yes       |
+|      | Key_1 and Key_2 are not equal. See                       |           |
+|      | @sec:aes-xts-considerations.                             |           |
++------+----------------------------------------------------------+-----------+
+| 10   | KMB shall have access to the SFRs defined in             | Yes       |
+|      | @tbl:kmb-ee-sfrs through the address defined by          |           |
+|      | [OCP_LOCK_MEK_ADDRESS]((#sec:sfrs).                      |           |
++------+----------------------------------------------------------+-----------+
+| 11   | MCU ROM shall configure registers OCP_LOCK_MEK_ADDRESS   | Yes       |
+|      | and OCP_LOCK_MEK_LENGTH, then setting CPTRA_FUSE_WR_DONE |           |
+|      | to prevent further modifications. Additionally,          |           |
+|      | OCP_LOCK_MEK_LENGTH must be set to 40h.  See @sec:sfrs.  |           |
++------+----------------------------------------------------------+-----------+
 
 ## Repository location
 
