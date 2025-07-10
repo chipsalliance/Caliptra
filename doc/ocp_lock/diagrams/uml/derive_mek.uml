@@ -28,7 +28,7 @@ $preconditioned_key_extract(SEK, sek, HEK, hek, EPK, epk)
 
 $zeroize(sek)
 
-$preconditioned_key_extract(EPK, epk, DPK, dpk, MEK secret seed, mek_secret_seed)
+$preconditioned_key_extract(DPK, dpk, EPK, epk, MEK secret seed, mek_secret_seed)
 
 $zeroize(dpk)
 $zeroize(epk)
