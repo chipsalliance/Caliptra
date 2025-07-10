@@ -735,7 +735,7 @@ The OCP_LOCK_MEK_ADDRESS register shall contain the fixed base address of the ME
 
 The OCP_LOCK_MEK_LENGTH register shall contain the size of the MEK, in bytes. This shall be set to 40h by the MCU ROM.
 
-MCU ROM is responsible for configuring OCP_LOCK_MEK_ADDRESS and OCP_LOCK_MEK_LENGTH, then setting CPTRA_FUSE_WR_DONE to prevent further modifications. OCP_LOCK_MEK_LENGTH must equal 40h.
+MCU ROM is responsible for configuring OCP_LOCK_MEK_ADDRESS and OCP_LOCK_MEK_LENGTH, then setting CPTRA_FUSE_WR_DONE to prevent further modifications.
 
 Table: KMB to encryption engine SFRs {#tbl:kmb-ee-sfrs}
 
