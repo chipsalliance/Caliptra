@@ -32,9 +32,9 @@ sets out the charter governing the Caliptra project.
 
 ### Caliptra 1.x:
   * [Main Caliptra specification 1.x](https://github.com/chipsalliance/Caliptra/blob/main/doc/caliptra_1x/Caliptra.md)
-  * [Caliptra Core Hardware Specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraHardwareSpecification.md)
+  * [Caliptra Core Hardware Specification](https://github.com/chipsalliance/caliptra-rtl/blob/v1.1/docs/CaliptraHardwareSpecification.md)
   * [Caliptra Core Hardware Integration
-    Specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md)
+    Specification](https://github.com/chipsalliance/caliptra-rtl/blob/v1.1/docs/CaliptraIntegrationSpecification.md)
   * [ROM 1.x](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md)
   * [FMC](https://github.com/chipsalliance/caliptra-sw/blob/main/fmc/README.md)
   * [Runtime](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md)
