@@ -735,7 +735,7 @@ The OCP_LOCK_MEK_ADDRESS register shall contain the fixed base address of the ME
 
 The OCP_LOCK_MEK_LENGTH register shall contain the size of the MEK, in bytes. This shall be set to 40h by the MCU ROM.
 
-MCU ROM is responsible for configuring OCP_LOCK_MEK_ADDRESS and OCP_LOCK_MEK_LENGTH, then setting CPTRA_FUSE_WR_DONE to prevent further modifications.
+MCU ROM is responsible for configuring OCP_LOCK_MEK_ADDRESS and OCP_LOCK_MEK_LENGTH, then setting CPTRA_FUSE_WR_DONE to prevent further modifications. OCP_LOCK_MEK_LENGTH must equal 40h.
 
 Table: KMB to encryption engine SFRs {#tbl:kmb-ee-sfrs}
 
@@ -795,7 +795,7 @@ Table: Offset OCP_LOCK_MEK_ADDRESS + 40h: METD – Metadata {#tbl:ee-metd-sfr}
 
 The KMB and the encryption engine must be the only components which have access to MEKs. Each MEK is associated with non-secret metadata, in order for the MEK to be used for any key-related operations including data I/O. The **METD** field is used to convey this metadata.
 
-When generating, loading, or deriving an MEK, the KMB takes an **METD** value as input from drive firmware and writes it to the **METD** register without any modification for the following reasons:
+When loading or deriving an MEK, the KMB takes an **METD** value as input from drive firmware and writes it to the **METD** register without any modification for the following reasons:
 
 1. A vendor does not need to implement an additional algorithm to map between identifiers in its own system and in the KMB
 2. A vendor-unique key-retrieval algorithm can easily be leveraged into a **METD**-generation algorithm
@@ -2157,12 +2157,12 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 +------+----------------------------------------------------------+-----------+
 | 10   | KMB shall have access to the SFRs defined in             | Yes       |
 |      | @tbl:kmb-ee-sfrs through the address defined by          |           |
-|      | [OCP_LOCK_MEK_ADDRESS]((#sec:sfrs).                      |           |
+|      | OCP_LOCK_MEK_ADDRESS. See @sec:sfrs.                     |           |
 +------+----------------------------------------------------------+-----------+
 | 11   | MCU ROM shall configure registers OCP_LOCK_MEK_ADDRESS   | Yes       |
 |      | and OCP_LOCK_MEK_LENGTH, then setting CPTRA_FUSE_WR_DONE |           |
 |      | to prevent further modifications. Additionally,          |           |
-|      | OCP_LOCK_MEK_LENGTH must be set to 40h.  See @sec:sfrs.  |           |
+|      | OCP_LOCK_MEK_LENGTH must be set to 40h. See @sec:sfrs.   |           |
 +------+----------------------------------------------------------+-----------+
 
 ## Repository location
