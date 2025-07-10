@@ -735,7 +735,7 @@ The OCP_LOCK_MEK_ADDRESS register shall contain the fixed base address of the ME
 
 The OCP_LOCK_MEK_LENGTH register shall contain the size of the MEK, in bytes. This shall be set to 40h by the MCU ROM.
 
-MCU ROM is responsible for modifying OCP_LOCK_MEK_ADDRESS and OCP_LOCK_MEK_LENGTH. CPTRA_FUSE_WR_DONE may be set by the MCU ROM to prevent further modifications.
+MCU ROM is responsible for configuring OCP_LOCK_MEK_ADDRESS and OCP_LOCK_MEK_LENGTH, then setting CPTRA_FUSE_WR_DONE to prevent further modifications.
 
 Table: KMB to encryption engine SFRs {#tbl:kmb-ee-sfrs}
 
@@ -776,7 +776,7 @@ The encryption engine is free to interpret the provided key in a vendor-defined 
 
 If an algorithm used by the encryption engine does not require 512 bits of key material, the encryption engine is free to disregard unused bits.
 
-Within KMB, loaded MEKs are only ever present in the Key Vault, so that they can be protected against firmware-level attacks. KMB will write MEKs into the encryption engine's key cache using the DMA engine. Given an index and a destination identifier, the DMA engine will copy the key value stored in Key Vault slot 15 to the destination address, specified by OCP_LOCK_MEK_ADDRESS, to which the DMA engine translates the destination identifier.
+Within KMB, loaded MEKs are only ever present in the Key Vault, so that they can be protected against firmware-level attacks. KMB will write MEKs into the encryption engine's key cache using the DMA engine. The DMA engine will copy the key value stored in Key Vault slot 15 to the destination address, specified by OCP_LOCK_MEK_ADDRESS.
 
 
 ##### Metadata register
@@ -793,16 +793,16 @@ Table: Offset OCP_LOCK_MEK_ADDRESS + OCP_LOCK_MEK_LENGTH + 14h: METD – Metadat
 |       |      |       | engine for the MEK.                                          |
 +-------+------+-------+--------------------------------------------------------------+
 
-The KMB and the encryption engine must be the only components which have access to MEKs. Each MEK is associated with a unique identifier, which may be visible to other components, in order for the MEK to be used for any key-related operations including data I/O. The **METD** field is used as such an identifier.
+The KMB and the encryption engine must be the only components which have access to MEKs. Each MEK is associated with non-secret metadata, in order for the MEK to be used for any key-related operations including data I/O. The **METD** field is used to convey this metadata.
 
-Instead of generating a random and unique identifier within the KMB while loading an MEK, the KMB takes an **METD** value as input from the drive firmware and write to the **METD** register without any modification for the sake of the following reasons:
+When generating, loading, or deriving an MEK, the KMB takes an **METD** value as input from drive firmware and writes it to the **METD** register without any modification for the following reasons:
 
 1. A vendor does not need to implement an additional algorithm to map between identifiers in its own system and in the KMB
 2. A vendor-unique key-retrieval algorithm can easily be leveraged into a **METD**-generation algorithm
 
 In order to reduce ambiguity, two examples of the **METD** field will be given: Logical Block Addressing (LBA) range-based metadata; and key-tag based metadata.
 
-When an SSD stores data with address-based encryption, an MEK can be uniquely identified by a (LBA range, Namespace ID) pair. Then, the (LBA range, Namespace ID) pair can be leveraged into **METD** as on @fig:lba-nsid-layout.
+When an SSD stores data with address-based encryption, an MEK can be uniquely identified by an (LBA range, Namespace ID) pair. Then, the (LBA range, Namespace ID) pair can be leveraged into **METD** as illustrated in @fig:lba-nsid-layout.
 
 ![LBA range based metadata format](./diagrams/metadata_register_lba_nsid.drawio.svg){#fig:lba-nsid-layout}
 
@@ -2155,7 +2155,7 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 |      | Key_1 and Key_2 are not equal. See                                                                                                   |           |
 |      | @sec:aes-xts-considerations.                                                                                                         |           |
 +------+--------------------------------------------------------------------------------------------------------------------------------------+-----------+
-| 10   | The KMB shall have access to the SFRs defined in @tbl:kmb-ee-sfrs through the address defined by [OCP_LOCK_MEK_ADDRESS]((#sec:sfrs). | Yes       |
+| 10   | KMB shall have access to the SFRs defined in @tbl:kmb-ee-sfrs through the address defined by [OCP_LOCK_MEK_ADDRESS]((#sec:sfrs). | Yes       |
 +------+--------------------------------------------------------------------------------------------------------------------------------------+-----------+
 
 ## Repository location
