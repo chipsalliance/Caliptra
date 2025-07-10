@@ -693,6 +693,8 @@ At initial boot, Caliptra firmware performs the following steps:
 
 - Determines whether a HEK is available, based on the fuse configuration. If a HEK is unavailable, KMB enters a mode where MEKs are not allowed to be loaded.
 - Initializes random HPKE keypairs for each supported algorithm, and assigns handles to them, reported via [ENUMERATE_KEM_HANDLES](#sec:enumerate-kem-handles).
+- May modify the [OCP_LOCK_MEK_REGISTER](#sec:sfrs) register to a new address.
+- May modify the [OCP_LOCK_MEK_LENGTH](#sec:sfrs) register to a new MEK size.
 
 The Enabled MPK Encryption Secret is not initialized at boot-up, as it is generated lazily upon first use. See @sec:mpks for details.
 
@@ -727,37 +729,63 @@ To ensure that MEKs are only ever visible to KMB and the encryption engine, KMB 
 
 The behavior of I/O through the encryption engine during the execution of an SFR command is vendor-defined.
 
-#### Special Function Registers
+#### Special Function Registers {#sec:sfrs}
 
 KMB uses Special Function Registers (SFRs) to communicate with the encryption engine as shown in @tbl:kmb-ee-sfrs and each of the following subsections which describe the registers.
 
+The OCP_LOCK_MEK_REGISTER register shall contain the fixed base address of the MEK register.
+
+The OCP_LOCK_MEK_LENGTH register shall contain the size of the MEK, in bytes. This shall be set to 40h.
+
+Until the Caliptra register CPTRA_FUSE_WR_DONE is set, OCP_LOCK_MEK_REGISTER and OCP_LOCK_MEK_LENGTH shall be modifiable by firmware.
+
 Table: KMB to encryption engine SFRs {#tbl:kmb-ee-sfrs}
 
-+------------------+----------------+-----------+-------------------------+
-| Register         | Address        | Byte Size | Description             |
-+==================+================+===========+=========================+
-| Control          | SFR_BASE + 0h  | 4h        | Register to handle      |
-|                  |                |           | commands                |
-+------------------+----------------+-----------+-------------------------+
-| Metadata         | SFR_BASE + 10h | 14h       | Register to provide     |
-| (METD)           |                |           | metadata                |
-+------------------+----------------+-----------+-------------------------+
-| Auxiliary Data   | SFR_BASE + 30h | 20h       | Register to provide     |
-| (AUX)            |                |           | auxiliary values        |
-+------------------+----------------+-----------+-------------------------+
-| Media Encryption | SFR_BASE + 50h | 40h       | Register to provide MEK |
-| Key (MEK)        |                |           |                         |
-+------------------+----------------+-----------+-------------------------+
++------------------+----------------------------------------------------+---------------------------+--------------------------+
+|     Register     |                      Address                       |         Byte Size         |       Description        |
++==================+====================================================+===========================+==========================+
+| Media Encryption | OCP_LOCK_MEK_REGISTER                              | OCP_LOCK_MEK_LENGTH (40h) | Register to provide MEK. |
+| Key (MEK)        |                                                    |                           |                          |
++------------------+----------------------------------------------------+---------------------------+--------------------------+
+| Control          | OCP_LOCK_MEK_REGISTER + OCP_LOCK_MEK_LENGTH        | 4h                        | Register to handle       |
+|                  |                                                    |                           | commands                 |
++------------------+----------------------------------------------------+---------------------------+--------------------------+
+| Metadata         | OCP_LOCK_MEK_REGISTER + OCP_LOCK_MEK_LENGTH  + 10h | 14h                       | Register to provide      |
+| (METD)           |                                                    |                           | metadata                 |
++------------------+----------------------------------------------------+---------------------------+--------------------------+
+| Auxiliary Data   | OCP_LOCK_MEK_REGISTER + OCP_LOCK_MEK_LENGTH  + 30h | 20h                       | Register to provide      |
+| (AUX)            |                                                    |                           | auxiliary values         |
++------------------+----------------------------------------------------+---------------------------+--------------------------+
 
-SFR_BASE is an address that is configured within KMB. The integrator should make sure that KMB can access these SFRs through these addresses.
+OCP_LOCK_MEK_REGISTER contains the base address for the SFRs shown in @tbl:kmb-ee-sfrs. The vendor should make sure that KMB can access these SFRs through these addresses.
 
-For alignment, offsets SFR_BASE + 4h..10h (inclusive) and 24h..30h (inclusive) are intentionally unallocated.
+For alignment, offsets OCP_LOCK_MEK_REGISTER + OCP_LOCK_MEK_LENGTH + 4h..10h (inclusive) and 24h..30h (inclusive) are intentionally unallocated.
+
+##### Media Encryption Key register
+
+Table: OCP_LOCK_MEK_REGISTER: MEK – Media Encryption Key {#tbl:ee-mek-sfr}
+
++-------+------+-------+----------------------------------------------------------+
+| Bytes | Type | Reset | Description                                              |
++=======+======+=======+==========================================================+
+| 63:00 | WO   | 0h    | **Media encryption key:** This field specifies a 512-bit |
+|       |      |       | encryption key.                                          |
++-------+------+-------+----------------------------------------------------------+
+
+The encryption engine is free to interpret the provided key in a vendor-defined manner. One sample interpretation for AES-XTS-256 is presented in @fig:mek-format-example-for-aes.
+
+![MEK format example for AES-XTS-256](./diagrams/mek_register_aes_xts_256.drawio.svg){#fig:mek-format-example-for-aes}
+
+If an algorithm used by the encryption engine does not require 512 bits of key material, the encryption engine is free to disregard unused bits.
+
+Within KMB, loaded MEKs are only ever present in the Key Vault, so that they can be protected against firmware-level attacks. KMB will write MEKs into the encryption engine's key cache using the DMA engine. Given an index and a destination identifier, the DMA engine will copy the key value stored in Key Vault slot 15 to the destination address, specified by OCP_LOCK_MEK_REGISTER, to which the DMA engine translates the destination identifier.
+
 
 ##### Control register {#sec:control-register}
 
 @tbl:ee-ctrl-sfr defines the Control register used to sequence the execution of a command and obtain the status of that command.
 
-Table: Offset SFR_Base + 0h: CTRL – Control {#tbl:ee-ctrl-sfr}
+Table: Offset OCP_LOCK_MEK_REGISTER + OCP_LOCK_MEK_LENGTH: CTRL – Control {#tbl:ee-ctrl-sfr}
 
 +-------+------+-------+-----------------------------------------------------------+
 | Bits  | Type | Reset | Description                                               |
@@ -877,7 +905,7 @@ Since the Control register is a part of the encryption engine whose implementati
 
 @tbl:ee-metd-sfr defines the Metadata register used to pass additional data related to the MEK.
 
-Table: Offset SFR_Base + 10h: METD – Metadata {#tbl:ee-metd-sfr}
+Table: Offset OCP_LOCK_MEK_REGISTER + OCP_LOCK_MEK_LENGTH + 10h: METD – Metadata {#tbl:ee-metd-sfr}
 
 +-------+------+-------+--------------------------------------------------------------+
 | Bytes | Type | Reset | Description                                                  |
@@ -910,7 +938,7 @@ The above examples are not the only possible values of **METD**. Vendors are enc
 
 @tbl:ee-aux-sfr defines the Auxiliary Data register used to pass additional vendor-specific data related to the MEK.
 
-Table: Offset SFR_Base + 30h: AUX – Auxiliary Data {#tbl:ee-aux-sfr}
+Table: OCP_LOCK_MEK_REGISTER + OCP_LOCK_MEK_LENGTH  + 30h: AUX – Auxiliary Data {#tbl:ee-aux-sfr}
 
 +-------+------+-------+----------------------------------------------------------+
 | Bytes | Type | Reset | Description                                              |
@@ -928,25 +956,6 @@ One simple use case of the **AUX** field is to store an offset of initialization
 ![Auxiliary data format example](./diagrams/aux_register_iv_nonce.drawio.svg){#fig:aux-register-format-example}
 
 When the drive firmware instructs KMB to load an MEK, the drive firmware can use the **AUX** value to specify which mode of operation should be used and which value should be used as an initialization vector or a nonce with the generated MEK.
-
-##### Media Encryption Key register
-
-Table: Offset SFR_Base + 50h: MEK – Media Encryption Key {#tbl:ee-mek-sfr}
-
-+-------+------+-------+----------------------------------------------------------+
-| Bytes | Type | Reset | Description                                              |
-+=======+======+=======+==========================================================+
-| 63:00 | WO   | 0h    | **Media encryption key:** This field specifies a 512-bit |
-|       |      |       | encryption key.                                          |
-+-------+------+-------+----------------------------------------------------------+
-
-The encryption engine is free to interpret the provided key in a vendor-defined manner. One sample interpretation for AES-XTS-256 is presented in @fig:mek-format-example-for-aes.
-
-![MEK format example for AES-XTS-256](./diagrams/mek_register_aes_xts_256.drawio.svg){#fig:mek-format-example-for-aes}
-
-If an algorithm used by the encryption engine does not require 512 bits of key material, the encryption engine is free to disregard unused bits.
-
-Within KMB, loaded MEKs are only ever present in the Key Vault, so that they can be protected against firmware-level attacks. KMB will write MEKs into the encryption engine's key cache using the DMA engine. Given an index and a destination identifier, the DMA engine will copy the key value stored in the given key vault slot to the destination address to which the DMA engine translates the destination identifier.
 
 #### KMB command sequence
 
