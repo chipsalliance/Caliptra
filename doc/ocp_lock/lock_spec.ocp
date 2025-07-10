@@ -182,6 +182,8 @@ The following areas are out of scope for this project.
 
 OCP L.O.C.K. is a feature set conditionally compiled into Caliptra Subsystem 2.1+. It consists of functionality in Caliptra ROM and Runtime Firmware along with a hardware interface from Caliptra Core to a vendor-implemented encryption engine, which is the path by which Caliptra Core programs MEKs. This hardware interface leverages the AXI Manager which is only available in Caliptra Subsystem.
 
+OCP L.O.C.K.'s KMB offers cryptographic services for code running in the Manufacturer Control Unit (MCU) [@{caliptra-2.0-ss-spec}], which runs vendor firmware that implements a host-facing storage interface, such as TCG Opal or Key Per I/O. The host will interact with MCU firmware to configure the storage device and actuate storage lifecycle events, such as MEK loading / unloading and cryptographic erase. Certain of these lifecycle events are handled by KMB on behalf of MCU firmware.
+
 ### Integration verification
 
 A product that integrates OCP L.O.C.K. will be expected to undergo an OCP S.A.F.E. review to ensure that L.O.C.K. is correctly integrated and that the drive firmware correctly invokes L.O.C.K. services.
@@ -361,7 +363,7 @@ All keys held by KMB firmware are protected by Caliptra, and cannot be viewed by
 
 In this specification, several flows involve deriving keys via a key derivation function (KDF). This specification leverages the KDF in Counter Mode defined in NIST SP 800-108 [@{sp800-108r1}] section 4.1, where the PRF is HMAC512. As each key produced by this KDF is no larger than 512 bits, a single invocation of the underlying PRF is needed. Therefore, each instance of \`SP 800-108 KDF\` in subsequent flows deconstructs to the following operation:
 
-$K_{OUT}$ = HMAC($K_{IN}$, 0x01 || Label [ || 0x00 || Context])
+$K_{OUT}$ = HMAC512($K_{IN}$, 0x01 || Label [ || 0x00 || Context])
 
 #### Key Extraction
 
@@ -382,7 +384,7 @@ Subsequent diagrams will use this operation when combining keys with different s
 The design of this operation is informed by a number of constraints on Caliptra hardware. Keys in the Key Vault support the following symmetric cryptographic operations:
 
   - Use as an AES key
-  - Use as an HMAC key or message
+  - Use as an HMAC key or message (where the HMAC result is never revealed to firmware)
 
 Notably, if a key in the Key Vault is used as an HMAC message, it constitutes the entirety of the HMAC message. No concatenation with other data is possible. Therefore a key in the Key Vault cannot be used as e.g. an SP 800-108 KDF's context string, which must be concatenated with other values such as the block counter.
 
