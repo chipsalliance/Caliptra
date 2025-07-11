@@ -742,7 +742,7 @@ MCU ROM is responsible for configuring OCP_LOCK_MEK_ADDRESS and OCP_LOCK_MEK_LEN
 Table: KMB to encryption engine SFRs {#tbl:kmb-ee-sfrs}
 
 +------------------+----------------------------+-----------+--------------------------+
-|     Register     |          Address           | Byte Size |       Description        |
+| Register         | Address                    | Byte Size | Description              |
 +==================+============================+===========+==========================+
 | Media Encryption | OCP_LOCK_MEK_ADDRESS       | 40h       | Register to provide MEK. |
 | Key (MEK)        |                            |           |                          |
@@ -2121,7 +2121,7 @@ This section enumerates requirements for devices that integrate OCP L.O.C.K.
 Table: Compliance requirements {#tbl:compliance-requirements}
 
 +------+----------------------------------------------------------+-----------+
-| Item |                       Requirement                        | Mandatory |
+| Item | Requirement                                              | Mandatory |
 +======+==========================================================+===========+
 | 1    | The device shall integrate Caliptra.                     | Yes       |
 +------+----------------------------------------------------------+-----------+
