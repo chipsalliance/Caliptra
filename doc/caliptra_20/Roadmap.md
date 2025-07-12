@@ -42,9 +42,11 @@ Subsystem.
     * otp\_ctrl changes to support zeroization and in field programming
         * Confirm and implement changes required for fuse ratcheting
     * https://github.com/chipsalliance/caliptra-rtl/issues/808: SHAKE256 and SHA3-256
-    * Add data paths for allowing AES plaintext_dest to be a KV slot
+    * Add KV-AES data paths
+        * AES(key = \*, msg = FW, dest = KV) is allowed
+        * AES(key != RT_OBFUSCATION_KV && msg = FW && dest = FW) is allowed
+            * Where RT_OBFUSCATION_KV is a specified hard-coded KV slot, whose contents are not allowed to be copied between slots.
     * https://github.com/chipsalliance/caliptra-rtl/issues/894: allow AES and HMAC engines to produce a key that is released to the storage device's line-rate encryption engine.
-    * Allow firmware to pass an HEK seed to the deobfuscation engine, where the result is sent directly to KV, similar to UDS and FE.
 
 ## Reviews, documentation, code health:
 
