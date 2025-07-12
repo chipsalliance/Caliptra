@@ -38,11 +38,11 @@ $preconditioned_key_extract(MPK secret, mpk_secret, MEK secret seed, mek_secret_
 $zeroize(mek_secret_seed)
 $zeroize(mpk_secret)
 
-cfw -> drbg: Get random 512-bit MEK
+cfw -> drbg: Get random 512-bit MEK seed
 
-$preconditioned_aes_encrypt(mek_secret, encryption_key, MEK, cfw)
+$preconditioned_aes_encrypt(mek_secret, encryption_key, MEK seed, cfw)
 
-cfw -> dfw: Command response\nand Locked MPK
+cfw -> dfw: Command response\nand Encrypted MEK seed
 cfw--
 
 @enduml
