@@ -142,6 +142,19 @@
             $zeroize($key)
         end
     !endprocedure
+    
+    !unquoted procedure $rt_deobfuscate($name, $from, $to)
+        group Deobfuscate secret
+            cfw -> aes++: Deobfuscate $name
+            cfw -> aes: Write IV
+            aes -> $from: Read $name
+            aes -> rt_deobf_key: Read runtime deobfuscation key
+            aes -> $to ** : Write AES-CBC-Decrypt(deobfuscation key, IV, $name)
+            $activate_kv($to)
+            aes -> cfw: Done
+            aes--
+        end
+    !endprocedure
 
     !unquoted procedure $program_mek()
         cfw -> sfr : Read Control Reg
@@ -209,9 +222,7 @@
         participant "DICE IDevID CDI\n(Key Vault)" as idev
         participant "DICE Runtime Alias Key\n(Key Vault)" as dice
         participant "HPKE keypair\n(in memory)" as hpke
-        participant "Caliptra\nStable Key\n(Key Vault)" as c_stable_key
-        participant "HEK Seed\n(Key Vault)" as hek_seed
-        participant "L.O.C.K.\nStable Key\n(Key Vault)" as l_stable_key
+        participant "Runtime\nDeobfuscation Key\n(Key Vault)" as rt_deobf_key
         participant "HEK\n(Key Vault)" as hek
         participant "Firmware DICE CDI\n(Key Vault)" as fw_cdi
         participant "Derived key\n(Key Vault)" as dkey
@@ -233,6 +244,7 @@
         participant "MPK\n(in memory)" as mpk
         participant "New Encryption Key\n(Key Vault)" as n_encryption_key
         participant "Enabled MPK Encryption Key\n(Key Vault)" as enabled_mpk_encryption_key
+        participant "MEK seed\n(in memory)" as mek_seed
         participant "MEK\n(Key Vault)" as mek
 
         ' Legend participants

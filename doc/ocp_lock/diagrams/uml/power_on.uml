@@ -23,34 +23,7 @@ aes--
 
 $kdf(crom, DICE UDS, uds, derivation constant, IDevID CDI, idev)
 
-$kdf(crom, IDevID CDI, idev, derivation constant, Caliptra Stable Key, c_stable_key)
-
-== Deobfucate the HEK seed ==
-
-crom -> fuses: Read HEK mode from fuses
-
-alt if in pre-production mode
-    crom -> crom: HEK IV = PREPRODUCTION_HEK_IV
-    crom -> crom: obfuscated HEK seed = 0x0000...
-else if in perma-HEK mode
-    crom -> crom: HEK IV = PERMA_HEK_IV
-    crom -> crom: obfuscated HEK seed = 0x0000...
-else if randomized HEK seed is present in fuses
-    crom -> crom: HEK IV = PERMA_HEK_IV
-    crom -> fuses: Read obfuscated HEK seed from fuses
-else No HEK seed is available
-    crom -> crom: Note the absence of the HEK
-end
-
-alt obfuscated HEK seed is available
-    crom -> aes++: Deobfuscate HEK seed
-    crom -> aes: Write HEK IV
-    crom -> aes: Write obfuscated HEK seed
-    aes -> hek_seed ** : Write AES-CBC-Decrypt(obfuscation key, IV, obfuscated seed)
-    $activate_kv(hek_seed)
-    aes -> crom: Done
-    aes--
-end
+$kdf(crom, IDevID CDI, idev, derivation constant, Runtime Deobfuscation Key, rt_deobf_key)
 
 crom -> crom: Continue with deriving other DICE secrets
 
@@ -62,15 +35,24 @@ crom--
 
 == Initialize the HEK if available ==
 
-alt deobfuscated HEK seed is available
-    $kdf(cfw, Caliptra stable key, c_stable_key, derivation constant, L.O.C.K. Stable Key, l_stable_key)
+cfw -> fuses: Read HEK mode from fuses
 
-    $preconditioned_key_extract(HEK seed, hek_seed, L.O.C.K. Stable Key, l_stable_key, HEK, hek)
-
-    $zeroize_from_rom(l_stable_key)
+alt if in pre-production mode
+    cfw -> cfw: HEK IV = PREPRODUCTION_HEK_IV
+    cfw -> cfw: HEK seed = 0x0000...
+else if in perma-HEK mode
+    cfw -> cfw: HEK IV = PRODUCTION_HEK_IV
+    cfw -> cfw: HEK seed = 0x0000...
+else if randomized HEK seed is present in fuses
+    cfw -> cfw: HEK IV = PERMA_HEK_IV
+    cfw -> fuses: Read HEK seed from fuses
+else No HEK seed is available
+    cfw -> cfw: Note the absence of the HEK seed
 end
 
-$zeroize_from_rom(hek_seed)
+alt HEK seed is available
+    $rt_deobfuscate(HEK seed, cfw, hek)
+end
 
 == Initialize an HPKE keypair for each algorithm supported ==
 

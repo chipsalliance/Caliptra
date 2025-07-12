@@ -38,7 +38,11 @@ $preconditioned_key_extract(MPK secret, mpk_secret, MEK secret seed, mek_secret_
 $zeroize(mek_secret_seed)
 $zeroize(mpk_secret)
 
-$preconditioned_aes_decrypt(mek_secret, encryption_key, encrypted MEK, mek)
+$preconditioned_aes_decrypt(mek_secret, encryption_key, encrypted MEK seed, mek_seed)
+
+$rt_deobfuscate(MEK seed, mek_seed, mek)
+
+$zeroize(mek_seed)
 
 $program_mek()
 
