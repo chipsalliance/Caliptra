@@ -670,6 +670,10 @@ Figures [-@fig:mek-generate] and [-@fig:mek-load] elide the process of deriving 
 
 ![Deriving an MEK](./diagrams/mek_derive.drawio.svg){#fig:mek-derive}
 
+The checksum returned from KMB may be stored persistently by drive firmware and used for future derivations, or may be discarded. The checksum allows drive firmware to ensure that an MEK derived in the future matches a given MEK derived previously. This check would be a precaution against mistakes that would result in an incorrect MEK being programmed to the encryption engine, which could lead to data loss. This specification does not define how drive firmware should react to a checksum mismatch.
+
+Note: a checksum is not required for encrypted MEKs. For encrypted MEKs, any change in the MEK secret would result in an error during AES-GCM decryption of the provided MEK.
+
 #### AES-XTS considerations {#sec:aes-xts-considerations}
 
 The MEK sent to the encryption engine may be used as an AES-XTS key. FIPS 140-3 IG [@{fips-140-3-ig}] section C.I states that in AES-XTS, the key is "parsed as the concatenation of two AES keys, denoted by *Key_1* and *Key_2*, that are 128 [or 256] bits long... *Key_1* and *Key_2* shall be generated and/or established independently according to the rules for component symmetric keys from NIST **SP 800-133rev2**, Sec. 6.3. The module **shall** check explicitly that *Key_1* ≠ *Key_2*, regardless of how *Key_1* and *Key_2* are obtained."
@@ -1549,6 +1553,10 @@ Table: DERIVE_MEK input arguments
 +--------------+--------+--------------------------------------------+
 | dpk          | u8[32] | Data Protection Key.                       |
 +--------------+--------+--------------------------------------------+
+| mek_checksum | u8[16] | Checksum used to validate the derived MEK. |
+|              |        | May be all-zeroes, in which case no check  |
+|              |        | is performed.                              |
++--------------+--------+--------------------------------------------+
 | metadata     | u8[20] | Metadata for MEK to load into the drive    |
 |              |        | encryption engine (i.e. NSID + LBA range). |
 +--------------+--------+--------------------------------------------+
@@ -1561,17 +1569,19 @@ Table: DERIVE_MEK input arguments
 
 Table: DERIVE_MEK output arguments
 
-+-------------+------+-------------------------------------------+
-| Name        | Type | Description                               |
-+=============+======+===========================================+
-| chksum      | u32  | Checksum over other output arguments,     |
-|             |      | computed by Caliptra.                     |
-+-------------+------+-------------------------------------------+
-| fips_status | u32  | Indicates if the command is FIPS approved |
-|             |      | or an error.                              |
-+-------------+------+-------------------------------------------+
-| reserved    | u32  | Reserved.                                 |
-+-------------+------+-------------------------------------------+
++--------------+--------+-------------------------------------------+
+| Name         | Type   | Description                               |
++==============+========+===========================================+
+| chksum       | u32    | Checksum over other output arguments,     |
+|              |        | computed by Caliptra.                     |
++--------------+--------+-------------------------------------------+
+| fips_status  | u32    | Indicates if the command is FIPS approved |
+|              |        | or an error.                              |
++--------------+--------+-------------------------------------------+
+| reserved     | u32    | Reserved.                                 |
++--------------+--------+-------------------------------------------+
+| mek_checksum | u8[16] | Checksum calculated from the derived MEK. |
++--------------+--------+-------------------------------------------+
 
 #### UNLOAD_MEK
 
