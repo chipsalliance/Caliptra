@@ -847,11 +847,15 @@ Table: Offset OCP_LOCK_MEK_ADDRESS + 80h: CTRL – Control {#tbl:ee-ctrl-sfr}
 +-------+------+-------+-----------------------------------------------------------+
 | Bits  | Type | Reset | Description                                               |
 +=======+======+=======+===========================================================+
-| 31    | RO   | 0h    | **Ready (RDY):** After an NVM Subsystem Reset occurs, the |
-|       |      |       | encryption engine sets this bit to 1b, indicating that    |
-|       |      |       | the encryption engine is ready to execute commands. If    |
-|       |      |       | this bit is 0b, then the encryption engine is not ready   |
-|       |      |       | to execute commands.                                      |
+| 31    | RO   | 0h    | **Ready (RDY):** After any reset, the default value of    |
+|       |      |       | this bit shall be 0b. Once the encryption engine is       |
+|       |      |       | initialized and becomes ready to handle commands, this    |
+|       |      |       | bit shall be transited from 0b to 1b. When a fatal error  |
+|       |      |       | has occured in the encryption engine, this bit may be     |
+|       |      |       | changed from 1b to 0b.                                    |
+|       |      |       |                                                           |
+|       |      |       | KMB checks that this bit to is set to 1b before issuing   |
+|       |      |       | any commands to the encryption engine.                    |
 +-------+------+-------+-----------------------------------------------------------+
 | 30:20 | RO   | 0h    | Reserved                                                  |
 +-------+------+-------+-----------------------------------------------------------+
