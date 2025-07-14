@@ -24,12 +24,4 @@ $ path/to/ocp-spec-tools/docker-run.sh --pdf lock_spec.pdf lock_spec.ocp
 
 ## Maintaining the specification
 
-### Editing diagrams
-
-Many diagrams in the specification are generated using draw.io. These can be edited with the [Draw.io Integration](https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio) Visual Studio Code extension.
-
-When creating new diagrams, be sure to enable a white background. Otherwise, the diagram will not be legible to viewers with dark mode enabled.
-
-<p align="center">
-  <img src="./images/drawio_background.png" alt="draw.io background color" width="200px" style="box-shadow: 0px 2px 5px gray;" />
-</p>
+See [here](https://github.com/opencomputeproject/ocp-spec-tools/blob/main/README.md#tips-and-tricks) for guidance on maintaining the specification.
