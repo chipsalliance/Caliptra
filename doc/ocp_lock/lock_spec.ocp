@@ -212,7 +212,7 @@ To safeguard user data stored on the drive, KMB defines a set of "protection key
 
 The EPK, DPK, and set of configured MPKs are used together to derive an MEK secret, which protects a given MEK. The MEK protection is implemented as one of two methods:
 
-- **MEK encryption** - the drive obtains a random MEK from KMB, encrypted by the MEK secret, and is allowed to load that encrypted MEK into the encryption engine via KMB. This supports Opal use-cases.
+- **MEK encryption** - the drive obtains a random MEK from KMB, encrypted by two keys: the MEK secret and the **MEK Deobfuscation Key (MDK)**, and is allowed to load that encrypted MEK into the encryption engine via KMB. This supports Opal use-cases.
 
 - **MEK derivation** - the drive instructs KMB to derive an MEK from the MEK secret and load the MEK into the encryption engine. This may support either Opal or Key Per I/O use-cases.
 
@@ -239,13 +239,20 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
 | CSP               | Usage                                | Lifecycle                                                   | Present in KV |
 +===================+======================================+=============================================================+===============+
-| Caliptra Stable   | Contributes to the derivation of the | Derived from DICE UDS at cold boot. Held in the Key Vault   | Yes           |
-| Key               | HEK. See @fig:hek-derivation.        | and lost on cold reset.                                     |               |
-|                   |                                      |                                                             |               |
-|                   |                                      | Rendered irrecoverable if the UDS is zeroized.              |               |
+| UDS               | Used to derive the DICE IDevID CDI,  | Held in the Key Vault during cold-boot and zeroized after   | Yes           |
+|                   | which in turn is used to derive the  | use.                                                        |               |
+|                   | MDK and HEK. See Figures             |                                                             |               |
+|                   | [-@fig:mdk-derivation] and           | Rendered irrecoverable if zeroized from persistent storage. |               |
+|                   | [-@fig:hek-derivation].              |                                                             |               |
++-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
+| MDK               | Used to perform the inner encryption | Derived from the UDS at cold boot. Held in the Key Vault    | Yes           |
+|                   | and decryption of each MEK. See      | and lost on cold reset.                                     |               |
+|                   | @sec:generate-load-random-mek.       |                                                             |               |
+|                   |                                      | Rendered irrecoverable if the DICE UDS is zeroized from     |               |
+|                   |                                      | persistent storage.                                         |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
 | HEK seed          | Contributes to the derivation of the | Randomly generated and stored obfuscated in fuses. When     | Yes           |
-|                   | HEK. See @fig:hek-derivation.        | held by Caliptra, the deobfuscated HEK seed is held in the  |               |
+|                   | HEK. See @sec:hek-lifecycle.         | held by Caliptra, the deobfuscated HEK seed is held in the  |               |
 |                   |                                      | Key Vault and is zeroized after being used to derive the    |               |
 |                   |                                      | HEK.                                                        |               |
 |                   |                                      |                                                             |               |
@@ -255,7 +262,7 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 |                   | EPK. See @fig:mpk-generation for one | cold boot. Held in the Key Vault and lost on cold reset.    |               |
 |                   | of several flows where this is done. |                                                             |               |
 |                   |                                      | Rendered irrecoverable if the HEK seed or the DICE UDS are  |               |
-|                   |                                      | zeroized.                                                   |               |
+|                   |                                      | zeroized from persistent storage.                           |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
 | SEK               | Contributes to the derivation of the | Managed outside of Caliptra. Randomly generated by drive    | No            |
 |                   | EPK. See @fig:mpk-generation for one | firmware and stored in flash. When held by Caliptra, the    |               |
@@ -268,7 +275,7 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 |                   | each Locked MPK encryption secret.   | zeroized after each use.                                    |               |
 |                   | See @fig:mpk-generation for one of   |                                                             |               |
 |                   | several flows where this is done.    | Rendered irrecoverable if the SEK, HEK seed, or DICE UDS    |               |
-|                   |                                      | are zeroized.                                               |               |
+|                   |                                      | are zeroized from persistent storage.                       |               |
 |                   | Contributes to the derivation of     |                                                             |               |
 |                   | each MEK secret. See                 |                                                             |               |
 |                   | @fig:mek-secret-derivation.          |                                                             |               |
@@ -286,7 +293,7 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 | encryption        | @fig:mpk-generation for one of       | the Key Vault and zeroized after each use.                  |               |
 | secrets           | several flows where this is done.    |                                                             |               |
 |                   |                                      | Rendered irrecoverable if the SEK, HEK seed, or DICE UDS    |               |
-|                   |                                      | are zeroized.                                               |               |
+|                   |                                      | are zeroized from persistent storage.                       |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
 | Enabled MPK       | Encrypts/decrypts Enabled MPKs. See  | Randomly generated when first needed at runtime. Held in    | Yes           |
 | Encryption Secret | Figures [-@fig:mpk-enabling] and     | the Key Vault and lost on cold reset.                       |               |
@@ -299,7 +306,11 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 |                   |                                      | zeroized after each use.                                    |               |
 |                   |                                      |                                                             |               |
 |                   |                                      | Rendered irrecoverable if the SEK, HEK seed, or DICE UDS    |               |
-|                   |                                      | are zeroized.                                               |               |
+|                   |                                      | are zeroized from persistent storage.                       |               |
++-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
+| MPK secrets       | Contributes to the derivation of an  | Derived from a sequence of MPKs. When held by Caliptra, the | Yes           |
+|                   | MEK secret. See                      | MPK secret is held in the Key Vault and is zeroized after   |               |
+|                   | @fig:mek-secret-derivation.          | an MEK secret is derived.                                   |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
 | DPKs              | Contributes to the derivation of an  | Managed outside of Caliptra. When held by Caliptra, the     | No            |
 |                   | MEK secret. See                      | DPK is held in ephemeral memory and is zeroized after each  |               |
@@ -309,16 +320,18 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 |                   | an MEK. See Figures                  | Held in the Key Vault and zeroized after each use.          |               |
 |                   | [-@fig:mek-generate],                |                                                             |               |
 |                   | [-@fig:mek-load], and                | Rendered irrecoverable if the SEK, HEK seed, or DICE UDS    |               |
-|                   | [-@fig:mek-derive].                  | are zeroized.                                               |               |
+|                   | [-@fig:mek-derive].                  | are zeroized from persistent storage.                       |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
-| MEKs              | Encrypts/decrypts user data written  | Either randomly generated on demand and encrypted at rest   | Yes           |
-|                   | to the storage device. See           | with the MEK secret, or derived from the MEK secret. Held   |               |
-|                   | @sec:meks.                           | in the Key Vault and zeroized after programming to the      |               |
-|                   |                                      | Encryption Engine.                                          |               |
+| MEKs              | Encrypts/decrypts user data written  | Either randomly generated on demand and encrypted at rest   | Yes[^meks]    |
+|                   | to the storage device. See           | with the MEK secret and MDK, or derived from the MEK        |               |
+|                   | @sec:meks.                           | secret. Held in the Key Vault and zeroized after            |               |
+|                   |                                      | programming to the Encryption Engine.                       |               |
 |                   |                                      |                                                             |               |
 |                   |                                      | Rendered irrecoverable if the SEK, HEK seed, or DICE UDS    |               |
-|                   |                                      | are zeroized.                                               |               |
+|                   |                                      | are zeroized from persistent storage.                       |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
+
+[^meks]: Randomly-generated MEKs are held in memory rather than the Key Vault when they are first generated. See @tbl:fw-managed-csps for more details.
 
 #### Key Vault
 
@@ -356,6 +369,15 @@ Table: Firmware-managed CSPs {#tbl:fw-managed-csps}
 |                      | AES engine does not presently suppport using keys in the Key Vault as    |
 |                      | messages to encrypt. Therefore, MPKs must be decrypted into memory when  |
 |                      | their encryption keys are rotated.                                       |
++----------------------+--------------------------------------------------------------------------+
+| Random MEKs (upon    | Caliptra does not presently support a data path between its DRBG and its |
+| initial generation)  | AES engine. Therefore, when a random MEK is first generated, KMB         |
+|                      | firmware reads the random MEK from the DRBG, and then encrypts it with   |
+|                      | the MDK (inner layer) and MEK secret (outer layer). Caliptra's AES       |
+|                      | engine ensures that the results of any AES-ECB decryption operation      |
+|                      | using the MDK must be routed to the Key Vault. This ensures that after a |
+|                      | random MEK has first been generated and encrypted, the plaintext MEK     |
+|                      | will only be visible to the Key Vault.                                   |
 +----------------------+--------------------------------------------------------------------------+
 
 All keys held by KMB firmware are protected by Caliptra, and cannot be viewed by drive firmware.
@@ -442,12 +464,12 @@ Table: HPKE algorithm support {#tbl:hpke-algorithm-support}
 | Algorithm type | Algorithm                | IANA code point | Reference document                        |
 +================+==========================+=================+===========================================+
 | KEM            | P-384 ECDH               | 0x0011          | RFC 9180 [@{ietf-rfc9180}]                |
-|                +--------------------------+-----------------+-------------------------------------------+
-|                | ML-KEM-1024              | 0x0042          | Post-Quantum and Post-Quantum/Traditional |
++----------------+--------------------------+-----------------+-------------------------------------------+
+| KEM            | ML-KEM-1024              | 0x0042          | Post-Quantum and Post-Quantum/Traditional |
 |                |                          |                 | Hybrid Algorithms for HPKE                |
 |                |                          |                 | [@{draft-ietf-hpke-pq}]                   |
-|                +--------------------------+-----------------+-------------------------------------------+
-|                | ML-KEM-1024 + P-384 ECDH | 0x0a25          | Hybrid PQ/T Key Encapsulation Mechanisms  |
++----------------+--------------------------+-----------------+-------------------------------------------+
+| KEM            | ML-KEM-1024 + P-384 ECDH | 0x0a25          | Hybrid PQ/T Key Encapsulation Mechanisms  |
 |                |                          |                 | [@{draft-irtf-cfrg-hybrid-kems}]          |
 +----------------+--------------------------+-----------------+-------------------------------------------+
 | KDF            | HKDF-SHA384              | 0x0002          | RFC 9180 [@{ietf-rfc9180}]                |
@@ -471,13 +493,13 @@ The HPKE sequence number is incremented for each decryption operation performed 
 
 The Enabled MPK Encryption Secret is lazily generated upon first use and is lost when the drive shuts down. Lazy generation allows injected host entropy to contribute to the secret's generation. 
 
-The Enabled MPK Encryption Secret is randomly generated and held in a Key Vault slot. There does not exist a hardware data path directly between Caliptra's DRBG and Key Vault. Therefore, KMB firmware will be responsible for reading random data from the DRBG and sending it to the Key Vault. To prevent KMB firmware from seeing the actual Enabled MPK Encryption Secret, the randomness obtained by firmware is permuted using a DICE secret already present in the Key Vault, as illustrated in @fig:enabled-mpk-secret-generation.
+The Enabled MPK Encryption Secret is randomly generated and held in a Key Vault slot. There does not exist a hardware data path directly between Caliptra's DRBG and Key Vault. Therefore, KMB firmware will read random data from the DRBG and send it to the Key Vault. To prevent KMB firmware from seeing the actual Enabled MPK Encryption Secret, the randomness obtained by firmware is permuted using the HEK, as illustrated in @fig:enabled-mpk-secret-generation.
 
 ![Enabled MPK Secret Generation](./diagrams/enabled_mpk_secret_generation.drawio.svg){#fig:enabled-mpk-secret-generation}
 
 #### MPK lifecycle
 
-MPKs can be generated, enabled, and have their access keys rotated.
+MPKs can be generated, enabled, and have their access keys rotated and tested.
 
 ##### MPK generation
 
@@ -604,9 +626,11 @@ Table: HEK lifecycle states {#tbl:hek-lifecycle-states}
 |                          | has been set.                  |                     |                                             |
 +--------------------------+--------------------------------+---------------------+---------------------------------------------+
 
-In addition to the HEK seed, the HEK is derived from Caliptra's DICE IDevID CDI. The mechanism used to compute the HEK is described in @fig:hek-derivation. This flow is performed upon KMB startup.
+In addition to the HEK seed, the HEK is derived from Caliptra's DICE UDS. The mechanism used to compute the HEK is described in @fig:hek-derivation. This flow is performed in Caliptra ROM upon KMB startup.
 
 ![HEK derivation](./diagrams/hek_derivation.drawio.svg){#fig:hek-derivation}
+
+The L.O.C.K. Stable Key is zeroized after being used to derive the HEK. By deriving the HEK in ROM based on secrets that are not available to runtime firmware, KMB ensures that compromised runtime firmware cannot derive the HEK using replayed HEK seed values.
 
 @tbl:hek-lifecycle-commands describes the commands that KMB exposes to manage the HEK lifecycle.
 
@@ -663,6 +687,12 @@ Figures [-@fig:mek-generate] and [-@fig:mek-load] elide the process of deriving 
 ![Generating an MEK](./diagrams/mek_generate.drawio.svg){#fig:mek-generate}
 
 ![Loading an MEK](./diagrams/mek_load.drawio.svg){#fig:mek-load}
+
+Random MEKs are given two layers of encryption: an inner layer using the MDK, and an outer layer using the MEK secret. The MDK is derived in ROM upon cold boot, as illustrated in @fig:mdk-derivation.
+
+![Deriving the MDK](./diagrams/mdk_derivation.drawio.svg){#fig:mdk-derivation}
+
+Hardware enforces that AES-ECB decryption results using the Key Vault slot that holds the MDK are always routed to the Key Vault. The inner layer of encryption with the MDK therefore ensures that the plaintext MEK is never visible to KMB firmware when it is being decrypted. By deriving the MDK in ROM based on secrets that are not available to runtime firmware, KMB ensures that compromised runtime firmware cannot derive the MDK into a separate Key Vault slot, which may have looser protections for whether firmware can see the results of an AES-ECB decryption operation.
 
 #### Deriving an MEK {#sec:derive-mek}
 
@@ -2087,6 +2117,8 @@ Table: Acronyms and abbreviations used throughout this document {#tbl:abbreviati
 | KMB          | Key Management Block                                     |
 +--------------+----------------------------------------------------------+
 | L.O.C.K.     | Layered Open-Source Cryptographic Key-management         |
++--------------+----------------------------------------------------------+
+| MDK          | MEK Deobfuscation Key                                    |
 +--------------+----------------------------------------------------------+
 | MEK          | Media Encryption Key                                     |
 +--------------+----------------------------------------------------------+
