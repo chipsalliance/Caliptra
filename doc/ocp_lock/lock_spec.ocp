@@ -395,7 +395,7 @@ The AES engine is used to compute the salt checksum because that is the only sup
 
 In this specification, several flows involve deriving a key for use in AES-GCM. In AES-GCM it is critical that IV collisions be avoided. To that end SP 800-38D [@{sp800-38d}] section 8.3 stipulates that AES-GCM-Encrypt may only be invoked at most $2^{32}$ times with a given AES key. One approach to address this constraint is to maintain counters to track the usage count of a given key. Such tracking would be difficult for Caliptra, which lacks direct access to rewritable storage which would be needed to maintain a counter that preserves its value across power cycles.
 
-To elide the need for maintaining counters, this specification defines the "preconditioned AES-Encrypt" and "preconditioned AES-Decrypt" operations, illustrated in Figures [-@fig:preconditioned-aes-encrypt] and [-@fig:preconditioned-aes-decrypt].
+To elide the need for maintaining counters, this specification defines the "preconditioned AES-Encrypt" and "preconditioned AES-Decrypt" operations, illustrated in Figures [-@fig:preconditioned-aes-encrypt] and [-@fig:preconditioned-aes-decrypt]. These operations are similar in principle to XAES-256-GCM [@{xaes-256-gcm}].
 
 ![Preconditioned AES-Encrypt](./diagrams/preconditioned_aes_encrypt.drawio.svg){#fig:preconditioned-aes-encrypt}
 
