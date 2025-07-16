@@ -14,6 +14,7 @@ end note
 
 ' Pre-existing state
 $activate_kv(hek)
+$activate_kv(mdk)
 $activate_kv(mpk_secret)
 
 dfw -> cfw++ : GENERATE_MEK
@@ -40,7 +41,16 @@ $zeroize(mpk_secret)
 
 cfw -> drbg: Get random 512-bit MEK
 
-$preconditioned_aes_encrypt(mek_secret, encryption_key, MEK, cfw)
+group Perform inner MEK encryption
+    cfw -> aes++: Encrypt MEK
+    cfw -> aes: Write MEK
+    aes -> mdk: Read encryption key
+    aes -> cfw: Write AES-ECB-Encrypt(encryption key, MEK)
+    aes -> cfw: Done
+    aes--
+end
+
+$preconditioned_aes_encrypt(mek_secret, encryption_key, single-encrypted MEK, cfw)
 
 cfw -> dfw: Command response\nand Locked MPK
 cfw--

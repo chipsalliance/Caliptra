@@ -14,6 +14,7 @@ end note
 
 ' Pre-existing state
 $activate_kv(hek)
+$activate_kv(mdk)
 $activate_kv(mpk_secret)
 
 dfw -> cfw++ : LOAD_MEK
@@ -38,7 +39,17 @@ $preconditioned_key_extract(MPK secret, mpk_secret, MEK secret seed, mek_secret_
 $zeroize(mek_secret_seed)
 $zeroize(mpk_secret)
 
-$preconditioned_aes_decrypt(mek_secret, encryption_key, encrypted MEK, mek)
+$preconditioned_aes_decrypt(mek_secret, encryption_key, double-encrypted MEK, cfw)
+
+group Perform inner MEK decryption
+    cfw -> aes++: Decrypt single-encrypted MEK
+    cfw -> aes: Write single-encrypted MEK
+    aes -> mdk: Read encryption key
+    aes -> mek **: Write AES-ECB-Decrypt(encryption key, single-encrypted MEK)
+    $activate_kv(mek)
+    aes -> cfw: Done
+    aes--
+end
 
 $program_mek()
 

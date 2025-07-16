@@ -127,15 +127,12 @@
             cfw -> aes++: Decrypt $ciphertext_name
             cfw -> aes: Write $ciphertext_name, AAD, and IV
             aes -> $key: Read encryption key
-            aes -> $ciphertext_to **: Write AES-GCM-Decrypt(encryption key, IV, AAD, ciphertext)
-
-            ' MEKs are the only secrets that are decrypted into KV
-            !if ($ciphertext_to == "mek")
-                $activate_kv($ciphertext_to)
-            !else
+            !if ($ciphertext_to != "cfw")
+                aes -> $ciphertext_to **: Write AES-GCM-Decrypt(encryption key, IV, AAD, ciphertext)
                 $activate($ciphertext_to)
+            !else
+                aes -> $ciphertext_to: Write AES-GCM-Decrypt(encryption key, IV, AAD, ciphertext)
             !endif
-
             aes -> cfw: Done
             aes--
 
@@ -209,10 +206,10 @@
         participant "DICE IDevID CDI\n(Key Vault)" as idev
         participant "DICE Runtime Alias Key\n(Key Vault)" as dice
         participant "HPKE keypair\n(in memory)" as hpke
-        participant "Caliptra\nStable Key\n(Key Vault)" as c_stable_key
         participant "HEK Seed\n(Key Vault)" as hek_seed
         participant "L.O.C.K.\nStable Key\n(Key Vault)" as l_stable_key
         participant "HEK\n(Key Vault)" as hek
+        participant "MDK\n(Key Vault)" as mdk
         participant "Firmware DICE CDI\n(Key Vault)" as fw_cdi
         participant "Derived key\n(Key Vault)" as dkey
         participant "Enabled MPK Encryption Secret\n(Key Vault)" as enabled_mpk_encryption_secret

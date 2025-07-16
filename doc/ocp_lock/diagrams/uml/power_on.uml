@@ -23,23 +23,25 @@ aes--
 
 $kdf(crom, DICE UDS, uds, derivation constant, IDevID CDI, idev)
 
-$kdf(crom, IDevID CDI, idev, derivation constant, Caliptra Stable Key, c_stable_key)
+$zeroize_from_rom(uds)
 
-== Deobfucate the HEK seed ==
+== Derive the HEK ==
 
-crom -> fuses: Read HEK mode from fuses
+group Deobfuscate the HEK seed
+    crom -> fuses: Read HEK mode from fuses
 
-alt if in pre-production mode
-    crom -> crom: HEK IV = PREPRODUCTION_HEK_IV
-    crom -> crom: obfuscated HEK seed = 0x0000...
-else if in perma-HEK mode
-    crom -> crom: HEK IV = PERMA_HEK_IV
-    crom -> crom: obfuscated HEK seed = 0x0000...
-else if randomized HEK seed is present in fuses
-    crom -> crom: HEK IV = PERMA_HEK_IV
-    crom -> fuses: Read obfuscated HEK seed from fuses
-else No HEK seed is available
-    crom -> crom: Note the absence of the HEK
+    alt if in pre-production mode
+        crom -> crom: HEK IV = PREPRODUCTION_HEK_IV
+        crom -> crom: obfuscated HEK seed = 0x0000...
+    else if in perma-HEK mode
+        crom -> crom: HEK IV = PERMA_HEK_IV
+        crom -> crom: obfuscated HEK seed = 0x0000...
+    else if randomized HEK seed is present in fuses
+        crom -> crom: HEK IV = PERMA_HEK_IV
+        crom -> fuses: Read obfuscated HEK seed from fuses
+    else No HEK seed is available
+        crom -> crom: Note the absence of the HEK seed
+    end
 end
 
 alt obfuscated HEK seed is available
@@ -50,27 +52,25 @@ alt obfuscated HEK seed is available
     $activate_kv(hek_seed)
     aes -> crom: Done
     aes--
+
+    $kdf(crom, IDevID CDI, idev, derivation constant, L.O.C.K. Stable Key, l_stable_key)
+
+    $preconditioned_key_extract(HEK seed, hek_seed, L.O.C.K. Stable Key, l_stable_key, HEK, hek)
+
+    $zeroize_from_rom(hek_seed)
+    $zeroize_from_rom(l_stable_key)
 end
 
-crom -> crom: Continue with deriving other DICE secrets
+== Derive the MDK ==
 
-$zeroize_from_rom(uds)
+$kdf(crom, IDevID CDI, idev, derivation constant, MDK, mdk)
+
+== Continue with the boot process ==
+
 $zeroize_from_rom(idev)
 
 crom -> cfw++ : FMC and runtime firmware boots
 crom--
-
-== Initialize the HEK if available ==
-
-alt deobfuscated HEK seed is available
-    $kdf(cfw, Caliptra stable key, c_stable_key, derivation constant, L.O.C.K. Stable Key, l_stable_key)
-
-    $preconditioned_key_extract(HEK seed, hek_seed, L.O.C.K. Stable Key, l_stable_key, HEK, hek)
-
-    $zeroize_from_rom(l_stable_key)
-end
-
-$zeroize_from_rom(hek_seed)
 
 == Initialize an HPKE keypair for each algorithm supported ==
 

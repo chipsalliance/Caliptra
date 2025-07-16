@@ -6,9 +6,6 @@
 
 !include utils.inc
 
-participant "L.O.C.K.\nStable Key\n(Key Vault)" as l_stable_key
-participant "HEK Seed\n(Key Vault)" as hek_seed
-
 dfw -> cfw++ : [Mailbox command]
 
 cfw -> legend_fw_key ** : Initialize firmware-visible key

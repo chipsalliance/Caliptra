@@ -20,7 +20,9 @@ dfw -> cfw++ : ENABLE_MPK
 alt Enabled MPK Encryption Secret not yet initialized
     cfw -> drbg: Get random 256-bit seed
 
-    $kdf(cfw, Firmware DICE CDI, fw_cdi, derivation constant and random seed, Enabled MPK Encryption Secret, enabled_mpk_encryption_secret)
+    $preconditioned_key_extract(random seed, cfw, HEK, hek, Enabled MPK Encryption Secret, enabled_mpk_encryption_secret)
+
+    cfw -> cfw: Zeroize random seed
 end
 
 cfw -> sek **: Populate SEK from mailbox command
