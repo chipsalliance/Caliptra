@@ -135,3 +135,10 @@ references:
     accessed:
       year: 2025
       month: 6
+  - id: "xaes-256-gcm"
+    title: "The XAES-256-GCM extended-nonce AEAD"
+    publisher: "C2SP"
+    url: "https://c2sp.org/XAES-256-GCM"
+    accessed:
+      year: 2025
+      month: 7
