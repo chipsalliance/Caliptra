@@ -41,10 +41,15 @@ Subsystem.
       [specification](https://github.com/chipsalliance/Caliptra/blob/main/doc/ocp_lock/Specification_v0.8.5.pdf)
     * otp\_ctrl changes to support zeroization and in field programming
         * Confirm and implement changes required for fuse ratcheting
-    * https://github.com/chipsalliance/caliptra-rtl/issues/808: SHAKE256 and SHA3-256
-    * Add data paths for allowing AES plaintext_dest to be a KV slot
-    * https://github.com/chipsalliance/caliptra-rtl/issues/894: allow AES and HMAC engines to produce a key that is released to the storage device's line-rate encryption engine.
-    * Allow firmware to pass an HEK seed to the deobfuscation engine, where the result is sent directly to KV, similar to UDS and FE.
+    * SHAKE256 and SHA3-256
+        * https://github.com/chipsalliance/caliptra-rtl/issues/808
+    * Add fuse register for passing obfuscated HEK seed from MCU to Caliptra Core. DOE deobfuscates the HEK seed into KV22
+    * Allow AES and HMAC engines to write a key into KV23 that is released to the storage device's line-rate encryption engine.
+        * https://github.com/chipsalliance/caliptra-rtl/issues/894
+    * Add KV-AES data path rules
+        * AES(key = \*, msg = KV, dest = \*) is disallowed
+        * AES(key = KV16, op = ECB-Decrypt, dest != KV23) is disallowed
+            * Where KV16 is populated by ROM and is not allowed to be copied between slots.
 
 ## Reviews, documentation, code health:
 
