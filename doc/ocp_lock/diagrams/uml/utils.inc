@@ -206,8 +206,6 @@
         participant "DICE IDevID CDI\n(Key Vault)" as idev
         participant "DICE Runtime Alias Key\n(Key Vault)" as dice
         participant "HPKE keypair\n(in memory)" as hpke
-        participant "HEK Seed\n(Key Vault)" as hek_seed
-        participant "L.O.C.K.\nStable Key\n(Key Vault)" as l_stable_key
         participant "HEK\n(Key Vault)" as hek
         participant "MDK\n(Key Vault)" as mdk
         participant "Firmware DICE CDI\n(Key Vault)" as fw_cdi

@@ -27,38 +27,22 @@ $zeroize_from_rom(uds)
 
 == Derive the HEK ==
 
-group Deobfuscate the HEK seed
+group Read the HEK seed
     crom -> fuses: Read HEK mode from fuses
 
     alt if in pre-production mode
-        crom -> crom: HEK IV = PREPRODUCTION_HEK_IV
-        crom -> crom: obfuscated HEK seed = 0x0000...
+        crom -> crom: HEK mode = PREPRODUCTION_HEK,\nHEK seed = 0x0000...
     else if in perma-HEK mode
-        crom -> crom: HEK IV = PERMA_HEK_IV
-        crom -> crom: obfuscated HEK seed = 0x0000...
+        crom -> crom: HEK mode = PERMA_HEK,\nHEK seed = 0x0000...
     else if randomized HEK seed is present in fuses
-        crom -> crom: HEK IV = PERMA_HEK_IV
-        crom -> fuses: Read obfuscated HEK seed from fuses
+        crom -> crom: HEK mode = PRODUCTION_HEK,\nHEK seed = [read from fuses]
     else No HEK seed is available
         crom -> crom: Note the absence of the HEK seed
     end
 end
 
-alt obfuscated HEK seed is available
-    crom -> aes++: Deobfuscate HEK seed
-    crom -> aes: Write HEK IV
-    crom -> aes: Write obfuscated HEK seed
-    aes -> hek_seed ** : Write AES-CBC-Decrypt(obfuscation key, IV, obfuscated seed)
-    $activate_kv(hek_seed)
-    aes -> crom: Done
-    aes--
-
-    $kdf(crom, IDevID CDI, idev, derivation constant, L.O.C.K. Stable Key, l_stable_key)
-
-    $preconditioned_key_extract(HEK seed, hek_seed, L.O.C.K. Stable Key, l_stable_key, HEK, hek)
-
-    $zeroize_from_rom(hek_seed)
-    $zeroize_from_rom(l_stable_key)
+alt HEK seed is available
+    $kdf(crom, IDevID CDI, idev, HEK mode || HEK seed, HEK, hek)
 end
 
 == Derive the MDK ==
