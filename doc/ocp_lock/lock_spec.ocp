@@ -717,7 +717,7 @@ Note that Caliptra hardware only supports the \`DRBG_Update\` operation when Cal
 
 At initial boot, Caliptra ROM shall derive the HEK and MDK, then set the CALIPTRA_OCP_LOCK_EN bit in the HW_CFG register.
 
-Next, Caliptra firmware performs the following steps:
+Next, Caliptra runtime firmware performs the following steps:
 
 - Determines whether a HEK is available, based on the fuse configuration. If a HEK is unavailable, KMB enters a mode where MEKs are not allowed to be loaded.
 - Initializes random HPKE keypairs for each supported algorithm, and assigns handles to them, reported via [ENUMERATE_HPKE_HANDLES](#sec:enumerate-hpke-handles-cmd).
