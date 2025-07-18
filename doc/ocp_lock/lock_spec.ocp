@@ -715,7 +715,7 @@ Note that Caliptra hardware only supports the \`DRBG_Update\` operation when Cal
 
 ### Boot-time initialization
 
-At initial boot, Caliptra ROM shall set the CALIPTRA_OCP_LOCK_EN bit in the HW_CFG register once OCP L.O.C.K activities are complete.
+At initial boot, Caliptra ROM shall derive the HEK and MDK, then set the CALIPTRA_OCP_LOCK_EN bit in the HW_CFG register.
 
 Next, Caliptra firmware performs the following steps:
 
