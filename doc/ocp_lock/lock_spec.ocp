@@ -176,8 +176,9 @@ The OCP L.O.C.K. KMB satisfies the following properties:
 The following areas are out of scope for this project.
 
 - Compliance with IEEE 1619^TM^-2025 [@{ieee-1619-2025}] requirements around key scope, i.e. restricting a given MEK to only encrypt a maximum of 2^44^ 128-bit blocks. Drive firmware will be responsible for enforcing this.
-- Compliance with Common Criteria requirement FCS_CKM.1.1(c) [@{cpp-fde}] when supporting derived MEKs. Key Per I/O calls for DEKs to be injected into the device. To support OCP L.O.C.K.'s goals around enabling cryptographic erase, before the injected DEK is used to encrypt user data, the DEK is first conditioned with an on-device secret that can be securely zeroized. FCS_CKM.1.1(c) currently does not allow injected keys to be thus conditioned and therefore does not allow for cryptographic erase under the Key Per I/O model. A storage device that integates OCP L.O.C.K. and aims to be compliant with this Common Criteria requirement may not support Key Per I/O.
+- Compliance with Common Criteria requirement FCS_CKM.1.1(c) [@{cpp-fde}] when supporting derived MEKs. Key Per I/O calls for DEKs to be injected into the device. To support OCP L.O.C.K.'s goals around enabling cryptographic erase, before the injected DEK is used to encrypt user data, the DEK is first conditioned with an on-device secret that can be securely zeroized. FCS_CKM.1.1(c) currently does not allow injected keys to be thus conditioned and therefore does not allow for cryptographic erase under the Key Per I/O model. A storage device that integrates OCP L.O.C.K. and aims to be compliant with this Common Criteria requirement may not support Key Per I/O.
 - Authorization for EPK/DPK/MPK rotation, or binding a given MEK to a particular locking range. The drive firmware is responsible for these.
+- Mitigation against availability attacks carried out by attackers with physical presence.
 
 ## Integrating OCP L.O.C.K.
 
@@ -330,7 +331,7 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 
 Some elements of the OCP L.O.C.K. key hierarchy are held in the [Caliptra Key Vault](https://github.com/chipsalliance/caliptra-rtl/blob/ea416cb/docs/CaliptraHardwareSpecification.md#key-vault). Such keys are wielded directly by hardware and cannot be read by firmware.
 
-Other elements of the key hierarcy are not thus protected. @tbl:fw-managed-csps describes why each firmware-managed CSP is held outside of the Key Vault.
+Other elements of the key hierarchy are not thus protected. @tbl:fw-managed-csps describes why each firmware-managed CSP is held outside of the Key Vault.
 
 Table: Firmware-managed CSPs {#tbl:fw-managed-csps}
 
@@ -359,7 +360,7 @@ Table: Firmware-managed CSPs {#tbl:fw-managed-csps}
 | MPKs                 | MPKs are encrypted at rest. The encryption key for a given MPK may be    |
 |                      | periodically rotated. To effectuate this, the MPK is decrypted using the |
 |                      | old encryption key, and re-encrypted with the new encryption key. The    |
-|                      | AES engine does not presently suppport using keys in the Key Vault as    |
+|                      | AES engine does not presently support using keys in the Key Vault as     |
 |                      | messages to encrypt. Therefore, MPKs must be decrypted into memory when  |
 |                      | their encryption keys are rotated.                                       |
 +----------------------+--------------------------------------------------------------------------+
@@ -481,6 +482,12 @@ Figures [-@fig:hpke-kem-ecdh], [-@fig:hpke-kem-mlkem], and [-@fig:hpke-kem-hybri
 ![HPKE AES-GCM key and IV derivation](./diagrams/hpke_key_derivation.drawio.svg){#fig:hpke-key-derivation}
 
 The HPKE sequence number is incremented for each decryption operation performed with keys derived from a given HPKE context. With the exception of MPK access key rotation as described in @sec:mpk-access-key-rotation, all flows that accept HPKE payloads will perform a single decryption operation with the computed context. MPK access key rotation will perform two decryption operations and will increment the sequence number between them.
+
+##### HPKE public key endorsement
+
+Upon request, KMB can issue an endorsement for a given HPKE public key, signed by Caliptra runtime firmware's DICE alias key. This is illustrated in @fig:hpke-pub-key-endorsement.
+
+![HPKE public key endorsement](./diagrams/hpke_pub_key_endorsement.drawio.svg){#fig:hpke-pub-key-endorsement}
 
 #### Enabled MPK Encryption Secret generation {#sec:enabled-mpk-encryption-key-generation}
 
@@ -879,7 +886,7 @@ Table: Offset OCP_LOCK_MEK_ADDRESS + 80h: CTRL – Control {#tbl:ee-ctrl-sfr}
 |       |      |       | this bit shall be 0b. Once the encryption engine is       |
 |       |      |       | initialized and becomes ready to handle commands, the     |
 |       |      |       | encryption engine shall set this bit from 0b to 1b. When  |
-|       |      |       | a fatal error has occured in the encryption engine, the   |
+|       |      |       | a fatal error has occurred in the encryption engine, the  |
 |       |      |       | encryption engine may set this bit from 1b to 0b.         |
 |       |      |       |                                                           |
 |       |      |       | KMB checks that this bit is set to 1b before issuing any  |
@@ -1113,7 +1120,7 @@ Each of the \`endorsement_algorithms\`, \`hpke_algorithms\`, and \`access_key_si
 
 #### CLEAR_KEY_CACHE
 
-This command unloads all MEKs in the encryption engine and deletes all keys in KMB.
+This command unloads all MEKs in the encryption engine.
 
 Command Code: 0x434C_4B43 ("CLKC")
 
