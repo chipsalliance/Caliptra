@@ -108,7 +108,7 @@ OCP L.O.C.K. is a committed intercept for storage products for Google and Micros
 
 ## Sustainability
 
-The goal of OCP L.O.C.K. is to eliminate the need for cloud service providers (CSPs) to destroy storage devices (e.g., SSDs) by providing a mechanism that increases the confidence that a media encryption key within the device is deleted during cryptographic erase. This enables repurposing the device and or components on the device at end of use or end of life. Given the size of the market serving CSPs, this provides a significant reduction of e-waste.
+The goal of OCP L.O.C.K. is to eliminate the need for cloud providers to destroy storage devices (e.g., SSDs) by providing a mechanism that increases the confidence that a media encryption key within the device is deleted during cryptographic erase. This enables repurposing the device and or components on the device at end of use or end of life. Given the size of the market serving cloud providers, this provides a significant reduction of e-waste.
 
 # Base specification
 
@@ -124,7 +124,7 @@ OCP L.O.C.K. may be integrated within a variety of self-encrypting storage devic
 
 ## Background
 
-In the life of a storage device in a datacenter, the device leaves the supplier, a customer writes user data to the device, and then the device is decommissioned. Customer data is not allowed to leave the data center. The CSP needs high confidence that the storage device leaving the datacenter is secure. The current default CSP policy to ensure this level of security is to destroy the drive. Other policies may exist that leverage drive capabilities (e.g., cryptographic erase), but are not generally deemed inherently trustworthy by these CSPs [@{self-encrypting-deception}]. This produces significant e-waste and inhibits any re-use/recycling.
+In the life of a storage device in a datacenter, the device leaves the supplier, a customer writes user data to the device, and then the device is decommissioned. Customer data is not allowed to leave the data center. The cloud provider needs high confidence that the storage device leaving the datacenter is secure. The current default cloud provider policy to ensure this level of security is to destroy the drive. Other policies may exist that leverage drive capabilities (e.g., cryptographic erase), but are not generally deemed inherently trustworthy by these cloud providers [@{self-encrypting-deception}]. This produces significant e-waste and inhibits any re-use/recycling.
 
 Self-encrypting drives (SEDs) store data encrypted at rest to media encryption keys (MEKs). SEDs include the following building blocks:
 
@@ -150,7 +150,7 @@ Adversary capabilities include:
 - Attempting to glitch execution of code running on general-purpose cores.
 - Stealing debug core dumps or UART/serial logs from a device while it is operating in a data center, and later stealing the device.
 - Gaining access to any class secrets, global secrets, or symmetric secrets shared between the device and an external entity.
-- Executing code within a virtual machine on a multi-tenant host offered by the CSP which manages an attached storage device.
+- Executing code within a virtual machine on a multi-tenant host offered by the cloud provider which manages an attached storage device.
 - Accessing all device design documents, code, and RTL.
 
 Given this adversary profile, the following are a list of vulnerabilities that OCP L.O.C.K. is designed to mitigate.
@@ -2181,7 +2181,7 @@ Table: Acronyms and abbreviations used throughout this document {#tbl:abbreviati
 +==============+==========================================================+
 | AES          | Advanced Encryption Standard                             |
 +--------------+----------------------------------------------------------+
-| CSP          | Cloud Service Provider                                   |
+| CSP          | Critical Security Parameter                              |
 +--------------+----------------------------------------------------------+
 | DPK          | Data Protection Key                                      |
 +--------------+----------------------------------------------------------+
