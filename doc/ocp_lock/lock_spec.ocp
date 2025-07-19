@@ -673,6 +673,12 @@ Note: it is the drive firmware's responsibility to ensure that MPKs are mixed in
 
 See @sec:generate-load-random-mek for how the MEK secret is used to generate and load random MEKs. See @sec:derive-mek for how the MEK secret is used to derive deterministic MEKs.
 
+#### Support for standard storage API flows
+
+KMB allows an MEK to be bound to zero MPKs, which supports standard Opal and Key Per I/O flows. The process for establishing such an MEK is illustrated in @fig:mek-secret-derivation-no-mpks.
+
+![Establishing an MEK bound to zero MPKs](./diagrams/mek_secret_derivation_no_mpks.drawio.svg){#fig:mek-secret-derivation-no-mpks}
+
 #### Generating and loading a random MEK {#sec:generate-load-random-mek}
 
 Figures [-@fig:mek-generate] and [-@fig:mek-load] elide the process of deriving the MEK secret, as those details are captured in @fig:mek-secret-derivation. When an MEK is generated or loaded, the inputs given in @fig:mek-secret-derivation are provided by drive firmware so that KMB may derive the MEK secret.
