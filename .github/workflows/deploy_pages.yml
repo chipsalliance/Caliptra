@@ -35,7 +35,7 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
           repository: "opencomputeproject/ocp-spec-tools"
-          ref: "ab43ac5f25d72be186ecc52d63f4312a8c5f761c"
+          ref: "e4f6d325846e03852952a4d02ee379b85ae610b7"
           # The underlying tex and templates assume this exists under the "extra" folder.
           path: "doc/ocp_lock/extra"
 
