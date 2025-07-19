@@ -821,12 +821,9 @@ Table: Offset OCP_LOCK_MEK_ADDRESS + 40h: METD – Metadata {#tbl:ee-metd-sfr}
 
 The KMB and the encryption engine must be the only components which have access to MEKs. Each MEK is associated with non-secret metadata, in order for the MEK to be used for any key-related operations including data I/O. The **METD** field is used to convey this metadata.
 
-When loading or deriving an MEK, the KMB takes an **METD** value as input from drive firmware and writes it to the **METD** register without any modification for the following reasons:
+When loading or deriving an MEK, the KMB takes an **METD** value as input from drive firmware and writes it to the **METD** register without any modification. This allows the vendor full control of the MEK indexing algorithm.
 
-1. A vendor does not need to implement an additional algorithm to map between identifiers in its own system and in the KMB
-2. A vendor-unique key-retrieval algorithm can easily be leveraged into a **METD**-generation algorithm
-
-In order to reduce ambiguity, two examples of the **METD** field will be given: Logical Block Addressing (LBA) range-based metadata; and key-tag based metadata.
+Two examples of how a storage device might leverage the **METD** field are provided: Logical Block Addressing (LBA) range-based metadata, and key-tag based metadata.
 
 When an SSD stores data with address-based encryption, an MEK can be uniquely identified by an (LBA range, Namespace ID) pair. Then, the (LBA range, Namespace ID) pair can be leveraged into **METD** as illustrated in @fig:lba-nsid-layout.
 
@@ -836,7 +833,7 @@ Address-based encryption is not the only encryption mechanism in SSDs. For examp
 
 ![Key tag based metadata format](./diagrams/metadata_register_key_tag.drawio.svg){#fig:key-tag-layout}
 
-The above examples are not the only possible values of **METD**. Vendors are encouraged to design and use their own **METD** if it fits better to their system.
+The above examples are not the only possible values of **METD**. Vendors may design and use their own **METD** if it is more suitable for their system.
 
 ##### Auxiliary Data register
 
@@ -872,20 +869,20 @@ Table: Offset OCP_LOCK_MEK_ADDRESS + 80h: CTRL – Control {#tbl:ee-ctrl-sfr}
 +=======+======+=======+===========================================================+
 | 31    | RO   | 0h    | **Ready (RDY):** After any reset, the default value of    |
 |       |      |       | this bit shall be 0b. Once the encryption engine is       |
-|       |      |       | initialized and becomes ready to handle commands, this    |
-|       |      |       | bit shall be transited from 0b to 1b. When a fatal error  |
-|       |      |       | has occured in the encryption engine, this bit may be     |
-|       |      |       | changed from 1b to 0b.                                    |
+|       |      |       | initialized and becomes ready to handle commands, the     |
+|       |      |       | encryption engine shall set this bit from 0b to 1b. When  |
+|       |      |       | a fatal error has occured in the encryption engine, the   |
+|       |      |       | encryption engine may set this bit from 1b to 0b.         |
 |       |      |       |                                                           |
-|       |      |       | KMB checks that this bit to is set to 1b before issuing   |
-|       |      |       | any commands to the encryption engine.                    |
+|       |      |       | KMB checks that this bit is set to 1b before issuing any  |
+|       |      |       | commands to the encryption engine.                        |
 +-------+------+-------+-----------------------------------------------------------+
 | 30:20 | RO   | 0h    | Reserved                                                  |
 +-------+------+-------+-----------------------------------------------------------+
 | 19:16 | RO   | 0h    | **Error (ERR):** When the encryption engine sets the DONE |
-|       |      |       | bit to 1b, the encryption engine sets this field to 0000b |
-|       |      |       | if the command specified by the CMD field succeeded, or a |
-|       |      |       | non-zero value if the command failed. See                 |
+|       |      |       | bit from 0b to 1b, the encryption engine sets this field  |
+|       |      |       | to 0000b if the command specified by the CMD field        |
+|       |      |       | succeeded, or a non-zero value if the command failed. See |
 |       |      |       | @tbl:ee-ctrl-err-codes.                                   |
 |       |      |       |                                                           |
 |       |      |       | Encryption engine error codes are surfaced back to drive  |
@@ -901,26 +898,24 @@ Table: Offset OCP_LOCK_MEK_ADDRESS + 80h: CTRL – Control {#tbl:ee-ctrl-sfr}
 | 1     | RW   | 0b    | **Done (DONE):** This bit indicates the completion of a   |
 |       |      |       | command by the encryption engine. If this bit is set to   |
 |       |      |       | 1b by the encryption engine, then the encryption engine   |
-|       |      |       | has completed the command specified by the CMD field. If  |
-|       |      |       | the EXE bit is 1b and this bit is 1b, then the encryption |
-|       |      |       | engine has completed executing the command specified by   |
-|       |      |       | the CMD field and the ERR field indicates the status of   |
-|       |      |       | the execution of that command. A write by KMB of the      |
-|       |      |       | value 1b to this bit shall cause the encryption engine    |
-|       |      |       | to:                                                       |
+|       |      |       | has completed the command specified by the CMD field and  |
+|       |      |       | the ERR field indicates the status of the execution of    |
+|       |      |       | that command. A write by KMB of the value 1b to this bit  |
+|       |      |       | shall cause the encryption engine to:                     |
 |       |      |       |                                                           |
-|       |      |       | - set this bit to 0b;                                     |
-|       |      |       | - set the EXE bit to 0b; and                              |
-|       |      |       | - set the ERR field to 0000b.                             |
-|       |      |       |                                                           |
-|       |      |       | When the encryption engine writes the value of 1b to the  |
-|       |      |       | DONE field, the value of the EXE bit does not change.     |
+|       |      |       | - set the DONE bit to 0b,                                 |
+|       |      |       | - set the EXE bit to 0b,                                  |
+|       |      |       | - set the ERR field to 0000b, and                         |
+|       |      |       | - set the CMD bit to 0000b.                               |
 +-------+------+-------+-----------------------------------------------------------+
-| 0     | RW   | 0b    | **Execute (EXE):** A write by KMB of the value 1b to this |
-|       |      |       | bit specifies that the encryption engine is to execute    |
-|       |      |       | the command specified by the CMD field. If the DONE bit   |
-|       |      |       | is set to 1 by KMB, then the encryption engine sets the   |
-|       |      |       | EXE bit to 0b.                                            |
+| 0     | RW   | 0b    | **Execute (EXE):** After any reset, the default value of  |
+|       |      |       | this field shall be 0b. When this bit is set from 0b to   |
+|       |      |       | 1b by KMB, the encryption engine shall execute the        |
+|       |      |       | command specified in the CMD field. Once the execution is |
+|       |      |       | complete, the encryption engine shall simulaneously set   |
+|       |      |       | this bit from 1b to 0b, set the DONE bit from 0b to       |
+|       |      |       | 1b, and populate the ERR field. While the EXE bit is 1b,  |
+|       |      |       | the encryption engine is busy.                            |
 +-------+------+-------+-----------------------------------------------------------+
 
 Table: CTRL error codes {#tbl:ee-ctrl-err-codes}
