@@ -1,0 +1,16 @@
+'
+' OCP Lock: ENUMERATE_HPKE_HANDLES API sequence diagram showing Caliptra FW/HW interactions
+'
+'
+@startuml
+
+!include utils.inc
+
+dfw -> cfw++ : ENUMERATE_HPKE_HANDLES
+
+cfw -> cfw: Create list of valid HPKE handles,\none per HPKE algorithm supported
+
+cfw -> dfw : Command response\hpke_handles
+cfw--
+
+@enduml

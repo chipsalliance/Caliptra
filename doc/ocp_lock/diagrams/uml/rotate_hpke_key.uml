@@ -1,5 +1,5 @@
 '
-' OCP Lock: ROTATE_ENCAPSULATION_KEY API sequence diagram showing Caliptra FW/HW interactions
+' OCP Lock: ROTATE_HPKE_KEY API sequence diagram showing Caliptra FW/HW interactions
 '
 '
 @startuml
@@ -9,7 +9,7 @@
 ' Pre-existing state
 $activate(hpke)
 
-dfw -> cfw++ : ROTATE_ENCAPSULATION_KEY(X)
+dfw -> cfw++ : ROTATE_HPKE_KEY(X)
 
 cfw -> drbg: Get random seed
 cfw -> hpke: Stash random seed
