@@ -793,6 +793,8 @@ OCP_LOCK_MEK_ADDRESS contains the base address for the SFRs shown in @tbl:kmb-ee
 
 For alignment, offsets OCP_LOCK_MEK_ADDRESS + OCP_LOCK_MEK_LENGTH + 14h..20h (inclusive) are intentionally unallocated.
 
+In the register definitions that follow, the "Type" column indicates whether KMB may read from or write to the given register.
+
 ##### Media Encryption Key register
 
 Table: OCP_LOCK_MEK_ADDRESS: MEK – Media Encryption Key {#tbl:ee-mek-sfr}
@@ -1146,7 +1148,7 @@ Table: CLEAR_KEY_CACHE output arguments
 
 #### ENDORSE_HPKE_PUB_KEY {#sec:endorse-hpke-pub-key-cmd}
 
-This command generates a signed certificate for the specified KEM using the specified endorsement algorithm.
+This command generates a signed certificate for the specified HPKE public key using the specified endorsement algorithm.
 
 See @fig:endorse-hpke-pub-key-uml for the sequence diagram.
 
@@ -1194,7 +1196,7 @@ Table: ENDORSE_HPKE_PUB_KEY output arguments
 
 #### ROTATE_HPKE_KEY {#sec:rotate-hpke-key-cmd}
 
-This command rotates the KEM keypair indicated by the specified handle and stores the new KEM keypair in volatile memory within KMB.
+This command rotates the HPKE keypair indicated by the specified handle and stores the new HPKE keypair in volatile memory within KMB.
 
 See @fig:rotate-hpke-key-uml for the sequence diagram.
 
@@ -2357,19 +2359,19 @@ Sequence diagram participants that represent keys in firmware and the Key Vault 
 ## Sequence to enumerate HPKE handles
 
 ```plantuml {caption="UML: Enumerating HPKE handles" #fig:enumerate-hpke-handles-uml}
-!include diagrams/uml/enumerate_kem_handles.uml
+!include diagrams/uml/enumerate_hpke_handles.uml
 ```
 
 ## Sequence to endorse an HPKE public key
 
 ```plantuml {caption="UML: Endorsing an HPKE public key" #fig:endorse-hpke-pub-key-uml}
-!include diagrams/uml/endorse_encapsulation_pub_key.uml
+!include diagrams/uml/endorse_hpke_pub_key.uml
 ```
 
 ## Sequence to rotate an HPKE keypair
 
-```plantuml {caption="UML: Rotating a KEM Encapsulation Key" #fig:rotate-hpke-key-uml}
-!include diagrams/uml/rotate_encapsulation_key.uml
+```plantuml {caption="UML: Rotating an HPKE Key" #fig:rotate-hpke-key-uml}
+!include diagrams/uml/rotate_hpke_key.uml
 ```
 
 ## Sequence to generate an MPK

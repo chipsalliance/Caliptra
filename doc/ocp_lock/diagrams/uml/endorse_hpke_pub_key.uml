@@ -1,5 +1,5 @@
 '
-' OCP Lock: ENDORSE_ENCAPSULATION_PUB_KEY API sequence diagram showing Caliptra FW/HW interactions
+' OCP Lock: ENDORSE_HPKE_PUB_KEY API sequence diagram showing Caliptra FW/HW interactions
 '
 '
 @startuml
@@ -10,7 +10,7 @@
 $activate_kv(dice)
 $activate(hpke)
 
-dfw -> cfw++ : ENDORSE_ENCAPSULATION_PUB_KEY
+dfw -> cfw++ : ENDORSE_HPKE_PUB_KEY
 
 cfw -> cfw: Build the certificate TBS
 cfw -> hpke: Read the HPKE public key
