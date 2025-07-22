@@ -17,10 +17,10 @@ $activate_kv(fw_cdi)
 
 dfw -> cfw++ : ENABLE_MPK
 
-alt Enabled MPK Encryption Secret not yet initialized
+alt Enabled MPK Encryption Key not yet initialized
     cfw -> drbg: Get random 256-bit seed
 
-    $preconditioned_key_extract(random seed, cfw, HEK, hek, Enabled MPK Encryption Secret, enabled_mpk_encryption_secret)
+    $preconditioned_key_extract(random seed, cfw, HEK, hek, Enabled MPK Encryption Key, enabled_mpk_encryption_key)
 
     cfw -> cfw: Zeroize random seed
 end
@@ -34,14 +34,14 @@ $zeroize(sek)
 
 $hpke_unwrap(ak, "")
 
-$preconditioned_key_extract(Access key, ak, EPK, epk, Locked MPK Encryption Secret, encryption_secret)
+$preconditioned_key_extract(Access key, ak, EPK, epk, Locked MPK Encryption Key, encryption_key)
 
 $zeroize(epk)
 $zeroize(ak)
 
-$preconditioned_aes_decrypt(encryption_secret, encryption_key, locked MPK, mpk)
+$preconditioned_aes_decrypt(encryption_key, encryption_subkey, locked MPK, mpk)
 
-$preconditioned_aes_encrypt(enabled_mpk_encryption_secret, enabled_mpk_encryption_key, ready MPK, mpk)
+$preconditioned_aes_encrypt(enabled_mpk_encryption_key, enabled_mpk_encryption_subkey, ready MPK, mpk)
 
 cfw -> dfw: Command response\nand Enabled MPK
 cfw--
