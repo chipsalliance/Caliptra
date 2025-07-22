@@ -592,9 +592,9 @@ Zeroizing either the HEK or SEK is equivalent to performing a cryptographic eras
 
 #### HEK lifecycle {#sec:hek-lifecycle}
 
-Caliptra with L.O.C.K. features a series of n 256-bit HEK slots present in a fuse bank, dubbed HEK~0~..HEK~n-1~, where 4 ≤ n ≤ 16. The vendor is responsible for determining the number of HEK slots available in fuses. These HEK slots are only programmable and readable by Caliptra Core, via the Caliptra fuse controller. KMB transitions each HEK slot individually from blank → randomized → zeroized. HEK~x~ is only randomized once HEK~x-1~ has been zeroized. KMB zeroizes a HEK by blowing every bit.
+Caliptra with L.O.C.K. features a series of n 256-bit HEK slots present in a fuse bank, dubbed HEK~0~..HEK~n-1~, where 4 ≤ n ≤ 16. The vendor is responsible for determining the number of HEK slots available in fuses. These HEK slots are programmed and read by MCU, via the Caliptra fuse controller. MCU is responsible for transitioning each HEK slot individually from blank → randomized → zeroized. HEK~x~ shall only be randomized once HEK~x-1~ has been zeroized. MCU shall zeroize a HEK slot by blowing every bit.
 
-Each HEK slot contains a HEK seed. KMB ROM reads the currently-randomized HEK slot from fuses when deriving the HEK.
+Each HEK slot contains a HEK seed. MCU ROM reads the currently-randomized HEK slot from fuses at boot, and passes it to Caliptra Core via a fuse register.
 
 There are two edge cases where the HEK is available even if there is no randomized seed available in the HEK fuse bank. In both cases, the HEK is derived from an all-zeroes HEK seed.
 
@@ -626,7 +626,7 @@ Table: HEK lifecycle states {#tbl:hek-lifecycle-states}
 |                          | has been set.                  |                |                                             |
 +--------------------------+--------------------------------+----------------+---------------------------------------------+
 
-In addition to the HEK seed, the HEK is derived from Caliptra's DICE UDS. The mechanism used to compute the HEK is described in @fig:hek-derivation. This flow is performed in Caliptra ROM upon KMB startup.
+In addition to the HEK seed, the HEK is derived from Caliptra's DICE UDS. The mechanism used to compute the HEK is described in @fig:hek-derivation. This flow is performed across MCU ROM and Caliptra ROM upon KMB startup.
 
 ![HEK derivation](./diagrams/hek_derivation.drawio.svg){#fig:hek-derivation}
 
@@ -1806,19 +1806,25 @@ Command Code: 0x5245_4B53 ("REKS")
 
 Table: REPORT_EPOCH_KEY_STATE input arguments
 
-+-----------+--------+---------------------------------------+
-| Name      | Type   | Description                           |
-+===========+========+=======================================+
-| chksum    | u32    | Checksum over other input arguments,  |
-|           |        | computed by the caller.               |
-+-----------+--------+---------------------------------------+
-| reserved  | u32    | Reserved.                             |
-+-----------+--------+---------------------------------------+
-| sek_state | u16    | SEK state. See @tbl:sek-state-values. |
-+-----------+--------+---------------------------------------+
-| nonce     | u8[16] | Freshness nonce to be included in the |
-|           |        | signed IETF EAT.                      |
-+-----------+--------+---------------------------------------+
++-----------------+--------+---------------------------------------+
+| Name            | Type   | Description                           |
++=================+========+=======================================+
+| chksum          | u32    | Checksum over other input arguments,  |
+|                 |        | computed by the caller.               |
++-----------------+--------+---------------------------------------+
+| reserved        | u32    | Reserved.                             |
++-----------------+--------+---------------------------------------+
+| total_hek_slots | u16    | Total number of HEK slots.            |
++-----------------+--------+---------------------------------------+
+| active_hek_slot | u16    | Currently-active HEK slot.            |
++-----------------+--------+---------------------------------------+
+| hek_state       | u16    | HEK state. See @tbl:hek-state-values. |
++-----------------+--------+---------------------------------------+
+| sek_state       | u16    | SEK state. See @tbl:sek-state-values. |
++-----------------+--------+---------------------------------------+
+| nonce           | u8[16] | Freshness nonce to be included in the |
+|                 |        | signed IETF EAT.                      |
++-----------------+--------+---------------------------------------+
 
 Table: REPORT_EPOCH_KEY_STATE output arguments
 
@@ -2278,28 +2284,32 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 |      | production lifecycle state and have a randomized         |           |
 |      | HEK. See @sec:hek-sek-lifecycle.                         |           |
 +------+----------------------------------------------------------+-----------+
-| 6    | The SEK shall only be programmed once the HEK is         | Yes       |
+| 6    | A HEK seed shall only be randomized once the prior seed  | Yes       |
+|      | has been zeroized, and a HEK seed shall only be zeroized |           |
+|      | after it has been randomized. See @sec:hek-lifecycle.    |           |
++------+----------------------------------------------------------+-----------+
+| 7    | The SEK shall only be programmed once the HEK is         | Yes       |
 |      | available, and the HEK shall only be zeroized            |           |
 |      | once the SEK is zeroized. See                            |           |
 |      | @sec:hek-sek-lifecycle.                                  |           |
 +------+----------------------------------------------------------+-----------+
-| 7    | MEKs shall not be programmed while the SEK is            | Yes       |
+| 8    | MEKs shall not be programmed while the SEK or HEK are    | Yes       |
 |      | zeroized. See @sec:heks-seks.                            |           |
 +------+----------------------------------------------------------+-----------+
-| 8    | Drive firmware shall implement authorization             | Yes       |
+| 9    | Drive firmware shall implement authorization             | Yes       |
 |      | controls to gate lifecycle events that have the          |           |
 |      | potential to trigger data loss. See                      |           |
 |      | @sec:authorization.                                      |           |
 +------+----------------------------------------------------------+-----------+
-| 9    | The encryption engine shall ensure that AES-XTS          | Yes       |
+| 10   | The encryption engine shall ensure that AES-XTS          | Yes       |
 |      | Key_1 and Key_2 are not equal. See                       |           |
 |      | @sec:aes-xts-considerations.                             |           |
 +------+----------------------------------------------------------+-----------+
-| 10   | KMB shall have access to the SFRs defined in             | Yes       |
+| 11   | KMB shall have access to the SFRs defined in             | Yes       |
 |      | @tbl:kmb-ee-sfrs through the address defined by          |           |
 |      | OCP_LOCK_MEK_ADDRESS. See @sec:sfrs.                     |           |
 +------+----------------------------------------------------------+-----------+
-| 11   | MCU ROM shall configure registers OCP_LOCK_MEK_ADDRESS   | Yes       |
+| 12   | MCU ROM shall configure registers OCP_LOCK_MEK_ADDRESS   | Yes       |
 |      | and OCP_LOCK_MEK_LENGTH, then setting CPTRA_FUSE_WR_DONE |           |
 |      | to prevent further modifications. Additionally,          |           |
 |      | OCP_LOCK_MEK_LENGTH must be set to 40h. See @sec:sfrs.   |           |
