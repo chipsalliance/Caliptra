@@ -266,7 +266,7 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 |                   |                                      | Drive firmware zeroizes the SEK from flash on demand.       |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
 | EPK               | Contributes to the derivation of     | Derived from the HEK and SEK. Held in the Key Vault and     | 17            |
-|                   | each Locked MPK encryption secret.   | zeroized after each use.                                    |               |
+|                   | each Locked MPK encryption key.      | zeroized after each use.                                    |               |
 |                   | See @fig:mpk-generation for one of   |                                                             |               |
 |                   | several flows where this is done.    | Rendered irrecoverable if the SEK, HEK seed, or DICE UDS    |               |
 |                   |                                      | are zeroized from persistent storage.                       |               |
@@ -279,25 +279,25 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 |                   | @sec:hpke-transport-encryption.      |                                                             |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
 | Access keys       | Contributes to the derivation of a   | Managed outside of Caliptra. Asymmetrically encrypted       | N/A           |
-|                   | Locked MPK encryption secret. See    | using the HPKE public key. When held by Caliptra, each      |               |
+|                   | Locked MPK encryption key. See       | using the HPKE public key. When held by Caliptra, each      |               |
 |                   | @fig:mpk-generation for one of       | access key is held in ephemeral memory and is zeroized      |               |
 |                   | several flows where this is done.    | after each use.                                             |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
 | Locked MPK        | Encrypts/decrypts a Locked MPK. See  | Derived from the EPK and an injected access key. Held in    | 18            |
-| encryption        | @fig:mpk-generation for one of       | the Key Vault and zeroized after each use.                  |               |
-| secrets           | several flows where this is done.    |                                                             |               |
+| encryption keys   | @fig:mpk-generation for one of       | the Key Vault and zeroized after each use.                  |               |
+|                   | several flows where this is done.    |                                                             |               |
 |                   |                                      | Rendered irrecoverable if the SEK, HEK seed, or DICE UDS    |               |
 |                   |                                      | are zeroized from persistent storage.                       |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
 | Enabled MPK       | Encrypts/decrypts Enabled MPKs. See  | Randomly generated when first needed at runtime. Held in    | 19            |
-| Encryption Secret | Figures [-@fig:mpk-enabling] and     | the Key Vault and lost on cold reset.                       |               |
+| Encryption Key    | Figures [-@fig:mpk-enabling] and     | the Key Vault and lost on cold reset.                       |               |
 |                   | [-@fig:mek-secret-derivation].       |                                                             |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
 | MPKs              | Contributes to the derivation of an  | Randomly generated on demand. Encrypted with a Locked MPK   | N/A           |
-|                   | MEK secret. See                      | encryption secret or the Enabled MPK Encryption Secret      |               |
-|                   | @fig:mek-secret-derivation.          | (depending on whether the MPK is locked or enabled). When   |               |
-|                   |                                      | decrypted, each MPK is held in ephemeral memory and is      |               |
-|                   |                                      | zeroized after each use.                                    |               |
+|                   | MEK secret. See                      | encryption key or the Enabled MPK Encryption Key (depending |               |
+|                   | @fig:mek-secret-derivation.          | on whether the MPK is locked or enabled). When decrypted,   |               |
+|                   |                                      | each MPK is held in ephemeral memory and is zeroized after  |               |
+|                   |                                      | each use.                                                   |               |
 |                   |                                      |                                                             |               |
 |                   |                                      | Rendered irrecoverable if the SEK, HEK seed, or DICE UDS    |               |
 |                   |                                      | are zeroized from persistent storage.                       |               |
@@ -417,7 +417,7 @@ To elide the need for maintaining counters, this specification defines the "prec
 
 ![Preconditioned AES-Decrypt](./diagrams/preconditioned_aes_decrypt.drawio.svg){#fig:preconditioned-aes-decrypt}
 
-Each AES secret is preconditioned using a randomly-generated 96-bit salt, before being used with AES-GCM-Encrypt. This ensures that it is safe to use a given input AES secret in approximately $2^{80}$ preconditioned AES-Encrypt operations before an IV collision is expected to occur with probability greater than $2^{-32}$. The $2^{80}$ limit is large enough that a given storage device will experience hardware failure well before that limit is reached. Ergo, usage counters within the drive are not needed for these keys. See [Appendix @sec:preconditioned-aes-calculations] for additional details on the calculations behind this figure.
+Each encryption key is preconditioned using a randomly-generated 96-bit salt to compute a subkey, which is used with AES-GCM-Encrypt. This ensures that it is safe to use a given input encryption key in approximately $2^{80}$ preconditioned AES-Encrypt operations before an IV collision is expected to occur with probability greater than $2^{-32}$. The $2^{80}$ limit is large enough that a given storage device will experience hardware failure well before that limit is reached. Ergo, usage counters within the drive are not needed for these keys. See [Appendix @sec:preconditioned-aes-calculations] for additional details on the calculations behind this figure.
 
 In addition to a plaintext message, this operation supports optional metadata for the message, which is attached as AAD.
 
@@ -425,8 +425,8 @@ In addition to a plaintext message, this operation supports optional metadata fo
 
 MPKs are the mechanism by which KMB enforces multi-party authorization as a precondition to loading an MEK. MPKs exist in one of two states: locked or enabled. In both these states the MPK is encrypted to a secret known only to KMB.
 
-- A locked MPK's encryption secret is derived from the HEK, SEK, and an externally-supplied access key to which the MPK is bound. The locked MPK is held at rest by drive firmware.
-- An enabled MPK's encryption secret is a common volatile secret held within KMB which is randomly generated and is lost when the drive shuts down. See @sec:enabled-mpk-encryption-key-generation for details on how this key is generated. Enabled MPKs are held in drive firmware memory.
+- A locked MPK's encryption key is derived from the HEK, SEK, and an externally-supplied access key to which the MPK is bound. The locked MPK is held at rest by drive firmware.
+- An enabled MPK's encryption key is a common volatile secret held within KMB which is randomly generated and is lost when the drive shuts down. See @sec:enabled-mpk-encryption-key-generation for details on how this key is generated. Enabled MPKs are held in drive firmware memory.
 
 The externally-supplied access key is encrypted in transit using an HPKE public key held by KMB. The "enabled" state allows the HPKE keypair to be rotated after the access key has been provisioned to the storage device, without removing the ability for KMB to decrypt the MPK when later loading an MEK bound to that MPK.
 
@@ -489,13 +489,13 @@ Upon request, KMB can issue an endorsement for a given HPKE public key, signed b
 
 ![HPKE public key endorsement](./diagrams/hpke_pub_key_endorsement.drawio.svg){#fig:hpke-pub-key-endorsement}
 
-#### Enabled MPK Encryption Secret generation {#sec:enabled-mpk-encryption-key-generation}
+#### Enabled MPK Encryption Key generation {#sec:enabled-mpk-encryption-key-generation}
 
-The Enabled MPK Encryption Secret is lazily generated upon first use and is lost when the drive shuts down. Lazy generation allows injected host entropy to contribute to the secret's generation. 
+The Enabled MPK Encryption Key is lazily generated upon first use and is lost when the drive shuts down. Lazy generation allows injected host entropy to contribute to the key's generation. 
 
-The Enabled MPK Encryption Secret is randomly generated and held in a Key Vault slot. There does not exist a hardware data path directly between Caliptra's DRBG and Key Vault. Therefore, KMB firmware will read random data from the DRBG and send it to the Key Vault. To prevent KMB firmware from seeing the actual Enabled MPK Encryption Secret, the randomness obtained by firmware is permuted using the HEK, as illustrated in @fig:enabled-mpk-secret-generation.
+The Enabled MPK Encryption Key is randomly generated and held in a Key Vault slot. There does not exist a hardware data path directly between Caliptra's DRBG and Key Vault. Therefore, KMB firmware will read random data from the DRBG and send it to the Key Vault. To prevent KMB firmware from seeing the actual Enabled MPK Encryption Key, the randomness obtained by firmware is permuted using the HEK, as illustrated in @fig:enabled-mpk-encryption-key-generation.
 
-![Enabled MPK Secret Generation](./diagrams/enabled_mpk_secret_generation.drawio.svg){#fig:enabled-mpk-secret-generation}
+![Enabled MPK Encryption Key Generation](./diagrams/enabled_mpk_encryption_key_generation.drawio.svg){#fig:enabled-mpk-encryption-key-generation}
 
 #### MPK lifecycle
 
@@ -511,8 +511,8 @@ KMB performs the following steps:
 
 1. Unwrap the given MPK access key using the HPKE keypair held within KMB.
 2. Randomly generate an MPK.
-3. Derive an MPK encryption secret from the HEK, SEK, and decrypted access key.
-4. Encrypt the MPK to the MPK encryption secret, attaching the given metadata as AAD.
+3. Derive an MPK encryption key from the HEK, SEK, and decrypted access key.
+4. Encrypt the MPK to the MPK encryption key, attaching the given metadata as AAD.
 5. Return the encrypted MPK to the drive firmware.
 
 Drive firmware may then store the encrypted MPK in persistent storage.
@@ -521,14 +521,14 @@ Drive firmware may then store the encrypted MPK in persistent storage.
 
 ##### MPK enabling
 
-Encrypted MPKs stored at rest in persistent storage are considered "locked", and must be enabled before they can be used to load an MEK. Enabled MPKs are also encrypted when handled by drive firmware, to the Enabled MPK Encryption Secret. Enabled MPKs do not survive across device reset.
+Encrypted MPKs stored at rest in persistent storage are considered "locked", and must be enabled before they can be used to load an MEK. Enabled MPKs are also encrypted when handled by drive firmware, to the Enabled MPK Encryption Key. Enabled MPKs do not survive across device reset.
 
 To enable an MPK, KMB performs the following steps:
 
 1. Unwrap the given MPK access key using the HPKE keypair held within KMB.
-2. Derive the MPK encryption secret from the HEK, SEK, and decrypted access key.
-3. Decrypt the MPK using the MPK encryption secret.
-4. Encrypt the MPK using the Enabled MPK Encryption Secret, preserving the MPK metadata.
+2. Derive the MPK encryption key from the HEK, SEK, and decrypted access key.
+3. Decrypt the MPK using the MPK encryption key.
+4. Encrypt the MPK using the Enabled MPK Encryption Key, preserving the MPK metadata.
 5. Return the re-encrypted "enabled" MPK to the drive firmware.
 
 Drive firmware may then stash the encrypted enabled MPK in volatile storage, and later provide it to the KMB when loading an MEK, as described in @sec:meks.
@@ -540,10 +540,10 @@ Drive firmware may then stash the encrypted enabled MPK in volatile storage, and
 The access key to which an MPK is bound may be rotated. The user must prove that they have knowledge of both the current and new access key before a rotation is allowed. This is accomplished by the user wrapping both their current and new access key in the same HPKE payload. KMB performs the following steps:
 
 1. Unwrap the given current access key and new access key using the HPKE keypair held within KMB, incrementing the HPKE sequence number between each decryption operation. Note that the sequence number increment is a side-effect of the \`ContextR.Open()\` HPKE operation.
-2. Derive the current MPK encryption secret from the HEK, SEK, and decrypted current access key.
-3. Derive the new MPK encryption secret from the HEK, SEK, and decrypted new access key.
-4. Decrypt the MPK using the current MPK encryption secret.
-5. Encrypt the MPK using the new MPK encryption secret, preserving the MPK metadata.
+2. Derive the current MPK encryption key from the HEK, SEK, and decrypted current access key.
+3. Derive the new MPK encryption key from the HEK, SEK, and decrypted new access key.
+4. Decrypt the MPK using the current MPK encryption key.
+5. Encrypt the MPK using the new MPK encryption key, preserving the MPK metadata.
 6. Return the re-encrypted MPK to the drive firmware.
 
 Drive firmware then zeroizes the old encrypted MPK and stores the new encrypted MPK in persistent storage.
@@ -557,8 +557,8 @@ A user that has bound an access key to an MPK may wish to confirm that their acc
 To test an MPK, KMB receives a wrapped MPK, wrapped MPK access key, and freshness nonce. KMB then performs the following steps:
 
 1. Unwrap the given MPK access key using the HPKE keypair held within KMB.
-2. Derive the MPK encryption secret from the HEK, SEK, and decrypted access key.
-3. Verify the integrity of the MPK ciphertext and AAD using the MPK encryption secret, discarding the decrypted MPK in the process.
+2. Derive the MPK encryption key from the HEK, SEK, and decrypted access key.
+3. Verify the integrity of the MPK ciphertext and AAD using the MPK encryption key, discarding the decrypted MPK in the process.
 4. Calculate and return the digest SHA2-384(MPK metadata || access key || nonce).
 
 The user can then verify that the returned digest matches their expectation.
@@ -735,7 +735,7 @@ Next, Caliptra runtime firmware performs the following steps:
 - Determines whether a HEK is available, based on the fuse configuration. If a HEK is unavailable, KMB enters a mode where MEKs are not allowed to be loaded.
 - Initializes random HPKE keypairs for each supported algorithm, and assigns handles to them, reported via [ENUMERATE_HPKE_HANDLES](#sec:enumerate-hpke-handles-cmd).
 
-The Enabled MPK Encryption Secret is not initialized at boot-up, as it is generated lazily upon first use. See @sec:mpks for details.
+The Enabled MPK Encryption Key is not initialized at boot-up, as it is generated lazily upon first use. See @sec:mpks for details.
 
 ### Authorization {#sec:authorization}
 
@@ -1365,23 +1365,23 @@ Table: ENABLE_MPK input arguments
 
 Table: ENABLE_MPK output arguments
 
-+-------------+------------+-------------------------------------------------+
-| Name        | Type       | Description                                     |
-+=============+============+=================================================+
-| chksum      | u32        | Checksum over other output arguments,           |
-|             |            | computed by Caliptra.                           |
-+-------------+------------+-------------------------------------------------+
-| fips_status | u32        | Indicates if the command is FIPS approved       |
-|             |            | or an error.                                    |
-+-------------+------------+-------------------------------------------------+
-| reserved    | u32        | Reserved.                                       |
-+-------------+------------+-------------------------------------------------+
-| enabled_mpk | EnabledMpk | MPK encrypted to Enabled MPK Encryption Secret. |
-+-------------+------------+-------------------------------------------------+
++-------------+------------+----------------------------------------------+
+| Name        | Type       | Description                                  |
++=============+============+==============================================+
+| chksum      | u32        | Checksum over other output arguments,        |
+|             |            | computed by Caliptra.                        |
++-------------+------------+----------------------------------------------+
+| fips_status | u32        | Indicates if the command is FIPS approved    |
+|             |            | or an error.                                 |
++-------------+------------+----------------------------------------------+
+| reserved    | u32        | Reserved.                                    |
++-------------+------------+----------------------------------------------+
+| enabled_mpk | EnabledMpk | MPK encrypted to Enabled MPK Encryption Key. |
++-------------+------------+----------------------------------------------+
 
 #### MIX_MPK {#sec:mix-mpk-cmd}
 
-This command initializes the MEK secret seed if not already initialized or if \`initialize\` is set to 1, decrypts the specified MPK with the with the Enabled MPK Encryption Secret, and then updates the MEK secret seed in KMB by performing a KDF with the MEK secret seed and the decrypted MPK.
+This command initializes the MEK secret seed if not already initialized or if \`initialize\` is set to 1, decrypts the specified MPK with the with the Enabled MPK Encryption Key, and then updates the MEK secret seed in KMB by performing a KDF with the MEK secret seed and the decrypted MPK.
 
 When generating an MEK, one or more MIX_MPK commands are processed to modify the MEK secret seed.
 
@@ -1391,20 +1391,20 @@ Command Code: 0x4D4D_504B ("MMPK")
 
 Table: MIX_MPK input arguments
 
-+-------------+------------+-----------------------------------------------------+
-| Name        | Type       | Description                                         |
-+=============+============+=====================================================+
-| chksum      | u32        | Checksum over other input arguments,                |
-|             |            | computed by the caller.                             |
-+-------------+------------+-----------------------------------------------------+
-| reserved    | u32        | Reserved.                                           |
-+-------------+------------+-----------------------------------------------------+
-| initialize  | u32        | If set to 1, the MEK secret seed is                 |
-|             |            | initialized before the given MPK is                 |
-|             |            | mixed. All other values reserved. Little-endian.    |
-+-------------+------------+-----------------------------------------------------+
-| enabled_mpk | EnabledMpk | MPK encrypted to the Enabled MPK Encryption Secret. |
-+-------------+------------+-----------------------------------------------------+
++-------------+------------+--------------------------------------------------+
+| Name        | Type       | Description                                      |
++=============+============+==================================================+
+| chksum      | u32        | Checksum over other input arguments,             |
+|             |            | computed by the caller.                          |
++-------------+------------+--------------------------------------------------+
+| reserved    | u32        | Reserved.                                        |
++-------------+------------+--------------------------------------------------+
+| initialize  | u32        | If set to 1, the MEK secret seed is              |
+|             |            | initialized before the given MPK is              |
+|             |            | mixed. All other values reserved. Little-endian. |
++-------------+------------+--------------------------------------------------+
+| enabled_mpk | EnabledMpk | MPK encrypted to the Enabled MPK Encryption Key. |
++-------------+------------+--------------------------------------------------+
 
 Table: MIX_MPK output arguments
 
@@ -1465,7 +1465,7 @@ Table: TEST_ACCESS_KEY output arguments
 
 #### GENERATE_MEK {#sec:generate-mek-cmd}
 
-This command generates a random 512-bit MEK and encrypts it using the MEK encryption secret, which is derived from the HEK, the MEK secret seed, and the given SEK and DPK.
+This command generates a random 512-bit MEK and encrypts it using the MEK secret, which is derived from the HEK, the MEK secret seed, and the given SEK and DPK.
 
 The DPK may be a value decrypted by a user-provided C_PIN in Opal.
 
@@ -1503,13 +1503,12 @@ Table: GENERATE_MEK output arguments
 +-------------+------------+-------------------------------------------+
 | reserved    | u32        | Reserved.                                 |
 +-------------+------------+-------------------------------------------+
-| wrapped_mek | WrappedMek | MEK encrypted to the derived MEK          |
-|             |            | encryption secret.                        |
+| wrapped_mek | WrappedMek | MEK encrypted to the derived MEK secret.  |
 +-------------+------------+-------------------------------------------+
 
 #### LOAD_MEK {#sec:load-mek-cmd}
 
-This command decrypts the given encrypted 512-bit MEK using the MEK encryption secret, which is derived from the HEK, the MEK secret seed, and the given SEK and DPK.
+This command decrypts the given encrypted 512-bit MEK using the MEK secret, which is derived from the HEK, the MEK secret seed, and the given SEK and DPK.
 
 The DPK may be a value decrypted by a user-provided C_PIN in Opal.
 
@@ -1523,30 +1522,29 @@ Command Code: 0x4C4D_454B ("LMEK")
 
 Table: LOAD_MEK input arguments
 
-+--------------+------------+---------------------------------------------+
-| Name         | Type       | Description                                 |
-+==============+============+=============================================+
-| chksum       | u32        | Checksum over other input arguments,        |
-|              |            | computed by the caller.                     |
-+--------------+------------+---------------------------------------------+
-| reserved     | u32        | Reserved.                                   |
-+--------------+------------+---------------------------------------------+
-| sek          | u8[32]     | Soft Epoch Key.                             |
-+--------------+------------+---------------------------------------------+
-| dpk          | u8[32]     | Data Protection Key.                        |
-+--------------+------------+---------------------------------------------+
-| metadata     | u8[20]     | Metadata for MEK to load into the drive     |
-|              |            | encryption engine (i.e. NSID + LBA range).  |
-+--------------+------------+---------------------------------------------+
-| aux_metadata | u8[32]     | Auxiliary metadata for the MEK              |
-|              |            | (optional; i.e. operation mode).            |
-+--------------+------------+---------------------------------------------+
-| wrapped_mek  | WrappedMek | MEK encrypted to the derived MEK encryption |
-|              |            | key.                                        |
-+--------------+------------+---------------------------------------------+
-| cmd_timeout  | u32        | Timeout in ms for command to encryption     |
-|              |            | engine to complete.                         |
-+--------------+------------+---------------------------------------------+
++--------------+------------+--------------------------------------------+
+| Name         | Type       | Description                                |
++==============+============+============================================+
+| chksum       | u32        | Checksum over other input arguments,       |
+|              |            | computed by the caller.                    |
++--------------+------------+--------------------------------------------+
+| reserved     | u32        | Reserved.                                  |
++--------------+------------+--------------------------------------------+
+| sek          | u8[32]     | Soft Epoch Key.                            |
++--------------+------------+--------------------------------------------+
+| dpk          | u8[32]     | Data Protection Key.                       |
++--------------+------------+--------------------------------------------+
+| metadata     | u8[20]     | Metadata for MEK to load into the drive    |
+|              |            | encryption engine (i.e. NSID + LBA range). |
++--------------+------------+--------------------------------------------+
+| aux_metadata | u8[32]     | Auxiliary metadata for the MEK             |
+|              |            | (optional; i.e. operation mode).           |
++--------------+------------+--------------------------------------------+
+| wrapped_mek  | WrappedMek | MEK encrypted to the derived MEK secret.   |
++--------------+------------+--------------------------------------------+
+| cmd_timeout  | u32        | Timeout in ms for command to encryption    |
+|              |            | engine to complete.                        |
++--------------+------------+--------------------------------------------+
 
 Table: LOAD_MEK output arguments
 
@@ -2329,15 +2327,15 @@ See <https://github.com/chipsalliance/Caliptra/tree/main/doc/ocp_lock>.
 
 # Preconditioned AES-Encrypt calculations {#sec:preconditioned-aes-calculations}
 
-This appendix expands on @sec:preconditioned-aes and provides additional details behind the claim that approximately $2^{80}$ preconditioned AES-Encrypt operations for a given secret are needed before an IV collision is expected to occur with probability greater than $2^{-32}$.
+This appendix expands on @sec:preconditioned-aes and provides additional details behind the claim that approximately $2^{80}$ preconditioned AES-Encrypt operations for a given encryption key are needed before an IV collision is expected to occur with probability greater than $2^{-32}$.
 
-To satisfy FIPS, it is sufficient to demonstrate that no single AES-GCM key will be used more than $2^{32}$ times. With a 96-bit salt, a given input secret can be expanded to up to $2^{96}$ possible keys. This can be put in terms of the "Balls into bins" problem [@{balls-into-bins}], where we are looking for the number of balls ($m$) required for the maximum load across $2^{96}$ bins ($n$) to be $2^{32}$. An approximation for the maximum load where $m>n$ is given as $m/n+\sqrt{m·log(n)/n}$. Rearranging to solve for $m$ via the quadratic formula yields $m≈2^{128}$. Therefore a given input secret may be used in at most $2^{128}$ preconditioned AES-Encrypt operations before any key derived from that secret is used in more than $2^{32}$ AES-GCM-Encrypt operations.
+To satisfy FIPS, it is sufficient to demonstrate that no single AES-GCM key will be used more than $2^{32}$ times. With a 96-bit salt, a given encryption key can be expanded to up to $2^{96}$ possible subkeys. This can be put in terms of the "Balls into bins" problem [@{balls-into-bins}], where we are looking for the number of balls ($m$) required for the maximum load across $2^{96}$ bins ($n$) to be $2^{32}$. An approximation for the maximum load where $m>n$ is given as $m/n+\sqrt{m·log(n)/n}$. Rearranging to solve for $m$ via the quadratic formula yields $m≈2^{128}$. Therefore a given encryption key may be used in at most $2^{128}$ preconditioned AES-Encrypt operations before any subkey derived from that key is used in more than $2^{32}$ AES-GCM-Encrypt operations.
 
-However, the $2^{32}$ encryption limit is a means to an end, namely ensuring a low probability of IV collisions. The Birthday paradox [@{birthday-problem}] implies that the probability of a collision between $n$ generated IVs where $d$ is the number of possible IVs is approximately $n^2/(2d)$. The chances of a 96-bit IV collision across $2^{32}$ IVs is therefore approximately $2^{2·32}/2^{96+1}=2^{-33}$ for a given key. If each of the $2^{96}$ derived keys might be used up to $2^{32}$ times, the expected number of derived keys that experience a collision is approximately $2^{96}·2^{-33}=2^{63}$. Clearly a limit of $2^{128}$ encryption operations for a given input secret, while meeting the letter of the FIPS requirements, is too large for safety.
+However, the $2^{32}$ encryption limit is a means to an end, namely ensuring a low probability of IV collisions. The Birthday paradox [@{birthday-problem}] implies that the probability of a collision between $n$ generated IVs where $d$ is the number of possible IVs is approximately $n^2/(2d)$. The chances of a 96-bit IV collision across $2^{32}$ IVs is therefore approximately $2^{2·32}/2^{96+1}=2^{-33}$ for a given subkey. If each of the $2^{96}$ derived subkeys might be used up to $2^{32}$ times, the expected number of derived subkeys that experience a collision is approximately $2^{96}·2^{-33}=2^{63}$. Clearly a limit of $2^{128}$ encryption operations for a given encryption key, while meeting the letter of the FIPS requirements, is too large for safety.
 
-We can calculate the safe margin by simply considering the 96-bit salt concatenated to the 96-bit IV. What we are really after is the maximum number of preconditioned AES-Encrypt invocations with a given input secret such that the likelihood of experiencing a collision of the 192-bit (salt || IV) pair is at most $2^{-32}$. Leveraging the Birthday paradox equation, $n≈\sqrt{2^{192+1}·2^{-32}}=2^{80.5}$.
+We can calculate the safe margin by simply considering the 96-bit salt concatenated to the 96-bit IV. What we are really after is the maximum number of preconditioned AES-Encrypt invocations with a given encryption key such that the likelihood of experiencing a collision of the 192-bit (salt || IV) pair is at most $2^{-32}$. Leveraging the Birthday paradox equation, $n≈\sqrt{2^{192+1}·2^{-32}}=2^{80.5}$.
 
-Therefore a given input secret may safely be used in at most $2^{80.5}$ preconditioned AES-Encrypt operations before an IV collision is expected to occur with probability greater than $2^{-32}$ across all of the AES-GCM keys derived from the input secret.
+Therefore a given encryption key may safely be used in at most $2^{80.5}$ preconditioned AES-Encrypt operations before an IV collision is expected to occur with probability greater than $2^{-32}$ across all of the AES-GCM subkeys derived from the encryption key.
 
 # EAT format for attesting to the epoch key state {#sec:eat-format}
 

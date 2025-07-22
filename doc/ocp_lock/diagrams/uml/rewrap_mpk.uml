@@ -26,11 +26,11 @@ $zeroize(sek)
 
 $hpke_unwrap(c_ak, n_ak)
 
-$preconditioned_key_extract(Current access key, c_ak, EPK, epk, current-access-key Locked MPK Encryption Secret, c_encryption_secret)
+$preconditioned_key_extract(Current access key, c_ak, EPK, epk, current-access-key Locked MPK Encryption Key, c_encryption_key)
 
 $zeroize(c_ak)
 
-$preconditioned_key_extract(New access key, n_ak, EPK, epk, new-access-key Locked MPK Encryption Secret, n_encryption_secret)
+$preconditioned_key_extract(New access key, n_ak, EPK, epk, new-access-key Locked MPK Encryption Key, n_encryption_key)
 
 $zeroize(epk)
 $zeroize(n_ak)

@@ -8,17 +8,17 @@
 
 note across
     <b>Preconditions:</b>
-    * Enabled MPK Encryption Secret is initialized.
+    * Enabled MPK Encryption Key is initialized.
     * The following sequence has occurred prior: INITIALIZE_MEK_SECRET, then zero or more MIX_MPK
 end note
 
 ' Pre-existing data
-$activate_kv(enabled_mpk_encryption_secret)
+$activate_kv(enabled_mpk_encryption_key)
 $activate_kv(mpk_secret)
 
 dfw -> cfw++ : MIX_MPK
 
-$preconditioned_aes_decrypt(enabled_mpk_encryption_secret, encryption_key, enabled MPK, mpk)
+$preconditioned_aes_decrypt(enabled_mpk_encryption_key, encryption_subkey, enabled MPK, mpk)
 
 $preconditioned_key_extract(MPK secret, mpk_secret, MPK, mpk, MPK secret, mpk_secret)
 

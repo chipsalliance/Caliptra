@@ -83,15 +83,15 @@
 
     !endprocedure
 
-    !unquoted procedure $preconditioned_aes_encrypt($secret, $key, $plaintext_name, $plaintext_from)
+    !unquoted procedure $preconditioned_aes_encrypt($key, $subkey, $plaintext_name, $plaintext_from)
         group Preconditioned AES Encrypt
             cfw -> drbg: Get random 96-bit AES IV
             cfw -> drbg: Get random 64-bit AES salt
 
-            $kdf(cfw, encryption secret, $secret, AES salt, AES encryption key, $key)
+            $kdf(cfw, encryption key, $key, AES salt, AES encryption subkey, $subkey)
 
-            !if ($secret != "enabled_mpk_encryption_secret")
-                $zeroize($secret)
+            !if ($key != "enabled_mpk_encryption_key")
+                $zeroize($key)
             !endif
 
             cfw -> aes++: Encrypt $plaintext_name
@@ -116,12 +116,12 @@
         end
     !endprocedure
 
-    !unquoted procedure $preconditioned_aes_decrypt($secret, $key, $ciphertext_name, $ciphertext_to)
+    !unquoted procedure $preconditioned_aes_decrypt($key, $subkey, $ciphertext_name, $ciphertext_to)
         group Preconditioned AES Decrypt
-            $kdf(cfw, encryption secret, $secret, AES salt, AES decryption key, $key)
+            $kdf(cfw, encryption key, $key, AES salt, AES decryption subkey, $subkey)
 
-            !if ($secret != "enabled_mpk_encryption_secret")
-                $zeroize($secret)
+            !if ($key != "enabled_mpk_encryption_key")
+                $zeroize($key)
             !endif
 
             cfw -> aes++: Decrypt $ciphertext_name
@@ -210,7 +210,7 @@
         participant "MDK\n(Key Vault)" as mdk
         participant "Firmware DICE CDI\n(Key Vault)" as fw_cdi
         participant "Derived key\n(Key Vault)" as dkey
-        participant "Enabled MPK Encryption Secret\n(Key Vault)" as enabled_mpk_encryption_secret
+        participant "Enabled MPK Encryption Key\n(Key Vault)" as enabled_mpk_encryption_key
         participant "MPK Secret\n(Key Vault)" as mpk_secret
         participant "SEK\n(in memory)" as sek
         participant "DPK\n(in memory)" as dpk
@@ -220,14 +220,14 @@
         participant "Access key\n(in memory)" as ak
         participant "Current Access key\n(in memory)" as c_ak
         participant "New access key\n(in memory)" as n_ak
-        participant "Encryption Secret\n(Key Vault)" as encryption_secret
-        participant "Current Encryption Secret\n(Key Vault)" as c_encryption_secret
-        participant "New Encryption Secret\n(Key Vault)" as n_encryption_secret
         participant "Encryption Key\n(Key Vault)" as encryption_key
+        participant "Current Encryption Key\n(Key Vault)" as c_encryption_key
+        participant "New Encryption Key\n(Key Vault)" as n_encryption_key
+        participant "Encryption Subkey\n(Key Vault)" as encryption_subkey
         participant "Current Encryption Key\n(Key Vault)" as c_encryption_key
         participant "MPK\n(in memory)" as mpk
         participant "New Encryption Key\n(Key Vault)" as n_encryption_key
-        participant "Enabled MPK Encryption Key\n(Key Vault)" as enabled_mpk_encryption_key
+        participant "Enabled MPK Encryption Subkey\n(Key Vault)" as enabled_mpk_encryption_subkey
         participant "MEK\n(Key Vault)" as mek
 
         ' Legend participants

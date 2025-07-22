@@ -26,14 +26,14 @@ $zeroize(sek)
 
 $hpke_unwrap(ak, "")
 
-$preconditioned_key_extract(Access key, ak, EPK, epk, Locked MPK Encryption Secret, encryption_secret)
+$preconditioned_key_extract(Access key, ak, EPK, epk, Locked MPK Encryption Key, encryption_key)
 
 $zeroize(epk)
 $zeroize(ak)
 
 cfw -> drbg: Get random 256-bit MEK
 
-$preconditioned_aes_encrypt(encryption_secret, encryption_key, MPK, cfw)
+$preconditioned_aes_encrypt(encryption_key, encryption_subkey, MPK, cfw)
 
 cfw -> dfw: Command response\nand Locked MPK
 cfw--
