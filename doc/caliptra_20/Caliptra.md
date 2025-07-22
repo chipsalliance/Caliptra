@@ -259,7 +259,7 @@ The following figure shows the basic high-level blocks of Caliptra.
 
 See the [hardware section](#hardware) for a detailed discussion.
 
-From Caliptra 2.x onwards, Caliptra introduces two modes of operation. **Passive** mode which was supported in 1.x architecture and **Subsystem** mode. Fundamental difference between passive mode and subsystem mode is that in the subsystem mode Caliptra is the RoT for the SoC and provides streaming boot, secure boot and attestation. In Subsystem mode, Caliptra also provides various crypto API services such as encryption/decryption of SoC FWs, Key releases, Key wraps, hashing etc. to name a few. Please see Caliptra subsystem mode Crypto API section for more details (**FIXME**: section name & details).
+From Caliptra 2.x onwards, Caliptra introduces two modes of operation. **Passive** mode which was supported in 1.x architecture and **Subsystem** mode. Fundamental difference between passive mode and subsystem mode is that in the subsystem mode Caliptra is the RoT for the SoC and provides streaming boot, secure boot and attestation. In Subsystem mode, Caliptra also provides various crypto API services such as encryption/decryption of SoC FWs, Key releases, Key wraps, hashing etc. to name a few. Please see [Caliptra runtime cryptographic mailbox commands documentation](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/runtime/README.md#cryptographic-mailbox-commands-new-in-20) for more details.
 
 **Passive Mode High Level Flow**
 
@@ -1018,7 +1018,7 @@ Caliptra supports 32 LMS trees for the vendor and 1 tree for the owner. The SoC 
 
 Caliptra has an option starting in 2.0 to use ML-DSA-87 signatures in addition to ECDSA to support FIPS 204 and CNSA 2.0 requirements for category 5.
 
-Caliptra provides cryptographic servies to support ML-KEM (in addition to ECDH) key exchanges.
+Caliptra 2.1 provides cryptographic servies to support ML-KEM (in addition to ECDH) key exchanges.
 
 ### Key rotation
 
@@ -1067,7 +1067,7 @@ Because warm reset is a pin input to Caliptra, Caliptra may not be idle when a w
 
 ## Mailbox
 
-The Caliptra Mailbox is a 128 KiB buffer that is used to exchange data between the SoC and the Caliptra microcontroller.
+The Caliptra Mailbox is a 256 KiB buffer that is used to exchange data between the SoC and the Caliptra microcontroller.
 
 The SoC communicates with the mailbox over an AXI interface. This allows the SoC to identify the device that is using the interface. This ensures that the mailbox, control registers, and fuses are read or written only by the appropriate device.
 
@@ -1335,7 +1335,7 @@ The Caliptra subsystem offers a complete RoT subsystem, with open source program
 # SoC Integration Flexibility
 - SoC may choose to add PLLs (Phase Locked Loop for stable clock generation), SoC specific mailboxes, SoC specific firewalls & address translations, environmental circuitry as some examples.
 - Caliptra subsystem provides flexibility to SoC to remap subsystem driven debug levels to SoC specific debug policies.
-- Please see Subsystem hardware and integration specifications for additional details on subsystem configurability (FIXME: Add md versions once available; right now they are uploaded as pdfs in Caliptra-SS repository's doc folder).
+- Please see Subsystem [hardware](https://github.com/chipsalliance/caliptra-ss/blob/main/docs/CaliptraSSHardwareSpecification.md) and [integration](https://github.com/chipsalliance/caliptra-ss/blob/main/docs/CaliptraSSIntegrationSpecification.md) specifications for additional details on subsystem configurability.
 
 # Caliptra Subsystem Architectural Flows
 
@@ -1387,7 +1387,6 @@ The Caliptra subsystem offers a complete RoT subsystem, with open source program
     1. The address of the MCU SRAM is provided to Caliptra’s RT FW through SOC manifest.
     2. Note: From validation front, need to ensure the Caliptra ROM and MCU are aligned in endianness.
 15. Caliptra RT FW will instruct Caliptra HW to read MCU SRAM and generate the hash (Caliptra HW will use the SHA accelerator and AXI mastering capabilities to do this)
-    > **Open**: Should we have a capability to do something like this for decryption too? (Key to be provided by MCU/SOC before running the decryption flow?)
 16. Caliptra RT FW will use this hash and verify it against the hash in the SOC manifest.
 17. Caliptra RT FW after verifying/authorizing the image and if it passes, it will set EXEC/GO bit into the register as specified in the previous command. This register write will also assert a Caliptra interface wire.
     1. MCU ROM will be polling the breadcrumb that the MCU SRAM has valid content and will jump to the MCU SRAM to execute from it. **NOTE:** This breadcrumb should be one of the status bits available on the MCU interface that is set by Caliptra GO bit wires.
@@ -1524,7 +1523,7 @@ Please refer to Caliptra subsystem Hardware specification.
 2. It must send payload to I3C target device in chunks of 256 bytes ( header (4B) + FW bytes(256B) as I3C target transfer ) only unless it is the last write for the image. Before sending the payload, it must read FIFO empty status from INDIRECT_FIFO_STATUS register.
 3. After last write for the image, it must activate the image after reading INDIRECT_FIFO_STATUS register, FIFO empty status.
 
-# Life Cycle Controller & SoC Debug Architecture
+# Lifecycle Controller & SoC Debug Architecture
 
 Please refer to Caliptra subsystem hardware specification.
 
