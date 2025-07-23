@@ -31,7 +31,7 @@ $preconditioned_key_extract(Access key, ak, EPK, epk, Locked MPK Encryption Key,
 $zeroize(epk)
 $zeroize(ak)
 
-cfw -> drbg: Get random 256-bit MEK
+cfw -> drbg: Get random 256-bit MPK
 
 $preconditioned_aes_encrypt(encryption_key, encryption_subkey, MPK, cfw)
 

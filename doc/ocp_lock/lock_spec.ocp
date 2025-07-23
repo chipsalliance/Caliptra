@@ -720,11 +720,19 @@ When in AES-XTS mode, the encryption engine will be responsible for performing t
 
 ### Random key generation via DRBG
 
-KMB generates multiple kinds of random keys. It does so using randomness obtained from a DRBG, which is seeded from Caliptra's TRNG and which may be updated with entropy from the host.
+KMB generates multiple kinds of random keys. It does so using randomness obtained from a DRBG, which is seeded from a TRNG and which may be updated with entropy from the host.
 
-![DRBG usage](./diagrams/drbg_diagram.drawio.svg){#fig:drbg-usage}
+Caliptra hardware [@{caliptra-2.0-hw-spec}] supports either an integrated or external DRBG, illustrated respectively in Figures [-@fig:drbg-internal] and [-@fig:drbg-external].
 
-Note that Caliptra hardware only supports the \`DRBG_Update\` operation when Caliptra is instantiated with an internal TRNG [@{caliptra-2.0-hw-spec}].
+![Integrated DRBG](./diagrams/drbg_internal.drawio.svg){#fig:drbg-internal}
+
+![External DRBG](./diagrams/drbg_external.drawio.svg){#fig:drbg-external}
+
+If Caliptra is instantiated with an intergrated DRBG, host-provided entropy can be mixed into the DRBG state via the [CM_RANDOM_STIR](https://github.com/chipsalliance/caliptra-sw/tree/main-2.x/runtime#cm_random_stir) Caliptra mailbox command.
+
+If Caliptra is not instantiated with an integrated DRBG, the drive is responsible for contributing host-provided entropy to the DRBG that feeds Caliptra.
+
+Note: OCP L.O.C.K. functionality does not require one or the other flavor of DRBG. Other aspects of Caliptra integration may impose such requirements, and are outside the scope of this specification.
 
 ### Boot-time initialization
 
