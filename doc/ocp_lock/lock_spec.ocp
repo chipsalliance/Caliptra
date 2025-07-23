@@ -1001,6 +1001,39 @@ The KMB therefore interacts with the Control register as follows in the normal c
 
 Since the Control register is a part of the encryption engine whose implementation can be unique to each vendor, behaviors of the Control register with respect to unexpected flows are left for vendors. For example, a vendor who wants robustness might integrate a write-lock into the Control register in order to prevent two almost simultaneous writes on the EXE bit. Vendors shall ensure that any customizations remain compatible with the interface defined in this specification.
 
+#### Control register state machine
+
+@fig:ctrl-reg-state-machine illustrates the control register's state machine as it transitions from power-on to executing a command.
+
+```mermaid {caption="Control register state machine" #fig:ctrl-reg-state-machine}
+stateDiagram-v2
+    state "RDY=0<br>ERR=0<br>CMD=0<br>DONE=0<br>EXE=0" as power_on
+    state "Encryption engine initializes" as init
+    state "RDY=1<br>ERR=0<br>CMD=0<br>DONE=0<br>EXE=0" as ready
+    state "RDY=0<br>ERR=[code]<br>CMD=0<br>DONE=0<br>EXE=0" as fatal
+
+    state "RDY=1<br>ERR=0<br>CMD=[code]<br>DONE=0<br>EXE=0" as cmd_init
+    state "RDY=1<br>ERR=0<br>CMD=[code]<br>DONE=0<br>EXE=1" as cmd_exe
+    state "Encryption engine processes command" as cmd_processing
+    state "RDY=1<br>ERR=[code]<br>CMD=[code]<br>DONE=1<br>EXE=0" as cmd_done
+    state "Encryption engine resets for next command" as cmd_reset
+
+    [*] --> power_on
+    power_on --> init
+    init --> fatal: Fatal error
+    fatal --> [*]
+
+    init --> ready: Encryption Engine writes<br>RDY=1
+    ready --> cmd_init: KMB writes<br>CMD=[code]
+    cmd_init --> cmd_exe: KMB writes<br>EXE=1
+    cmd_exe --> cmd_processing
+    cmd_processing --> fatal: Fatal error
+    cmd_processing --> cmd_done: Encryption engine writes<br>ERR=[code]<br>DONE=1<br>EXE=0
+    cmd_done --> cmd_reset: KMB writes<br>DONE=1
+    cmd_reset --> ready: Encryption engine writes<br>ERR=0,<br>CMD=0,<br>DONE=0,<br>EXE=0
+    cmd_reset --> fatal: Fatal error
+```
+
 #### KMB command sequence
 
 @fig:cmd-ee-example-uml shows a sample command execution. This is an expected sequence when the drive firmware instructs the KMB to load an MEK. This sequence would occur as part of the [DERIVE_MEK](#sec:derive-mek-cmd) or [LOAD_MEK](#sec:load-mek-cmd) mailbox commands. The internal behavior of the encryption engine is one of several possible mechanisms, and can be different per vendor.
