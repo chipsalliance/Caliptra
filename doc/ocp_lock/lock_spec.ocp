@@ -274,6 +274,14 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 |                   | each MEK secret. See                 |                                                             |               |
 |                   | @fig:mek-secret-derivation.          |                                                             |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
+| Volatile Escrow   | Allows KMB firmware to escrow        | Randomly generated when first needed at runtime. Held in    | 18            |
+| Key               | volatile secrets for future access   | the Key Vault and lost on cold reset.                       |               |
+|                   | by runtime KMB firmware.             |                                                             |               |
+|                   |                                      |                                                             |               |
+|                   | Encrypts/decrypts Enabled MPKs. See  |                                                             |               |
+|                   | Figures [-@fig:mpk-enabling] and     |                                                             |               |
+|                   | [-@fig:mek-secret-derivation].       |                                                             |               |
++-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
 | HPKE private keys | Provides transport encryption for    | Randomly generated on startup. Held in volatile memory,     | N/A           |
 |                   | injected access keys. See            | rotated on demand, and lost on cold reset.                  |               |
 |                   | @sec:hpke-transport-encryption.      |                                                             |               |
@@ -283,21 +291,16 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 |                   | @fig:mpk-generation for one of       | access key is held in ephemeral memory and is zeroized      |               |
 |                   | several flows where this is done.    | after each use.                                             |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
-| Locked MPK        | Encrypts/decrypts a Locked MPK. See  | Derived from the EPK and an injected access key. Held in    | 18            |
+| Locked MPK        | Encrypts/decrypts a Locked MPK. See  | Derived from the EPK and an injected access key. Held in    | 19            |
 | encryption keys   | @fig:mpk-generation for one of       | the Key Vault and zeroized after each use.                  |               |
 |                   | several flows where this is done.    |                                                             |               |
 |                   |                                      | Rendered irrecoverable if the SEK, HEK seed, or DICE UDS    |               |
 |                   |                                      | are zeroized from persistent storage.                       |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
-| Enabled MPK       | Encrypts/decrypts Enabled MPKs. See  | Randomly generated when first needed at runtime. Held in    | 19            |
-| Encryption Key    | Figures [-@fig:mpk-enabling] and     | the Key Vault and lost on cold reset.                       |               |
-|                   | [-@fig:mek-secret-derivation].       |                                                             |               |
-+-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
 | MPKs              | Contributes to the derivation of an  | Randomly generated on demand. Encrypted with a Locked MPK   | N/A           |
-|                   | MEK secret. See                      | encryption key or the Enabled MPK Encryption Key (depending |               |
-|                   | @fig:mek-secret-derivation.          | on whether the MPK is locked or enabled). When decrypted,   |               |
-|                   |                                      | each MPK is held in ephemeral memory and is zeroized after  |               |
-|                   |                                      | each use.                                                   |               |
+|                   | MEK secret. See                      | encryption key or the VEK (depending on whether the MPK is  |               |
+|                   | @fig:mek-secret-derivation.          | locked or enabled). When decrypted, each MPK is held in     |               |
+|                   |                                      | ephemeral memory and is zeroized after each use.            |               |
 |                   |                                      |                                                             |               |
 |                   |                                      | Rendered irrecoverable if the SEK, HEK seed, or DICE UDS    |               |
 |                   |                                      | are zeroized from persistent storage.                       |               |
@@ -421,12 +424,25 @@ Each encryption key is preconditioned using a randomly-generated 96-bit salt to 
 
 In addition to a plaintext message, this operation supports optional metadata for the message, which is attached as AAD.
 
+#### VEK {#sec:vek}
+
+The Volatile Escrow Key (VEK) is held in the Key Vault and is used to protect volatile keys held outside of the Key Vault. There are two keys protected by the VEK:
+
+- HPKE keypairs
+- Enabled MPKs
+
+The VEK is lazily generated upon first use and is lost when the drive shuts down. Lazy generation allows injected host entropy to contribute to the key's generation. 
+
+The VEK is randomly generated and held in a Key Vault slot. There does not exist a hardware data path directly between Caliptra's DRBG and Key Vault. Therefore, KMB firmware will read random data from the DRBG and send it to the Key Vault. To prevent KMB firmware from seeing the actual VEK, the randomness obtained by firmware is permuted using the HEK, as illustrated in @fig:vek-generation.
+
+![VEK Generation](./diagrams/vek_generation.drawio.svg){#fig:vek-generation}
+
 ### MPKs {#sec:mpks}
 
 MPKs are the mechanism by which KMB enforces multi-party authorization as a precondition to loading an MEK. MPKs exist in one of two states: locked or enabled. In both these states the MPK is encrypted to a secret known only to KMB.
 
 - A locked MPK's encryption key is derived from the HEK, SEK, and an externally-supplied access key to which the MPK is bound. The locked MPK is held at rest by drive firmware.
-- An enabled MPK's encryption key is a common volatile secret held within KMB which is randomly generated and is lost when the drive shuts down. See @sec:enabled-mpk-encryption-key-generation for details on how this key is generated. Enabled MPKs are held in drive firmware memory.
+- An enabled MPK's encryption key is a common volatile secret held within KMB which is randomly generated and is lost when the drive shuts down. See @sec:vek for details on how this key is generated. Enabled MPKs are held in drive firmware memory.
 
 The externally-supplied access key is encrypted in transit using an HPKE public key held by KMB. The "enabled" state allows the HPKE keypair to be rotated after the access key has been provisioned to the storage device, without removing the ability for KMB to decrypt the MPK when later loading an MEK bound to that MPK.
 
@@ -489,14 +505,6 @@ Upon request, KMB can issue an endorsement for a given HPKE public key, signed b
 
 ![HPKE public key endorsement](./diagrams/hpke_pub_key_endorsement.drawio.svg){#fig:hpke-pub-key-endorsement}
 
-#### Enabled MPK Encryption Key generation {#sec:enabled-mpk-encryption-key-generation}
-
-The Enabled MPK Encryption Key is lazily generated upon first use and is lost when the drive shuts down. Lazy generation allows injected host entropy to contribute to the key's generation. 
-
-The Enabled MPK Encryption Key is randomly generated and held in a Key Vault slot. There does not exist a hardware data path directly between Caliptra's DRBG and Key Vault. Therefore, KMB firmware will read random data from the DRBG and send it to the Key Vault. To prevent KMB firmware from seeing the actual Enabled MPK Encryption Key, the randomness obtained by firmware is permuted using the HEK, as illustrated in @fig:enabled-mpk-encryption-key-generation.
-
-![Enabled MPK Encryption Key Generation](./diagrams/enabled_mpk_encryption_key_generation.drawio.svg){#fig:enabled-mpk-encryption-key-generation}
-
 #### MPK lifecycle
 
 MPKs can be generated, enabled, and have their access keys rotated and tested.
@@ -521,14 +529,14 @@ Drive firmware may then store the encrypted MPK in persistent storage.
 
 ##### MPK enabling
 
-Encrypted MPKs stored at rest in persistent storage are considered "locked", and must be enabled before they can be used to load an MEK. Enabled MPKs are also encrypted when handled by drive firmware, to the Enabled MPK Encryption Key. Enabled MPKs do not survive across device reset.
+Encrypted MPKs stored at rest in persistent storage are considered "locked", and must be enabled before they can be used to load an MEK. Enabled MPKs are also encrypted when handled by drive firmware, to the VEK. Enabled MPKs do not survive across device reset.
 
 To enable an MPK, KMB performs the following steps:
 
 1. Unwrap the given MPK access key using the HPKE keypair held within KMB.
 2. Derive the MPK encryption key from the HEK, SEK, and decrypted access key.
 3. Decrypt the MPK using the MPK encryption key.
-4. Encrypt the MPK using the Enabled MPK Encryption Key, preserving the MPK metadata.
+4. Encrypt the MPK using the VEK, preserving the MPK metadata.
 5. Return the re-encrypted "enabled" MPK to the drive firmware.
 
 Drive firmware may then stash the encrypted enabled MPK in volatile storage, and later provide it to the KMB when loading an MEK, as described in @sec:meks.
@@ -727,7 +735,7 @@ Next, Caliptra runtime firmware performs the following steps:
 - Determines whether a HEK is available, based on the fuse configuration. If a HEK is unavailable, KMB enters a mode where MEKs are not allowed to be loaded.
 - Initializes random HPKE keypairs for each supported algorithm, and assigns handles to them, reported via [ENUMERATE_HPKE_HANDLES](#sec:enumerate-hpke-handles-cmd).
 
-The Enabled MPK Encryption Key is not initialized at boot-up, as it is generated lazily upon first use. See @sec:mpks for details.
+The VEK is not initialized at boot-up, as it is generated lazily upon first use. See @sec:vek for details.
 
 ### Authorization {#sec:authorization}
 
@@ -1363,7 +1371,7 @@ Table: REWRAP_MPK output arguments
 
 #### ENABLE_MPK {#sec:enable-mpk-cmd}
 
-This command decrypts \`sealed_access_key\`. Then the decrypted access_key is used to decrypt \`locked_mpk\` using KDF(HEK || SEK || access_key, "MPK"). An "enabled" MPK is encrypted with the Enabled MPK Encryption Key. The encrypted enabled MPK is returned.
+This command decrypts \`sealed_access_key\`. Then the decrypted access_key is used to decrypt \`locked_mpk\` using KDF(HEK || SEK || access_key, "MPK"). An "enabled" MPK is encrypted with the VEK. The encrypted enabled MPK is returned.
 
 See @fig:enable-mpk-uml for the sequence diagram.
 
@@ -1390,23 +1398,23 @@ Table: ENABLE_MPK input arguments
 
 Table: ENABLE_MPK output arguments
 
-+-------------+------------+----------------------------------------------+
-| Name        | Type       | Description                                  |
-+=============+============+==============================================+
-| chksum      | u32        | Checksum over other output arguments,        |
-|             |            | computed by Caliptra.                        |
-+-------------+------------+----------------------------------------------+
-| fips_status | u32        | Indicates if the command is FIPS approved    |
-|             |            | or an error.                                 |
-+-------------+------------+----------------------------------------------+
-| reserved    | u32        | Reserved.                                    |
-+-------------+------------+----------------------------------------------+
-| enabled_mpk | EnabledMpk | MPK encrypted to Enabled MPK Encryption Key. |
-+-------------+------------+----------------------------------------------+
++-------------+------------+-------------------------------------------+
+| Name        | Type       | Description                               |
++=============+============+===========================================+
+| chksum      | u32        | Checksum over other output arguments,     |
+|             |            | computed by Caliptra.                     |
++-------------+------------+-------------------------------------------+
+| fips_status | u32        | Indicates if the command is FIPS approved |
+|             |            | or an error.                              |
++-------------+------------+-------------------------------------------+
+| reserved    | u32        | Reserved.                                 |
++-------------+------------+-------------------------------------------+
+| enabled_mpk | EnabledMpk | MPK encrypted to the VEK.                 |
++-------------+------------+-------------------------------------------+
 
 #### MIX_MPK {#sec:mix-mpk-cmd}
 
-This command initializes the MEK secret seed if not already initialized or if \`initialize\` is set to 1, decrypts the specified MPK with the with the Enabled MPK Encryption Key, and then updates the MEK secret seed in KMB by performing a KDF with the MEK secret seed and the decrypted MPK.
+This command initializes the MEK secret seed if not already initialized or if \`initialize\` is set to 1, decrypts the specified MPK with the with the VEK, and then updates the MEK secret seed in KMB by performing a KDF with the MEK secret seed and the decrypted MPK.
 
 When generating an MEK, one or more MIX_MPK commands are processed to modify the MEK secret seed.
 
@@ -1428,7 +1436,7 @@ Table: MIX_MPK input arguments
 |             |            | initialized before the given MPK is              |
 |             |            | mixed. All other values reserved. Little-endian. |
 +-------------+------------+--------------------------------------------------+
-| enabled_mpk | EnabledMpk | MPK encrypted to the Enabled MPK Encryption Key. |
+| enabled_mpk | EnabledMpk | MPK encrypted to the VEK.                        |
 +-------------+------------+--------------------------------------------------+
 
 Table: MIX_MPK output arguments
@@ -2171,6 +2179,8 @@ Table: Acronyms and abbreviations used throughout this document {#tbl:abbreviati
 | TCG          | Trusted Computing Group                                  |
 +--------------+----------------------------------------------------------+
 | UART         | Universal asynchronous receiver-transmitter              |
++--------------+----------------------------------------------------------+
+| VEK          | Volatile Escrow Key                                      |
 +--------------+----------------------------------------------------------+
 | XTS          | XEX-based tweaked-codebook mode with ciphertext stealing |
 +--------------+----------------------------------------------------------+

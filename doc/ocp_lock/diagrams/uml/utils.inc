@@ -210,7 +210,7 @@
         participant "MDK\n(Key Vault)" as mdk
         participant "Firmware DICE CDI\n(Key Vault)" as fw_cdi
         participant "Derived key\n(Key Vault)" as dkey
-        participant "Enabled MPK Encryption Key\n(Key Vault)" as enabled_mpk_encryption_key
+        participant "VEK\n(Key Vault)" as vek
         participant "MPK Secret\n(Key Vault)" as mpk_secret
         participant "SEK\n(in memory)" as sek
         participant "DPK\n(in memory)" as dpk
@@ -227,7 +227,7 @@
         participant "Current Encryption Key\n(Key Vault)" as c_encryption_key
         participant "MPK\n(in memory)" as mpk
         participant "New Encryption Key\n(Key Vault)" as n_encryption_key
-        participant "Enabled MPK Encryption Subkey\n(Key Vault)" as enabled_mpk_encryption_subkey
+        participant "VEK Subkey\n(Key Vault)" as vek_subkey
         participant "MEK\n(Key Vault)" as mek
 
         ' Legend participants

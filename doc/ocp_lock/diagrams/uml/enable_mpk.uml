@@ -17,10 +17,10 @@ $activate_kv(fw_cdi)
 
 dfw -> cfw++ : ENABLE_MPK
 
-alt Enabled MPK Encryption Key not yet initialized
+alt VEK not yet initialized
     cfw -> drbg: Get random 256-bit seed
 
-    $preconditioned_key_extract(random seed, cfw, HEK, hek, Enabled MPK Encryption Key, enabled_mpk_encryption_key)
+    $preconditioned_key_extract(random seed, cfw, HEK, hek, VEK, vek)
 
     cfw -> cfw: Zeroize random seed
 end
