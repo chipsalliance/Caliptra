@@ -38,15 +38,28 @@ $preconditioned_key_extract(MPK secret, mpk_secret, MEK secret seed, mek_secret_
 $zeroize(mek_secret_seed)
 $zeroize(mpk_secret)
 
+group Calculate MEK checksum
+    cfw -> aes++: Compute MEK checksum
+    aes -> mek_secret: Read MEK secret
+    aes -> cfw: Write AES-ECB-Encrypt(MEK secret, 0x0000...)
+    aes -> cfw: Done
+    aes--
+end
+
 $kdf(cfw, MEK secret, mek_secret, derivation constant, MEK, mek)
 
 $zeroize(mek_secret)
+
+alt Drive firmware provided a non-zero MEK checksum
+    cfw -> cfw: Compare provided checksum with calculated checksum
+    note right cfw: Abort the operation if the checksums are not equal.\nOtherwise, proceed to MEK programming.
+end
 
 $program_mek()
 
 $zeroize(mek)
 
-cfw -> dfw : Command response\n\
+cfw -> dfw : Command response\nand MEK checksum\n\
  (Status = Control Reg\n\
                 Error field)
 cfw--
