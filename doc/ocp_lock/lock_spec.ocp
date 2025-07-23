@@ -632,29 +632,6 @@ In addition to the HEK seed, the HEK is derived from Caliptra's DICE UDS. The me
 
 By deriving the HEK in ROM based on secrets that are not available to runtime firmware, KMB ensures that compromised runtime firmware cannot derive the HEK using replayed HEK seed values.
 
-@tbl:hek-lifecycle-commands describes the commands that KMB exposes to manage the HEK lifecycle.
-
-Table: HEK lifecycle management commands {#tbl:hek-lifecycle-commands}
-
-+----------------------------------+------------------------------------------------------------------+
-| Command                          | Description                                                      |
-+==================================+==================================================================+
-| [PROGRAM_NEXT_HEK                | Programs a random HEK into the next slot. Upon                   |
-| ](#sec:program-next-hek-cmd)     | success, if the SEK is programmed, MEKs may be loaded.           |
-+----------------------------------+------------------------------------------------------------------+
-| [ZEROIZE_CURRENT_HEK             | Sets the current HEK slot's fuses to all-ones. May be            |
-| ](#sec:zeroize-current-hek-cmd)  | re-attempted if an error caused the active HEK slot to be        |
-|                                  | left in an invalid state. Upon success, MEKs may not be loaded.  |
-+----------------------------------+------------------------------------------------------------------+
-| [ENABLE_PERMANENT_HEK            | Enables a mode where the HEK is enabled but all zeroes. May      |
-| ](#sec:enable-permanent-hek-cmd) | only be invoked once all HEK slots are zeroized. May be          |
-|                                  | re-attempted if an error caused the permanent-HEK fuse indicator |
-|                                  | to be left in an invalid state. Upon success, if the SEK is      |
-|                                  | programmed, MEKs may be loaded.                                  |
-+----------------------------------+------------------------------------------------------------------+
-
-If an error causes the active HEK slot to be left in an invalid state, MEKs may not be loaded. If this state persists, the device is unusable.
-
 #### HEK and SEK lifecycle {#sec:hek-sek-lifecycle}
 
 @fig:hek-sek-rotation illustrates the case where a drive ships with four HEK slots.
@@ -663,10 +640,13 @@ If an error causes the active HEK slot to be left in an invalid state, MEKs may 
 
 A device out of manufacturing must be in the production lifecycle state and have a randomized HEK.
 
-Drive firmware is responsible for enforcing that SEK programming and zeroization follows the state machine illustrated in @fig:hek-sek-rotation. Specifically:
+Drive firmware is responsible for enforcing that HEK and SEK programming / zeroization follows the state machine illustrated in @fig:hek-sek-rotation. Specifically:
 
 - The SEK shall only be programmed once the HEK is available.
-- The HEK shall only be zeroized once the SEK is zeroized.
+- The HEK seed shall only be zeroized once the SEK is zeroized.
+- The HEK seed shall only be zeroized after it has been randomized or corrupted.
+- The next HEK seed shall only be programmed once the prior HEK seed has been zeroized.
+- Perma-HEK mode shall only be enabled once all HEK seeds have been zeroized.
 
 ### MEKs {#sec:meks}
 
@@ -1709,103 +1689,6 @@ Table: HpkeHandle contents
 |                |      | @tbl:get-algorithms-output-args.            |
 +----------------+------+---------------------------------------------+
 
-#### ZEROIZE_CURRENT_HEK {#sec:zeroize-current-hek-cmd}
-
-This command programs all un-programmed bits in the current HEK slot, so all bits are programmed. May re-attempt a previously-failed zeroize operation. This command does not modify the \`active_hek_slot\` reported in [REPORT_EPOCH_KEY_STATE](#sec:report-epoch-key-state-cmd).
-
-Command Code: 0x5A43_484B ("ZCHK")
-
-Table: ZEROIZE_CURRENT_HEK input arguments
-
-+----------+------+-----------------------------------------------+
-| Name     | Type | Description                                   |
-+==========+======+===============================================+
-| chksum   | u32  | Checksum over other input arguments, computed |
-|          |      | by the caller.                                |
-+----------+------+-----------------------------------------------+
-| reserved | u32  | Reserved.                                     |
-+----------+------+-----------------------------------------------+
-| hek_slot | u32  | Current HEK slot to zeroize.                  |
-+----------+------+-----------------------------------------------+
-
-Table: ZEROIZE_CURRENT_HEK output arguments
-
-+-------------+------+------------------------------------------------+
-| Name        | Type | Description                                    |
-+=============+======+================================================+
-| chksum      | u32  | Checksum over other output arguments, computed |
-|             |      | by Caliptra.                                   |
-+-------------+------+------------------------------------------------+
-| reserved    | u32  | Reserved.                                      |
-+-------------+------+------------------------------------------------+
-| fips_status | u32  | Indicates if the command is FIPS approved      |
-|             |      | or an error.                                   |
-+-------------+------+------------------------------------------------+
-
-#### PROGRAM_NEXT_HEK {#sec:program-next-hek-cmd}
-
-This command generates a random key and programs it into the next-available HEK slot. The \`active_hek_slot\` reported in @sec:report-epoch-key-state-cmd is incremented after successfully programming the random key, with the exception that when this command is used to provision the first HEK, the \`active_hek_slot\` is not incremented, because it is already set to the first slot.
-
-Command Code: 0x504E_484B ("PNHK")
-
-Table: PROGRAM_NEXT_HEK input arguments
-
-+----------+------+--------------------------------------+
-| Name     | Type | Description                          |
-+==========+======+======================================+
-| chksum   | u32  | Checksum over other input arguments, |
-|          |      | computed by the caller.              |
-+----------+------+--------------------------------------+
-| reserved | u32  | Reserved.                            |
-+----------+------+--------------------------------------+
-| hek_slot | u32  | Next HEK slot to program.            |
-+----------+------+--------------------------------------+
-
-Table: PROGRAM_NEXT_HEK output arguments
-
-+-------------+------+-------------------------------------------+
-| Name        | Type | Description                               |
-+=============+======+===========================================+
-| chksum      | u32  | Checksum over other output arguments,     |
-|             |      | computed by Caliptra.                     |
-+-------------+------+-------------------------------------------+
-| fips_status | u32  | Indicates if the command is FIPS approved |
-|             |      | or an error.                              |
-+-------------+------+-------------------------------------------+
-| reserved    | u32  | Reserved.                                 |
-+-------------+------+-------------------------------------------+
-
-#### ENABLE_PERMANENT_HEK {#sec:enable-permanent-hek-cmd}
-
-This command enables a state where the HEK is enabled but all-zeroes. The command is only allowed once all HEK fuse slots are programmed and zeroized.
-
-Command Code: 0x4550_484B ("EPHK")
-
-Table: ENABLE_PERMANENT_HEK input arguments
-
-+----------+------+--------------------------------------+
-| Name     | Type | Description                          |
-+==========+======+======================================+
-| chksum   | u32  | Checksum over other input arguments, |
-|          |      | computed by the caller.              |
-+----------+------+--------------------------------------+
-| reserved | u32  | Reserved.                            |
-+----------+------+--------------------------------------+
-
-Table: ENABLE_PERMANENT_HEK output arguments
-
-+-------------+------+-------------------------------------------+
-| Name        | Type | Description                               |
-+=============+======+===========================================+
-| chksum      | u32  | Checksum over other output arguments,     |
-|             |      | computed by Caliptra.                     |
-+-------------+------+-------------------------------------------+
-| fips_status | u32  | Indicates if the command is FIPS approved |
-|             |      | or an error.                              |
-+-------------+------+-------------------------------------------+
-| reserved    | u32  | Reserved.                                 |
-+-------------+------+-------------------------------------------+
-
 #### REPORT_EPOCH_KEY_STATE {#sec:report-epoch-key-state-cmd}
 
 This command reports the state of the epoch keys. The drive indicates the state of the SEK, while KMB internally senses the state of the HEK.
@@ -1889,28 +1772,13 @@ Table: HEK state values {#tbl:hek-state-values}
 | 1h    | HEK_UNAVAIL_EMPTY     | The drive has transitioned to the    |
 |       |                       | Production life cycle state and a    |
 |       |                       | HEK has not yet been provisioned.    |
-|       |                       | The PROGRAM_NEXT_HEK command can be  |
-|       |                       | used to provision the first secret.  |
 +-------+-----------------------+--------------------------------------+
 | 2h    | HEK_AVAIL_PROD        | A randomized HEK is provisioned in   |
-|       |                       | the current slot. The                |
-|       |                       | ZEROIZE_CURRENT_HEK command can be   |
-|       |                       | used to zeroize the current slot.    |
+|       |                       | the current slot.                    |
 +-------+-----------------------+--------------------------------------+
 | 3h    | HEK_UNAVAIL_ZEROIZED  | The current HEK has been zeroized.   |
-|       |                       | The PROGRAM_NEXT_HEK command can be  |
-|       |                       | used to provision a new HEK, if      |
-|       |                       | there remains at least one available |
-|       |                       | blank HEK slot.                      |
-|       |                       |                                      |
-|       |                       | If all slots have been zeroized, the |
-|       |                       | ENABLE_PERMANENT_HEK command can be  |
-|       |                       | used to make the HEK available.      |
 +-------+-----------------------+--------------------------------------+
 | 4h    | HEK_UNAVAIL_CORRUPTED | The current HEK slot is corrupted.   |
-|       |                       | The ZEROIZE_CURRENT_HEK command can  |
-|       |                       | be used to zeroize the current       |
-|       |                       | slot.                                |
 +-------+-----------------------+--------------------------------------+
 | 5h    | HEK_AVAIL_PERMANENT   | All HEKs have been zeroized and      |
 |       |                       | permanent HEK mode has been enabled. |
@@ -1933,7 +1801,7 @@ See @tbl:hek-lifecycle-states for more information about the relationship betwee
 
 HEK_AVAIL_PREPROD → HEK_UNAVAIL_EMPTY is a one-way transition that the device vendor is expected to trigger by advancing the Caliptra lifecycle state to Production.
 
-HEK_UNAVAIL_ZEROIZED → HEK_AVAIL_PERMANENT is a one-way transition that the device owner can trigger using the ENABLE_PERMANENT_HEK command once all HEK slots have been zeroized.
+HEK_UNAVAIL_ZEROIZED → HEK_AVAIL_PERMANENT is a one-way transition that the device owner can trigger once all HEK slots have been zeroized.
 
 See @fig:hek-sek-rotation for more details about the transitions between HEK states.
 
@@ -2296,10 +2164,8 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 |      | has been zeroized, and a HEK seed shall only be zeroized |           |
 |      | after it has been randomized. See @sec:hek-lifecycle.    |           |
 +------+----------------------------------------------------------+-----------+
-| 7    | The SEK shall only be programmed once the HEK is         | Yes       |
-|      | available, and the HEK shall only be zeroized            |           |
-|      | once the SEK is zeroized. See                            |           |
-|      | @sec:hek-sek-lifecycle.                                  |           |
+| 7    | HEK and SEK programming/zeroization shall adhere to the  | Yes       |
+|      | sequence described in @sec:hek-sek-lifecycle.            |           |
 +------+----------------------------------------------------------+-----------+
 | 8    | MEKs shall not be programmed while the SEK or HEK are    | Yes       |
 |      | zeroized. See @sec:heks-seks.                            |           |
