@@ -426,10 +426,7 @@ In addition to a plaintext message, this operation supports optional metadata fo
 
 #### VEK {#sec:vek}
 
-The Volatile Escrow Key (VEK) is held in the Key Vault and is used to protect volatile keys held outside of the Key Vault. There are two keys protected by the VEK:
-
-- HPKE keypairs
-- Enabled MPKs
+The Volatile Escrow Key (VEK) is held in the Key Vault and is used to protect volatile keys held outside of the Key Vault, specifically Enabled MPKs.
 
 The VEK is lazily generated upon first use and is lost when the drive shuts down. Lazy generation allows injected host entropy to contribute to the key's generation. 
 
@@ -529,7 +526,7 @@ Drive firmware may then store the encrypted MPK in persistent storage.
 
 ##### MPK enabling
 
-Encrypted MPKs stored at rest in persistent storage are considered "locked", and must be enabled before they can be used to load an MEK. Enabled MPKs are also encrypted when handled by drive firmware, to the VEK. Enabled MPKs do not survive across device reset.
+Encrypted MPKs stored at rest in persistent storage are considered "locked", and must be enabled before they can be used to load an MEK. Enabled MPKs are encrypted to the VEK when handled by drive firmware. Enabled MPKs do not survive across device reset.
 
 To enable an MPK, KMB performs the following steps:
 
@@ -695,6 +692,8 @@ Hardware enforces that AES-ECB decryption results using the Key Vault slot that 
 ![Deriving an MEK](./diagrams/mek_derive.drawio.svg){#fig:mek-derive}
 
 The checksum returned from KMB may be stored persistently by drive firmware and used for future derivations, or may be discarded. The checksum allows drive firmware to ensure that an MEK derived in the future matches a given MEK derived previously. This check would be a precaution against mistakes that would result in an incorrect MEK being programmed to the encryption engine, which could lead to data loss. This specification does not define how drive firmware should react to a checksum mismatch.
+
+The checksum is not derived from the MEK directly, because Caliptra hardware restricts what operations can be done with the Key Vault slot that holds the MEK.
 
 Note: a checksum is not required for encrypted MEKs. For encrypted MEKs, any change in the MEK secret would result in an error during AES-GCM decryption of the provided MEK.
 
@@ -1186,6 +1185,56 @@ Table: CLEAR_KEY_CACHE output arguments
 | reserved    | u32  | Reserved.                                              |
 +-------------+------+--------------------------------------------------------+
 
+#### ENUMERATE_HPKE_HANDLES {#sec:enumerate-hpke-handles-cmd}
+
+This command returns a list of all currently-active HPKE handles for resources held by KMB.
+
+See @fig:enumerate-hpke-handles-uml for the sequence diagram.
+
+Command Code: 0x4548_444C ("EHDL")
+
+Table: ENUMERATE_HPKE_HANDLES input arguments
+
++----------+------+--------------------------------------+
+| Name     | Type | Description                          |
++==========+======+======================================+
+| chksum   | u32  | Checksum over other input arguments, |
+|          |      | computed by the caller.              |
++----------+------+--------------------------------------+
+| reserved | u32  | Reserved.                            |
++----------+------+--------------------------------------+
+
+Table: ENUMERATE_HPKE_HANDLES output arguments
+
++-------------------+---------------+---------------------------------------------+
+| Name              | Type          | Description                                 |
++===================+===============+=============================================+
+| chksum            | u32           | Checksum over other output arguments,       |
+|                   |               | computed by Caliptra.                       |
++-------------------+---------------+---------------------------------------------+
+| fips_status       | u32           | Indicates if the command is FIPS approved   |
+|                   |               | or an error.                                |
++-------------------+---------------+---------------------------------------------+
+| reserved          | u32           | Reserved.                                   |
++-------------------+---------------+---------------------------------------------+
+| hpke_handle_count | u32           | Number of HPKE handles (N).                 |
++-------------------+---------------+---------------------------------------------+
+| hpke_handles      | HpkeHandle[N] | List of (HPKE handle value, HPKE algorithm) |
+|                   |               | tuples.                                     |
++-------------------+---------------+---------------------------------------------+
+
+Table: HpkeHandle contents
+
++----------------+------+---------------------------------------------+
+| Name           | Type | Description                                 |
++================+======+=============================================+
+| handle         | u32  | Handle for HPKE keypair held in KMB memory. |
++----------------+------+---------------------------------------------+
+| hpke_algorithm | u32  | HPKE algorithm. Shall be a bit value        |
+|                |      | indicated as supported in                   |
+|                |      | @tbl:get-algorithms-output-args.            |
++----------------+------+---------------------------------------------+
+
 #### ENDORSE_HPKE_PUB_KEY {#sec:endorse-hpke-pub-key-cmd}
 
 This command generates a signed certificate for the specified HPKE public key using the specified endorsement algorithm.
@@ -1273,7 +1322,7 @@ Table: ROTATE_HPKE_KEY output arguments
 
 #### GENERATE_MPK {#sec:generate-mpk-cmd}
 
-This command unwraps the specified access key, generates a random MPK, then encrypts the MPK with KDF(HEK || SEK || access_key, "MPK") which is returned for the drive to persistently store. The given \`metadata\` is placed in the  \`metadata\` field of the returned MPK to cryptographically tie them together.
+This command unwraps the specified access key, generates a random MPK, then encrypts the MPK with a Locked MPK encryption key. The Locked MPK is returned for the drive to persistently store. The given \`metadata\` is placed in the  \`metadata\` field of the returned MPK to cryptographically tie them together.
 
 See @fig:generate-mpk-uml for the sequence diagram.
 
@@ -1316,9 +1365,9 @@ Table: GENERATE_MPK output arguments
 
 #### REWRAP_MPK {#sec:rewrap-mpk-cmd}
 
-This command unwraps current_access_key and encrypted new_access_key from sealed_access_keys. Then current_access_key is used to decrypt new_access_key. The specified MPK is decrypted using KDF(HEK || SEK || current_access_key, "MPK"). A new MPK is encrypted with the output of KDF(HEK || SEK || new_access_key, "MPK"). The new encrypted MPK is returned.
+This command unwraps current_access_key and encrypted new_access_key from sealed_access_keys. Then current_access_key is used to decrypt new_access_key. The specified MPK is decrypted using its current Locked MPK encryption key, then re-encrypted with its new Locked MPK encryption key. The new locked MPK is returned.
 
-The drive stores the returned new encrypted MPK and zeroizes the old encrypted MPK.
+The drive stores the returned new locked MPK and zeroizes the old locked MPK.
 
 See @fig:rewrap-mpk-uml for the sequence diagram.
 
@@ -1371,7 +1420,7 @@ Table: REWRAP_MPK output arguments
 
 #### ENABLE_MPK {#sec:enable-mpk-cmd}
 
-This command decrypts \`sealed_access_key\`. Then the decrypted access_key is used to decrypt \`locked_mpk\` using KDF(HEK || SEK || access_key, "MPK"). An "enabled" MPK is encrypted with the VEK. The encrypted enabled MPK is returned.
+This command decrypts \`sealed_access_key\`, then uses it to derive a Locked MPK encryption key, which is used to decrypt \`locked_mpk\`. The MPK is then re-encrypted with the VEK. The enabled MPK is returned.
 
 See @fig:enable-mpk-uml for the sequence diagram.
 
@@ -1414,7 +1463,7 @@ Table: ENABLE_MPK output arguments
 
 #### MIX_MPK {#sec:mix-mpk-cmd}
 
-This command initializes the MEK secret seed if not already initialized or if \`initialize\` is set to 1, decrypts the specified MPK with the with the VEK, and then updates the MEK secret seed in KMB by performing a KDF with the MEK secret seed and the decrypted MPK.
+This command initializes the MEK secret seed if not already initialized or if \`initialize\` is set to 1, decrypts the specified MPK with the VEK, and then updates the MEK secret seed in KMB by performing a KDF with the MEK secret seed and the decrypted MPK.
 
 When generating an MEK, one or more MIX_MPK commands are processed to modify the MEK secret seed.
 
@@ -1646,7 +1695,7 @@ Table: DERIVE_MEK output arguments
 +--------------+--------+-------------------------------------------+
 | reserved     | u32    | Reserved.                                 |
 +--------------+--------+-------------------------------------------+
-| mek_checksum | u8[16] | Checksum calculated from the derived MEK. |
+| mek_checksum | u8[16] | Checksum calculated for the derived MEK.  |
 +--------------+--------+-------------------------------------------+
 
 #### UNLOAD_MEK
@@ -1687,56 +1736,6 @@ Table: UNLOAD_MEK output arguments
 +-------------+------+-------------------------------------------+
 | reserved    | u32  | Reserved.                                 |
 +-------------+------+-------------------------------------------+
-
-#### ENUMERATE_HPKE_HANDLES {#sec:enumerate-hpke-handles-cmd}
-
-This command returns a list of all currently-active HPKE handles for resources held by KMB.
-
-See @fig:enumerate-hpke-handles-uml for the sequence diagram.
-
-Command Code: 0x4548_444C ("EHDL")
-
-Table: ENUMERATE_HPKE_HANDLES input arguments
-
-+----------+------+--------------------------------------+
-| Name     | Type | Description                          |
-+==========+======+======================================+
-| chksum   | u32  | Checksum over other input arguments, |
-|          |      | computed by the caller.              |
-+----------+------+--------------------------------------+
-| reserved | u32  | Reserved.                            |
-+----------+------+--------------------------------------+
-
-Table: ENUMERATE_HPKE_HANDLES output arguments
-
-+-------------------+---------------+---------------------------------------------+
-| Name              | Type          | Description                                 |
-+===================+===============+=============================================+
-| chksum            | u32           | Checksum over other output arguments,       |
-|                   |               | computed by Caliptra.                       |
-+-------------------+---------------+---------------------------------------------+
-| fips_status       | u32           | Indicates if the command is FIPS approved   |
-|                   |               | or an error.                                |
-+-------------------+---------------+---------------------------------------------+
-| reserved          | u32           | Reserved.                                   |
-+-------------------+---------------+---------------------------------------------+
-| hpke_handle_count | u32           | Number of HPKE handles (N).                 |
-+-------------------+---------------+---------------------------------------------+
-| hpke_handles      | HpkeHandle[N] | List of (HPKE handle value, HPKE algorithm) |
-|                   |               | tuples.                                     |
-+-------------------+---------------+---------------------------------------------+
-
-Table: HpkeHandle contents
-
-+----------------+------+---------------------------------------------+
-| Name           | Type | Description                                 |
-+================+======+=============================================+
-| handle         | u32  | Handle for HPKE keypair held in KMB memory. |
-+----------------+------+---------------------------------------------+
-| hpke_algorithm | u32  | HPKE algorithm. Shall be a bit value        |
-|                |      | indicated as supported in                   |
-|                |      | @tbl:get-algorithms-output-args.            |
-+----------------+------+---------------------------------------------+
 
 #### REPORT_EPOCH_KEY_STATE {#sec:report-epoch-key-state-cmd}
 
@@ -1989,26 +1988,6 @@ Table: KMB mailbox command result codes {#tbl:kmb-mailbox-codes}
 | LOCK_HEK_NOT_AVAILABLE | 0x4C48_4E41 | The operation requires   |
 |                        | ("LHNA")    | the HEK, which is        |
 |                        |             | unavailable.             |
-+------------------------+-------------+--------------------------+
-| LOCK_HEK_NOT_ZEROIZED  | 0x4C48_4E5A | Next HEK slot cannot     |
-|                        | ("LHNZ")    | be programmed because    |
-|                        |             | the current slot         |
-|                        |             | is programmed or         |
-|                        |             | corrupted, and must be   |
-|                        |             | zeroized.                |
-+------------------------+-------------+--------------------------+
-| LOCK_HEK_ZEROIZED      | 0x4C48_5A44 | Current HEK slot cannot  |
-|                        | ("LHZD")    | be zeroized because it   |
-|                        |             | is already zeroized.     |
-+------------------------+-------------+--------------------------+
-| LOCK_HEK_SLOTS_FULL    | 0x4C48_5346 | Next HEK slot cannot be  |
-|                        | ("LHSF")    | programmed because all   |
-|                        |             | slots are exhausted.     |
-+------------------------+-------------+--------------------------+
-| LOCK_HEKS_UNZEROIZED   | 0x4C48_555A | Permanent-HEK mode       |
-|                        | ("LHUZ")    | cannot be enabled        |
-|                        |             | because one or more HEK  |
-|                        |             | slots are not zeroized.  |
 +------------------------+-------------+--------------------------+
 
 ##### Fatal errors
