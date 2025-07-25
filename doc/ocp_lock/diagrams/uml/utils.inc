@@ -192,16 +192,19 @@
 
     !pragma teoz true
 
+    participant "MCU ROM" as mrom
+    participant "Fuses" as fuses
+    participant "HEK seed\nfuse register" as hek_seed_fuse_reg
     participant "Storage\nDevice\nFW" as dfw
 
     box "Caliptra"
-        participant "ROM" as crom
+        participant "Caliptra ROM" as crom
+        participant "Lifecycle controller" as lifecycle
         participant "FW" as cfw
         participant "DRBG" as drbg
         participant "DMA engine" as dma
         participant "HMAC engine" as hmac
         participant "AES engine" as aes
-        participant "Fuses" as fuses
         participant "DICE UDS\n(Key Vault)" as uds
         participant "DICE IDevID CDI\n(Key Vault)" as idev
         participant "DICE Runtime Alias Key\n(Key Vault)" as dice
