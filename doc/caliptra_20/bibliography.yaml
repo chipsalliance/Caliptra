@@ -1,0 +1,54 @@
+references:
+  - id: "sp800-193"
+    title: "Platform Firmware Resiliency Guidelines"
+    publisher: "NIST"
+    issued:
+      year: 2019
+      month: 5
+    url: "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-193.pdf"
+  - id: global-platform-rot-reqs
+    title: "GlobalPlatform Technology Root of Trust Definitions and Requirements Version 1.1"
+    publisher: "GlobalPlatform"
+    issued:
+      year: 2018
+      month: 6
+    url: "https://globalplatform.org/wp-content/uploads/2018/07/GP_RoT_Definitions_and_Requirements_v1.1_PublicRelease-2018-06-28.pdf"
+  - id: ocp-secure-boot-spec
+    title: "Open Compute Project Secure Boot Specification"
+    publisher: "OCP"
+    issued:
+      year: 2021
+    url: "https://www.opencompute.org/documents/secure-boot-2-pdf"
+  - id: tcg-dice-layering-arch
+    title: "TCG DICE Layering Architecture Version 1.0 Revision 0.19"
+    publisher: "TCG"
+    issued:
+      year: 2020
+      month: 7
+    url: "https://trustedcomputinggroup.org/wp-content/uploads/DICE-Layering-Architecture-r19_pub.pdf"
+  - id: tcg-dice-attestation-arch
+    title: "TCG DICE Attestation Architecture Version 1.00 Revision 0.23"
+    publisher: "TCG"
+    issued:
+      year: 2021
+      month: 3
+    url: "https://trustedcomputinggroup.org/wp-content/uploads/DICE-Attestation-Architecture-r23-final.pdf"
+  - id: tcg-dice-hw-Requirements
+    title: "Hardware Requirements for a Device Identifier Composition Engine Version 1.0 Revision 0.91"
+    publisher: "TCG"
+    issued:
+      year: 2024
+      month: 8
+    url: "https://trustedcomputinggroup.org/wp-content/uploads/Hardware-Requirements-for-a-Device-Identifier-Composition-Engine-Version-1.0-Revision-0.91_pub.pdf"
+  - id: side-channel-attacks
+    title: "Side-Channel Attacks: Ten Years After Its Publication and the Impacts on Cryptographic Module Security Testing"
+    url: "https://csrc.nist.gov/csrc/media/events/physical-security-testing-workshop/documents/papers/physecpaper19.pdf"
+  - id: ocp-attestation-spec
+    title: "Attestation of System Components v1.0 Requirements and Recommendations"
+    publisher: "OCP"
+    issued:
+      year: 2020
+      month: 11
+    url: "https://www.opencompute.org/documents/attestation-v1-0-20201104-pdf"
+  - id: ocp-ownership-transfer-spec
+    title: "OCP Security WG: Ownership Transfer"
