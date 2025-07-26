@@ -438,12 +438,12 @@ The VEK is randomly generated and held in a Key Vault slot. There does not exist
 
 MPKs are the mechanism by which KMB enforces multi-party authorization as a precondition to loading an MEK. MPKs exist in one of two states: locked or enabled. In both these states the MPK is encrypted to a secret known only to KMB.
 
-- A locked MPK's encryption key is derived from the HEK, SEK, and an externally-supplied access key to which the MPK is bound. The locked MPK is held at rest by drive firmware.
-- An enabled MPK's encryption key is a common volatile secret held within KMB which is randomly generated and is lost when the drive shuts down. See @sec:vek for details on how this key is generated. Enabled MPKs are held in drive firmware memory.
+- A Locked MPK's encryption key is derived from the HEK, SEK, and an externally-supplied access key to which the MPK is bound. The Locked MPK is held at rest by drive firmware.
+- An Enabled MPK's encryption key is a common volatile secret held within KMB which is randomly generated and is lost when the drive shuts down. See @sec:vek for details on how this key is generated. Enabled MPKs are held in drive firmware memory.
 
 The externally-supplied access key is encrypted in transit using an HPKE public key held by KMB. The "enabled" state allows the HPKE keypair to be rotated after the access key has been provisioned to the storage device, without removing the ability for KMB to decrypt the MPK when later loading an MEK bound to that MPK.
 
-For each MPK to which a given MEK is bound, the host is expected to invoke a command to supply the MPK's encrypted access key. Upon receipt the drive firmware passes that encrypted access key to KMB, along with the locked MPK, to produce the enabled MPK which is cached in drive memory. This is done prior to the drive firmware actually loading the MEK, and is performed once for each MPK to which a given MEK is bound.
+For each MPK to which a given MEK is bound, the host is expected to invoke a command to supply the MPK's encrypted access key. Upon receipt the drive firmware passes that encrypted access key to KMB, along with the Locked MPK, to produce the Enabled MPK which is cached in drive memory. This is done prior to the drive firmware actually loading the MEK, and is performed once for each MPK to which a given MEK is bound.
 
 #### Transport encryption for MPK access keys {#sec:hpke-transport-encryption}
 
@@ -510,7 +510,7 @@ MPKs can be generated, enabled, and have their access keys rotated and tested.
 
 Drive firmware may request that KMB generate an MPK, bound to a given access key.
 
-To identify an MPK, at creation time the drive firmware can provide "metadata" for the MPK, which is included in the generated locked MPK and bound to the ciphertext as AAD. See @sec:host-apis for guidance on how drive firmware should populate the metadata field for the MPK. Note that "metadata" in this context refers to metadata about the MPK, and bears no relation to metadata about an MEK.
+To identify an MPK, at creation time the drive firmware can provide "metadata" for the MPK, which is included in the generated Locked MPK and bound to the ciphertext as AAD. See @sec:host-apis for guidance on how drive firmware should populate the metadata field for the MPK. Note that "metadata" in this context refers to metadata about the MPK, and bears no relation to metadata about an MEK.
 
 KMB performs the following steps:
 
@@ -536,7 +536,7 @@ To enable an MPK, KMB performs the following steps:
 4. Encrypt the MPK using the VEK, preserving the MPK metadata.
 5. Return the re-encrypted "enabled" MPK to the drive firmware.
 
-Drive firmware may then stash the encrypted enabled MPK in volatile storage, and later provide it to the KMB when loading an MEK, as described in @sec:meks.
+Drive firmware may then stash the encrypted Enabled MPK in volatile storage, and later provide it to the KMB when loading an MEK, as described in @sec:meks.
 
 ![MPK enabling](./diagrams/mpk_enable.drawio.svg){#fig:mpk-enabling}
 
@@ -1365,9 +1365,9 @@ Table: GENERATE_MPK output arguments
 
 #### REWRAP_MPK {#sec:rewrap-mpk-cmd}
 
-This command unwraps current_access_key and encrypted new_access_key from sealed_access_keys. Then current_access_key is used to decrypt new_access_key. The specified MPK is decrypted using its current Locked MPK encryption key, then re-encrypted with its new Locked MPK encryption key. The new locked MPK is returned.
+This command unwraps current_access_key and encrypted new_access_key from sealed_access_keys. Then current_access_key is used to decrypt new_access_key. The specified MPK is decrypted using its current Locked MPK encryption key, then re-encrypted with its new Locked MPK encryption key. The new Locked MPK is returned.
 
-The drive stores the returned new locked MPK and zeroizes the old locked MPK.
+The drive stores the returned Locked MPK and zeroizes the old Locked MPK.
 
 See @fig:rewrap-mpk-uml for the sequence diagram.
 
@@ -1420,7 +1420,7 @@ Table: REWRAP_MPK output arguments
 
 #### ENABLE_MPK {#sec:enable-mpk-cmd}
 
-This command decrypts \`sealed_access_key\`, then uses it to derive a Locked MPK encryption key, which is used to decrypt \`locked_mpk\`. The MPK is then re-encrypted with the VEK. The enabled MPK is returned.
+This command decrypts \`sealed_access_key\`, then uses it to derive a Locked MPK encryption key, which is used to decrypt \`locked_mpk\`. The MPK is then re-encrypted with the VEK. The Enabled MPK is returned.
 
 See @fig:enable-mpk-uml for the sequence diagram.
 
