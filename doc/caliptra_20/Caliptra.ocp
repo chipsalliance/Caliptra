@@ -93,6 +93,15 @@ Caliptra[^1] was originally created as part of the Open Compute Project ([OCP](h
 
 The objective of Caliptra is to define core RoT capabilities that must be implemented in the System on Chip (SoC) or ASIC of any device in a cloud platform. The collection of these RoT capabilities is referred to as the ***Silicon RoT Services (Silicon RoT).***
 
+## Companion specifications
+
+This present document provides a high-level architecture for Caliptra. The following documents contain useful details of various aspects of Caliptra:
+
+- Caliptra Hardware Specification [@{caliptra-hardware-spec}]
+- Caliptra Integration Specification [@{caliptra-integration-spec}]
+- Caliptra ROM Specification [@{caliptra-rom-spec}]
+- Caliptra Runtime Specification [@{caliptra-runtime-spec}]
+
 ---
 
 ## Background
