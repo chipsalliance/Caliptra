@@ -51,7 +51,7 @@ jobs:
 
           # Label the current spec version.
           commit_hash=$(git rev-parse --short HEAD)
-          sed -i -r "/^---$/,/^---$/s/(version: .*)/\1 (Git commit ${commit_hash})/g" Caliptra.ocp
+          sed -i -r "/^---$/,/^---$/s/^(version: \"?[^\"]*)(\"?)$/\1 (Git commit ${commit_hash})\2/g" Caliptra.ocp
 
           echo "Building git ref main"
 
@@ -91,7 +91,7 @@ jobs:
             if [[ "${ref}" == "main" ]]; then
               # Label the current spec version.
               commit_hash=$(git rev-parse --short HEAD)
-              sed -i -r "/^---$/,/^---$/s/(version: .*)/\1 (Git commit ${commit_hash})/g" lock_spec.ocp
+              sed -i -r "/^---$/,/^---$/s/^(version: \"?[^\"]*)(\"?)$/\1 (Git commit ${commit_hash})\2/g" lock_spec.ocp
 
               # Also render the latest version in PDF
               /usr/bin/build.sh \
