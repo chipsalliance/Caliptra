@@ -93,6 +93,15 @@ Caliptra[^1] was originally created as part of the Open Compute Project ([OCP](h
 
 The objective of Caliptra is to define core RoT capabilities that must be implemented in the System on Chip (SoC) or ASIC of any device in a cloud platform. The collection of these RoT capabilities is referred to as the ***Silicon RoT Services (Silicon RoT).***
 
+## Companion specifications
+
+This present document provides a high-level architecture for Caliptra. The following documents contain useful details of various aspects of Caliptra:
+
+- Caliptra Hardware Specification [@{caliptra-hardware-spec}]
+- Caliptra Integration Specification [@{caliptra-integration-spec}]
+- Caliptra ROM Specification [@{caliptra-rom-spec}]
+- Caliptra Runtime Specification [@{caliptra-runtime-spec}]
+
 ---
 
 ## Background
@@ -217,7 +226,7 @@ Threat scenarios as comprehended by assets and possible attack paths are as comp
 
 An attacker profile is based on factors like the tools that are accessible to the attacker, the level of access to the target of evaluation, and expertise of the attacker to use these methods. These factors are described in the following tables.
 
-Table: Tools accessible to attacker
+Table: Tools accessible to attacker {#tbl:tools-accessible-to-attacker}
 
 | **Attack tools** | **Type of attack** | **Purpose and usage** |
 | :--------- | :--------- | :--------- |
@@ -226,14 +235,14 @@ Table: Tools accessible to attacker
 | Power analyzers, timing analyzers (scopes, etc.), low speed bus analyzers, and optical emission analyzers | Side channel analysis | Infer security sensitive information by analyzing various operational conditions. |
 | Microscopic imaging, reverse engineering, scanning electron microscope imaging, and focused ion beam (FIB) | Chip invasive attacks| Decapsulation, depackaging, and rebonding to probe the internals of the chip. |
 
-Table: Type of access to level of access
+Table: Type of access to level of access {#tbl:type-level-of-access}
 
 | **Type of access** | **Levels of access** | **Attack paths available** |
 | :--------- | :--------- | :--------- |
 | Physical access | Unrestricted access for physical and logical attacks. | Chip invasive attacks and chip non-invasive attacks |
 | Remote access | Limited access for attacks with both privileged and unprivileged access rights. | Chip non-invasive attacks and network attacks |
 
-Table: Definition of expertise (JIL)
+Table: Definition of expertise (JIL) {#tbl:definition-of-expertise}
 
 +-------------------+------------------------------------------+------------------------------------------+
 | Proficiency level | Definition                               | Detailed definition                      |
@@ -271,7 +280,7 @@ Invasive attacks that involve depackaging or delayering of the SoC/ASIC are out-
 * Power and electromagnetic analysis attacks
   * *Counter measurements - as strong recommendation*
 
-Table: Attack types
+Table: Attack types {#tbl:attack-types}
 
 +-------------------+------------------------------------------+--------------------------------------------+
 | Attack            | Description                              | Threat model scope                         |
@@ -314,7 +323,7 @@ Table: Attack types
 |                   |                                          | the package lid.                           |
 +-------------------+------------------------------------------+--------------------------------------------+
 
-Table: Logical attacks
+Table: Logical attacks {#tbl:logical-attacks}
 
 +--------------------+----------------------------------------+-----------------------------------------------+
 | Attack             | Description                            | Threat model scope                            |
@@ -352,7 +361,7 @@ The following figure shows trust boundaries for the discussion of threat modelin
 
 Trust levels of Caliptra and the SoC security engine are not hierarchical. These two entities are responsible for different security aspects of the chip.
 
-![Caliptra trust boundaries](./images/Caliptra_trust_boundary.png)
+![Caliptra trust boundaries](./images/Caliptra_trust_boundary.png){#fig:caliptra-trust-boundaries}
 
 #### Caliptra interactions
 
@@ -364,7 +373,7 @@ Assets are defined to be secrets or abilities that must be protected by an owner
 
 An example of when an owner must protect assets is moving from secure mode to insecure mode. Another example is moving from one owner to another. Before moving through these transitions, the owner must ensure all assets are removed, disabled, or protected based on how the use case is defined.
 
-Table: Assets
+Table: Assets {#tbl:assets}
 
 +-----------------------------+-----------------------------+-------------------------------+----------------+--------------------------------+-----------------------------------+
 | Asset category              | Asset                       | Security property             | Attack profile | Attack path                    | Mitigation                        |
@@ -506,7 +515,7 @@ Table: Assets
 
 The following figure shows the basic high-level blocks of Caliptra.
 
-![Caliptra high level blocks](./images/Caliptra2p0.png)
+![Caliptra high level blocks](./images/Caliptra2p0.png){#fig:high-level-blocks}
 
 See the [hardware section](#hardware) for a detailed discussion.
 
@@ -530,7 +539,7 @@ Caliptra is among the first microcontrollers taken out of reset by the power-on 
 
 See [Error Reporting and Handling](#error-reporting-and-handling) for details about Caliptra and SoC firmware load and verification error handling.
 
-![Passive Caliptra boot flow](./images/Boot_flow.png)
+![Passive Caliptra boot flow](./images/Boot_flow.png){#fig:passive-boot-flow}
 
 **Subsystem Mode Boot Flow**
 
@@ -644,7 +653,7 @@ The owner key, when represented in fuses or in the FMC's alias certificate, is a
 ### Provisioning UDS during Manufacturing (Subsystem Mode)
 **Note:** In passive mode, SoC follows the same flows/restrictions as Caliptra 1.x
 
-![Subsystem Mode: UDS manufacturing flow](./images/Manuf-UDS-Flow.png)
+![Subsystem Mode: UDS manufacturing flow](./images/Manuf-UDS-Flow.png){#fig:subsystem-uds-manufacturing-flow}
 
 There are three ways of generating a UDS_SEED
 Use the internal TRNG to directly generate a 384-bit random number.
@@ -661,7 +670,7 @@ Combine the internal TRNG output with a Manufacturing time provided value to pro
 
 ### Provisioning IDevID during manufacturing {#sec:idev-during-manufacturing}
 
-![Device manufacturing identity flow](./images/Caliptra_manuf_flow1.png)
+![Device manufacturing identity flow](./images/Caliptra_manuf_flow1.png){#fig:device-manufacturing-identity-flow}
 
 1. High Volume Manufacturing (HVM) programs the IDevID certificate attributes fuses. See [IDevID Certificate](#idevid-certificate) for encodings.
 2. HVM programs NIST compliant UDS into fuses using SoC-specific fuse programming flow. Note that this UDS goes through an obfuscation function within Caliptra IP.
@@ -762,7 +771,7 @@ Caliptra does not allocate fuses in its fuse map for the IDevID certificate sign
 
 Caliptra ROM generates the LDevID certificate and endorses it with the IDevID private key. The LDevID certificate implements the following field values:
 
-Table: LDevID certificate fields
+Table: LDevID certificate fields {#tbl:ldevid-cert-fields}
 
 | Field                          | Sub field    | Value
 | -------------                  | ---------    | ---------
@@ -793,7 +802,7 @@ Caliptra does not generate an LDevID CSR. Owners that wish to endorse LDevID mus
 
 Caliptra ROM generates the Alias~FMC~ certificate and endorses it with the LDevID private key. The Alias~FMC~ certificate implements the following field values:
 
-Table: Alias~FMC~ certificate fields
+Table: Alias~FMC~ certificate fields {#tbl:alias-fmc-cert-fields}
 
 | Field                          | Sub field    | Value
 | -------------                  | ---------    | ---------
@@ -840,7 +849,7 @@ Caliptra does not generate an Alias~FMC~ CSR. Owners that wish to endorse Alias~
 
 Caliptra FMC generates the Alias~RT~ certificate and endorses it with the Alias~FMC~ private key. The Alias~RT~ certificate implements the following field values:
 
-Table: Alias~RT~ certificate fields
+Table: Alias~RT~ certificate fields {#tbl:alias-rt-cert-fields}
 
 | Field                          | Sub field    | Value
 | -------------                  | ---------    | ---------
@@ -875,7 +884,7 @@ Caliptra RT generates the DPE certificate and endorses it with the Alias~RT~ pri
 
 ### Caliptra security states
 
-![Caliptra security states](./images/Caliptra_security_states.png)
+![Caliptra security states](./images/Caliptra_security_states.png){#fig:caliptra-security-states}
 
 **Definitions**
 
@@ -897,7 +906,7 @@ Caliptra RT generates the DPE certificate and endorses it with the Alias~RT~ pri
 * Caliptra’s security state determines Caliptra’s debug state and the state of its security assets.
 * In general, if Caliptra is in an insecure state, all keys and assets are ‘zeroized’. Zeroized may mean switching to all 0s, 1s, or debug keys based on the key. See [Caliptra Assets](#sec:assets) for information.
 
-Table: Security states
+Table: Security states {#tbl:security-states}
 
 +------------------+-------------------+-----------------------------------------------+----------------------------------+
 | Security state,  | State             | Definition                                    | State transition requirement     |
@@ -1007,7 +1016,7 @@ As noted earlier, Caliptra plays a role in maintaining the resilience posture of
 
 The following table describes the NIST SP 800-193 requirements that Caliptra shall meet, either on its own or in conjunction with other components within the SoC or platform. Requirements not listed are assumed to be not covered and out-of-scope for Caliptra. In particular, most requirements related to firmware update and recovery are out-of-scope and must be handled by other components of the system.
 
-Table: NIST SP 800-193 requirements
+Table: NIST SP 800-193 requirements {#tbl:nist-sp-800-193-requirements}
 
 | NIST SP 800-193 Chapter | Requirement | Caliptra responsibility |
 | :---------------------- | :---------- | :---------------------- |
@@ -1055,7 +1064,7 @@ The log and cumulative measurement mechanism is similar to that used in TPM. In 
 
 Caliptra contains 32 384-bit PCR banks that are extendable by the SHA engine, and readable by Caliptra firmware. The usage of the PCR banks is as follows:
 
-Table: PCR bank usage
+Table: PCR bank usage {#tbl:pcr-bank-usage}
 
 |**PCR number**|**Type**|**Extend control**|**Description**|
 | - | - | - | - |
@@ -1208,7 +1217,7 @@ KAT execution is described as two types:
 
 A detailed description of the POST and CAST KATs can be found at csrc.nist.gov.
 
-Table: KAT failure mitigations
+Table: KAT failure mitigations {#tbl:kat-failure-mitigations}
 
 |KAT type|If fails|
 | - | - |
@@ -1522,7 +1531,7 @@ Please refer to [Caliptra HW specification](https://github.com/chipsalliance/cal
 
 ### Passive Caliptra FW Load flow
 
-![Passive Caliptra FW load flow](./images/Caliptra_boot_flow3.png)
+![Passive Caliptra FW load flow](./images/Caliptra_boot_flow3.png){#fig:passive-fw-load-flow}
 
 1. After the Caliptra microcontroller is out of reset, ROM starts executing and triggers the crypto block to run the UDS decrypt flow.
 2. Caliptra ROM enables the mailbox. (Until this point, any accidental or non-accidental writes that target the mailbox are dropped by the hardware.)
@@ -1537,7 +1546,7 @@ Please see the subsystem architecture section below.
 
 ### CPU warm reset or PCIe hot reset flow →  Caliptra IP reset {#sec:reset-flow}
 
-![Hardware reset flow](./images/Caliptra_boot_flow5.png)
+![Hardware reset flow](./images/Caliptra_boot_flow5.png){#fig:hardare-reset-flow}
 
 **Note:** Since Caliptra IP may be placed in an ACPI S5 domain of the device, there may be devices where Caliptra IP may not go through reset on a device hot reset or CPU warm reset. But the flow shows what happens when such a reset happens.
 
@@ -1589,7 +1598,7 @@ Mailboxes are generic data passing structures, and the Caliptra hardware only en
 **Notes on behavior:**
 After LOCK is granted, the mailbox is locked until that device has concluded its operation. The mailbox is responsible only for accepting writes from the device that requested and locked the mailbox.
 
-![Mailbox sender flow](./images/Caliptra_mbox_state.png)
+![Mailbox sender flow](./images/Caliptra_mbox_state.png){#fig:mailbox-sender-flow}
 
 #### Receiver protocol
 
@@ -1609,7 +1618,7 @@ Upon receiving an indication that the mailbox is populated, the appropriate devi
     1. If response data was provided, STATUS should be written to DATA\_READY.
     2. Otherwise, STATUS should be written to CMD\_COMPLETE (or CMD\_FAILURE).
 
-![Mailbox receiver flow](./images/Caliptra_mbox_sequence.png)
+![Mailbox receiver flow](./images/Caliptra_mbox_sequence.png){#fig:mailbox-receiver-flow}
 
 #### User attributes
 
@@ -1643,7 +1652,7 @@ Caliptra provides a HW API to do a SHA384 hash calculation. The SoC can access t
 
 #### JTAG/TAP debug
 
-![Debug flow](./images/Caliptra_boot_flow6.png)
+![Debug flow](./images/Caliptra_boot_flow6.png){#fig:debug-flow}
 
 1. SoC drives the security state indicating that it is a debug flow. See [Caliptra security states](#caliptra-security-states) for encodings.
 2. SoC (using a GPIO pin or SoC ROM) drives BootFSMBrk (this is also used for debug cases). This can be driven at any time before cptra\_rst\_b is deasserted.
@@ -1654,7 +1663,7 @@ Caliptra provides a HW API to do a SHA384 hash calculation. The SoC can access t
 7. Microcontroller executes the appropriate debug service.
 8. Specific SoC interface registers are accessible over the JTAG interface in debug (or manufacturing mode). The following are the JTAG register addresses for these registers.
 
-Table: JTAG accessible registers
+Table: JTAG accessible registers {#tbl:jtag-accessible-registers}
 
 +--------------------------------+--------------+---------------+
 | Register name                  | JTAG address | Accessibility |
@@ -1870,7 +1879,7 @@ Table: Caliptra Fuse Map {#tbl:caliptra-fuse-map}
 
 This section describes Caliptra error reporting and handling.
 
-Table: Hardware and firmware error types
+Table: Hardware and firmware error types {#tbl:hw-fw-error-types}
 
 +----------+-------------------------------------+-----------------------------------------+
 |          | Fatal errors                        | Non-fatal errors                        |
@@ -1933,7 +1942,7 @@ Please refer to [the Caliptra code base](https://github.com/chipsalliance/calipt
 ## Caliptra Security Subsystem
 The Caliptra subsystem offers a complete RoT subsystem, with open source programmable components for customization of SoC boot flows.
 
-![Caliptra security subsystem](./images/Subsystem.png)
+![Caliptra security subsystem](./images/Subsystem.png){#fig:caliptra-security-subsystem}
 
 ## Caliptra Subsystem Trademark Compliance
 - Caliptra subsystem trademark compliance shall have Caliptra Core 2.0, Life Cycle Controller, Fuse Controller, I3C with OCP streaming boot interface, Manufacture Control Unit (MCU) and Manufacturer Control Interface (MCI) taken as is without change to ensure there is hardware transparency and consistency.
@@ -2003,7 +2012,7 @@ The Caliptra subsystem offers a complete RoT subsystem, with open source program
 20. MCU RT FW is responsible for responding to all MCTP requests.
 21. MCU RT FW will do the PLDM T5 flow, extract FW or configuration payload, use Caliptra to authenticate and deploy the rest of the images as described in run-time authentication flows.
 
-![Subsystem Boot Flow](./images/Subsystem-BootFlow.png)
+![Subsystem Boot Flow](./images/Subsystem-BootFlow.png){#fig:subsystem-boot-flow}
 
 **Common Run-time Authentication Flows**
 
