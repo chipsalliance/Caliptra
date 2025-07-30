@@ -16,12 +16,12 @@ defaults:
   run:
     shell: bash
 jobs:
-  # Uploads OCP Lock specification.
-  ocp-lock:
+  # Uploads rendered specifications.
+  spec-uploads:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/trustedcomputinggroup/pandoc:latest
-    name: Render OCP LOCK HTML
+    name: Render Specifications
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -37,7 +37,38 @@ jobs:
           repository: "opencomputeproject/ocp-spec-tools"
           ref: "e4f6d325846e03852952a4d02ee379b85ae610b7"
           # The underlying tex and templates assume this exists under the "extra" folder.
-          path: "doc/ocp_lock/extra"
+          path: "ocp-spec-tools"
+
+      - name: Render Caliptra 2.0 HTML
+        run: |
+          # Need to trust directory in the docker container.
+          chown -R $(id -u):$(id -g) $PWD
+
+          git reset --hard main
+
+          cp -R ocp-spec-tools doc/caliptra_20/extra
+          pushd doc/caliptra_20
+
+          # Label the current spec version.
+          commit_hash=$(git rev-parse --short HEAD)
+          sed -i -r "/^---$/,/^---$/s/(version: .*)/\1 (Git commit ${commit_hash})/g" spec.ocp
+
+          echo "Building git ref main"
+
+          /usr/bin/build.sh \
+            --crossref=tcg \
+            --csl extra/ocp-pandoc-resources/ieee.csl \
+            --nogitversion \
+            --template_html extra/ocp-pandoc-resources/html/ocp.html.template \
+            --html_stylesheet extra/ocp-pandoc-resources/html/style.css \
+            --html_stylesheet extra/ocp-pandoc-resources/html/github-markdown.css \
+            --html Caliptra.html Caliptra.ocp
+
+          popd
+
+          mkdir -p "gh-pages/2.0/HEAD"
+          cp doc/caliptra_20/Caliptra.html "gh-pages/2.0/HEAD/index.html"
+          echo "Added webpage 2.0/HEAD/index.html"
 
       - name: Render OCP LOCK HTML
         run: |
@@ -54,6 +85,7 @@ jobs:
 
             git reset --hard $ref
 
+            cp -R ocp-spec-tools doc/ocp_lock/extra
             pushd doc/ocp_lock
 
             if [[ "${ref}" == "main" ]]; then
@@ -112,10 +144,10 @@ jobs:
             fi
           done
 
-      - name: Upload artifacts for ocp-lock spec
+      - name: Upload artifacts for rendered specs
         uses: actions/upload-artifact@v4
         with:
-          name: ocp-lock
+          name: rendered-specs
           path: gh-pages
 
   # Adds README.md files as chipsalliance.github.io index files.
@@ -142,7 +174,7 @@ jobs:
       - name: Upload artifacts for index
         uses: actions/upload-artifact@v4
         with:
-          name: index
+          name: rendered-index
           path: gh-pages
 
   deploy:
@@ -150,17 +182,17 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: [index, ocp-lock]
+    needs: [index, spec-uploads]
     steps:
       - name: Download index artifacts
         uses: actions/download-artifact@v4
         with:
-          name: index
+          name: rendered-index
           path: gh-pages
-      - name: Download ocp-lock artifacts
+      - name: Download rendered artifacts
         uses: actions/download-artifact@v4
         with:
-          name: ocp-lock
+          name: rendered-specs
           path: gh-pages
       - name: Upload static files as artifact
         uses: actions/upload-pages-artifact@v3
