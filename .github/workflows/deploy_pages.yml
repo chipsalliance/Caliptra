@@ -51,7 +51,7 @@ jobs:
 
           # Label the current spec version.
           commit_hash=$(git rev-parse --short HEAD)
-          sed -i -r "/^---$/,/^---$/s/(version: .*)/\1 (Git commit ${commit_hash})/g" spec.ocp
+          sed -i -r "/^---$/,/^---$/s/(version: .*)/\1 (Git commit ${commit_hash})/g" Caliptra.ocp
 
           echo "Building git ref main"
 
