@@ -635,7 +635,11 @@ In addition to the HEK seed, the HEK is derived from Caliptra's DICE UDS. The me
 
 ![HEK derivation](./diagrams/hek_derivation.drawio.svg){#fig:hek-derivation}
 
+MCU ROM is responsible for invoking the [REPORT_HEK_METADATA](#sec:report-hek-metadata-cmd) command exactly once, after cold boot and before Caliptra FMC/runtime firmware is loaded. If REPORT_HEK_METADATA is not invoked, KMB will zeroize the HEK and runtime functions which rely on it will be disabled.
+
 By deriving the HEK in ROM based on secrets that are not available to runtime firmware, KMB ensures that compromised runtime firmware cannot derive the HEK using replayed HEK seed values.
+
+Note: the HEK is derived before REPORT_HEK_METADATA is invoked due to IDevID having been zeroized from the Key Vault by the time Caliptra ROM is ready to handle mailbox commands.
 
 #### HEK and SEK lifecycle {#sec:hek-sek-lifecycle}
 
@@ -1066,6 +1070,103 @@ For such commands, KMB firmware will return a \`LOCK_EE_NOT_READY\` error immedi
 #### Side-channel mitigations
 
 Several mailbox commands invoke ECDH and/or ML-KEM Decaps. These operations involve deterministic data-dependent operations and are potentially susceptible to timing attacks and power analysis. To mitigate such attacks, Caliptra leverages masking in hardware, and introduces random jitter delays in firmware before handling mailbox commands.
+
+#### REPORT_HEK_METADATA {#sec:report-hek-metadata-cmd}
+
+This command is exposed by Caliptra ROM and allows MCU ROM to report metadata about the HEK. This command must be called exactly once after each cold boot and before loading Caliptra's FMC and runtime firmware.
+
+By exposing this command in ROM, Caliptra de-privileges runtime compromise of drive firmware that might cause it to mis-report the HEK seed state, which could lead to incorrect device state attestations.
+
+See @fig:power-on-uml for the sequence diagram.
+
+Command Code: 0x5248_4D54 ("RHMT")
+
+Table: REPORT_HEK_METADATA input arguments
+
++-------------+------+--------------------------------------+
+| Name        | Type | Description                          |
++=============+======+======================================+
+| chksum      | u32  | Checksum over other input arguments, |
+|             |      | computed by the caller.              |
++-------------+------+--------------------------------------+
+| reserved    | u32  | Reserved.                            |
++-------------+------+--------------------------------------+
+| total_slots | u16  | Total number of HEK seed slots.      |
++-------------+------+--------------------------------------+
+| active_slot | u16  | Currently-active HEK seed slot.      |
+|             |      | Zero-indexed.                        |
++-------------+------+--------------------------------------+
+| seed_state  | u16  | HEK seed state. See                  |
+|             |      | @tbl:hek-seed-state-values.          |
++-------------+------+--------------------------------------+
+| padding     | u16  | Reserved.                            |
++-------------+------+--------------------------------------+
+
+Table: HEK seed state values {#tbl:hek-seed-state-values}
+
++-------------+----------------------------+
+| Value       | Description                |
++=============+============================+
+| 0h          | HEK_SEED_UNAVAIL_EMPTY     |
++-------------+----------------------------+
+| 1h          | HEK_SEED_UNAVAIL_ZEROIZED  |
++-------------+----------------------------+
+| 2h          | HEK_SEED_UNAVAIL_CORRUPTED |
++-------------+----------------------------+
+| 3h          | HEK_SEED_AVAIL_RANDOMIZED  |
++-------------+----------------------------+
+| 4h          | HEK_SEED_AVAIL_PERMANENT   |
++-------------+----------------------------+
+| 5h to FFFFh | Reserved                   |
++-------------+----------------------------+
+
+MCU ROM shall adhere to @tbl:hek-metadata-conditions when populating the HEK metadata.
+
+Table: Conditions for setting seed_state and active_slot {#tbl:hek-metadata-conditions}
+
++----------------------+----------------------------+----------------+
+| Condition            | Value of seed_state        | Value of       |
+|                      |                            | active_slot    |
++======================+============================+================+
+| All HEK seed slots   | HEK_SEED_UNAVAIL_EMPTY     | 0              |
+| are blank.           |                            |                |
++----------------------+----------------------------+----------------+
+| One or more HEK seed | HEK_SEED_UNAVAIL_ZEROIZED  | The last slot  |
+| slots are zeroized,  |                            | that was       |
+| and either the next  |                            | zeroized.      |
+| seed slot is blank,  |                            |                |
+| or there are no      |                            |                |
+| remaining seed       |                            |                |
+| slots.               |                            |                |
++----------------------+----------------------------+----------------+
+| A HEK seed slot has  | HEK_SEED_UNAVAIL_CORRUPTED | The slot that  |
+| been corrupted by    |                            | is corrupted.  |
+| an interrupted       |                            |                |
+| write.               |                            |                |
++----------------------+----------------------------+----------------+
+| A HEK seed slot has  | HEK_SEED_AVAIL_RANDOMIZED  | The slot that  |
+| been programmed      |                            | is randomized. |
+| with randomness.     |                            |                |
++----------------------+----------------------------+----------------+
+| All HEK seed slots   | HEK_SEED_AVAIL_PERMANENT   | The last slot  |
+| have been zeroized   |                            | that was       |
+| and the perma-HEK    |                            | zeroized.      |
+| mode bit has been    |                            |                |
+| programmed.          |                            |                |
++----------------------+----------------------------+----------------+
+
+Table: REPORT_HEK_METADATA output arguments
+
++---------------+--------+--------------------------------------------------------+
+| Name          | Type   | Description                                            |
++===============+========+========================================================+
+| chksum        | u32    | Checksum over other output arguments, computed by      |
+|               |        | Caliptra.                                              |
++---------------+--------+--------------------------------------------------------+
+| fips_status   | u32    | Indicates if the command is FIPS approved or an error. |
++---------------+--------+--------------------------------------------------------+
+| reserved      | u32[4] | Reserved.                                              |
++---------------+--------+--------------------------------------------------------+
 
 #### GET_STATUS
 
@@ -2190,9 +2291,10 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 |      | production lifecycle state and have a randomized         |           |
 |      | HEK. See @sec:hek-sek-lifecycle.                         |           |
 +------+----------------------------------------------------------+-----------+
-| 6    | A HEK seed shall only be randomized once the prior seed  | Yes       |
-|      | has been zeroized, and a HEK seed shall only be zeroized |           |
-|      | after it has been randomized. See @sec:hek-lifecycle.    |           |
+| 6    | MCU ROM shall populate the HEK seed fuse register and    | Yes       |
+|      | invoke REPORT_HEK_METADATA upon cold boot. See Sections  |           |
+|      | [-@sec:hek-lifecycle] and                                |           |
+|      | [-@sec:report-hek-metadata-cmd].                         |           |
 +------+----------------------------------------------------------+-----------+
 | 7    | HEK and SEK programming/zeroization shall adhere to the  | Yes       |
 |      | sequence described in @sec:hek-sek-lifecycle.            |           |
@@ -2218,7 +2320,7 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 |      | to prevent further modifications. Additionally,          |           |
 |      | OCP_LOCK_MEK_LENGTH must be set to 40h. See @sec:sfrs.   |           |
 +------+----------------------------------------------------------+-----------+
-| 12   | Upon KMB cold or warm reset, drive firmware shall        | Yes       |
+| 13   | Upon KMB cold or warm reset, drive firmware shall        | Yes       |
 |      | enumerate HPKE keypairs supported by KMB and advertise   |           |
 |      | them to the host, if drive firmware supports a           |           |
 |      | host-facing API for doing so. See                        |           |
