@@ -65,7 +65,7 @@ group Report HEK metadata
         crom -> crom: Note that the HEK is enabled. Leave it in Key Vault.
     else lifecycle == Production and (HEK seed is randomized or HEK mode is permanent)
         crom -> crom: Note that the HEK is enabled. Leave it in Key Vault.
-    else
+    else lifecycle == Production and HEK seed is neither randomized nor permanent
         crom -> crom: Note that the HEK is disabled.
         $zeroize_from_rom(hek)
     end
