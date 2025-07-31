@@ -52,19 +52,3 @@ references:
     url: "https://www.opencompute.org/documents/attestation-v1-0-20201104-pdf"
   - id: ocp-ownership-transfer-spec
     title: "OCP Security WG: Ownership Transfer"
-  - id: caliptra-hardware-spec
-    title: "Caliptra Hardware Specification v2.0"
-    publisher: "CHIPS Alliance"
-    url: "https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraHardwareSpecification.md"
-  - id: caliptra-integration-spec
-    title: "Caliptra Integration Specification v2.0"
-    publisher: "CHIPS Alliance"
-    url: "https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md"
-  - id: caliptra-rom-spec
-    title: "Caliptra ROM Specification v2.0"
-    publisher: "CHIPS Alliance"
-    url: "https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/rom/dev/README.md"
-  - id: caliptra-runtime-spec
-    title: "Caliptra Runtime Specification v2.0"
-    publisher: "CHIPS Alliance"
-    url: "https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/runtime/README.md"

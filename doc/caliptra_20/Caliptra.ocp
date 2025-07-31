@@ -55,9 +55,8 @@ A full explanation of the OCP core tenets can be seen [here](https://146a55aca6f
 
 ## Openness
 
-The Caliptra source for RTL and firmware will be licensed using the Apache 2.0 license. The specific
-mechanics and hosting of the code are work in progress due to CHIPS alliance timelines. Future versions
-of this spec will point to the relevant resources.
+The Caliptra source for RTL and firmware are licensed using the Apache 2.0 license. See
+[caliptra.io](https://caliptra.io) for links to all code repositories and companion specifications.
 
 ## Efficiency
 
@@ -92,15 +91,6 @@ instances to consume mere Joules per year, which is conducive to sustainability.
 Caliptra[^1] was originally created as part of the Open Compute Project ([OCP](https://www.opencompute.org/)). The major revisions of the Caliptra specifications are published at OCP. The evolving source code and documentation for Caliptra are in this repository within the [CHIPS Alliance Project](https://chipsalliance.org/), a Series of LF Projects, LLC.
 
 The objective of Caliptra is to define core RoT capabilities that must be implemented in the System on Chip (SoC) or ASIC of any device in a cloud platform. The collection of these RoT capabilities is referred to as the ***Silicon RoT Services (Silicon RoT).***
-
-## Companion specifications
-
-This present document provides a high-level architecture for Caliptra. The following documents contain useful details of various aspects of Caliptra:
-
-- Caliptra Hardware Specification [@{caliptra-hardware-spec}]
-- Caliptra Integration Specification [@{caliptra-integration-spec}]
-- Caliptra ROM Specification [@{caliptra-rom-spec}]
-- Caliptra Runtime Specification [@{caliptra-runtime-spec}]
 
 ---
 
@@ -200,7 +190,7 @@ Detection of corrupted critical code and data (configuration) requires strong en
 * Cryptographically verify & measure its code and configuration
 * Sign these measurements with a unique attestation key
 * Report measurements to a host or external entity, which can further verify the authenticity and integrity of the device (also known as *attestation*)
-* **Recovery** follows Open Compute Project Secure Recovery flows and Streaming Boot. (FIXME: Add links to released specs; they are in draft mode now)
+* **Recovery** follows Open Compute Project Secure Recovery flows and Streaming Boot. (See @sec:ocp-recovery-hw-specs for links.)
 
 **Measurements** and **Verification** include **Code** and **Configuration**. Configuration includes invasive capabilities that impact the user service level agreement (SLA) on confidentiality; for example, the enablement of debug capabilities that grant an operator access to raw, unencrypted registers for any tenant context. In order to measure and attest configuration, the Silicon RoT must be in control of the configuration.
 
@@ -1981,7 +1971,7 @@ The Caliptra subsystem offers a complete RoT subsystem, with open source program
 1. Caliptra ROM waits for SoC infrastructure readiness indication. If this indication is set, Caliptra will do the identity derviation flows. If it is not set, then this flow is run when the SoC infrastructure readiness indication is set.
 2. Caliptra ROM uses the streaming boot interface to load its firmware. Please see the specific section for next level specifics; At a high level, Caliptra ROM sets the device ready in the I3C controller and poll I3C for the payloads.
 3. BMC or a similar platform component will send the image (code or data) through OCP streaming boot interface.
-   1.Caliptra ROM uses the streaming boot interface to receive 'data' from the BMC or MCU. Examples include SoC specific configuration. Caliptra ROM operation of the streaming boot interface will be identical for receiving either 'code' or 'data'. The data flow and code flow over streaming boot interface is the same from physical interface point of view and follows the OCP recovery spec for streaming boot support as implemented in Caliptra subsystem documentation (please see the recovery section).
+   1. Caliptra ROM uses the streaming boot interface to receive 'data' from the BMC or MCU. Examples include SoC specific configuration. Caliptra ROM operation of the streaming boot interface will be identical for receiving either 'code' or 'data'. The data flow and code flow over streaming boot interface is the same from physical interface point of view and follows the OCP recovery spec for streaming boot support as implemented in Caliptra subsystem documentation (please see the recovery section).
    2. This need for data flow (from flash or BMC) is indicated by a SOC configuration bit to Caliptra ROM.
    3. This ‘data’ flow is possible only before SOC infra readiness is set. This is specifically used for scenarios where PUF or other characterization data is coming off-chip (say a flash or BMC). **FIXME:** Security and operations impact of this step/flow is being analyzed. This capability/flexibility will be updated or removed once that is finalized.
    4. This data must be hashed into PCR0
@@ -2102,7 +2092,7 @@ I3C streaming boot interface is responsible for the following list of actions:
 2. Updating status registers based on interaction of AC-RoT and other devices
 3. Asserting / Deasserting “payload_available” & “image_activated” signals
 
-## OCP Recovery Interface Hardware Specifications
+## OCP Recovery Interface Hardware Specifications {#sec:ocp-recovery-hw-specs}
 
 [OCP Recovery Document](https://docs.google.com/document/d/1Ge_w9i5A6YKG-7nlTp--JhZf6By7I9oB3oW_2_i7JbE/edit?usp=sharing)
 
