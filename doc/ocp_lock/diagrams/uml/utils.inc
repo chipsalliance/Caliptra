@@ -73,8 +73,14 @@
             cfw -> hmac++: Derive $output_name
             hmac -> $salt_from: Read $salt_name
             hmac -> dkey: Read preconditioned key
-            hmac -> $output_to **: Write HMAC($salt_name, preconditioned key)
-            $activate_kv($output_to)
+
+            !if ($output_to != "mpk_secret")
+                hmac -> $output_to **: Write HMAC($salt_name, preconditioned key)
+                $activate_kv($output_to)
+            !else
+                hmac -> $output_to: Write HMAC($salt_name, preconditioned key)
+            !endif
+
             hmac -> cfw: Done
             hmac--
 
