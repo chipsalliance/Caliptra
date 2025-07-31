@@ -1562,11 +1562,46 @@ Table: ENABLE_MPK output arguments
 | enabled_mpk | EnabledMpk | MPK encrypted to the VEK.                 |
 +-------------+------------+-------------------------------------------+
 
+#### INITIALIZE_MEK_SECRET {#sec:initialize-mek-secret}
+
+This command shall initialize the MEK secret seed as described in @fig:mek-secret-derivation.
+
+See @fig:initialize-mek-secret-uml for the sequence diagram.
+
+Command Code: 0X494D_0B53 ("IMKS")
+
+Table: INITIALIZE_MEK_SECRET input arguments
+
++-------------+------------+--------------------------------------------------+
+| Name        | Type       | Description                                      |
++=============+============+==================================================+
+| chksum      | u32        | Checksum over other input arguments,             |
+|             |            | computed by the caller.                          |
++-------------+------------+--------------------------------------------------+
+| reserved    | u32        | Reserved.                                        |
++-------------+------------+--------------------------------------------------+
+
+Table: INITIALIZE_MEK_SECRET output arguments
+
++-------------+------+-------------------------------------------+
+| Name        | Type | Description                               |
++=============+======+===========================================+
+| chksum      | u32  | Checksum over other output arguments,     |
+|             |      | computed by Caliptra.                     |
++-------------+------+-------------------------------------------+
+| fips_status | u32  | Indicates if the command is FIPS approved |
+|             |      | or an error.                              |
++-------------+------+-------------------------------------------+
+| reserved    | u32  | Reserved.                                 |
++-------------+------+-------------------------------------------+
+
 #### MIX_MPK {#sec:mix-mpk-cmd}
 
-This command initializes the MEK secret seed if not already initialized or if \`initialize\` is set to 1, decrypts the specified MPK with the VEK, and then updates the MEK secret seed in KMB by performing a KDF with the MEK secret seed and the decrypted MPK.
+This command decrypts the specified MPK with the VEK, and then updates the MEK secret seed in KMB by performing a KDF with the MEK secret seed and the decrypted MPK.
 
 When generating an MEK, one or more MIX_MPK commands are processed to modify the MEK secret seed.
+
+The MEK secret seed must already be initialized by [INITIALIZE_MEK_SECRET](#sec:initialize-mek-secret) or this command shall return an error.
 
 See @fig:mix-mpk-uml for the sequence diagram.
 
@@ -1581,10 +1616,6 @@ Table: MIX_MPK input arguments
 |             |            | computed by the caller.                          |
 +-------------+------------+--------------------------------------------------+
 | reserved    | u32        | Reserved.                                        |
-+-------------+------------+--------------------------------------------------+
-| initialize  | u32        | If set to 1, the MEK secret seed is              |
-|             |            | initialized before the given MPK is              |
-|             |            | mixed. All other values reserved. Little-endian. |
 +-------------+------------+--------------------------------------------------+
 | enabled_mpk | EnabledMpk | MPK encrypted to the VEK.                        |
 +-------------+------------+--------------------------------------------------+
@@ -1652,7 +1683,7 @@ This command generates a random 512-bit MEK and encrypts it using the MEK secret
 
 The DPK may be a value decrypted by a user-provided C_PIN in Opal.
 
-When generating an MEK, the MEK secret seed is initialized if no MPK has previously been mixed into the MEK secret seed.
+[INITIALIZE_MEK_SECRET](#sec:initialize-mek-secret) must be invoked prior to this command or an error shall be returned.
 
 See @fig:generate-mek-uml for the sequence diagram.
 
@@ -1695,9 +1726,9 @@ This command decrypts the given encrypted 512-bit MEK using the MEK secret, whic
 
 The DPK may be a value decrypted by a user-provided C_PIN in Opal.
 
-When decrypting an MEK, the MEK secret seed is initialized if no MPK has previously been mixed into the MEK secret seed.
-
 The decrypted MEK, specified metadata, and aux_metadata are loaded into the encryption engine key cache. The metadata format is vendor-defined and specifies the information to the encryption engine on where within the key cache the MEK is loaded.
+
+[INITIALIZE_MEK_SECRET](#sec:initialize-mek-secret) must be invoked prior to this command or an error shall be returned.
 
 See @fig:load-mek-uml for the sequence diagram.
 
@@ -1747,9 +1778,9 @@ Table: LOAD_MEK output arguments
 
 This command derives an MEK using the HEK, the MEK secret seed, and the given SEK and DPK.
 
-When deriving an MEK, the MEK secret seed is initialized if no MPK has previously been mixed into the MEK secret seed.
-
 The derived MEK, specified metadata, and aux_metadata are loaded into the encryption engine key cache. The metadata format is vendor-defined and specifies the information to the encryption engine on where within the key cache the MEK is loaded.
+
+[INITIALIZE_MEK_SECRET](#sec:initialize-mek-secret) must be invoked prior to this command or an error shall be returned.
 
 See @fig:derive-mek-uml for the sequence diagram.
 
@@ -2395,6 +2426,12 @@ Sequence diagram participants that represent keys in firmware and the Key Vault 
 
 ```plantuml {caption="UML: Rotating an HPKE Key" #fig:rotate-hpke-key-uml}
 !include diagrams/uml/rotate_hpke_key.uml
+```
+
+## Sequence to initialize the MEK secret seed
+
+```plantuml {caption="UML: Initialize MEK Secret" #fig:initialize-mek-secret-uml}
+!include diagrams/uml/initialize_mek_secret.uml
 ```
 
 ## Sequence to generate an MPK
