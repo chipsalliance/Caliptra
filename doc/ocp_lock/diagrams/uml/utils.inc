@@ -96,7 +96,7 @@
 
             $kdf(cfw, encryption key, $key, AES salt, AES encryption subkey, $subkey)
 
-            !if ($key != "enabled_mpk_encryption_key")
+            !if ($key != "vek")
                 $zeroize($key)
             !endif
 
@@ -109,8 +109,8 @@
                 aes -> $plaintext_from: Read $plaintext_name
             !endif
 
-            aes -> $key: Read encryption key
-            aes -> cfw: Write AES-GCM-Encrypt(encryption key, IV, AAD, plaintext)
+            aes -> $subkey: Read encryption subkey
+            aes -> cfw: Write AES-GCM-Encrypt(encryption subkey, IV, AAD, plaintext)
             aes -> cfw: Done
             aes--
 
@@ -118,7 +118,7 @@
                 $zeroize($plaintext_from)
             !endif
 
-            $zeroize($key)
+            $zeroize($subkey)
         end
     !endprocedure
 
@@ -126,23 +126,23 @@
         group Preconditioned AES Decrypt
             $kdf(cfw, encryption key, $key, AES salt, AES decryption subkey, $subkey)
 
-            !if ($key != "enabled_mpk_encryption_key")
+            !if ($key != "vek")
                 $zeroize($key)
             !endif
 
             cfw -> aes++: Decrypt $ciphertext_name
             cfw -> aes: Write $ciphertext_name, AAD, and IV
-            aes -> $key: Read encryption key
+            aes -> $subkey: Read encryption subkey
             !if ($ciphertext_to != "cfw")
-                aes -> $ciphertext_to **: Write AES-GCM-Decrypt(encryption key, IV, AAD, ciphertext)
+                aes -> $ciphertext_to **: Write AES-GCM-Decrypt(encryption subkey, IV, AAD, ciphertext)
                 $activate($ciphertext_to)
             !else
-                aes -> $ciphertext_to: Write AES-GCM-Decrypt(encryption key, IV, AAD, ciphertext)
+                aes -> $ciphertext_to: Write AES-GCM-Decrypt(encryption subkey, IV, AAD, ciphertext)
             !endif
             aes -> cfw: Done
             aes--
 
-            $zeroize($key)
+            $zeroize($subkey)
         end
     !endprocedure
 
@@ -233,9 +233,9 @@
         participant "Current Encryption Key\n(Key Vault)" as c_encryption_key
         participant "New Encryption Key\n(Key Vault)" as n_encryption_key
         participant "Encryption Subkey\n(Key Vault)" as encryption_subkey
-        participant "Current Encryption Key\n(Key Vault)" as c_encryption_key
+        participant "Current Encryption Subkey\n(Key Vault)" as c_encryption_subkey
         participant "MPK\n(in memory)" as mpk
-        participant "New Encryption Key\n(Key Vault)" as n_encryption_key
+        participant "New Encryption Subkey\n(Key Vault)" as n_encryption_subkey
         participant "VEK Subkey\n(Key Vault)" as vek_subkey
         participant "MEK\n(Key Vault)" as mek
 

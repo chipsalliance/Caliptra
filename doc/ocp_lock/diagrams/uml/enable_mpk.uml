@@ -41,7 +41,7 @@ $zeroize(ak)
 
 $preconditioned_aes_decrypt(encryption_key, encryption_subkey, locked MPK, mpk)
 
-$preconditioned_aes_encrypt(enabled_mpk_encryption_key, enabled_mpk_encryption_subkey, ready MPK, mpk)
+$preconditioned_aes_encrypt(vek, vek_subkey, ready MPK, mpk)
 
 cfw -> dfw: Command response\nand Enabled MPK
 cfw--
