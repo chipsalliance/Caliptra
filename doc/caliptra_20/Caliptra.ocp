@@ -505,7 +505,7 @@ Table: Assets {#tbl:assets}
 
 The following figure shows the basic high-level blocks of Caliptra.
 
-![Caliptra high level blocks](./images/Caliptra2p0.png){#fig:high-level-blocks}
+![Caliptra high level blocks](./images/Caliptra2p0.png){width=512px #fig:high-level-blocks}
 
 See the [hardware section](#hardware) for a detailed discussion.
 
@@ -529,7 +529,7 @@ Caliptra is among the first microcontrollers taken out of reset by the power-on 
 
 See [Error Reporting and Handling](#error-reporting-and-handling) for details about Caliptra and SoC firmware load and verification error handling.
 
-![Passive Caliptra boot flow](./images/Boot_flow.png){#fig:passive-boot-flow}
+![Passive Caliptra boot flow](./images/Boot_flow.png){width=512px #fig:passive-boot-flow}
 
 **Subsystem Mode Boot Flow**
 
@@ -643,7 +643,7 @@ The owner key, when represented in fuses or in the FMC's alias certificate, is a
 ### Provisioning UDS during Manufacturing (Subsystem Mode)
 **Note:** In passive mode, SoC follows the same flows/restrictions as Caliptra 1.x
 
-![Subsystem Mode: UDS manufacturing flow](./images/Manuf-UDS-Flow.png){#fig:subsystem-uds-manufacturing-flow}
+![Subsystem Mode: UDS manufacturing flow](./images/Manuf-UDS-Flow.png){width=512px #fig:subsystem-uds-manufacturing-flow}
 
 There are three ways of generating a UDS_SEED
 Use the internal TRNG to directly generate a 384-bit random number.
@@ -874,7 +874,7 @@ Caliptra RT generates the DPE certificate and endorses it with the Alias~RT~ pri
 
 ### Caliptra security states
 
-![Caliptra security states](./images/Caliptra_security_states.png){#fig:caliptra-security-states}
+![Caliptra security states](./images/Caliptra_security_states.png){width=512px #fig:caliptra-security-states}
 
 **Definitions**
 
@@ -1932,7 +1932,7 @@ Please refer to [the Caliptra code base](https://github.com/chipsalliance/calipt
 ## Caliptra Security Subsystem
 The Caliptra subsystem offers a complete RoT subsystem, with open source programmable components for customization of SoC boot flows.
 
-![Caliptra security subsystem](./images/Subsystem.png){#fig:caliptra-security-subsystem}
+![Caliptra security subsystem](./images/Subsystem.png){width=512px #fig:caliptra-security-subsystem}
 
 ## Caliptra Subsystem Trademark Compliance
 - Caliptra subsystem trademark compliance shall have Caliptra Core 2.0, Life Cycle Controller, Fuse Controller, I3C with OCP streaming boot interface, Manufacture Control Unit (MCU) and Manufacturer Control Interface (MCI) taken as is without change to ensure there is hardware transparency and consistency.
@@ -2002,7 +2002,7 @@ The Caliptra subsystem offers a complete RoT subsystem, with open source program
 20. MCU RT FW is responsible for responding to all MCTP requests.
 21. MCU RT FW will do the PLDM T5 flow, extract FW or configuration payload, use Caliptra to authenticate and deploy the rest of the images as described in run-time authentication flows.
 
-![Subsystem Boot Flow](./images/Subsystem-BootFlow.png){#fig:subsystem-boot-flow}
+![Subsystem Boot Flow](./images/Subsystem-BootFlow.png){width=512px #fig:subsystem-boot-flow}
 
 **Common Run-time Authentication Flows**
 
