@@ -1431,38 +1431,40 @@ Command Code: 0x474D_504B ("GMPK")
 
 Table: GENERATE_MPK input arguments
 
-+-------------------+------------------+----------------------------------------+
-| Name              | Type             | Description                            |
-+===================+==================+========================================+
-| chksum            | u32              | Checksum over other input arguments,   |
-|                   |                  | computed by the caller.                |
-+-------------------+------------------+----------------------------------------+
-| reserved          | u32              | Reserved.                              |
-+-------------------+------------------+----------------------------------------+
-| sek               | u8[32]           | Soft Epoch Key.                        |
-+-------------------+------------------+----------------------------------------+
-| metadata_len      | u32              | Length of the metadata argument.       |
-+-------------------+------------------+----------------------------------------+
-| metadata          | u8[metadata_len] | Metadata for the MPK.                  |
-+-------------------+------------------+----------------------------------------+
-| sealed_access_key | SealedAccessKey  | HPKE-sealed access key.                |
-+-------------------+------------------+----------------------------------------+
++-------------------+-------------------------+--------------------------------------+
+| Name              | Type                    | Description                          |
++===================+=========================+======================================+
+| chksum            | u32                     | Checksum over other input arguments, |
+|                   |                         | computed by the caller.              |
++-------------------+-------------------------+--------------------------------------+
+| reserved          | u32                     | Reserved.                            |
++-------------------+-------------------------+--------------------------------------+
+| sek               | u8[32]                  | Soft Epoch Key.                      |
++-------------------+-------------------------+--------------------------------------+
+| metadata_len      | u32                     | Length of the metadata argument.     |
++-------------------+-------------------------+--------------------------------------+
+| metadata          | u8[metadata_len]        | Metadata for the MPK.                |
++-------------------+-------------------------+--------------------------------------+
+| sealed_access_key | [SealedAccessKey](      | HPKE-sealed access key.              |
+|                   | #sec:sealed-access-key) |                                      |
++-------------------+-------------------------+--------------------------------------+
 
 Table: GENERATE_MPK output arguments
 
-+---------------+-----------+------------------------------------------------+
-| Name          | Type      | Description                                    |
-+===============+===========+================================================+
-| chksum        | u32       | Checksum over other output arguments, computed |
-|               |           | by Caliptra.                                   |
-+---------------+-----------+------------------------------------------------+
-| fips_status   | u32       | Indicates if the command is FIPS approved or   |
-|               |           | an error.                                      |
-+---------------+-----------+------------------------------------------------+
-| reserved      | u32       | Reserved.                                      |
-+---------------+-----------+------------------------------------------------+
-| encrypted_mpk | LockedMpk | MPK encrypted to access_key.                   |
-+---------------+-----------+------------------------------------------------+
++---------------+-------------------+------------------------------------------------+
+| Name          | Type              | Description                                    |
++===============+===================+================================================+
+| chksum        | u32               | Checksum over other output arguments, computed |
+|               |                   | by Caliptra.                                   |
++---------------+-------------------+------------------------------------------------+
+| fips_status   | u32               | Indicates if the command is FIPS approved or   |
+|               |                   | an error.                                      |
++---------------+-------------------+------------------------------------------------+
+| reserved      | u32               | Reserved.                                      |
++---------------+-------------------+------------------------------------------------+
+| encrypted_mpk | [LockedMpk](      | MPK encrypted to access_key.                   |
+|               | #sec:wrapped-key) |                                                |
++---------------+-------------------+------------------------------------------------+
 
 #### REWRAP_MPK {#sec:rewrap-mpk-cmd}
 
@@ -1476,48 +1478,51 @@ Command Code: 0x5245_5750 ("REWP")
 
 Table: REWRAP_MPK input arguments
 
-+--------------------+-----------------------+---------------------------------+
-| Name               | Type                  | Description                     |
-+====================+=======================+=================================+
-| chksum             | u32                   | Checksum over other input       |
-|                    |                       | arguments, computed by the      |
-|                    |                       | caller.                         |
-+--------------------+-----------------------+---------------------------------+
-| reserved           | u32                   | Reserved.                       |
-+--------------------+-----------------------+---------------------------------+
-| sek                | u8[32]                | Soft Epoch Key.                 |
-+--------------------+-----------------------+---------------------------------+
-| current_locked_mpk | LockedMpk             | Current MPK to be rewrapped.    |
-+--------------------+-----------------------+---------------------------------+
-| sealed_access_key  | SealedAccessKey       | HPKE-sealed access key.         |
-+--------------------+-----------------------+---------------------------------+
-| new_ak_ciphertext  | u8[access_key_len+Nt] | New access key ciphertext and   |
-|                    |                       | authentication tag.             |
-|                    |                       | \`access_key_len\` is provided  |
-|                    |                       | by the SealedAccessKey. \`Nt\`  |
-|                    |                       | is the HPKE value associated    |
-|                    |                       | with the \`aead_id\` identifier |
-|                    |                       | from the SealedAccessKey's      |
-|                    |                       | \`hpke_algorithm\`. See         |
-|                    |                       | @tbl:sealed-access-key-contents |
-|                    |                       | for details.                    |
-+--------------------+-----------------------+---------------------------------+
++--------------------+-------------------------+---------------------------------+
+| Name               | Type                    | Description                     |
++====================+=========================+=================================+
+| chksum             | u32                     | Checksum over other input       |
+|                    |                         | arguments, computed by the      |
+|                    |                         | caller.                         |
++--------------------+-------------------------+---------------------------------+
+| reserved           | u32                     | Reserved.                       |
++--------------------+-------------------------+---------------------------------+
+| sek                | u8[32]                  | Soft Epoch Key.                 |
++--------------------+-------------------------+---------------------------------+
+| current_locked_mpk | [LockedMpk](            | Current MPK to be rewrapped.    |
+|                    | #sec:wrapped-key)       |                                 |
++--------------------+-------------------------+---------------------------------+
+| sealed_access_key  | [SealedAccessKey](      | HPKE-sealed current access key. |
+|                    | #sec:sealed-access-key) |                                 |
++--------------------+-------------------------+---------------------------------+
+| new_ak_ciphertext  | u8[access_key_len+Nt]   | New access key ciphertext and   |
+|                    |                         | authentication tag.             |
+|                    |                         | \`access_key_len\` is provided  |
+|                    |                         | by the SealedAccessKey. \`Nt\`  |
+|                    |                         | is the HPKE value associated    |
+|                    |                         | with the \`aead_id\` identifier |
+|                    |                         | from the SealedAccessKey's      |
+|                    |                         | \`hpke_algorithm\`. See         |
+|                    |                         | @sec:sealed-access-key for      |
+|                    |                         | details.                        |
++--------------------+-------------------------+---------------------------------+
 
 Table: REWRAP_MPK output arguments
 
-+----------------+-----------+-------------------------------------------+
-| Name           | Type      | Description                               |
-+================+===========+===========================================+
-| chksum         | u32       | Checksum over other output arguments,     |
-|                |           | computed by Caliptra.                     |
-+----------------+-----------+-------------------------------------------+
-| fips_status    | u32       | Indicates if the command is FIPS approved |
-|                |           | or an error.                              |
-+----------------+-----------+-------------------------------------------+
-| reserved       | u32       | Reserved.                                 |
-+----------------+-----------+-------------------------------------------+
-| new_locked_mpk | LockedMpk | MPK encrypted to new_access_key.          |
-+----------------+-----------+-------------------------------------------+
++----------------+-------------------+-------------------------------------------+
+| Name           | Type              | Description                               |
++================+===================+===========================================+
+| chksum         | u32               | Checksum over other output arguments,     |
+|                |                   | computed by Caliptra.                     |
++----------------+-------------------+-------------------------------------------+
+| fips_status    | u32               | Indicates if the command is FIPS approved |
+|                |                   | or an error.                              |
++----------------+-------------------+-------------------------------------------+
+| reserved       | u32               | Reserved.                                 |
++----------------+-------------------+-------------------------------------------+
+| new_locked_mpk | [LockedMpk](      | MPK encrypted to new_access_key.          |
+|                | #sec:wrapped-key) |                                           |
++----------------+-------------------+-------------------------------------------+
 
 #### ENABLE_MPK {#sec:enable-mpk-cmd}
 
@@ -1529,38 +1534,40 @@ Command Code: 0x524D_504B ("RMPK")
 
 Table: ENABLE_MPK input arguments
 
-+-------------------+-----------------+------------------------------+
-| Name              | Type            | Description                  |
-+===================+=================+==============================+
-| chksum            | u32             | Checksum over other          |
-|                   |                 | input arguments,             |
-|                   |                 | computed by the caller.      |
-+-------------------+-----------------+------------------------------+
-| reserved          | u32             | Reserved.                    |
-+-------------------+-----------------+------------------------------+
-| sek               | u8[32]          | Soft Epoch Key.              |
-+-------------------+-----------------+------------------------------+
-| sealed_access_key | SealedAccessKey | HPKE-sealed access key.      |
-+-------------------+-----------------+------------------------------+
-| locked_mpk        | LockedMpk       | MPK encrypted to the HEK and |
-|                   |                 | access key.                  |
-+-------------------+-----------------+------------------------------+
++-------------------+-------------------------+------------------------------+
+| Name              | Type                    | Description                  |
++===================+=========================+==============================+
+| chksum            | u32                     | Checksum over other          |
+|                   |                         | input arguments,             |
+|                   |                         | computed by the caller.      |
++-------------------+-------------------------+------------------------------+
+| reserved          | u32                     | Reserved.                    |
++-------------------+-------------------------+------------------------------+
+| sek               | u8[32]                  | Soft Epoch Key.              |
++-------------------+-------------------------+------------------------------+
+| sealed_access_key | [SealedAccessKey](      | HPKE-sealed access key.      |
+|                   | #sec:sealed-access-key) |                              |
++-------------------+-------------------------+------------------------------+
+| locked_mpk        | [LockedMpk](            | MPK encrypted to the HEK and |
+|                   | #sec:wrapped-key)       | access key.                  |
++-------------------+-------------------------+------------------------------+
 
 Table: ENABLE_MPK output arguments
 
-+-------------+------------+-------------------------------------------+
-| Name        | Type       | Description                               |
-+=============+============+===========================================+
-| chksum      | u32        | Checksum over other output arguments,     |
-|             |            | computed by Caliptra.                     |
-+-------------+------------+-------------------------------------------+
-| fips_status | u32        | Indicates if the command is FIPS approved |
-|             |            | or an error.                              |
-+-------------+------------+-------------------------------------------+
-| reserved    | u32        | Reserved.                                 |
-+-------------+------------+-------------------------------------------+
-| enabled_mpk | EnabledMpk | MPK encrypted to the VEK.                 |
-+-------------+------------+-------------------------------------------+
++-------------+-------------------+-------------------------------------------+
+| Name        | Type              | Description                               |
++=============+===================+===========================================+
+| chksum      | u32               | Checksum over other output arguments,     |
+|             |                   | computed by Caliptra.                     |
++-------------+-------------------+-------------------------------------------+
+| fips_status | u32               | Indicates if the command is FIPS approved |
+|             |                   | or an error.                              |
++-------------+-------------------+-------------------------------------------+
+| reserved    | u32               | Reserved.                                 |
++-------------+-------------------+-------------------------------------------+
+| enabled_mpk | [EnabledMpk](     | MPK encrypted to the VEK.                 |
+|             | #sec:wrapped-key) |                                           |
++-------------+-------------------+-------------------------------------------+
 
 #### INITIALIZE_MEK_SECRET {#sec:initialize-mek-secret}
 
@@ -1609,16 +1616,17 @@ Command Code: 0x4D4D_504B ("MMPK")
 
 Table: MIX_MPK input arguments
 
-+-------------+------------+--------------------------------------------------+
-| Name        | Type       | Description                                      |
-+=============+============+==================================================+
-| chksum      | u32        | Checksum over other input arguments,             |
-|             |            | computed by the caller.                          |
-+-------------+------------+--------------------------------------------------+
-| reserved    | u32        | Reserved.                                        |
-+-------------+------------+--------------------------------------------------+
-| enabled_mpk | EnabledMpk | MPK encrypted to the VEK.                        |
-+-------------+------------+--------------------------------------------------+
++-------------+-------------------+--------------------------------------+
+| Name        | Type              | Description                          |
++=============+===================+======================================+
+| chksum      | u32               | Checksum over other input arguments, |
+|             |                   | computed by the caller.              |
++-------------+-------------------+--------------------------------------+
+| reserved    | u32               | Reserved.                            |
++-------------+-------------------+--------------------------------------+
+| enabled_mpk | [EnabledMpk](     | MPK encrypted to the VEK.            |
+|             | #sec:wrapped-key) |                                      |
++-------------+-------------------+--------------------------------------+
 
 Table: MIX_MPK output arguments
 
@@ -1644,23 +1652,24 @@ Command Code: 0x5441_434B ("TACK")
 
 Table: TEST_ACCESS_KEY input arguments
 
-+-------------------+-----------------+---------------------------------------+
-| Name              | Type            | Description                           |
-+===================+=================+=======================================+
-| chksum            | u32             | Checksum over other input arguments,  |
-|                   |                 | computed by the caller.               |
-+-------------------+-----------------+---------------------------------------+
-| reserved          | u32             | Reserved.                             |
-+-------------------+-----------------+---------------------------------------+
-| sek               | u8[32]          | Soft Epoch Key.                       |
-+-------------------+-----------------+---------------------------------------+
-| nonce             | u8[32]          | Host-provided random value.           |
-+-------------------+-----------------+---------------------------------------+
-| locked_mpk        | LockedMpk       | Locked MPK associated with the access |
-|                   |                 | key.                                  |
-+-------------------+-----------------+---------------------------------------+
-| sealed_access_key | SealedAccessKey | HPKE-sealed access key.               |
-+-------------------+-----------------+---------------------------------------+
++-------------------+-------------------------+---------------------------------------+
+| Name              | Type                    | Description                           |
++===================+=========================+=======================================+
+| chksum            | u32                     | Checksum over other input arguments,  |
+|                   |                         | computed by the caller.               |
++-------------------+-------------------------+---------------------------------------+
+| reserved          | u32                     | Reserved.                             |
++-------------------+-------------------------+---------------------------------------+
+| sek               | u8[32]                  | Soft Epoch Key.                       |
++-------------------+-------------------------+---------------------------------------+
+| nonce             | u8[32]                  | Host-provided random value.           |
++-------------------+-------------------------+---------------------------------------+
+| locked_mpk        | [LockedMpk](            | Locked MPK associated with the access |
+|                   | #sec:wrapped-key)       | key.                                  |
++-------------------+-------------------------+---------------------------------------+
+| sealed_access_key | [SealedAccessKey](      | HPKE-sealed access key.               |
+|                   | #sec:sealed-access-key) |                                       |
++-------------------+-------------------------+---------------------------------------+
 
 Table: TEST_ACCESS_KEY output arguments
 
@@ -1706,19 +1715,20 @@ Table: GENERATE_MEK input arguments
 
 Table: GENERATE_MEK output arguments
 
-+-------------+------------+-------------------------------------------+
-| Name        | Type       | Description                               |
-+=============+============+===========================================+
-| chksum      | u32        | Checksum over other output arguments,     |
-|             |            | computed by Caliptra.                     |
-+-------------+------------+-------------------------------------------+
-| fips_status | u32        | Indicates if the command is FIPS approved |
-|             |            | or an error.                              |
-+-------------+------------+-------------------------------------------+
-| reserved    | u32        | Reserved.                                 |
-+-------------+------------+-------------------------------------------+
-| wrapped_mek | WrappedMek | MEK encrypted to the derived MEK secret.  |
-+-------------+------------+-------------------------------------------+
++-------------+-------------------+-------------------------------------------+
+| Name        | Type              | Description                               |
++=============+===================+===========================================+
+| chksum      | u32               | Checksum over other output arguments,     |
+|             |                   | computed by Caliptra.                     |
++-------------+-------------------+-------------------------------------------+
+| fips_status | u32               | Indicates if the command is FIPS approved |
+|             |                   | or an error.                              |
++-------------+-------------------+-------------------------------------------+
+| reserved    | u32               | Reserved.                                 |
++-------------+-------------------+-------------------------------------------+
+| wrapped_mek | [WrappedMek](     | MEK encrypted to the derived MEK secret.  |
+|             | #sec:wrapped-key) |                                           |
++-------------+-------------------+-------------------------------------------+
 
 #### LOAD_MEK {#sec:load-mek-cmd}
 
@@ -1736,29 +1746,30 @@ Command Code: 0x4C4D_454B ("LMEK")
 
 Table: LOAD_MEK input arguments
 
-+--------------+------------+--------------------------------------------+
-| Name         | Type       | Description                                |
-+==============+============+============================================+
-| chksum       | u32        | Checksum over other input arguments,       |
-|              |            | computed by the caller.                    |
-+--------------+------------+--------------------------------------------+
-| reserved     | u32        | Reserved.                                  |
-+--------------+------------+--------------------------------------------+
-| sek          | u8[32]     | Soft Epoch Key.                            |
-+--------------+------------+--------------------------------------------+
-| dpk          | u8[32]     | Data Protection Key.                       |
-+--------------+------------+--------------------------------------------+
-| metadata     | u8[20]     | Metadata for MEK to load into the drive    |
-|              |            | encryption engine (i.e. NSID + LBA range). |
-+--------------+------------+--------------------------------------------+
-| aux_metadata | u8[32]     | Auxiliary metadata for the MEK             |
-|              |            | (optional; i.e. operation mode).           |
-+--------------+------------+--------------------------------------------+
-| wrapped_mek  | WrappedMek | MEK encrypted to the derived MEK secret.   |
-+--------------+------------+--------------------------------------------+
-| cmd_timeout  | u32        | Timeout in ms for command to encryption    |
-|              |            | engine to complete.                        |
-+--------------+------------+--------------------------------------------+
++--------------+-------------------+--------------------------------------------+
+| Name         | Type              | Description                                |
++==============+===================+============================================+
+| chksum       | u32               | Checksum over other input arguments,       |
+|              |                   | computed by the caller.                    |
++--------------+-------------------+--------------------------------------------+
+| reserved     | u32               | Reserved.                                  |
++--------------+-------------------+--------------------------------------------+
+| sek          | u8[32]            | Soft Epoch Key.                            |
++--------------+-------------------+--------------------------------------------+
+| dpk          | u8[32]            | Data Protection Key.                       |
++--------------+-------------------+--------------------------------------------+
+| metadata     | u8[20]            | Metadata for MEK to load into the drive    |
+|              |                   | encryption engine (i.e. NSID + LBA range). |
++--------------+-------------------+--------------------------------------------+
+| aux_metadata | u8[32]            | Auxiliary metadata for the MEK             |
+|              |                   | (optional; i.e. operation mode).           |
++--------------+-------------------+--------------------------------------------+
+| wrapped_mek  | [WrappedMek](     | MEK encrypted to the derived MEK secret.   |
+|              | #sec:wrapped-key) |                                            |
++--------------+-------------------+--------------------------------------------+
+| cmd_timeout  | u32               | Timeout in ms for command to encryption    |
+|              |                   | engine to complete.                        |
++--------------+-------------------+--------------------------------------------+
 
 Table: LOAD_MEK output arguments
 
@@ -1989,6 +2000,10 @@ See @fig:hek-sek-rotation for more details about the transitions between HEK sta
 
 This section defines common types used to interface between the drive firmware and KMB. These types are common patterns found in both requests and responses.
 
+##### SealedAccessKey type {#sec:sealed-access-key}
+
+This type holds an HPKE-wrapped access key.
+
 Table: SealedAccessKey contents {#tbl:sealed-access-key-contents}
 
 +----------------+-----------------------+------------------------------------------------+
@@ -2015,7 +2030,7 @@ Table: SealedAccessKey contents {#tbl:sealed-access-key-contents}
 
 \`Nenc\` and \`Nt\` are HPKE values associated with the \`kem_id\` and \`aead_id\` identifiers from the given \`hpke_algorithm\`. For example, if byte 0 bit 0 of \`hpke_algorithm\` is set (indicating \`kem_id\` 0x0011 and \`aead_id\` 0x0002), then according to [@{ietf-rfc9180}], \`Nenc\` and \`Nt\` would be 97 and 16, respectively.
 
-##### WrappedKey type
+##### WrappedKey type {#sec:wrapped-key}
 
 AES-256-GCM is used for all wrapping and unwrapping.
 
@@ -2047,7 +2062,7 @@ Table: WrappedKey contents
 | ciphertext   | u8[key_len+16]   | Key ciphertext and authentication tag.     |
 +--------------+------------------+--------------------------------------------+
 
-The AAD for the encrypted message is constructed as \`key_type\` || \`id\` || \`metadata_len\` || \`metadata\`.
+The AAD for the encrypted message is constructed as \`key_type\` || \`salt\` || \`metadata_len\` || \`metadata\`.
 
 Variants of WrappedKey will be used to reduce duplicating information in commands. The following names will be used for WrappedKeys of a specific \`key_type\` and \`key_len\`:
 
@@ -2269,6 +2284,8 @@ Table: Acronyms and abbreviations used throughout this document {#tbl:abbreviati
 +--------------+----------------------------------------------------------+
 | MEK          | Media Encryption Key                                     |
 +--------------+----------------------------------------------------------+
+| ML-DSA       | Module-Lattice-Based Digital Signature Algorithm         |
++--------------+----------------------------------------------------------+
 | ML-KEM       | Module-Lattice-Based Key-Encapsulation Mechanism         |
 +--------------+----------------------------------------------------------+
 | MPK          | Multi-party Protection Key                               |
@@ -2285,9 +2302,9 @@ Table: Acronyms and abbreviations used throughout this document {#tbl:abbreviati
 +--------------+----------------------------------------------------------+
 | SSD          | Solid-state drive                                        |
 +--------------+----------------------------------------------------------+
-| SVN          | Security Version Number                                  |
-+--------------+----------------------------------------------------------+
 | TCG          | Trusted Computing Group                                  |
++--------------+----------------------------------------------------------+
+| TRNG         | True Random Number Generator                             |
 +--------------+----------------------------------------------------------+
 | UART         | Universal asynchronous receiver-transmitter              |
 +--------------+----------------------------------------------------------+
