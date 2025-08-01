@@ -701,6 +701,22 @@ The checksum is not derived from the MEK directly, because Caliptra hardware res
 
 Note: a checksum is not required for encrypted MEKs. For encrypted MEKs, any change in the MEK secret would result in an error during AES-GCM decryption of the provided MEK.
 
+#### MEK command sequence
+
+KMB exposes the following mailbox commands for establishing an MEK:
+
+- [INITIALIZE_MEK_SECRET](#sec:initialize-mek-secret-cmd)
+- [MIX_MPK](#sec:mix-mpk-cmd)
+- [GENERATE_MEK](#sec:generate-mek-cmd)
+- [LOAD_MEK](#sec:load-mek-cmd)
+- [DERIVE_MEK](#sec:derive-mek-cmd)
+
+@fig:mek-command-sequence illustrates how these commands are used in sequence.
+
+![MEK command sequence](./diagrams/mek_command_sequence.drawio.svg){#fig:mek-command-sequence}
+
+Integrators may elect to utilize either MEK generation or MEK derivation when establishing an MEK.
+
 #### AES-XTS considerations {#sec:aes-xts-considerations}
 
 The MEK sent to the encryption engine may be used as an AES-XTS key. FIPS 140-3 IG [@{fips-140-3-ig}] section C.I states that in AES-XTS, the key is "parsed as the concatenation of two AES keys, denoted by *Key_1* and *Key_2*, that are 128 [or 256] bits long... *Key_1* and *Key_2* shall be generated and/or established independently according to the rules for component symmetric keys from NIST **SP 800-133rev2**, Sec. 6.3. The module **shall** check explicitly that *Key_1* ≠ *Key_2*, regardless of how *Key_1* and *Key_2* are obtained."
@@ -1004,34 +1020,7 @@ Since the Control register is a part of the encryption engine whose implementati
 
 @fig:ctrl-reg-state-machine illustrates the control register's state machine as it transitions from power-on to executing a command.
 
-```mermaid {caption="Control register state machine" #fig:ctrl-reg-state-machine}
-stateDiagram-v2
-    state "RDY=0<br>ERR=0<br>CMD=0<br>DONE=0<br>EXE=0" as power_on
-    state "Encryption engine initializes" as init
-    state "RDY=1<br>ERR=0<br>CMD=0<br>DONE=0<br>EXE=0" as ready
-    state "RDY=0<br>ERR=[code]<br>CMD=0<br>DONE=0<br>EXE=0" as fatal
-
-    state "RDY=1<br>ERR=0<br>CMD=[code]<br>DONE=0<br>EXE=0" as cmd_init
-    state "RDY=1<br>ERR=0<br>CMD=[code]<br>DONE=0<br>EXE=1" as cmd_exe
-    state "Encryption engine processes command" as cmd_processing
-    state "RDY=1<br>ERR=[code]<br>CMD=[code]<br>DONE=1<br>EXE=0" as cmd_done
-    state "Encryption engine resets for next command" as cmd_reset
-
-    [*] --> power_on
-    power_on --> init
-    init --> fatal: Fatal error
-    fatal --> [*]
-
-    init --> ready: Encryption Engine writes<br>RDY=1
-    ready --> cmd_init: KMB writes<br>CMD=[code]
-    cmd_init --> cmd_exe: KMB writes<br>EXE=1
-    cmd_exe --> cmd_processing
-    cmd_processing --> fatal: Fatal error
-    cmd_processing --> cmd_done: Encryption engine writes<br>ERR=[code]<br>DONE=1<br>EXE=0
-    cmd_done --> cmd_reset: KMB writes<br>DONE=1
-    cmd_reset --> ready: Encryption engine writes<br>ERR=0,<br>CMD=0,<br>DONE=0,<br>EXE=0
-    cmd_reset --> fatal: Fatal error
-```
+![Control register state machine](./diagrams/ctrl_register_state_machine.drawio.svg){#fig:ctrl-reg-state-machine}
 
 #### KMB command sequence
 
@@ -1569,7 +1558,7 @@ Table: ENABLE_MPK output arguments
 |             | #sec:wrapped-key) |                                           |
 +-------------+-------------------+-------------------------------------------+
 
-#### INITIALIZE_MEK_SECRET {#sec:initialize-mek-secret}
+#### INITIALIZE_MEK_SECRET {#sec:initialize-mek-secret-cmd}
 
 This command shall initialize the MEK secret seed as described in @fig:mek-secret-derivation.
 
@@ -1579,14 +1568,14 @@ Command Code: 0X494D_0B53 ("IMKS")
 
 Table: INITIALIZE_MEK_SECRET input arguments
 
-+-------------+------------+--------------------------------------------------+
-| Name        | Type       | Description                                      |
-+=============+============+==================================================+
-| chksum      | u32        | Checksum over other input arguments,             |
-|             |            | computed by the caller.                          |
-+-------------+------------+--------------------------------------------------+
-| reserved    | u32        | Reserved.                                        |
-+-------------+------------+--------------------------------------------------+
++----------+------+--------------------------------------+
+| Name     | Type | Description                          |
++==========+======+======================================+
+| chksum   | u32  | Checksum over other input arguments, |
+|          |      | computed by the caller.              |
++----------+------+--------------------------------------+
+| reserved | u32  | Reserved.                            |
++----------+------+--------------------------------------+
 
 Table: INITIALIZE_MEK_SECRET output arguments
 
@@ -1608,7 +1597,7 @@ This command decrypts the specified MPK with the VEK, and then updates the MEK s
 
 When generating an MEK, one or more MIX_MPK commands are processed to modify the MEK secret seed.
 
-The MEK secret seed must already be initialized by [INITIALIZE_MEK_SECRET](#sec:initialize-mek-secret) or this command shall return an error.
+The MEK secret seed must already be initialized by [INITIALIZE_MEK_SECRET](#sec:initialize-mek-secret-cmd) or this command shall return an error.
 
 See @fig:mix-mpk-uml for the sequence diagram.
 
@@ -1692,7 +1681,7 @@ This command generates a random 512-bit MEK and encrypts it using the MEK secret
 
 The DPK may be a value decrypted by a user-provided C_PIN in Opal.
 
-[INITIALIZE_MEK_SECRET](#sec:initialize-mek-secret) must be invoked prior to this command or an error shall be returned.
+[INITIALIZE_MEK_SECRET](#sec:initialize-mek-secret-cmd) must be invoked prior to this command or an error shall be returned.
 
 See @fig:generate-mek-uml for the sequence diagram.
 
@@ -1738,7 +1727,7 @@ The DPK may be a value decrypted by a user-provided C_PIN in Opal.
 
 The decrypted MEK, specified metadata, and aux_metadata are loaded into the encryption engine key cache. The metadata format is vendor-defined and specifies the information to the encryption engine on where within the key cache the MEK is loaded.
 
-[INITIALIZE_MEK_SECRET](#sec:initialize-mek-secret) must be invoked prior to this command or an error shall be returned.
+[INITIALIZE_MEK_SECRET](#sec:initialize-mek-secret-cmd) must be invoked prior to this command or an error shall be returned.
 
 See @fig:load-mek-uml for the sequence diagram.
 
@@ -1791,7 +1780,7 @@ This command derives an MEK using the HEK, the MEK secret seed, and the given SE
 
 The derived MEK, specified metadata, and aux_metadata are loaded into the encryption engine key cache. The metadata format is vendor-defined and specifies the information to the encryption engine on where within the key cache the MEK is loaded.
 
-[INITIALIZE_MEK_SECRET](#sec:initialize-mek-secret) must be invoked prior to this command or an error shall be returned.
+[INITIALIZE_MEK_SECRET](#sec:initialize-mek-secret-cmd) must be invoked prior to this command or an error shall be returned.
 
 See @fig:derive-mek-uml for the sequence diagram.
 
@@ -2221,22 +2210,28 @@ Table: Mapping between KMB mailbox commands and host-facing storage APIs {#tbl:h
 |                                   |                         | hex value of the target          |
 |                                   |                         | AccessCondition object UID.      |
 +-----------------------------------+-------------------------+----------------------------------+
-| [MIX_MPK](#sec:mix-mpk-cmd) and   | TCG Opal                | When a K_AES_* entry is created, |
-| [GENERATE_MEK](                   |                         | that action may be performed by  |
-| #sec:generate-mek-cmd)            |                         | these commands.                  |
+| [MIX_MPK](#sec:mix-mpk-cmd)       | TCG MEK-MPA             | When a K_AES_* entry is created  |
+|                                   |                         | or unlocked, and that entry is   |
+|                                   |                         | bound to an AccessCondition,     |
+|                                   |                         | the K_AES_* entry is bound to    |
+|                                   |                         | the AccessCondition via this     |
+|                                   |                         | command.                         |
 +-----------------------------------+-------------------------+----------------------------------+
-| [MIX_MPK](#sec:mix-mpk-cmd) and   | TCG Opal                | When a K_AES_* entry is          |
-| [LOAD_MEK](#sec:load-mek-cmd)     |                         | unlocked, that action may be     |
-|                                   |                         | performed by these commands.     |
+| [GENERATE_MEK](                   | TCG Opal                | When a K_AES_* entry is created, |
+| #sec:generate-mek-cmd)            |                         | that action may be performed by  |
+|                                   |                         | this command.                    |
 +-----------------------------------+-------------------------+----------------------------------+
-| [MIX_MPK](#sec:mix-mpk-cmd) and   | TCG Opal                | When a K_AES_* entry is          |
-| [DERIVE_MEK](#sec:derive-mek-cmd) |                         | unlocked, that action may be     |
-|                                   |                         | performed by these commands.     |
-|                                   +-------------------------+----------------------------------+
-|                                   | TCG Key Per I/O         | When a key tag with an           |
+| [LOAD_MEK](#sec:load-mek-cmd)     | TCG Opal                | When a K_AES_* entry is          |
+|                                   |                         | unlocked, that action may be     |
+|                                   |                         | performed by this command.       |
++-----------------------------------+-------------------------+----------------------------------+
+| [DERIVE_MEK](#sec:derive-mek-cmd) | TCG Opal                | When a K_AES_* entry is          |
+|                                   |                         | unlocked, that action may be     |
+|                                   |                         | performed by this command.       |
++-----------------------------------+-------------------------+----------------------------------+
+| [DERIVE_MEK](#sec:derive-mek-cmd) | TCG Key Per I/O         | When a key tag with an           |
 |                                   |                         | associated DEK is injected, the  |
-|                                   |                         | MEK is derived via these         |
-|                                   |                         | commands.                        |
+|                                   |                         | MEK is derived via this command. |
 +-----------------------------------+-------------------------+----------------------------------+
 
 Rotation of the HEK and SEK and injection of host entropy require additional host APIs beyond those available in TCG Opal or Key Per I/O. Such APIs are beyond the scope of the present document.
@@ -2398,6 +2393,8 @@ Therefore a given encryption key may safely be used in at most $2^{80.5}$ precon
 This section will be fleshed out with additional details as they become available.
 
 # Sequence diagrams
+
+**NOTE: these UML diagrams will be removed from the final 1.0 version of the spec. They will be preserved in a separate document as a snapshot of the specification as it existed at the time.**
 
 For brevity, these sequence diagrams do not illustrate error paths.
 
