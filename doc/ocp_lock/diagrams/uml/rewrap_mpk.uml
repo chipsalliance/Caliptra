@@ -35,9 +35,9 @@ $preconditioned_key_extract(New access key, n_ak, EPK, epk, new-access-key Locke
 $zeroize(epk)
 $zeroize(n_ak)
 
-$preconditioned_aes_decrypt(c_encryption_secret, c_encryption_key, MPK bound to current access key, mpk)
+$preconditioned_aes_decrypt(c_encryption_key, c_encryption_subkey, MPK bound to current access key, mpk)
 
-$preconditioned_aes_encrypt(n_encryption_secret, n_encryption_key, MPK bound to new access key, mpk)
+$preconditioned_aes_encrypt(n_encryption_key, n_encryption_subkey, MPK bound to new access key, mpk)
 
 cfw -> dfw: Command response\nand Rewrapped MPK
 cfw--
