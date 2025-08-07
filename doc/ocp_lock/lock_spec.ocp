@@ -615,18 +615,18 @@ Table: HEK lifecycle states {#tbl:hek-lifecycle-states}
 | Caliptra lifecycle state | HEK fuse state, where x is the | HEK seed value | [Reported HEK state](#tbl:hek-state-values) |
 |                          | current HEK slot               |                |                                             |
 +==========================+================================+================+=============================================+
-| Unprovisioned or         | [Any]                          | 0x0000...      | HEK_AVAIL_PREPROD                           |
+| Unprovisioned or         | [Any]                          | 0x0000...      | HEK_AVAIL_UNERASABLE                        |
 | Manufacturing            |                                |                |                                             |
 +--------------------------+--------------------------------+----------------+---------------------------------------------+
 | Production               | HEK slot 0 is unprogrammed.    | N/A            | HEK_UNAVAIL_EMPTY                           |
 +--------------------------+--------------------------------+----------------+---------------------------------------------+
-| Production               | HEK slot x is randomized.      | HEK slot x     | HEK_AVAIL_PROD                              |
+| Production               | HEK slot x is randomized.      | HEK slot x     | HEK_AVAIL_PROGRAMED                         |
 +--------------------------+--------------------------------+----------------+---------------------------------------------+
 | Production               | HEK slot x is zeroized.        | N/A            | HEK_UNAVAIL_ZEROIZED                        |
 +--------------------------+--------------------------------+----------------+---------------------------------------------+
 | Production               | HEK slot x is corrupted.       | N/A            | HEK_UNAVAIL_CORRUPTED                       |
 +--------------------------+--------------------------------+----------------+---------------------------------------------+
-| Production               | Every HEK slot is zeroized,    | 0x0000...      | HEK_AVAIL_PERMANENT                         |
+| Production               | Every HEK slot is zeroized,    | 0x0000...      | HEK_AVAIL_UNERASABLE                        |
 |                          | and the permanent-HEK fuse bit |                |                                             |
 |                          | has been set.                  |                |                                             |
 +--------------------------+--------------------------------+----------------+---------------------------------------------+
@@ -1877,55 +1877,53 @@ Command Code: 0x5245_4B53 ("REKS")
 
 Table: REPORT_EPOCH_KEY_STATE input arguments
 
-+-----------------+--------+---------------------------------------+
-| Name            | Type   | Description                           |
-+=================+========+=======================================+
-| chksum          | u32    | Checksum over other input arguments,  |
-|                 |        | computed by the caller.               |
-+-----------------+--------+---------------------------------------+
-| reserved        | u32    | Reserved.                             |
-+-----------------+--------+---------------------------------------+
-| total_hek_slots | u16    | Total number of HEK slots.            |
-+-----------------+--------+---------------------------------------+
-| active_hek_slot | u16    | Currently-active HEK slot.            |
-+-----------------+--------+---------------------------------------+
-| hek_state       | u16    | HEK state. See @tbl:hek-state-values. |
-+-----------------+--------+---------------------------------------+
-| sek_state       | u16    | SEK state. See @tbl:sek-state-values. |
-+-----------------+--------+---------------------------------------+
-| nonce           | u8[16] | Freshness nonce to be included in the |
-|                 |        | signed IETF EAT.                      |
-+-----------------+--------+---------------------------------------+
++-----------+--------+---------------------------------------+
+| Name      | Type   | Description                           |
++===========+========+=======================================+
+| chksum    | u32    | Checksum over other input arguments,  |
+|           |        | computed by the caller.               |
++-----------+--------+---------------------------------------+
+| reserved  | u32    | Reserved.                             |
++-----------+--------+---------------------------------------+
+| sek_state | u16    | SEK state. See @tbl:sek-state-values. |
++-----------+--------+---------------------------------------+
+| padding   | u16    | Reserved.                             |
++-----------+--------+---------------------------------------+
+| nonce     | u8[16] | Freshness nonce to be included in the |
+|           |        | signed IETF EAT.                      |
++-----------+--------+---------------------------------------+
 
-Table: REPORT_EPOCH_KEY_STATE output arguments
+Table: REPORT_EPOCH_KEY_STATE output arguments {#tbl:report-epoch-key-state-resp}
 
-+-----------------+-------------+----------------------------------------------+
-| Name            | Type        | Description                                  |
-+=================+=============+==============================================+
-| chksum          | u32         | Checksum over other output arguments,        |
-|                 |             | computed by Caliptra.                        |
-+-----------------+-------------+----------------------------------------------+
-| fips_status     | u32         | Indicates if the command is FIPS approved    |
-|                 |             | or an error.                                 |
-+-----------------+-------------+----------------------------------------------+
-| reserved        | u32         | Reserved.                                    |
-+-----------------+-------------+----------------------------------------------+
-| total_hek_slots | u16         | Total number of HEK slots.                   |
-+-----------------+-------------+----------------------------------------------+
-| active_hek_slot | u16         | Currently-active HEK slot.                   |
-+-----------------+-------------+----------------------------------------------+
-| hek_state       | u16         | State of the currently-active HEK. See       |
-|                 |             | @tbl:hek-state-values.                       |
-+-----------------+-------------+----------------------------------------------+
-| sek_state       | u16         | SEK state from the input argument.           |
-+-----------------+-------------+----------------------------------------------+
-| nonce           | u8[16]      | Nonce from the input argument.               |
-+-----------------+-------------+----------------------------------------------+
-| eat_len         | u16         | Total length of the IETF EAT.                |
-+-----------------+-------------+----------------------------------------------+
-| eat             | u8[eat_len] | CBOR-encoded and signed IETF EAT.            |
-|                 |             | See @sec:eat-format for the format.          |
-+-----------------+-------------+----------------------------------------------+
++------------------------+-------------+-------------------------------------------+
+| Name                   | Type        | Description                               |
++========================+=============+===========================================+
+| chksum                 | u32         | Checksum over other output arguments,     |
+|                        |             | computed by Caliptra.                     |
++------------------------+-------------+-------------------------------------------+
+| fips_status            | u32         | Indicates if the command is FIPS approved |
+|                        |             | or an error.                              |
++------------------------+-------------+-------------------------------------------+
+| reserved               | u32         | Reserved.                                 |
++------------------------+-------------+-------------------------------------------+
+| hek_erasures_remaining | u16         | Remaining number of times the HEK may be  |
+|                        |             | erased.                                   |
+|                        |             |                                           |
+|                        |             | See @sec:hek-erasures-remaining for how   |
+|                        |             | this field is calculated.                 |
++------------------------+-------------+-------------------------------------------+
+| hek_state              | u16         | State of the currently-active HEK. See    |
+|                        |             | @tbl:hek-state-values.                    |
++------------------------+-------------+-------------------------------------------+
+| sek_state              | u16         | SEK state from the input argument.        |
++------------------------+-------------+-------------------------------------------+
+| eat_len                | u16         | Total length of the IETF EAT.             |
++------------------------+-------------+-------------------------------------------+
+| nonce                  | u8[16]      | Nonce from the input argument.            |
++------------------------+-------------+-------------------------------------------+
+| eat                    | u8[eat_len] | CBOR-encoded and signed IETF EAT.         |
+|                        |             | See @sec:eat-format for the format.       |
++------------------------+-------------+-------------------------------------------+
 
 Table: SEK state values {#tbl:sek-state-values}
 
@@ -1939,6 +1937,8 @@ Table: SEK state values {#tbl:sek-state-values}
 | 2h to FFFFh | Reserved       |
 +-------------+----------------+
 
+The value reported from @tbl:hek-state-values depends on Caliptra's current lifecycle state as well as the \`seed_state\` value from [REPORT_HEK_METADATA](#sec:report-hek-metadata-cmd).
+
 Table: HEK state values {#tbl:hek-state-values}
 
 +-------+-----------------------+--------------------------------------+
@@ -1946,32 +1946,45 @@ Table: HEK state values {#tbl:hek-state-values}
 |       |                       |                                      |
 |       |                       |                                      |
 +=======+=======================+======================================+
-| 0h    | HEK_AVAIL_PREPROD     | HEK is available for pre-production  |
-|       |                       | testing.                             |
-+-------+-----------------------+--------------------------------------+
-| 1h    | HEK_UNAVAIL_EMPTY     | The drive has transitioned to the    |
+| 0h    | HEK_UNAVAIL_EMPTY     | The drive has transitioned to the    |
 |       |                       | Production life cycle state and a    |
 |       |                       | HEK has not yet been provisioned.    |
+|       |                       |                                      |
+|       |                       | Reported if \`seed_state\` is        |
+|       |                       | HEK_SEED_UNAVAIL_EMPTY.              |
 +-------+-----------------------+--------------------------------------+
-| 2h    | HEK_AVAIL_PROD        | A randomized HEK is provisioned in   |
+| 1h    | HEK_UNAVAIL_ZEROIZED  | The current HEK has been zeroized.   |
+|       |                       |                                      |
+|       |                       | Reported if \`seed_state\` is        |
+|       |                       | HEK_SEED_UNAVAIL_ZEROIZED.           |
++-------+-----------------------+--------------------------------------+
+| 2h    | HEK_UNAVAIL_CORRUPTED | The current HEK slot is corrupted.   |
+|       |                       |                                      |
+|       |                       | Reported if \`seed_state\` is        |
+|       |                       | HEK_SEED_UNAVAIL_CORRUPTED.          |
++-------+-----------------------+--------------------------------------+
+| 3h    | HEK_AVAIL_PROGRAMMED  | A randomized HEK is provisioned in   |
 |       |                       | the current slot.                    |
-+-------+-----------------------+--------------------------------------+
-| 3h    | HEK_UNAVAIL_ZEROIZED  | The current HEK has been zeroized.   |
-+-------+-----------------------+--------------------------------------+
-| 4h    | HEK_UNAVAIL_CORRUPTED | The current HEK slot is corrupted.   |
-+-------+-----------------------+--------------------------------------+
-| 5h    | HEK_AVAIL_PERMANENT   | All HEKs have been zeroized and      |
-|       |                       | permanent HEK mode has been enabled. |
 |       |                       |                                      |
-|       |                       | Owners may opt into this state once  |
-|       |                       | every HEK has been zeroized.         |
-|       |                       |                                      |
-|       |                       | In this state, data written to the   |
-|       |                       | storage device can no longer be      |
-|       |                       | cryptographically erased via HEK     |
-|       |                       | zeroization.                         |
+|       |                       | Reported if \`seed_state\` is        |
+|       |                       | HEK_SEED_AVAIL_RANDOMIZED.           |
 +-------+-----------------------+--------------------------------------+
-| 6h to | Reserved              | Reserved.                            |
+| 4h    | HEK_AVAIL_UNERASABLE  | The HEK is not used to provide       |
+|       |                       | sanitization capabilities. In this   |
+|       |                       | state, data written to the storage   |
+|       |                       | device cannot be cryptographically   |
+|       |                       | erased via HEK zeroization.          |
+|       |                       |                                      |
+|       |                       | Reported if Caliptra is not in the   |
+|       |                       | production lifecycle state or if     |
+|       |                       | \`seed_state\` is                    |
+|       |                       | HEK_SEED_AVAIL_PERMANENT.            |
+|       |                       |                                      |
+|       |                       | KMB internally derives a HEK in this |
+|       |                       | state, but the HEK is derived from   |
+|       |                       | non-erasable secrets.                |
++-------+-----------------------+--------------------------------------+
+| 5h to | Reserved              | Reserved.                            |
 | FFFFh |                       |                                      |
 +-------+-----------------------+--------------------------------------+
 
@@ -1979,11 +1992,37 @@ Operations that use the HEK are disallowed in all \`HEK_UNAVAIL_*\` states.
 
 See @tbl:hek-lifecycle-states for more information about the relationship between HEKs and Caliptra lifecycle states.
 
-HEK_AVAIL_PREPROD → HEK_UNAVAIL_EMPTY is a one-way transition that the device vendor is expected to trigger by advancing the Caliptra lifecycle state to Production.
+HEK_AVAIL_UNERASABLE → HEK_UNAVAIL_EMPTY is a one-way transition that the device vendor is expected to trigger by advancing the Caliptra lifecycle state to Production.
 
-HEK_UNAVAIL_ZEROIZED → HEK_AVAIL_PERMANENT is a one-way transition that the device owner can trigger once all HEK slots have been zeroized.
+HEK_UNAVAIL_ZEROIZED → HEK_AVAIL_UNERASABLE is a one-way transition that the device owner can trigger once all HEK slots have been zeroized.
 
 See @fig:hek-sek-rotation for more details about the transitions between HEK states.
+
+##### Calculation of hek_erasures_remaining {#sec:hek-erasures-remaining}
+
+The \`hek_erasures_remaining\` field in [REPORT_EPOCH_KEY_STATE](#tbl:report-epoch-key-state-resp) is based on the following values from [REPORT_HEK_METADATA](#sec:report-hek-metadata-cmd):
+
+- total_slots
+- active_slot
+- seed_state
+
+The calculation is as follows:
+
+$$
+\text{seed\_is\_erased}= 
+\begin{cases}
+    true & \text{if seed\_state}=\text{HEK\_SEED\_UNAVAIL\_ZEROIZED}\\
+    true & \text{if seed\_state}=\text{HEK\_SEED\_AVAIL\_PERMANENT}\\
+    false & \text{otherwise}
+\end{cases}
+$$
+$$
+\text{hek\_erasures\_remaining}=\text{total\_slots}-\text{active\_slot}- 
+\begin{cases}
+    1 & \text{if seed\_is\_erased}\\
+    0 & \text{otherwise}
+\end{cases}
+$$
 
 #### Common mailbox types
 
