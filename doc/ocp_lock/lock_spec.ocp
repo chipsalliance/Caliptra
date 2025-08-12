@@ -2047,6 +2047,10 @@ Table: SealedAccessKey contents {#tbl:sealed-access-key-contents}
 |                |                       | value associated with a bit value indicated as |
 |                |                       | supported in @tbl:get-algorithms-output-args.  |
 +----------------+-----------------------+------------------------------------------------+
+| aad            | u32                   | AAD attached to the encapsulated access key.   |
+|                |                       | Opaque to KMB; may be interpreted by drive     |
+|                |                       | firmware.                                      |
++----------------+-----------------------+------------------------------------------------+
 | info_len       | u32                   | Length of the info field.                      |
 +----------------+-----------------------+------------------------------------------------+
 | info           | u8[info_len]          | Info to use with HPKE unwrap.                  |
