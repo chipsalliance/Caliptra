@@ -118,13 +118,24 @@ references:
       month: 2
     url: "https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hybrid-kems"
   - id: "caliptra-2.0-hw-spec"
-    title: "Caliptra 2.0 RTL Specification"
+    title: "Caliptra 2.0 Hardware Specification"
     publisher: "CHIPS Alliance"
     url: "https://github.com/chipsalliance/caliptra-rtl/blob/ea416cb/docs/CaliptraHardwareSpecification.md"
+  - id: "caliptra-2.0-integration-spec"
+    title: "Caliptra 2.0 Integration Specification"
+    publisher: "CHIPS Alliance"
+    url: "https://github.com/chipsalliance/caliptra-rtl/blob/ea416cb/docs/CaliptraIntegrationSpecification.md"
   - id: "caliptra-2.0-ss-spec"
     title: "Caliptra 2.0 Subsystem Specification"
     publisher: "CHIPS Alliance"
     url: "https://github.com/chipsalliance/caliptra-ss/blob/9d10858/docs/CaliptraSSHardwareSpecification.md"
+  - id: "nvme-base-spec-2.2"
+    title: "NVM Express Base Specification, Revision 2.2"
+    publisher: "NVM Express"
+    issued:
+      year: 2025
+      month: 3
+    url: "https://nvmexpress.org/wp-content/uploads/NVM-Express-Base-Specification-Revision-2.2-2025.03.11-Ratified.pdf"
   - id: "balls-into-bins"
     title: "Balls into bins problem"
     publisher: "Wikipedia"
