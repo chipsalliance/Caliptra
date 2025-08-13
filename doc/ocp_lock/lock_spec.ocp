@@ -1,6 +1,6 @@
 ---
 title: "OCP L.O.C.K."
-version: 0.8.5
+version: 0.9
 type: BASE
 project: NVMe™
 authors: [(See Acknowledgements section)]
@@ -1128,7 +1128,7 @@ Table: HEK seed state values {#tbl:hek-seed-state-values}
 +-------------+----------------------------+
 | 2h          | HEK_SEED_UNAVAIL_CORRUPTED |
 +-------------+----------------------------+
-| 3h          | HEK_SEED_AVAIL_RANDOMIZED  |
+| 3h          | HEK_SEED_AVAIL_PROGRAMMED  |
 +-------------+----------------------------+
 | 4h          | HEK_SEED_AVAIL_PERMANENT   |
 +-------------+----------------------------+
@@ -1139,36 +1139,36 @@ MCU ROM shall adhere to @tbl:hek-metadata-conditions when populating the HEK met
 
 Table: Conditions for setting seed_state and active_slot {#tbl:hek-metadata-conditions}
 
-+----------------------+----------------------------+----------------+
-| Condition            | Value of seed_state        | Value of       |
-|                      |                            | active_slot    |
-+======================+============================+================+
-| All HEK seed slots   | HEK_SEED_UNAVAIL_EMPTY     | 0              |
-| are blank.           |                            |                |
-+----------------------+----------------------------+----------------+
-| One or more HEK seed | HEK_SEED_UNAVAIL_ZEROIZED  | The last slot  |
-| slots are zeroized,  |                            | that was       |
-| and either the next  |                            | zeroized.      |
-| seed slot is blank,  |                            |                |
-| or there are no      |                            |                |
-| remaining seed       |                            |                |
-| slots.               |                            |                |
-+----------------------+----------------------------+----------------+
-| A HEK seed slot has  | HEK_SEED_UNAVAIL_CORRUPTED | The slot that  |
-| been corrupted by    |                            | is corrupted.  |
-| an interrupted       |                            |                |
-| write.               |                            |                |
-+----------------------+----------------------------+----------------+
-| A HEK seed slot has  | HEK_SEED_AVAIL_RANDOMIZED  | The slot that  |
-| been programmed      |                            | is randomized. |
-| with randomness.     |                            |                |
-+----------------------+----------------------------+----------------+
-| All HEK seed slots   | HEK_SEED_AVAIL_PERMANENT   | The last slot  |
-| have been zeroized   |                            | that was       |
-| and the perma-HEK    |                            | zeroized.      |
-| mode bit has been    |                            |                |
-| programmed.          |                            |                |
-+----------------------+----------------------------+----------------+
++----------------------+----------------------------+------------------+
+| Condition            | Value of seed_state        | Value of         |
+|                      |                            | active_slot      |
++======================+============================+==================+
+| All HEK seed slots   | HEK_SEED_UNAVAIL_EMPTY     | 0                |
+| are blank.           |                            |                  |
++----------------------+----------------------------+------------------+
+| One or more HEK seed | HEK_SEED_UNAVAIL_ZEROIZED  | The last slot    |
+| slots are zeroized,  |                            | that was         |
+| and either the next  |                            | zeroized.        |
+| seed slot is blank,  |                            |                  |
+| or there are no      |                            |                  |
+| remaining seed       |                            |                  |
+| slots.               |                            |                  |
++----------------------+----------------------------+------------------+
+| A HEK seed slot has  | HEK_SEED_UNAVAIL_CORRUPTED | The slot that    |
+| been corrupted by    |                            | is corrupted.    |
+| an interrupted       |                            |                  |
+| write.               |                            |                  |
++----------------------+----------------------------+------------------+
+| A HEK seed slot has  | HEK_SEED_AVAIL_PROGRAMMED  | The slot that    |
+| been programmed      |                            | is programmed    |
+| with randomness.     |                            | with randomness. |
++----------------------+----------------------------+------------------+
+| All HEK seed slots   | HEK_SEED_AVAIL_PERMANENT   | The last slot    |
+| have been zeroized   |                            | that was         |
+| and the perma-HEK    |                            | zeroized.        |
+| mode bit has been    |                            |                  |
+| programmed.          |                            |                  |
++----------------------+----------------------------+------------------+
 
 Table: REPORT_HEK_METADATA output arguments
 
@@ -1993,7 +1993,7 @@ Table: HEK state values {#tbl:hek-state-values}
 |       |                       | the current slot.                    |
 |       |                       |                                      |
 |       |                       | Reported if \`seed_state\` is        |
-|       |                       | HEK_SEED_AVAIL_RANDOMIZED.           |
+|       |                       | HEK_SEED_AVAIL_PROGRAMMED.           |
 +-------+-----------------------+--------------------------------------+
 | 4h    | HEK_AVAIL_UNERASABLE  | The HEK is not used to provide       |
 |       |                       | sanitization capabilities. In this   |
@@ -2146,50 +2146,56 @@ Depending on the type of fault, drive firmware may resubmit the mailbox command.
 
 Table: KMB mailbox command result codes {#tbl:kmb-mailbox-codes}
 
-+------------------------+-------------+--------------------------+
-| Name                   | Value       | Description              |
-+========================+=============+==========================+
-| LOCK_ENGINE_TIMEOUT    | 0x4C45_544F | Timeout occurred when    |
-|                        | ("LETO")    | communicating with the   |
-|                        |             | drive encryption engine  |
-|                        |             | to execute a command     |
-+------------------------+-------------+--------------------------+
-| LOCK_ENGINE_CODE + u16 | 0x4443_xxxx | Vendor-specific error    |
-|                        | ("ECxx")    | code in the low 16 bits  |
-+------------------------+-------------+--------------------------+
-| LOCK_BAD_ALGORITHM     | 0x4C42_414C | Unsupported algorithm,   |
-|                        | ("LBAL")    | or algorithm does not    |
-|                        |             | match the given handle   |
-+------------------------+-------------+--------------------------+
-| LOCK_BAD_HANDLE        | 0x4C42_4841 | Unknown handle           |
-|                        | ("LBHA")    |                          |
-+------------------------+-------------+--------------------------+
-| LOCK_NO_HANDLES        | 0x4C4E_4841 | Too many extant handles  |
-|                        | ("LNHA")    | exist                    |
-+------------------------+-------------+--------------------------+
-| LOCK_KEM_DECAPSULATION | 0x4C4B_4445 | Error during KEM         |
-|                        | ("LKDE")    | decapsulation            |
-+------------------------+-------------+--------------------------+
-| LOCK_ACCESS_KEY_UNWRAP | 0x4C41_4B55 | Error during access key  |
-|                        | ("LAKU")    | decryption               |
-+------------------------+-------------+--------------------------+
-| LOCK_MPK_DECRYPT       | 0x4C50_4445 | Error during MPK         |
-|                        | ("LPDE")    | decryption               |
-+------------------------+-------------+--------------------------+
-| LOCK_MEK_DECRYPT       | 0x4C4D_4445 | Error during MEK         |
-|                        | ("LMDE")    | decryption               |
-+------------------------+-------------+--------------------------+
-| LOCK_HEK_INVALID_SLOT  | 0x4C48_4953 | Incorrect HEK slot when  |
-|                        | ("LHIS")    | programming or zeroizing |
-+------------------------+-------------+--------------------------+
-| LOCK_EE_NOT_READY      | 0x4C45_4E52 | Encryption engine was    |
-|                        | ("LENR")    | not ready when the       |
-|                        |             | command was received.    |
-+------------------------+-------------+--------------------------+
-| LOCK_HEK_NOT_AVAILABLE | 0x4C48_4E41 | The operation requires   |
-|                        | ("LHNA")    | the HEK, which is        |
-|                        |             | unavailable.             |
-+------------------------+-------------+--------------------------+
++--------------------------+-------------+---------------------------+
+| Name                     | Value       | Description               |
++==========================+=============+===========================+
+| LOCK_ENGINE_TIMEOUT      | 0x4C45_544F | Timeout occurred when     |
+|                          | ("LETO")    | communicating with the    |
+|                          |             | drive encryption engine   |
+|                          |             | to execute a command      |
++--------------------------+-------------+---------------------------+
+| LOCK_ENGINE_CODE + u16   | 0x4443_xxxx | Vendor-specific error     |
+|                          | ("ECxx")    | code in the low 16 bits   |
++--------------------------+-------------+---------------------------+
+| LOCK_BAD_ALGORITHM       | 0x4C42_414C | Unsupported algorithm,    |
+|                          | ("LBAL")    | or algorithm does not     |
+|                          |             | match the given handle    |
++--------------------------+-------------+---------------------------+
+| LOCK_BAD_HANDLE          | 0x4C42_4841 | Unknown handle            |
+|                          | ("LBHA")    |                           |
++--------------------------+-------------+---------------------------+
+| LOCK_NO_HANDLES          | 0x4C4E_4841 | Too many extant handles   |
+|                          | ("LNHA")    | exist                     |
++--------------------------+-------------+---------------------------+
+| LOCK_KEM_DECAPSULATION   | 0x4C4B_4445 | Error during KEM          |
+|                          | ("LKDE")    | decapsulation             |
++--------------------------+-------------+---------------------------+
+| LOCK_ACCESS_KEY_UNWRAP   | 0x4C41_4B55 | Error during access key   |
+|                          | ("LAKU")    | decryption                |
++--------------------------+-------------+---------------------------+
+| LOCK_MPK_DECRYPT         | 0x4C50_4445 | Error during MPK          |
+|                          | ("LPDE")    | decryption                |
++--------------------------+-------------+---------------------------+
+| LOCK_MEK_DECRYPT         | 0x4C4D_4445 | Error during MEK          |
+|                          | ("LMDE")    | decryption                |
++--------------------------+-------------+---------------------------+
+| LOCK_HEK_INVALID_SLOT    | 0x4C48_4953 | Incorrect HEK slot when   |
+|                          | ("LHIS")    | programming or zeroizing  |
++--------------------------+-------------+---------------------------+
+| LOCK_EE_NOT_READY        | 0x4C45_4E52 | Encryption engine was     |
+|                          | ("LENR")    | not ready when the        |
+|                          |             | command was received.     |
++--------------------------+-------------+---------------------------+
+| LOCK_HEK_NOT_AVAILABLE   | 0x4C48_4E41 | The operation requires    |
+|                          | ("LHNA")    | the HEK, which is         |
+|                          |             | unavailable.              |
++--------------------------+-------------+---------------------------+
+| LOCK_MEK_NOT_INITIALIZED | 0x4C4D_4E49 | MIX_MPK, GENERATE_MEK,    |
+|                          | ("LMNI")    | LOAD_MEK, or DERIVE_MEK   |
+|                          |             | were called without first |
+|                          |             | invoking                  |
+|                          |             | INITIALIZE_MEK_SECRET.    |
++--------------------------+-------------+---------------------------+
 
 ##### Fatal errors
 
@@ -2434,7 +2440,7 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 |      | supports a host-facing API for doing so. See             |           |
 |      | @sec:hpke-transport-encryption.                          |           |
 +------+----------------------------------------------------------+-----------+
-| 14   | Integrations will invoke Caliptra resets according to    | Yes       |
+| 14   | Integrations shall invoke Caliptra resets according to   | Yes       |
 |      | the directives given in @sec:reset-behavior.             |           |
 +------+----------------------------------------------------------+-----------+
 
