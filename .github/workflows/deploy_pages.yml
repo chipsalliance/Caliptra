@@ -16,143 +16,27 @@ defaults:
   run:
     shell: bash
 jobs:
-  # Uploads rendered specifications.
-  spec-uploads:
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/trustedcomputinggroup/pandoc:latest
-    name: Render Specifications
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-
-      - name: Checkout Template dependencies
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-          repository: "opencomputeproject/ocp-spec-tools"
-          ref: "e4f6d325846e03852952a4d02ee379b85ae610b7"
-          # The underlying tex and templates assume this exists under the "extra" folder.
-          path: "ocp-spec-tools"
-
-      - name: Render Caliptra 2.0 HTML
-        run: |
-          # Need to trust directory in the docker container.
-          chown -R $(id -u):$(id -g) $PWD
-
-          git reset --hard main
-
-          cp -R ocp-spec-tools doc/caliptra_20/extra
-          pushd doc/caliptra_20
-
-          # Label the current spec version.
-          commit_hash=$(git rev-parse --short HEAD)
-
-          # `version: 1.3` --> `version: 1.3 (Git commit xyz)`
-          # `version: "2.0"` --> `version: "2.0 (Git commit xyz)"`
-          sed -i -r "/^---$/,/^---$/s/^(version: \"?[^\"]*)(\"?)$/\1 (Git commit ${commit_hash})\2/g" Caliptra.ocp
-
-          echo "Building git ref main"
-
-          /usr/bin/build.sh \
-            --crossref=tcg \
-            --csl extra/ocp-pandoc-resources/ieee.csl \
-            --nogitversion \
-            --template_html extra/ocp-pandoc-resources/html/ocp.html.template \
-            --html_stylesheet extra/ocp-pandoc-resources/html/style.css \
-            --html Caliptra.html Caliptra.ocp
-
-          popd
-
-          mkdir -p "gh-pages/2.0/specification/HEAD"
-          cp doc/caliptra_20/Caliptra.html "gh-pages/2.0/specification/HEAD/index.html"
-          echo "Added webpage 2.0/specification/HEAD/index.html"
-
-      - name: Render OCP LOCK HTML
-        run: |
-          # Need to trust directory in the docker container.
-          chown -R $(id -u):$(id -g) $PWD
-
-          # Publish pages for `main` and ocp-lock tags.
-          GIT_REFS=()
-          GIT_REFS+=("main")
-          GIT_REFS+=($(git tag --list 'ocp-lock-*'))
-
-          for ref in "${GIT_REFS[@]}"; do
-            echo "Building git ref $ref"
-
-            git reset --hard $ref
-
-            cp -R ocp-spec-tools doc/ocp_lock/extra
-            pushd doc/ocp_lock
-
-            if [[ "${ref}" == "main" ]]; then
-              # Label the current spec version.
-              commit_hash=$(git rev-parse --short HEAD)
-
-              # `version: 1.3` --> `version: 1.3 (Git commit xyz)`
-              # `version: "2.0"` --> `version: "2.0 (Git commit xyz)"`
-              sed -i -r "/^---$/,/^---$/s/^(version: \"?[^\"]*)(\"?)$/\1 (Git commit ${commit_hash})\2/g" lock_spec.ocp
-
-              # Also render the latest version in PDF
-              /usr/bin/build.sh \
-                --crossref=tcg \
-                --csl extra/ocp-pandoc-resources/ieee.csl \
-                --nogitversion \
-                --template extra/ocp-pandoc-resources/pdf/ocp.tex \
-                --pdf lock_spec.pdf lock_spec.ocp
-            fi
-
-            /usr/bin/build.sh \
-              --crossref=tcg \
-              --csl extra/ocp-pandoc-resources/ieee.csl \
-              --nogitversion \
-              --template_html extra/ocp-pandoc-resources/html/ocp.html.template \
-              --html_stylesheet extra/ocp-pandoc-resources/html/style.css \
-              --html lock_spec.html lock_spec.ocp
-
-            popd
-
-            if [[ "${ref}" == "main" ]]; then
-              trimmed_ref="HEAD"
-            else
-              # Trim `ocp-lock-` to avoid redundancy in the URL.
-              trimmed_ref=$(echo ${ref} | sed 's/ocp-lock-//')
-            fi
-
-            mkdir -p "gh-pages/ocp-lock/specification/${trimmed_ref}"
-            cp doc/ocp_lock/lock_spec.html "gh-pages/ocp-lock/specification/${trimmed_ref}/index.html"
-            echo "Added webpage ocp-lock/specification/${trimmed_ref}/index.html"
-
-            if [[ "${trimmed_ref}" == "HEAD" ]]; then
-              pdf_dir_name="gh-pages/ocp-lock/specification/HEAD/pdf"
-              pdf_name="OCP_LOCK_Specification_${commit_hash}.pdf"
-
-              mkdir -p "${pdf_dir_name}"
-              cat > "${pdf_dir_name}/index.html" << EOF
-                <html>
-                  <body style="margin:0">
-                    <iframe id="viewer" style="border:none" width="100%" height="100%"></iframe>
-                    <script type="text/javascript">
-                      // Forward the location hash to the iframe to allow deep-linking.
-                      document.getElementById("viewer").src = "${pdf_name}" + document.location.hash;
-                    </script>
-                  </body>
-                </html>
-          EOF
-              cp doc/ocp_lock/lock_spec.pdf "${pdf_dir_name}/${pdf_name}"
-            fi
-          done
-
-      - name: Upload artifacts for rendered specs
-        uses: actions/upload-artifact@v4
-        with:
-          name: rendered-specs
-          path: gh-pages
+  # Render specs
+  spec-render:
+    uses: opencomputeproject/ocp-spec-tools/.github/workflows/render.yml@stable
+    with:
+      tcg-container-version: latest
+      ocp-template-ref: stable
+      inputs: >-
+        [
+          {
+            "src": "doc/caliptra_20/Caliptra.ocp",
+            "append_git_rev_to_version": true,
+            "gh_pages_html": "2.0/specification/HEAD"
+          },
+          {
+            "src": "doc/ocp_lock/lock_spec.ocp",
+            "append_git_rev_to_version": true,
+            "gh_pages_html": "ocp-lock/specification/HEAD",
+            "gh_pages_pdf": "ocp-lock/specification/HEAD/pdf"
+          }
+        ]
+      artifact-name: rendered-specs
 
   # Adds README.md files as chipsalliance.github.io index files.
   index:
@@ -186,7 +70,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: [index, spec-uploads]
+    needs: [index, spec-render]
     steps:
       - name: Download index artifacts
         uses: actions/download-artifact@v4
