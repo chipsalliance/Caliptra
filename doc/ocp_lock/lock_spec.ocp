@@ -2464,7 +2464,9 @@ Therefore a given encryption key may safely be used in at most $2^{80.5}$ precon
 
 # EAT format for attesting to the epoch key state {#sec:eat-format}
 
-This section will be fleshed out with additional details as they become available.
+This format is currently under development within TCG as part of the Hard Cryptographic Purge feature set[^crypto-purge].
+
+[^crypto-purge]: https://trustedcomputinggroup.org/trusted-computing-group-storage-work-group-call-for-participation/
 
 # Sequence diagrams
 
