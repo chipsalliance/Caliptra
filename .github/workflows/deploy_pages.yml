@@ -43,8 +43,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       - name: Stage README
         run: |
           mkdir -p gh-pages-staging/doc
@@ -58,6 +56,8 @@ jobs:
           destination: gh-pages
       - name: Stage LOCK releases
         run: |
+          # Ensure gh-pages is writable, since it was created via jekyll-build-pages' container.
+          sudo chown -R $(id -u):$(id -g) gh-pages
           mkdir -p gh-pages/ocp-lock/specification/
           cp doc/ocp_lock/OCP_LOCK_Specification_*.pdf gh-pages/ocp-lock/specification/
       - name: Upload artifacts for index
