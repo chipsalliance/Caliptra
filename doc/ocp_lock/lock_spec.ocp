@@ -2429,10 +2429,9 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 |      | @tbl:kmb-ee-sfrs through the address defined by          |           |
 |      | OCP_LOCK_MEK_ADDRESS. See @sec:sfrs.                     |           |
 +------+----------------------------------------------------------+-----------+
-| 12   | MCU ROM shall configure registers                        |           |
+| 12   | MCU ROM shall configure registers                        | Yes       |
 |      | SS_KEY_RELEASE_BASE_ADDR_L, SS_KEY_RELEASE_BASE_ADDR_H   |           |
-|      | and SS_KEY_RELEASE_SIZE,                                 | Yes       |
-|      | then setting CPTRA_FUSE_WR_DONE                          |           |
+|      | and SS_KEY_RELEASE_SIZE, then setting CPTRA_FUSE_WR_DONE |           |
 |      | to prevent further modifications. Additionally,          |           |
 |      | OCP_LOCK_MEK_LENGTH must be set to 40h. See @sec:sfrs.   |           |
 +------+----------------------------------------------------------+-----------+
