@@ -817,11 +817,11 @@ The behavior of I/O through the encryption engine during the execution of an SFR
 
 KMB uses Special Function Registers (SFRs) to communicate with the encryption engine as shown in @tbl:kmb-ee-sfrs and each of the following subsections which describe the registers.
 
-The OCP_LOCK_MEK_ADDRESS register shall contain the fixed base address of the MEK register.
+The OCP_LOCK_MEK_ADDRESS register represents the combined registers SS_KEY_RELEASE_BASE_ADDR_L and SS_KEY_RELEASE_BASE_ADDR_H and shall contain the fixed base address of the MEK register.
 
-The OCP_LOCK_MEK_LENGTH register shall contain the size of the MEK, in bytes. This shall be set to 40h by the MCU ROM.
+The SS_KEY_RELEASE_SIZE register shall contain the size of the MEK, in bytes. This shall be set to 40h by the MCU ROM.
 
-MCU ROM is responsible for configuring OCP_LOCK_MEK_ADDRESS and OCP_LOCK_MEK_LENGTH, then setting CPTRA_FUSE_WR_DONE to prevent further modifications.
+MCU ROM is responsible for configuring SS_KEY_RELEASE_BASE_ADDR_L, SS_KEY_RELEASE_BASE_ADDR_H and SS_KEY_RELEASE_SIZE, then setting CPTRA_FUSE_WR_DONE to prevent further modifications.
 
 Table: KMB to encryption engine SFRs {#tbl:kmb-ee-sfrs}
 
@@ -2429,8 +2429,10 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 |      | @tbl:kmb-ee-sfrs through the address defined by          |           |
 |      | OCP_LOCK_MEK_ADDRESS. See @sec:sfrs.                     |           |
 +------+----------------------------------------------------------+-----------+
-| 12   | MCU ROM shall configure registers OCP_LOCK_MEK_ADDRESS   | Yes       |
-|      | and OCP_LOCK_MEK_LENGTH, then setting CPTRA_FUSE_WR_DONE |           |
+| 12   | MCU ROM shall configure registers                        |           |
+|      | SS_KEY_RELEASE_BASE_ADDR_L, SS_KEY_RELEASE_BASE_ADDR_H   |           |
+|      | and SS_KEY_RELEASE_SIZE,                                 | Yes       |
+|      | then setting CPTRA_FUSE_WR_DONE                          |           |
 |      | to prevent further modifications. Additionally,          |           |
 |      | OCP_LOCK_MEK_LENGTH must be set to 40h. See @sec:sfrs.   |           |
 +------+----------------------------------------------------------+-----------+
