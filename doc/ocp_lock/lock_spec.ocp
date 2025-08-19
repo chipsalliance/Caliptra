@@ -821,7 +821,7 @@ The OCP_LOCK_MEK_ADDRESS register represents the combined registers SS_KEY_RELEA
 
 The SS_KEY_RELEASE_SIZE register shall contain the size of the MEK, in bytes. This shall be set to 40h by the MCU ROM.
 
-MCU ROM is responsible for configuring SS_KEY_RELEASE_BASE_ADDR_L, SS_KEY_RELEASE_BASE_ADDR_H and SS_KEY_RELEASE_SIZE, then setting CPTRA_FUSE_WR_DONE to prevent further modifications.
+MCU ROM is responsible for configuring SS_KEY_RELEASE_BASE_ADDR_L, SS_KEY_RELEASE_BASE_ADDR_H and SS_KEY_RELEASE_SIZE, prior to setting CPTRA_FUSE_WR_DONE to prevent further modifications.
 
 Table: KMB to encryption engine SFRs {#tbl:kmb-ee-sfrs}
 
