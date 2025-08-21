@@ -1117,8 +1117,6 @@ This command is exposed by Caliptra ROM and allows MCU ROM to report metadata ab
 
 By exposing this command in ROM, Caliptra de-privileges runtime compromise of drive firmware that might cause it to mis-report the HEK seed state, which could lead to incorrect device state attestations.
 
-See @fig:cold-reset-uml for the sequence diagram.
-
 Command Code: 0x5248_4D54 ("RHMT")
 
 Table: REPORT_HEK_METADATA input arguments
@@ -1212,8 +1210,6 @@ Table: REPORT_HEK_METADATA output arguments
 
 Exposes a command that allows drive firmware to determine if the encryption engine is ready to process commands as well vendor-defined drive encryption engine status data.
 
-See @fig:get-status-uml for the sequence diagram.
-
 Command Code: 0x4753_5441 ("GSTA")
 
 Table: GET_STATUS input arguments
@@ -1243,8 +1239,6 @@ Table: GET_STATUS output arguments
 #### GET_ALGORITHMS
 
 Exposes a command that allows drive firmware to determine the types of algorithms supported by KMB for endorsement, KEM, MPK, and access key generation.
-
-See @fig:get-supported-algorithms-uml for the sequence diagram.
 
 Command Code: 0x4741_4C47 ("GALG")
 
@@ -1330,8 +1324,6 @@ Table: CLEAR_KEY_CACHE output arguments
 
 This command returns a list of all currently-active HPKE handles for resources held by KMB.
 
-See @fig:enumerate-hpke-handles-uml for the sequence diagram.
-
 Command Code: 0x4548_444C ("EHDL")
 
 Table: ENUMERATE_HPKE_HANDLES input arguments
@@ -1380,8 +1372,6 @@ Table: HpkeHandle contents
 
 This command generates a signed certificate for the specified HPKE public key using the specified endorsement algorithm.
 
-See @fig:endorse-hpke-pub-key-uml for the sequence diagram.
-
 Command Code: 0x4548_504B ("EHPK")
 
 Table: ENDORSE_HPKE_PUB_KEY input arguments
@@ -1428,8 +1418,6 @@ Table: ENDORSE_HPKE_PUB_KEY output arguments
 
 This command rotates the HPKE keypair indicated by the specified handle and stores the new HPKE keypair in volatile memory within KMB.
 
-See @fig:rotate-hpke-key-uml for the sequence diagram.
-
 Command Code: 0x5248_504B ("RHPK")
 
 Table: ROTATE_HPKE_KEY input arguments
@@ -1464,8 +1452,6 @@ Table: ROTATE_HPKE_KEY output arguments
 #### GENERATE_MPK {#sec:generate-mpk-cmd}
 
 This command unwraps the specified access key, generates a random MPK, then encrypts the MPK with a Locked MPK encryption key. The Locked MPK is returned for the drive to persistently store. The given \`metadata\` is placed in the  \`metadata\` field of the returned MPK to cryptographically tie them together.
-
-See @fig:generate-mpk-uml for the sequence diagram.
 
 Command Code: 0x474D_504B ("GMPK")
 
@@ -1511,8 +1497,6 @@ Table: GENERATE_MPK output arguments
 This command unwraps current_access_key and encrypted new_access_key from sealed_access_keys. Then current_access_key is used to decrypt new_access_key. The specified MPK is decrypted using its current Locked MPK encryption key, then re-encrypted with its new Locked MPK encryption key. The new Locked MPK is returned.
 
 The drive stores the returned Locked MPK and zeroizes the old Locked MPK.
-
-See @fig:rewrap-mpk-uml for the sequence diagram.
 
 Command Code: 0x5245_5750 ("REWP")
 
@@ -1568,8 +1552,6 @@ Table: REWRAP_MPK output arguments
 
 This command decrypts \`sealed_access_key\`, then uses it to derive a Locked MPK encryption key, which is used to decrypt \`locked_mpk\`. The MPK is then re-encrypted with the VEK. The Enabled MPK is returned.
 
-See @fig:enable-mpk-uml for the sequence diagram.
-
 Command Code: 0x524D_504B ("RMPK")
 
 Table: ENABLE_MPK input arguments
@@ -1613,8 +1595,6 @@ Table: ENABLE_MPK output arguments
 
 This command shall initialize the MEK secret seed as described in @fig:mek-secret-derivation.
 
-See @fig:initialize-mek-secret-uml for the sequence diagram.
-
 Command Code: 0X494D_0B53 ("IMKS")
 
 Table: INITIALIZE_MEK_SECRET input arguments
@@ -1650,8 +1630,6 @@ When generating an MEK, one or more MIX_MPK commands are processed to modify the
 
 The MEK secret seed must already be initialized by [INITIALIZE_MEK_SECRET](#sec:initialize-mek-secret-cmd) or this command shall return an error.
 
-See @fig:mix-mpk-uml for the sequence diagram.
-
 Command Code: 0x4D4D_504B ("MMPK")
 
 Table: MIX_MPK input arguments
@@ -1685,8 +1663,6 @@ Table: MIX_MPK output arguments
 #### TEST_ACCESS_KEY {#sec:test-access-key-cmd}
 
 This command is used by the host to check the input access key is associated with the given MPK. The \`nonce\` is a random value to be included in the digest calculation to prevent response replay attacks. The output is calculated as SHA2-384(metadata || decrypted access key || nonce). The metadata is taken from the provided MPK's \`metadata\` field.
-
-See @fig:test-access-key-uml for the sequence diagram.
 
 Command Code: 0x5441_434B ("TACK")
 
@@ -1734,8 +1710,6 @@ The DPK may be a value decrypted by a user-provided C_PIN in Opal.
 
 [INITIALIZE_MEK_SECRET](#sec:initialize-mek-secret-cmd) must be invoked prior to this command or an error shall be returned.
 
-See @fig:generate-mek-uml for the sequence diagram.
-
 Command Code: 0x474D_454B ("GMEK")
 
 Table: GENERATE_MEK input arguments
@@ -1779,8 +1753,6 @@ The DPK may be a value decrypted by a user-provided C_PIN in Opal.
 The decrypted MEK, specified metadata, and aux_metadata are loaded into the encryption engine key cache. The metadata format is vendor-defined and specifies the information to the encryption engine on where within the key cache the MEK is loaded.
 
 [INITIALIZE_MEK_SECRET](#sec:initialize-mek-secret-cmd) must be invoked prior to this command or an error shall be returned.
-
-See @fig:load-mek-uml for the sequence diagram.
 
 Command Code: 0x4C4D_454B ("LMEK")
 
@@ -1833,8 +1805,6 @@ The derived MEK, specified metadata, and aux_metadata are loaded into the encryp
 
 [INITIALIZE_MEK_SECRET](#sec:initialize-mek-secret-cmd) must be invoked prior to this command or an error shall be returned.
 
-See @fig:derive-mek-uml for the sequence diagram.
-
 Command Code: 0x444D_454B ("DMEK")
 
 Table: DERIVE_MEK input arguments
@@ -1884,8 +1854,6 @@ Table: DERIVE_MEK output arguments
 #### UNLOAD_MEK
 
 This command causes the MEK associated to the specified metadata to be unloaded for the key cache of the encryption engine. The metadata format is vendor-defined and specifies the information to the encryption engine on where within the key cache, the MEK is loaded.
-
-See @fig:unload-mek-uml for the sequence diagram.
 
 Command Code: 0x554D_454B ("UMEK")
 
@@ -2493,119 +2461,3 @@ Therefore a given encryption key may safely be used in at most $2^{80.5}$ precon
 This format is currently under development within TCG as part of the Hard Cryptographic Purge feature set[^crypto-purge].
 
 [^crypto-purge]: https://trustedcomputinggroup.org/trusted-computing-group-storage-work-group-call-for-participation/
-
-# Sequence diagrams
-
-**NOTE: these UML diagrams will be removed from the final 1.0 version of the spec. They will be preserved in a separate document as a snapshot of the specification as it existed at the time.**
-
-For brevity, these sequence diagrams do not illustrate error paths.
-
-Sequence diagram participants that represent keys in firmware and the Key Vault are given blue and green lifelines, respectively.
-
-@fig:legend-uml portrays a simple example sequence which illustrates using the HMAC engine to populate a key in the Key Vault.
-
-```plantuml {caption="UML: Simple example sequence" #fig:legend-uml}
-!include diagrams/uml/legend.uml
-```
-
-## Sequence of events at cold reset
-
-```plantuml {caption="UML: Cold reset" #fig:cold-reset-uml}
-!include diagrams/uml/cold_reset.uml
-```
-
-## Sequence to obtain the current status of KMB
-
-```plantuml {caption="UML: Get Status" #fig:get-status-uml}
-!include diagrams/uml/get_status.uml
-```
-
-## Sequence to obtain the supported algorithms
-
-```plantuml {caption="UML: Get Supported Algorithms" #fig:get-supported-algorithms-uml}
-!include diagrams/uml/get_algorithms.uml
-```
-
-## Sequence to enumerate HPKE handles
-
-```plantuml {caption="UML: Enumerating HPKE handles" #fig:enumerate-hpke-handles-uml}
-!include diagrams/uml/enumerate_hpke_handles.uml
-```
-
-## Sequence to endorse an HPKE public key
-
-```plantuml {caption="UML: Endorsing an HPKE public key" #fig:endorse-hpke-pub-key-uml}
-!include diagrams/uml/endorse_hpke_pub_key.uml
-```
-
-## Sequence to rotate an HPKE keypair
-
-```plantuml {caption="UML: Rotating an HPKE Key" #fig:rotate-hpke-key-uml}
-!include diagrams/uml/rotate_hpke_key.uml
-```
-
-## Sequence to initialize the MEK secret seed
-
-```plantuml {caption="UML: Initialize MEK Secret" #fig:initialize-mek-secret-uml}
-!include diagrams/uml/initialize_mek_secret.uml
-```
-
-## Sequence to generate an MPK
-
-```plantuml {caption="UML: Generating an MPK" #fig:generate-mpk-uml}
-!include diagrams/uml/generate_mpk.uml
-```
-
-## Sequence to enable an MPK
-
-```plantuml {caption="UML: Enabling an MPK" #fig:enable-mpk-uml}
-!include diagrams/uml/enable_mpk.uml
-```
-
-## Sequence to rotate the access key of an MPK
-
-```plantuml {caption="UML: Rewrapping an MPK" #fig:rewrap-mpk-uml}
-!include diagrams/uml/rewrap_mpk.uml
-```
-
-## Sequence to mix an MPK into the MEK secret seed
-
-```plantuml {caption="UML: Mixing an MPK" #fig:mix-mpk-uml}
-!include diagrams/uml/mix_mpk.uml
-```
-
-## Sequence to test the access key of an MPK
-
-```plantuml {caption="UML: Testing an Access Key" #fig:test-access-key-uml}
-!include diagrams/uml/test_access_key.uml
-```
-
-## Sequence to generate an MEK
-
-```plantuml {caption="UML: Generating an MEK" #fig:generate-mek-uml}
-!include diagrams/uml/generate_mek.uml
-```
-
-## Sequence to load an MEK
-
-```plantuml {caption="UML: Loading an MEK" #fig:load-mek-uml}
-!include diagrams/uml/load_mek.uml
-```
-
-## Sequence to derive an MEK
-
-```plantuml {caption="UML: Deriving an MEK" #fig:derive-mek-uml}
-!include diagrams/uml/derive_mek.uml
-```
-
-## Sequence to unload an MEK from the encryption engine key cache
-
-```plantuml {caption="UML: Unloading an MEK" #fig:unload-mek-uml}
-!include diagrams/uml/unload_mek.uml
-```
-
-## Sequence to unload all MEKs (i.e., zeroize) from the encryption engine key cache
-
-```plantuml {caption="UML: Unloading all MEKs" #fig:clear-key-cache-uml}
-!include diagrams/uml/clear_key_cache.uml
-```
