@@ -758,7 +758,8 @@ This section defines expected behavior for KMB across each Caliptra reset type, 
 | Caliptra reset type    | Behavior                                                   |
 +========================+============================================================+
 | Cold boot / cold reset | Caliptra ROM derives the HEK and MDK, then sets the        |
-|                        | CALIPTRA_OCP_LOCK_EN bit in the HW_CFG register.           |
+|                        | LOCK_IN_PROGRESS bit in the SS_OCP_LOCK_CTRL               |
+|                        | register.                                                  |
 |                        |                                                            |
 |                        | Next, Caliptra runtime firmware performs the following     |
 |                        | steps:                                                     |
@@ -2390,7 +2391,9 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 +======+==========================================================+===========+
 | 1    | The device shall integrate Caliptra.                     | Yes       |
 +------+----------------------------------------------------------+-----------+
-| 2    | OCP L.O.C.K. shall be enabled.                           | Yes       |
+| 2    | OCP L.O.C.K. shall be enabled by setting the input       | Yes       |
+|      | strap `ss_ocp_lock_en` in Caliptra Core or               |           |
+|      | `cptra_ss_strap_ocp_lock_en_i` in Caliptra Subsystem.    |           |
 +------+----------------------------------------------------------+-----------+
 | 3    | Media encryption keys shall only be programmable         |           |
 |      | to the encryption engine via Caliptra. See               | Yes       |
