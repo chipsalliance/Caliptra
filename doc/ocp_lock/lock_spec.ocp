@@ -314,11 +314,17 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 |                   | MEK secret. See                      | DPK is held in ephemeral memory and is zeroized after each  |               |
 |                   | @fig:mek-secret-derivation.          | use.                                                        |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
-| MEK secrets       | Either encrypts/decrypts or derives  | Derived from the EPK, DPK, and zero or more decrypted MPKs. | 21            |
-|                   | an MEK. See Figures                  | Held in the Key Vault and zeroized after each use.          |               |
-|                   | [-@fig:mek-generate],                |                                                             |               |
-|                   | [-@fig:mek-load], and                | Rendered irrecoverable if the SEK, HEK seed, or DICE UDS    |               |
-|                   | [-@fig:mek-derive].                  | are zeroized from persistent storage.                       |               |
+| MEK secrets       | Either encrypts/decrypts an MEK or   | Derived from the EPK, DPK, and zero or more decrypted MPKs. | 21            |
+|                   | is used to derive an MEK seed. See   | Held in the Key Vault and zeroized after each use.          |               |
+|                   | Sections                             |                                                             |               |
+|                   | [-@sec:generate-load-random-mek]     | Rendered irrecoverable if the SEK, HEK seed, or DICE UDS    |               |
+|                   | and [-@sec:derive-mek].              | are zeroized from persistent storage.                       |               |
++-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
+| MEK seeds         | Used to derive an MEK. See           | Derived from an MEK secret. Held by firmware and zeroized   | N/A           |
+|                   | @sec:derive-mek.                     | after each use.                                             |               |
+|                   |                                      |                                                             |               |
+|                   |                                      | Rendered irrecoverable if the SEK, HEK seed, or DICE UDS    |               |
+|                   |                                      | are zeroized from persistent storage.                       |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
 | MEKs              | Encrypts/decrypts user data written  | Either randomly generated on demand and encrypted at rest   | 23[^meks]     |
 |                   | to the storage device. See           | with the MEK secret and MDK, or derived from the MEK        |               |
@@ -367,6 +373,9 @@ Table: Firmware-managed CSPs {#tbl:fw-managed-csps}
 |                      | AES engine does not presently support using keys in the Key Vault as     |
 |                      | messages to encrypt. Therefore, MPKs must be decrypted into memory when  |
 |                      | their encryption keys are rotated.                                       |
++----------------------+--------------------------------------------------------------------------+
+| MEK seeds (only used | See @sec:derive-mek for rationale on why the MEK seed is readable by     |
+| for derived MEKs)    | firmware.                                                                |
 +----------------------+--------------------------------------------------------------------------+
 | Random MEKs (upon    | Caliptra does not presently support a data path between its DRBG and its |
 | initial generation)  | AES engine. Therefore, when a random MEK is first generated, KMB         |
@@ -684,6 +693,8 @@ Figures [-@fig:mek-generate] and [-@fig:mek-load] elide the process of deriving 
 
 ![Loading an MEK](./diagrams/mek_load.drawio.svg){#fig:mek-load}
 
+##### Decrypting MEKs with the MDK
+
 Random MEKs are given two layers of encryption: an inner layer using the MDK, and an outer layer using the MEK secret. The MDK is derived in ROM upon cold reset, as described in @sec:reset-behavior and illustrated in @fig:mdk-derivation.
 
 ![Deriving the MDK](./diagrams/mdk_derivation.drawio.svg){#fig:mdk-derivation}
@@ -696,7 +707,21 @@ Hardware enforces that AES-ECB decryption results using the Key Vault slot that 
 
 ![Deriving an MEK](./diagrams/mek_derive.drawio.svg){#fig:mek-derive}
 
-The checksum returned from KMB may be stored persistently by drive firmware and used for future derivations, or may be discarded. The checksum allows drive firmware to ensure that an MEK derived in the future matches a given MEK derived previously. This check would be a precaution against mistakes that would result in an incorrect MEK being programmed to the encryption engine, which could lead to data loss. This specification does not define how drive firmware should react to a checksum mismatch.
+##### Decrypting MEK seeds with the MDK
+
+The MEK seed is calculated via CMAC instead of HMAC, and then "decrypted" via the MDK, for the following reasons:
+
+ - The only way to populate the Key Vault slot that holds the MEK is via the AES engine operating in ECB-decrypt mode (where the key is taken from Key Vault slot 16, which holds the MDK).
+ - The AES engine does not allow messages to be read from the Key Vault. Therefore we must derive a key from the MEK secret that is readable by firmware, so firmware can pass it as an AES message to compute the MEK.
+ - Since the MEK secret is in the Key Vault, the result of any HMAC operations would be required to go back to the Key Vault, and not be available to firmware.
+ - The CMAC operation, by contrast, utilizes the AES engine in a manner that allows the results to be readable by firmware. Therefore CMAC is used to compute the MEK seed from the MEK secret.
+ - The resulting MEK seed is then passed as an AES message to the AES engine, which uses it in a decryption operation to produce the derived MEK.
+
+##### Derived MEK checksums
+
+When deriving an MEK, drive firmware provides an MEK checksum to KMB. If the provided checksum is non-zero, it is compared with the calculated checksum. The operation fails (and the derived MEK is not sent to the encryption engine) if the provided checksum does not match the calculated checksum. This check is skipped if the provided checksum is all-zeroes.
+
+Upon success, the calculated checksum is returned to drive firmware. Drive firmware may choose to store the checksum persistently and use it for future derivations, or may discard the returned checksum. The checksum allows drive firmware to ensure that an MEK derived in the future matches a given MEK derived previously. This check would be a precaution against mistakes or bit flips that would result in an incorrect MEK being programmed to the encryption engine, which could lead to data loss. This specification does not define how drive firmware should react to a checksum mismatch.
 
 The checksum is not derived from the MEK directly, because Caliptra hardware restricts what operations can be done with the Key Vault slot that holds the MEK.
 
