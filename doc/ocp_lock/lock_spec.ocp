@@ -512,6 +512,8 @@ Upon request, KMB can issue an endorsement for a given HPKE public key, signed b
 
 ![HPKE public key endorsement](./diagrams/hpke_pub_key_endorsement.drawio.svg){#fig:hpke-pub-key-endorsement}
 
+The endorsement will include the HPKEIdentifiers extension as defined in [@{tcg-mek-mpa}], with the \`kem_id\`, \`kdf_id\`, and \`aead_id\` identifiers populated based on the HPKE keypair's algorithms. See @tbl:hpke-algorithm-support for the algorithm identifiers supported by KMB.
+
 #### MPK lifecycle
 
 MPKs can be generated, enabled, and have their access keys rotated and tested.
