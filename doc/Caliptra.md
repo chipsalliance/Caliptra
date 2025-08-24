@@ -1578,6 +1578,30 @@ Please refer to Caliptra subsystem Hardware specification.
 
 Please refer to Caliptra subsystem hardware specification.
 
+# OCP L.O.C.K. HW Architecture and Security Claims
+
+Please refer to Caliptra and Caliptra subsystem hardware specification for HW implementation details and Key Vault (KV) rules.
+
+## Security Claims and Assumptions
+
+- The OCP LOCK implementation employs NIST approved algorithms (e.g., AES, SHA‑2/HMAC)
+- Certain secret keys involved in OCP LOCK (HEK/HEK_SEED, de‑obf key, MEK, etc.) are never readable by firmware and are only usable by cryptographic engines or DMA via KV references. KV entries carry lock bits (lock‑write, lock‑use) that enforce non‑observability and immutability until uC reset.
+- If Caliptra runtime firmware (RT FW) is compromised, it can generate an arbitrary new MEK and release it via the allowed DMA path; this does not break confidentiality of media encrypted under earlier MEKs, because ciphertext written prior to FW compromise remains bound to different keys. 
+- MEK generation flow is not isolated from RT FW. MEK load flow is protected from RT FW and this FW can generate a new MEK (e.g., for rotation) but cannot re‑materialize a previous MEK except by executing the OCP LOCK MEK load flow under ROM‑enabled KV rules and secrets. Recovering a MEK from its wrapped/encrypted form uses LOCK‑scoped KV slots, filtering, and AES write‑path policy; the unwrap/decryption outputs to the designated KV slot, not to FW.
+- DMA offset used to send MEK is locked when the FUSE_WR_DONE is set to high and cannot be changed until the next cold boot.
+- Caliptra subsystem’s security boundary ends at the Caliptra core DMA write of MEK into the required destination (offset determined through strap by integrator); confidentiality/integrity beyond that destination is the SoC owner’s responsibility. 
+- KV rules ensure that a KV slot can be used as AES key but cannot be used as AES plaintext or ciphertext, except for MEK encryption KV slot which has its own unique rule.
+- ROM sequencing & enablement: Caliptra ROM sets OCP_LOCK_IN_PROGRESS before any RT FW OCP LOCK operation, which enables the KV filtering/isolation logic and the Key Release path; if not set, OCP LOCK data paths are disabled. If the OCP LOCK is intended to be used, Caliptra ROM MUST set the OCP_LOCK_IN_PROGRESS to high.
+- The integrator sets OCP_LOCK enable strap pin (a HW tieoff pin, not modifiable by SW) at integration time and Caliptra ROM sets OCP_LOCK_IN_PROGRESS before any OCP LOCK operation, which enables the KV Slot filtering/isolation logic and the Key Release path; if not set, OCP LOCK data paths are disabled. This rule also ensures that any potential security issue comes from OCP LOCK is under the quarantine of OCP LOCK boundary and does not affect Caliptra’s rest of KV slots. However, KV 16 has a different rule because it is populated by Caliptra ROM, which sets OCP_LOCK_IN_PROGRESS bit. Thus, KV 16 is restricted with OCP_LOCK_ENABLE strap pin but not by OCP_LOCK_IN_PROGRESS.
+- While OCP LOCK is in progress, AES operations cannot be abused by malicious FW to perform arbitrary AES operation into KV to exfiltrate or implant-control data if it is not for MEK decryption process and MEK decryption KV slots. KV write‑path restrictions are enforced in HW: mode check + key/slot policy; destination is forced to a designated LOCK slot; other AES ops route only to FW data‑out, not KV; write‑enable hardened to prevent mid‑transfer changes.
+- DMA data FIFOs are flushed after every DMA transfer, ensuring that there is no residue data remaining from MEK after the OCP LOCK flow completion
+- Caliptra top enforces mutual exclusion (BUSY checks / HW_ERROR) while LOCK flows are active; KV rules enforce single active engine for read/write correctness.
+- Any KV slot that stores a secret value can be partially overwritten by the HMAC core, since HMAC writes 384 bits of a 512-bit slot. However, the HMAC core always sets the last valid d-word flag when performing this partial overwrite. This flag ensures that any remaining 128 bits in the slot are treated as invalid, preventing an adversary from exploiting the unchanged portion for pre-image recovery. If the last valid d-word flag is set for 384-bit and HMAC is triggered for 512-bit, HMAC core generates an error signal. Similarly, AES cannot perform arbitrary encryption or decryption using partially overwritten KV slots because AES keys are at most 256 bits and always start from the least significant bits (LSB) of the slot. Since HMAC writes a minimum of 384 bits, any AES operation will necessarily use the updated portion of the slot, not any stale data. The same KV slot may also be reused for ML-KEM or ECC operations. These are asymmetric cryptographic operations where the secret is either a private key or a seed used to derive the private key. Partial overwrites do not expose these secrets. While it could be argued that such secrets might be manipulated to sign arbitrary data or perform unauthorized decapsulation, these operations can only occur after ROM execution—at which point Caliptra secrets are either cleared or locked, eliminating this risk. OCP LOCK utilizes ML-KEM and ECDH for the key wrapping operations however these operations do not go through KV and managed by RT FW and thus these are out of scope of this partial write feature. 
+- MEK, HEK seed, MEK encryption key cannot be copied. This is an important isolation guarantee.
+- Single-encrypted ("obfuscated") MEK is exposed to RT FW of Caliptra. If malicious firmware gains access to the obfuscated MEK it can successfully derive the MEK to KV23 and release it to the SSD controller without requiring any other security inputs (Access Keys, MPK, EPK, etc). Firmware must clear it from memory immediately after use.
+
+
+
 # Terminology
 
 The following acronyms and abbreviations are used throughout this document.
