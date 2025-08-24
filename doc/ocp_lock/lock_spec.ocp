@@ -118,7 +118,7 @@ OCP L.O.C.K. (Layered Open-source Cryptographic Key management) provides secure 
 
 OCP L.O.C.K. was originally created as part of the Open Compute Project (OCP). The major revisions of the OCP L.O.C.K. specifications are published as part of Caliptra at OCP, as OCP L.O.C.K. is an extension to Caliptra. The evolving source code and documentation for Caliptra are in the repository within the CHIPS Alliance Project, a Series of LF Projects, LLC.
 
-OCP L.O.C.K. may be integrated within a variety of self-encrypting storage devices, and is not restricted exclusively to NVMe™. OCP L.O.C.K. is designed for compatibility with the TCG Opal[^opal] [@{tcg-opal}] or Key Per I/O [@{tcg-kpio}] storage device specifications.
+OCP L.O.C.K. may be integrated within a variety of self-encrypting storage devices, and is not restricted exclusively to NVMe™. OCP L.O.C.K. is designed for compatibility with the TCG Storage Architecture [@{tcg-storage-architecture}], including support for TCG Opal[^opal] [@{tcg-opal}], TCG Enterprise [@{tcg-enterprise}], and Key Per I/O [@{tcg-kpio}] specifications.
 
 [^opal]: Opal in the context of this document includes the Opal Family of SSCs: Opal SSC, Opalite SSC, Ruby SSC. Pyrite is excluded as Pyrite SSDs are non-SED.
 
@@ -132,7 +132,7 @@ Self-encrypting drives (SEDs) store data encrypted at rest to media encryption k
 - An encryption engine which performs line-rate encryption and decryption of data as it enters and exits the drive.
 - A drive controller which exposes host-side APIs for managing the lifecycle of MEKs.
 
-MEKs may be bound to user credentials, which the host must provide to the drive in order for the associated data to be readable. A given MEK may be bound to one or more credentials. This model is captured in the TCG Opal specification.
+MEKs may be bound to user credentials, which the host must provide to the drive in order for the associated data to be readable. A given MEK may be bound to one or more credentials. This model is captured in the TCG Opal and Enterprise specifications.
 
 MEKs may be erased, to cryptographically erase all data which was encrypted to the MEK. To erase an MEK, it is sufficient for the drive to erase all copies of it, or all copies of a key with which it was protected.
 
@@ -184,7 +184,7 @@ The following areas are out of scope for this project.
 
 OCP L.O.C.K. is a feature set conditionally compiled into Caliptra Subsystem 2.1+. It consists of functionality in Caliptra ROM and Runtime Firmware along with a hardware interface from Caliptra Core to a vendor-implemented encryption engine, which is the path by which Caliptra Core programs MEKs. This hardware interface leverages the AXI Manager which is only available in Caliptra Subsystem.
 
-OCP L.O.C.K.'s KMB offers cryptographic services for code running in the Manufacturer Control Unit (MCU) [@{caliptra-2.0-ss-spec}], which runs vendor firmware that implements a host-facing storage interface, such as TCG Opal or Key Per I/O. The host will interact with MCU firmware to configure the storage device and actuate storage lifecycle events, such as MEK loading / unloading and cryptographic erase. Certain of these lifecycle events are handled by KMB on behalf of MCU firmware.
+OCP L.O.C.K.'s KMB offers cryptographic services for code running in the Manufacturer Control Unit (MCU) [@{caliptra-2.0-ss-spec}], which runs vendor firmware that implements a host-facing storage interface, such as TCG Opal, Enterprise, or Key Per I/O. The host will interact with MCU firmware to configure the storage device and actuate storage lifecycle events, such as MEK loading / unloading and cryptographic erase. Certain of these lifecycle events are handled by KMB on behalf of MCU firmware.
 
 ### Integration verification
 
@@ -199,11 +199,11 @@ A product that integrates OCP L.O.C.K. will be expected to undergo an OCP S.A.F.
 To safeguard user data stored on the drive, KMB defines a set of "protection keys", each of which must be available in order for an MEK to be accessible.
 
 - The **data protection key (DPK)**, which is managed by the nominal owner of the data. A given MEK is bound to a single DPK.
-  - In Opal the DPK may be protected by the user's C_PIN, while in Key Per I/O the DPK may be the DEK associated with a given key tag.
+  - In Opal or Enterprise the DPK may be protected by the user's C_PIN, while in Key Per I/O the DPK may be the DEK associated with a given key tag.
 
 - A configurable number of **Multi-party Protection Keys (MPKs)**, which are each managed by an additional entity that must assent before user data is available. A given MEK may be bound to zero or more MPKs.
   - Each multi-party entity grants access to the data by providing an access key to the drive. Each MPK is protected by a distinct access key, which is never stored persistently within the drive. MPK access keys are protected in transit using HPKE [@{ietf-rfc9180}]. This enables use-cases where the access key is served to the drive from a remote key management service, without revealing the access key to the drive's host.
-  - Binding an MEK to zero MPKs allows for legacy Opal or Key Per I/O support.
+  - Binding an MEK to zero MPKs allows for legacy Opal, Enterperise, or Key Per I/O support.
 
 - A composite **epoch protection key (EPK)**, which is the output of a KDF of two "component epoch keys" held within the device: the **Soft Epoch Key (SEK)** and the **Hard Epoch Key (HEK)**. The EPK is managed by the storage device itself, and all MEKs in use by the device are bound to it.
   - All MEKs in use by the drive can be cryptographically erased by zeroizing either the SEK or HEK. New MEKs shall not be loadable until the zeroized epoch keys are regenerated.
@@ -213,9 +213,9 @@ To safeguard user data stored on the drive, KMB defines a set of "protection key
 
 The EPK, DPK, and set of configured MPKs are used together to derive an MEK secret, which protects a given MEK. The MEK protection is implemented as one of two methods:
 
-- **MEK encryption** - the drive obtains a random MEK from KMB, encrypted by two keys: the MEK secret and the **MEK Deobfuscation Key (MDK)**, and is allowed to load that encrypted MEK into the encryption engine via KMB. This supports Opal use-cases.
+- **MEK encryption** - the drive obtains a random MEK from KMB, encrypted by two keys: the MEK secret and the **MEK Deobfuscation Key (MDK)**, and is allowed to load that encrypted MEK into the encryption engine via KMB. This supports Opal or Enterprise use-cases.
 
-- **MEK derivation** - the drive instructs KMB to derive an MEK from the MEK secret and load the MEK into the encryption engine. This may support either Opal or Key Per I/O use-cases.
+- **MEK derivation** - the drive instructs KMB to derive an MEK from the MEK secret and load the MEK into the encryption engine. This may support either Opal, Enterprise, or Key Per I/O use-cases.
 
 MEKs are never visible to drive firmware. Drive firmware instructs KMB to load MEKs into the key cache of the encryption engine, using standard interfaces described in @sec:interfaces. Each MEK has associated vendor-defined metadata, e.g. to identify the namespace and LBA range to be encrypted by the MEK.
 
@@ -588,9 +588,9 @@ Drive firmware provides the DPK (Data Protection Key) to KMB when generating, lo
 
 #### Example flow when generating or loading an MEK
 
-In this flow, the DPK may be encrypted by a user's Opal C_PIN. Drive firmware logic which decrypts MEKs can be repurposed to produce the DPK.
+In this flow, the DPK may be encrypted by a user's C_PIN. Drive firmware logic which decrypts MEKs can be repurposed to produce the DPK. This flow may be used to support TCG Opal or Enterprise.
 
-![Example drive flow to decrypt a DPK based on a host-provided Opal C_PIN](./diagrams/dpk_decryption_example.drawio.svg){#fig:dpk-decryption}
+![Example drive flow to decrypt a DPK based on a host-provided C_PIN](./diagrams/dpk_decryption_example.drawio.svg){#fig:dpk-decryption}
 
 #### Example flow when deriving an MEK
 
@@ -681,9 +681,9 @@ Note: it is the drive firmware's responsibility to ensure that MPKs are mixed in
 
 See @sec:generate-load-random-mek for how the MEK secret is used to generate and load random MEKs. See @sec:derive-mek for how the MEK secret is used to derive deterministic MEKs.
 
-#### Support for standard storage API flows
+#### Support for legacy storage API flows
 
-KMB allows an MEK to be bound to zero MPKs, which supports standard Opal and Key Per I/O flows. The process for establishing such an MEK is illustrated in @fig:mek-secret-derivation-no-mpks.
+KMB allows an MEK to be bound to zero MPKs, which supports legacy TCG Opal, Enterprise, or Key Per I/O flows. The process for establishing such an MEK is illustrated in @fig:mek-secret-derivation-no-mpks.
 
 ![Establishing an MEK bound to zero MPKs](./diagrams/mek_secret_derivation_no_mpks.drawio.svg){#fig:mek-secret-derivation-no-mpks}
 
@@ -1733,7 +1733,7 @@ Table: TEST_ACCESS_KEY output arguments
 
 This command generates a random 512-bit MEK and encrypts it using the MEK secret, which is derived from the HEK, the MEK secret seed, and the given SEK and DPK.
 
-The DPK may be a value decrypted by a user-provided C_PIN in Opal.
+The DPK may be a value decrypted by a user-provided C_PIN in TCG Opal or Enterprise.
 
 [INITIALIZE_MEK_SECRET](#sec:initialize-mek-secret-cmd) must be invoked prior to this command or an error shall be returned.
 
@@ -1777,7 +1777,7 @@ Table: GENERATE_MEK output arguments
 
 This command decrypts the given encrypted 512-bit MEK using the MEK secret, which is derived from the HEK, the MEK secret seed, and the given SEK and DPK.
 
-The DPK may be a value decrypted by a user-provided C_PIN in Opal.
+The DPK may be a value decrypted by a user-provided C_PIN in TCG Opal or Enterprise.
 
 The decrypted MEK, specified metadata, and aux_metadata are loaded into the encryption engine key cache. The metadata format is vendor-defined and specifies the information to the encryption engine on where within the key cache the MEK is loaded.
 
@@ -2235,7 +2235,7 @@ This section will be fleshed out with additional details as they become availabl
 
 ## Host APIs {#sec:host-apis}
 
-In addition to supporting TCG Opal and Key Per I/O, OCP L.O.C.K. provides underlying support for the Media Encryption Key Multiparty Authorization (MEK-MPA) Opal feature-set [@{tcg-mek-mpa}]. These bindings are described in @tbl:host-api-mapping.
+In addition to supporting TCG Opal, Enterprise, and Key Per I/O, OCP L.O.C.K. provides underlying support for the Media Encryption Key Multiparty Authorization (MEK-MPA) Opal feature-set [@{tcg-mek-mpa}]. These bindings are described in @tbl:host-api-mapping.
 
 Table: Mapping between KMB mailbox commands and host-facing storage APIs {#tbl:host-api-mapping}
 
@@ -2316,15 +2316,15 @@ Table: Mapping between KMB mailbox commands and host-facing storage APIs {#tbl:h
 |                                   |                         | the AccessCondition via this     |
 |                                   |                         | command.                         |
 +-----------------------------------+-------------------------+----------------------------------+
-| [GENERATE_MEK](                   | TCG Opal                | When a K_AES_* entry is created, |
+| [GENERATE_MEK](                   | TCG Opal or Enterprise  | When a K_AES_* entry is created, |
 | #sec:generate-mek-cmd)            |                         | that action may be performed by  |
 |                                   |                         | this command.                    |
 +-----------------------------------+-------------------------+----------------------------------+
-| [LOAD_MEK](#sec:load-mek-cmd)     | TCG Opal                | When a K_AES_* entry is          |
+| [LOAD_MEK](#sec:load-mek-cmd)     | TCG Opal or Enterprise  | When a K_AES_* entry is          |
 |                                   |                         | unlocked, that action may be     |
 |                                   |                         | performed by this command.       |
 +-----------------------------------+-------------------------+----------------------------------+
-| [DERIVE_MEK](#sec:derive-mek-cmd) | TCG Opal                | When a K_AES_* entry is          |
+| [DERIVE_MEK](#sec:derive-mek-cmd) | TCG Opal or Enterprise  | When a K_AES_* entry is          |
 |                                   |                         | unlocked, that action may be     |
 |                                   |                         | performed by this command.       |
 +-----------------------------------+-------------------------+----------------------------------+
@@ -2333,7 +2333,7 @@ Table: Mapping between KMB mailbox commands and host-facing storage APIs {#tbl:h
 |                                   |                         | MEK is derived via this command. |
 +-----------------------------------+-------------------------+----------------------------------+
 
-Rotation of the HEK and SEK and injection of host entropy require additional host APIs beyond those available in TCG Opal or Key Per I/O. Such APIs are beyond the scope of the present document.
+Rotation of the HEK and SEK and injection of host entropy require additional host APIs beyond those available in TCG Opal, Enterprise, or Key Per I/O. Such APIs are beyond the scope of the present document.
 
 ## Terminology
 
