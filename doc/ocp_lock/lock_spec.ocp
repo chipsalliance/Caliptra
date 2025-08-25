@@ -1,6 +1,6 @@
 ---
 title: "OCP L.O.C.K."
-version: 0.9
+version: 1.0 (RC1)
 type: BASE
 project: NVMe™
 authors: [(See Acknowledgements section)]
@@ -769,7 +769,7 @@ Caliptra hardware [@{caliptra-2.0-hw-spec}] supports either an integrated or ext
 
 ![External DRBG](./diagrams/drbg_external.drawio.svg){#fig:drbg-external}
 
-If Caliptra is instantiated with an intergrated DRBG, host-provided entropy can be mixed into the DRBG state via the [CM_RANDOM_STIR](https://github.com/chipsalliance/caliptra-sw/tree/main-2.x/runtime#cm_random_stir) Caliptra mailbox command.
+If Caliptra is instantiated with an integrated DRBG, host-provided entropy can be mixed into the DRBG state via the [CM_RANDOM_STIR](https://github.com/chipsalliance/caliptra-sw/tree/main-2.x/runtime#cm_random_stir) Caliptra mailbox command.
 
 If Caliptra is not instantiated with an integrated DRBG, the drive is responsible for contributing host-provided entropy to the DRBG that feeds Caliptra.
 
@@ -1004,7 +1004,7 @@ Table: Offset OCP_LOCK_MEK_ADDRESS + 80h: CTRL – Control {#tbl:ee-ctrl-sfr}
 |       |      |       | this field shall be 0b. When this bit is set from 0b to   |
 |       |      |       | 1b by KMB, the encryption engine shall execute the        |
 |       |      |       | command specified in the CMD field. Once the execution is |
-|       |      |       | complete, the encryption engine shall simulaneously set   |
+|       |      |       | complete, the encryption engine shall simultaneously set  |
 |       |      |       | this bit from 1b to 0b, set the DONE bit from 0b to       |
 |       |      |       | 1b, and populate the ERR field. While the EXE bit is 1b,  |
 |       |      |       | the encryption engine is busy.                            |
@@ -2467,4 +2467,4 @@ Therefore a given encryption key may safely be used in at most $2^{80.5}$ precon
 
 This format is currently under development within TCG as part of the Hard Cryptographic Purge feature set[^crypto-purge].
 
-[^crypto-purge]: https://trustedcomputinggroup.org/trusted-computing-group-storage-work-group-call-for-participation/
+[^crypto-purge]: <https://trustedcomputinggroup.org/trusted-computing-group-storage-work-group-call-for-participation/>
