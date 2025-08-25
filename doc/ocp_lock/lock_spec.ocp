@@ -681,9 +681,9 @@ Note: it is the drive firmware's responsibility to ensure that MPKs are mixed in
 
 See @sec:generate-load-random-mek for how the MEK secret is used to generate and load random MEKs. See @sec:derive-mek for how the MEK secret is used to derive deterministic MEKs.
 
-#### Support for legacy storage API flows
+#### Support for non-MPA storage API flows
 
-KMB allows an MEK to be bound to zero MPKs, which supports legacy TCG Opal, Enterprise, or Key Per I/O flows. The process for establishing such an MEK is illustrated in @fig:mek-secret-derivation-no-mpks.
+KMB allows an MEK to be bound to zero MPKs, which supports TCG flows that do not interact with the TCG MEK-MPA specification. The process for establishing such an MEK is illustrated in @fig:mek-secret-derivation-no-mpks.
 
 ![Establishing an MEK bound to zero MPKs](./diagrams/mek_secret_derivation_no_mpks.drawio.svg){#fig:mek-secret-derivation-no-mpks}
 
