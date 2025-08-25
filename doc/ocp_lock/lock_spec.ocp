@@ -395,6 +395,8 @@ In this specification, several flows involve deriving keys via a key derivation 
 
 $K_{OUT}$ = HMAC512($K_{IN}$, 0x01 || Label [ || 0x00 || Context])
 
+There is one exception to this in @sec:derive-mek, where CMAC instead of HMAC is used as the PRF for a particular instance of KDF. See @sec:mek-seed-decryption for details.
+
 #### Key Extraction
 
 In this specification, several flows involve combining together multiple symmetric keys. NIST SP 800-133 [@{sp800-133r2}] section 6.3 provides a number of FIPS-approved methods for combining keys together; this specification leverages the HMAC-based key-extraction process detailed there.
@@ -709,7 +711,7 @@ Hardware enforces that AES-ECB decryption results using the Key Vault slot that 
 
 ![Deriving an MEK](./diagrams/mek_derive.drawio.svg){#fig:mek-derive}
 
-##### Decrypting MEK seeds with the MDK
+##### Decrypting MEK seeds with the MDK {#sec:mek-seed-decryption}
 
 The MEK seed is calculated via CMAC instead of HMAC, and then "decrypted" via the MDK, for the following reasons:
 
