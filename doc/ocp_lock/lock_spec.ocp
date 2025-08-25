@@ -203,7 +203,7 @@ To safeguard user data stored on the drive, KMB defines a set of "protection key
 
 - A configurable number of **Multi-party Protection Keys (MPKs)**, which are each managed by an additional entity that must assent before user data is available. A given MEK may be bound to zero or more MPKs.
   - Each multi-party entity grants access to the data by providing an access key to the drive. Each MPK is protected by a distinct access key, which is never stored persistently within the drive. MPK access keys are protected in transit using HPKE [@{ietf-rfc9180}]. This enables use-cases where the access key is served to the drive from a remote key management service, without revealing the access key to the drive's host.
-  - Binding an MEK to zero MPKs allows for legacy Opal, Enterperise, or Key Per I/O support.
+  - Binding an MEK to zero MPKs allows for legacy Opal, Enterprise, or Key Per I/O support.
 
 - A composite **epoch protection key (EPK)**, which is the output of a KDF of two "component epoch keys" held within the device: the **Soft Epoch Key (SEK)** and the **Hard Epoch Key (HEK)**. The EPK is managed by the storage device itself, and all MEKs in use by the device are bound to it.
   - All MEKs in use by the drive can be cryptographically erased by zeroizing either the SEK or HEK. New MEKs shall not be loadable until the zeroized epoch keys are regenerated.
