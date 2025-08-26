@@ -231,7 +231,7 @@ An example of when an owner must protect assets is moving from secure mode to in
 | Fuse/OTP high value secrets | FW authentication keys | Integrity | Proficient | Glitching | 1. Redundant decision making on critical code execution<br>2. Error check before consuming values from fuses<br>3. Environmental monitoring and protection |
 | Fuse/OTP high value secrets | Versioning information from fuses | Integrity | Proficient | Glitching | Environmental monitoring and protection |
 | Fuse/OTP high value secrets | IDEVID CERT chain | Integrity | Proficient | Glitching | 1. Environmental monitoring and protection<br>2. Error check before consuming values from fuse in various ways |
-| Fuse/OTP high value secrets | OCP L.O.C.K. HEK RATCHET SEED 0-7 | Confidentiality | Proficient | 1. Glitching<br>2. Software writing to modify the valid seed |1. Consuming it after obfuscating with class RTL key<br>2. Environmental monitoring and protection<br>3. Error check before consuming values from fuse in various ways|
+| Fuse/OTP high value secrets | OCP L.O.C.K. HEK RATCHET SEED | Confidentiality | Proficient | 1. Glitching<br>2. Software writing to modify the valid seed |1. Consuming it after obfuscating with class RTL key<br>2. Environmental monitoring and protection<br>3. Error check before consuming values from fuse in various ways|
 | Die unique assets | UDS (802.1AR Unique Device Secret) | Confidentiality and integrity | Proficient | 1. Software reading actual secrets<br>2. Side channel attack to infer secret | 1. Secrets locked in key vault, not readable by software<br>2. SCA protections |
 | Die unique assets | CDI<sub>n</sub> (DICE compound device identifier for Layer n) | Confidentiality and integrity | Proficient | 1. Software reading actual secrets<br>2. Side channel attack to infer secret | 1. Secrets locked in key vault, not readable by software<br>2. SCA protections |
 | Die unique assets | IDevID<sub>Priv</sub> | Confidentiality and integrity | Proficient | 1. Software reading actual secrets<br>2. Side channel attack to infer secret | 1. Secrets locked in key vault, not readable by software<br>2. SCA protections |
@@ -1287,14 +1287,7 @@ The following table describes Caliptra's fuse map:
 | PQC Key Type                    | 2               | ROM FMC RUNTIME | In-field programmable                           | One-hot encoded selection of PQC key type for firmware validation. <br> - **Bit 0** - MLDSA <br> - **Bit 1** - LMS<br>|
 | SOC MANIFEST SVN                | 128             | ROM FMC RUNTIME | In-field programmable                           | One-hot encoded value for the SOC authorization manifest minimum supported SVN. |
 | SOC MANIFEST MAX SVN            | 8               | ROM FMC RUNTIME | In-field programmable                           | Maximum value for the SOC authorization manifest SVN. |
-| HEK RATCHET SEED 0              | 256             | ROM             | In-field programmable                           | OCP L.O.C.K. seed used by hardware to generate HEK |
-| HEK RATCHET SEED 1              | 256             | ROM             | In-field programmable                           | OCP L.O.C.K. seed used by hardware to generate HEK |
-| HEK RATCHET SEED 2              | 256             | ROM             | In-field programmable                           | OCP L.O.C.K. seed used by hardware to generate HEK |
-| HEK RATCHET SEED 3              | 256             | ROM             | In-field programmable                           | OCP L.O.C.K. seed used by hardware to generate HEK |
-| HEK RATCHET SEED 4              | 256             | ROM             | In-field programmable                           | OCP L.O.C.K. seed used by hardware to generate HEK |
-| HEK RATCHET SEED 5              | 256             | ROM             | In-field programmable                           | OCP L.O.C.K. seed used by hardware to generate HEK |
-| HEK RATCHET SEED 6              | 256             | ROM             | In-field programmable                           | OCP L.O.C.K. seed used by hardware to generate HEK |
-| HEK RATCHET SEED 7              | 256             | ROM             | In-field programmable                           | OCP L.O.C.K. seed used by hardware to generate HEK |
+| HEK RATCHET SEED                | 256             | ROM             | In-field programmable                           | OCP L.O.C.K. seed used by hardware to generate HEK |
 
 
 # Error reporting and handling
