@@ -2152,8 +2152,12 @@ Table: KMB mailbox command result codes {#tbl:kmb-mailbox-codes}
 |                          |             | drive encryption engine   |
 |                          |             | to execute a command      |
 +--------------------------+-------------+---------------------------+
-| LOCK_ENGINE_CODE + u16   | 0x4443_xxxx | Vendor-specific error     |
-|                          | ("ECxx")    | code in the low 16 bits   |
+| LOCK_ENGINE_CODE         | 0x4C45_430x | Vendor-specific error     |
+|                          | ("LECx")    | code in the low 4 bits.   |
+|                          |             | See                       |
+|                          |             | @tbl:ee-ctrl-err-codes    |
+|                          |             | for an enumeration of     |
+|                          |             | error code values.        |
 +--------------------------+-------------+---------------------------+
 | LOCK_BAD_ALGORITHM       | 0x4C42_414C | Unsupported algorithm,    |
 |                          | ("LBAL")    | or algorithm does not     |
@@ -2194,14 +2198,6 @@ Table: KMB mailbox command result codes {#tbl:kmb-mailbox-codes}
 |                          |             | invoking                  |
 |                          |             | INITIALIZE_MEK_SECRET.    |
 +--------------------------+-------------+---------------------------+
-
-##### Fatal errors
-
-This section will be fleshed out with additional details as they become available.
-
-##### Non-fatal errors
-
-This section will be fleshed out with additional details as they become available.
 
 ## Host APIs {#sec:host-apis}
 
