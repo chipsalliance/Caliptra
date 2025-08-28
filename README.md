@@ -74,6 +74,7 @@ Additional Features
 \* Requires 1.1 RTL
 
 Compatible Configurations:
+
 | RTL | ROM | Runtime FMC/FW |
 | --- | --- | --- |
 | 1.1.x | 1.1.x | 1.1.x |
@@ -98,6 +99,7 @@ Additional Features
 \*\* Requires 1.2 ROM
 
 Compatible Configurations:
+
 | RTL | ROM | Runtime FMC/FW |
 | --- | --- | --- |
 | 1.1.x | 1.2.x | 1.2.x |
@@ -145,6 +147,8 @@ The Caliptra code base and documentation are split across several repositories:
 
 The GitHub config parameters for all of the branches are documented in a [local
 file](https://github.com/chipsalliance/Caliptra/blob/main/GitHubRules.md).
+
+GitHub branch names for `caliptra-sw` are documented in its [BRANCHING_STRATEGY.md](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/BRANCHING_STRATEGY.md) document.
 
 ### Convenience repository URLs
 
