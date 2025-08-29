@@ -479,22 +479,28 @@ An HPKE variant relies on three types of algorithms: KEM, KDF, and AEAD. @tbl:hp
 
 Table: HPKE algorithm support {#tbl:hpke-algorithm-support}
 
-+----------------+--------------------------+-----------------+-------------------------------------------+
-| Algorithm type | Algorithm                | IANA code point | Reference document                        |
-+================+==========================+=================+===========================================+
-| KEM            | P-384 ECDH               | 0x0011          | RFC 9180 [@{ietf-rfc9180}]                |
-+----------------+--------------------------+-----------------+-------------------------------------------+
-| KEM            | ML-KEM-1024              | 0x0042          | Post-Quantum and Post-Quantum/Traditional |
-|                |                          |                 | Hybrid Algorithms for HPKE                |
-|                |                          |                 | [@{draft-ietf-hpke-pq}]                   |
-+----------------+--------------------------+-----------------+-------------------------------------------+
-| KEM            | ML-KEM-1024 + P-384 ECDH | 0x0a25          | Hybrid PQ/T Key Encapsulation Mechanisms  |
-|                |                          |                 | [@{draft-irtf-cfrg-hybrid-kems}]          |
-+----------------+--------------------------+-----------------+-------------------------------------------+
-| KDF            | HKDF-SHA384              | 0x0002          | RFC 9180 [@{ietf-rfc9180}]                |
-+----------------+--------------------------+-----------------+-------------------------------------------+
-| AEAD           | AES-256-GCM              | 0x0002          | RFC 9180 [@{ietf-rfc9180}]                |
-+----------------+--------------------------+-----------------+-------------------------------------------+
++----------------+-----------------------------+-----------------+-------------------------------------------+
+| Algorithm type | Algorithm                   | IANA code point | Reference document                        |
+|                |                             |                 |                                           |
++================+=============================+=================+===========================================+
+| KEM            | ML-KEM-1024                 | 0x0042          | PQ and PQ/T                               |
+|                |                             |                 | Hybrid Algorithms for HPKE                |
+|                |                             |                 | [@{draft-ietf-hpke-pq}]                   |
+|                +-----------------------------+-----------------+                                           |
+|                | ML-KEM-1024 + P-384         | 0x0052          |                                           |
+|                |                             |                 |                                           |
+|                |                             |                 |                                           |
+|                +-----------------------------+-----------------+-------------------------------------------+
+|                | P-384                       | 0x0011          | RFC 9180 [@{ietf-rfc9180}]                |
++----------------+-----------------------------+-----------------+                                           |
+| KDF            | HKDF-SHA384                 | 0x0002          |                                           |
++----------------+-----------------------------+-----------------+                                           |
+| AEAD           | AES-256-GCM                 | 0x0002          |                                           |
++----------------+-----------------------------+-----------------+-------------------------------------------+
+
+For the post-quantum KEMs, the definitions are currently distributed across a number of documents. [@{draft-irtf-cfrg-hybrid-kems}] contains the generic constructions, [@{draft-irtf-cfrg-concrete-hybrid-kems}] contains the concrete parameterization, and [@{draft-ietf-hpke-pq}] contains the HPKE IANA code-point assignments.[^pq-kems]
+
+[^pq-kems]: As of this specification's publication, post-quantum HPKE KEMs are not fully ratified in IETF. However, the relevant IETF editors are confident that the IANA code points and associated definitions will not change before the drafts are finalized, with two exceptions for the hybrid ML-KEM-1024 + P-384 KEM: the KDF will be updated from HKDF-SHA-256 to SHA3-256, and the label may be updated to reflect the post-quantum KEM first. The IETF editors expect to make these changes in September 2025. @fig:hpke-kem-hybrid, where this KEM is illustrated, uses the SHA3-256 KDF and the label as is currently available in [@{draft-irtf-cfrg-concrete-hybrid-kems}].
 
 Figures [-@fig:hpke-kem-ecdh], [-@fig:hpke-kem-mlkem], and [-@fig:hpke-kem-hybrid] illustrate each KEM algorithm. The details of how the AES-GCM key and IV are derived are illustrated in @fig:hpke-key-derivation.
 
@@ -1282,8 +1288,8 @@ Table: GET_ALGORITHMS output arguments {#tbl:get-algorithms-output-args}
 |                        |        | [@{ietf-rfc9180}]                                 |
 |                        |        | - Byte 0 bit 1: 0x0042, 0x0002, 0x0002            |
 |                        |        | [@{draft-ietf-hpke-pq}]                           |
-|                        |        | - Byte 0 bit 2: 0x0a25, 0x0002, 0x0002            |
-|                        |        | [@{draft-irtf-cfrg-hybrid-kems}]                  |
+|                        |        | - Byte 0 bit 2: 0x0052, 0x0002, 0x0002            |
+|                        |        | [@{draft-ietf-hpke-pq}]                           |
 +------------------------+--------+---------------------------------------------------+
 | access_key_sizes       | u32    | Indicates the length of plaintext access keys:    |
 |                        |        |                                                   |
