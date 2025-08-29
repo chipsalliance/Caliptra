@@ -1213,7 +1213,7 @@ Table: REPORT_HEK_METADATA output arguments
 
 #### GET_STATUS
 
-Exposes a command that allows drive firmware to determine if the encryption engine is ready to process commands as well vendor-defined drive encryption engine status data.
+Exposes a command that allows drive firmware to determine if the encryption engine is ready to process commands as well as vendor-defined drive encryption engine status data.
 
 Command Code: 0x4753_5441 ("GSTA")
 
