@@ -41,6 +41,9 @@ sets out the charter governing the Caliptra project.
 
 ### Caliptra 2.x:
   * [Main Caliptra specification 2.0 - Version 1.0](https://github.com/chipsalliance/Caliptra/blob/main/doc/caliptra_20/Caliptra.md)
+  * [Caliptra Core Hardware Specification 2.0.1](https://github.com/chipsalliance/caliptra-rtl/blob/v2.0.1/docs/CaliptraHardwareSpecification.md)
+  * [Caliptra Core Hardware Integration
+    Specification 2.0.1](https://github.com/chipsalliance/caliptra-rtl/blob/v2.0.1/docs/CaliptraIntegrationSpecification.md)
   * [Caliptra Subsystem Hardware Specification - Version 1.0rc1](https://github.com/chipsalliance/caliptra-ss/blob/main/docs/CaliptraSSHardwareSpecification.md)
   * [Caliptra Subsystem Integration Specification - Version 1.0rc1](https://github.com/chipsalliance/caliptra-ss/blob/main/docs/CaliptraSSIntegrationSpecification.md)
   * [ROM 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/rom/dev/README.md)
