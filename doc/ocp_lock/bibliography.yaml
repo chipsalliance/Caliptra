@@ -115,15 +115,29 @@ references:
       year: 2025
       month: 6
     url: "https://datatracker.ietf.org/doc/html/draft-ietf-hpke-pq"
+  - id: "draft-irtf-cfrg-concrete-hybrid-kems"
+    title: "Concrete Hybrid PQ/T Key Encapsulation Mechanisms"
+    author:
+      - family: "Connolly"
+        given: "D."
+      - family: "Barnes"
+        given: "R."
+    issued:
+      year: 2025
+      month: 7
+    url: "https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-concrete-hybrid-kems"
   - id: "draft-irtf-cfrg-hybrid-kems"
     title: "Hybrid PQ/T Key Encapsulation Mechanisms"
     author:
       - family: "Connolly"
         given: "D."
-        affiliation: "SandboxAQ"
+      - family: "Barnes"
+        given: "R."
+      - family: "Grubbs"
+        given: "P."
     issued:
       year: 2025
-      month: 2
+      month: 7
     url: "https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hybrid-kems"
   - id: "caliptra-2.0-hw-spec"
     title: "Caliptra 2.0 Hardware Specification"
