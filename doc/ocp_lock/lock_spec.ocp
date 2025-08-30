@@ -184,7 +184,9 @@ The following areas are out of scope for this project.
 
 OCP L.O.C.K. is a feature set conditionally compiled into Caliptra Subsystem 2.1+. It consists of functionality in Caliptra ROM and Runtime Firmware along with a hardware interface from Caliptra Core to a vendor-implemented encryption engine, which is the path by which Caliptra Core programs MEKs. This hardware interface leverages the AXI Manager which is only available in Caliptra Subsystem.
 
-OCP L.O.C.K.'s KMB offers cryptographic services for code running in the Manufacturer Control Unit (MCU) [@{caliptra-2.0-ss-spec}], which runs vendor firmware that implements a host-facing storage interface, such as TCG Opal, Enterprise, or Key Per I/O. The host will interact with MCU firmware to configure the storage device and actuate storage lifecycle events, such as MEK loading / unloading and cryptographic erase. Certain of these lifecycle events are handled by KMB on behalf of MCU firmware.
+OCP L.O.C.K.'s KMB offers cryptographic services for drive firmware, which implements a host-facing storage interface, such as TCG Opal, Enterprise, or Key Per I/O. The host will interact with drive firmware to configure the storage device and actuate storage lifecycle events, such as MEK loading / unloading and cryptographic erase. Certain of these lifecycle events are handled by KMB on behalf of drive firmware.
+
+In Caliptra Subsystem, drive firmware runs within the Manufacturer Control Unit (MCU) [@{caliptra-2.0-ss-spec}].
 
 ### Integration verification
 
@@ -671,6 +673,8 @@ Drive firmware is responsible for enforcing that HEK and SEK programming / zeroi
 - The next HEK seed shall only be programmed once the prior HEK seed has been zeroized.
 - Perma-HEK mode shall only be enabled once all HEK seeds have been zeroized.
 
+Drive firmware is responsible for zeroizing the encryption engine's key cache when the SEK transitions from randomized to zeroized. HEK transitions involve power cycles and therefore the key cache is implicitly zeroized across such transitions.
+
 ### MEKs {#sec:meks}
 
 KMB can encrypt randomly-generated MEKs, or compute derived MEKs.
@@ -763,17 +767,11 @@ When in AES-XTS mode, the encryption engine will be responsible for performing t
 
 KMB generates multiple kinds of random keys. It does so using randomness obtained from a DRBG, which is seeded from a TRNG and which may be updated with entropy from the host.
 
-Caliptra hardware [@{caliptra-2.0-hw-spec}] supports either an integrated or external DRBG, illustrated respectively in Figures [-@fig:drbg-internal] and [-@fig:drbg-external].
+Caliptra hardware [@{caliptra-2.0-hw-spec}] supports either an integrated or external DRBG. Caliptra Subsystem requires leveraging the integrated DRBG. This construction is illustrated in @fig:drbg-internal.
 
 ![Integrated DRBG](./diagrams/drbg_internal.drawio.svg){#fig:drbg-internal}
 
-![External DRBG](./diagrams/drbg_external.drawio.svg){#fig:drbg-external}
-
-If Caliptra is instantiated with an integrated DRBG, host-provided entropy can be mixed into the DRBG state via the [CM_RANDOM_STIR](https://github.com/chipsalliance/caliptra-sw/tree/main-2.x/runtime#cm_random_stir) Caliptra mailbox command.
-
-If Caliptra is not instantiated with an integrated DRBG, the drive is responsible for contributing host-provided entropy to the DRBG that feeds Caliptra.
-
-Note: OCP L.O.C.K. functionality does not require one or the other flavor of DRBG. Other aspects of Caliptra integration may impose such requirements, and are outside the scope of this specification.
+Host-provided entropy can be mixed into the DRBG state via the [CM_RANDOM_STIR](https://github.com/chipsalliance/caliptra-sw/tree/main-2.x/runtime#cm_random_stir) Caliptra mailbox command.
 
 ### Authorization {#sec:authorization}
 
@@ -1284,6 +1282,9 @@ Table: GET_ALGORITHMS output arguments {#tbl:get-algorithms-output-args}
 |                        |        | [@{draft-ietf-hpke-pq}]                           |
 |                        |        | - Byte 0 bit 2: 0x0a25, 0x0002, 0x0002            |
 |                        |        | [@{draft-irtf-cfrg-hybrid-kems}]                  |
+|                        |        |                                                   |
+|                        |        | See @tbl:hpke-algorithm-support for definitions   |
+|                        |        | of each HPKE algorithm identifier.                |
 +------------------------+--------+---------------------------------------------------+
 | access_key_sizes       | u32    | Indicates the length of plaintext access keys:    |
 |                        |        |                                                   |
@@ -2392,9 +2393,9 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 |      | strap `ss_ocp_lock_en` in Caliptra Core or               |           |
 |      | `cptra_ss_strap_ocp_lock_en_i` in Caliptra Subsystem.    |           |
 +------+----------------------------------------------------------+-----------+
-| 3    | Media encryption keys shall only be programmable         |           |
-|      | to the encryption engine via Caliptra. See               | Yes       |
-|      | @sec:architecture.                                       |           |
+| 3    | When a storage device is in a production lifecycle       |           |
+|      | state, MEKs shall only be programmable to the encryption | Yes       |
+|      | engine via Caliptra. See @sec:architecture.              |           |
 +------+----------------------------------------------------------+-----------+
 | 4    | The encryption engine shall remove all MEKs from         | Yes       |
 |      | the encryption engine on a power cycle or during         |           |
