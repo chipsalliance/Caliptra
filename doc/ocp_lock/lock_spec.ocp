@@ -2125,7 +2125,7 @@ A KMB mailbox command can fail to complete in the following ways:
 
 In all of these cases, the error is reported in the command return status.
 
-Depending on the type of fault, drive firmware may resubmit the mailbox command.
+KMB mailbox errors should generally result in an error being surfaced to the host.
 
 Table: KMB mailbox command result codes {#tbl:kmb-mailbox-codes}
 
@@ -2135,35 +2135,33 @@ Table: KMB mailbox command result codes {#tbl:kmb-mailbox-codes}
 | LOCK_ENGINE_TIMEOUT      | 0x4C45_544F | Timeout occurred when     |
 |                          | ("LETO")    | communicating with the    |
 |                          |             | drive encryption engine   |
-|                          |             | to execute a command      |
+|                          |             | to execute a command.     |
 +--------------------------+-------------+---------------------------+
 | LOCK_ENGINE_CODE + u16   | 0x4443_xxxx | Vendor-specific error     |
-|                          | ("ECxx")    | code in the low 16 bits   |
+|                          | ("ECxx")    | code in the low 16 bits.  |
 +--------------------------+-------------+---------------------------+
 | LOCK_BAD_ALGORITHM       | 0x4C42_414C | Unsupported algorithm,    |
 |                          | ("LBAL")    | or algorithm does not     |
-|                          |             | match the given handle    |
+|                          |             | match the given handle.   |
 +--------------------------+-------------+---------------------------+
-| LOCK_BAD_HANDLE          | 0x4C42_4841 | Unknown handle            |
+| LOCK_BAD_HANDLE          | 0x4C42_4841 | Unknown handle.           |
 |                          | ("LBHA")    |                           |
 +--------------------------+-------------+---------------------------+
-| LOCK_NO_HANDLES          | 0x4C4E_4841 | Too many extant handles   |
-|                          | ("LNHA")    | exist                     |
-+--------------------------+-------------+---------------------------+
 | LOCK_KEM_DECAPSULATION   | 0x4C4B_4445 | Error during KEM          |
-|                          | ("LKDE")    | decapsulation             |
+|                          | ("LKDE")    | decapsulation.            |
 +--------------------------+-------------+---------------------------+
 | LOCK_ACCESS_KEY_UNWRAP   | 0x4C41_4B55 | Error during access key   |
-|                          | ("LAKU")    | decryption                |
+|                          | ("LAKU")    | decryption.               |
 +--------------------------+-------------+---------------------------+
 | LOCK_MPK_DECRYPT         | 0x4C50_4445 | Error during MPK          |
-|                          | ("LPDE")    | decryption                |
+|                          | ("LPDE")    | decryption.               |
 +--------------------------+-------------+---------------------------+
 | LOCK_MEK_DECRYPT         | 0x4C4D_4445 | Error during MEK          |
-|                          | ("LMDE")    | decryption                |
+|                          | ("LMDE")    | decryption.               |
 +--------------------------+-------------+---------------------------+
-| LOCK_HEK_INVALID_SLOT    | 0x4C48_4953 | Incorrect HEK slot when   |
-|                          | ("LHIS")    | programming or zeroizing  |
+| LOCK_MEK_CHKSUM_FAIL     | 0x4C4D_4346 | Error during MEK          |
+|                          | ("LMCF")    | derivation due to         |
+|                          |             | checksum mismatch.        |
 +--------------------------+-------------+---------------------------+
 | LOCK_EE_NOT_READY        | 0x4C45_4E52 | Encryption engine was     |
 |                          | ("LENR")    | not ready when the        |
@@ -2179,14 +2177,6 @@ Table: KMB mailbox command result codes {#tbl:kmb-mailbox-codes}
 |                          |             | invoking                  |
 |                          |             | INITIALIZE_MEK_SECRET.    |
 +--------------------------+-------------+---------------------------+
-
-##### Fatal errors
-
-This section will be fleshed out with additional details as they become available.
-
-##### Non-fatal errors
-
-This section will be fleshed out with additional details as they become available.
 
 ## Host APIs {#sec:host-apis}
 
