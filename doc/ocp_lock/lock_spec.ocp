@@ -822,6 +822,8 @@ OCP L.O.C.K. defines two interfaces:
 - The [encryption engine interface](#sec:encryption-engine-interface) is exposed from the vendor-implemented encryption engine to KMB, and defines a standard mechanism for programming MEKs and control messages.
 - The [mailbox interface](#sec:mailbox-interface) is exposed from KMB to storage drive firmware, and enables the drive to manage MEKs and associated keys.
 
+***Note: as of this specification's publication, KMB firmware has not yet been implemented. As such, certain details of the interface specification are subject to change. This notice will be removed once firmware has been implemented.***
+
 ### Encryption engine interface {#sec:encryption-engine-interface}
 
 This section defines the interface between KMB and an encryption engine. An encryption engine is used to encrypt/decrypt user data. Its design and implementation are vendor specific. MEKs are generated or derived within KMB and used by the encryption engine to encrypt and decrypt user data. The interface defined in this section is used to load MEKs from KMB to the encryption engine or to cause the encryption engine to unload (i.e., remove) loaded MEKs. MEKs shall not be accessible to the drive firmware as they are being transferred between KMB and the encryption engine.
