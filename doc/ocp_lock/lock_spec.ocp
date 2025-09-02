@@ -246,11 +246,8 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 |                   |                                      | Rendered irrecoverable if the DICE UDS is zeroized from     |               |
 |                   |                                      | persistent storage.                                         |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
-| HEK seed          | Contributes to the derivation of the | Randomly generated and stored in fuses. When held by        | 22            |
-|                   | HEK. See @sec:hek-lifecycle.         | Caliptra, the HEK seed is held in ephemeral memory and is   |               |
-|                   |                                      | zeroized after being used to derive the HEK.                |               |
-|                   |                                      |                                                             |               |
-|                   |                                      | Zeroized from fuses on demand.                              |               |
+| HEK seed          | Contributes to the derivation of the | Randomly generated and stored in fuses.                     | N/A           |
+|                   | HEK. See @sec:hek-lifecycle.         |                                                             |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
 | HEK               | Contributes to the derivation of the | Derived from the HEK seed and the Caliptra Stable Key       | 22            |
 |                   | EPK. See @fig:mpk-generation for one | during cold reset. Held in the Key Vault and lost on cold   |               |
@@ -276,7 +273,7 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 |                   | @fig:mek-secret-derivation.          |                                                             |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
 | Volatile Escrow   | Allows KMB firmware to escrow        | Randomly generated when first needed at runtime. Held in    | 18            |
-| Key               | volatile secrets for future access   | the Key Vault and lost on cold reset.                       |               |
+| Key (VEK)         | volatile secrets for future access   | the Key Vault and lost on cold reset.                       |               |
 |                   | by runtime KMB firmware.             |                                                             |               |
 |                   |                                      |                                                             |               |
 |                   | Encrypts/decrypts Enabled MPKs. See  |                                                             |               |
@@ -1604,14 +1601,18 @@ Command Code: 0X494D_0B53 ("IMKS")
 
 Table: INITIALIZE_MEK_SECRET input arguments
 
-+----------+------+--------------------------------------+
-| Name     | Type | Description                          |
-+==========+======+======================================+
-| chksum   | u32  | Checksum over other input arguments, |
-|          |      | computed by the caller.              |
-+----------+------+--------------------------------------+
-| reserved | u32  | Reserved.                            |
-+----------+------+--------------------------------------+
++----------+--------+--------------------------------------+
+| Name     | Type   | Description                          |
++==========+========+======================================+
+| chksum   | u32    | Checksum over other input arguments, |
+|          |        | computed by the caller.              |
++----------+--------+--------------------------------------+
+| reserved | u32    | Reserved.                            |
++----------+--------+--------------------------------------+
+| sek      | u8[32] | Soft Epoch Key.                      |
++----------+--------+--------------------------------------+
+| dpk      | u8[32] | Data Protection Key.                 |
++----------+--------+--------------------------------------+
 
 Table: INITIALIZE_MEK_SECRET output arguments
 
@@ -1709,9 +1710,7 @@ Table: TEST_ACCESS_KEY output arguments
 
 #### GENERATE_MEK {#sec:generate-mek-cmd}
 
-This command generates a random 512-bit MEK and encrypts it using the MEK secret, which is derived from the HEK, the MEK secret seed, and the given SEK and DPK.
-
-The DPK may be a value decrypted by a user-provided C_PIN in TCG Opal or Enterprise.
+This command generates a random 512-bit MEK and encrypts it using the MEK secret.
 
 [INITIALIZE_MEK_SECRET](#sec:initialize-mek-secret-cmd) must be invoked prior to this command or an error shall be returned.
 
@@ -1726,10 +1725,6 @@ Table: GENERATE_MEK input arguments
 |          |        | by the caller.                                |
 +----------+--------+-----------------------------------------------+
 | reserved | u32    | Reserved.                                     |
-+----------+--------+-----------------------------------------------+
-| sek      | u8[32] | Soft Epoch Key.                               |
-+----------+--------+-----------------------------------------------+
-| dpk      | u8[32] | Data Protection Key.                          |
 +----------+--------+-----------------------------------------------+
 
 Table: GENERATE_MEK output arguments
@@ -1751,9 +1746,7 @@ Table: GENERATE_MEK output arguments
 
 #### LOAD_MEK {#sec:load-mek-cmd}
 
-This command decrypts the given encrypted 512-bit MEK using the MEK secret, which is derived from the HEK, the MEK secret seed, and the given SEK and DPK.
-
-The DPK may be a value decrypted by a user-provided C_PIN in TCG Opal or Enterprise.
+This command decrypts the given encrypted 512-bit MEK using the MEK secret.
 
 The decrypted MEK, specified metadata, and aux_metadata are loaded into the encryption engine key cache. The metadata format is vendor-defined and specifies the information to the encryption engine on where within the key cache the MEK is loaded.
 
@@ -1770,10 +1763,6 @@ Table: LOAD_MEK input arguments
 |              |                   | computed by the caller.                    |
 +--------------+-------------------+--------------------------------------------+
 | reserved     | u32               | Reserved.                                  |
-+--------------+-------------------+--------------------------------------------+
-| sek          | u8[32]            | Soft Epoch Key.                            |
-+--------------+-------------------+--------------------------------------------+
-| dpk          | u8[32]            | Data Protection Key.                       |
 +--------------+-------------------+--------------------------------------------+
 | metadata     | u8[20]            | Metadata for MEK to load into the drive    |
 |              |                   | encryption engine (i.e. NSID + LBA range). |
@@ -1804,7 +1793,7 @@ Table: LOAD_MEK output arguments
 
 #### DERIVE_MEK {#sec:derive-mek-cmd}
 
-This command derives an MEK using the HEK, the MEK secret seed, and the given SEK and DPK.
+This command derives an MEK using the MEK secret.
 
 The derived MEK, specified metadata, and aux_metadata are loaded into the encryption engine key cache. The metadata format is vendor-defined and specifies the information to the encryption engine on where within the key cache the MEK is loaded.
 
@@ -1821,10 +1810,6 @@ Table: DERIVE_MEK input arguments
 |              |        | computed by the caller.                    |
 +--------------+--------+--------------------------------------------+
 | reserved     | u32    | Reserved.                                  |
-+--------------+--------+--------------------------------------------+
-| sek          | u8[32] | Soft Epoch Key.                            |
-+--------------+--------+--------------------------------------------+
-| dpk          | u8[32] | Data Protection Key.                       |
 +--------------+--------+--------------------------------------------+
 | mek_checksum | u8[16] | Checksum used to validate the derived MEK. |
 |              |        | May be all-zeroes, in which case no check  |
