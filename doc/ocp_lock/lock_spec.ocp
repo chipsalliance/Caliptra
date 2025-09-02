@@ -448,7 +448,7 @@ The VEK is randomly generated and held in a Key Vault slot. There does not exist
 
 ### MPKs {#sec:mpks}
 
-MPKs are the mechanism by which KMB enforces multi-party authorization as a precondition to loading an MEK. MPKs exist in one of two states: locked or enabled. In both these states the MPK is encrypted to a secret known only to KMB.
+Multi-party Protection Keys (MPKs) are the mechanism by which KMB enforces multi-party authorization as a precondition to loading an MEK. MPKs exist in one of two states: locked or enabled. In both these states the MPK is encrypted to a secret known only to KMB.
 
 - A Locked MPK's encryption key is derived from the HEK, SEK, and an externally-supplied access key to which the MPK is bound. The Locked MPK is held at rest by drive firmware.
 - An Enabled MPK's encryption key is a common volatile secret held within KMB which is randomly generated and is lost when the drive shuts down. See @sec:vek for details on how this key is generated. Enabled MPKs are held in drive firmware memory.
@@ -586,7 +586,7 @@ The user can then verify that the returned digest matches their expectation.
 
 ### DPKs
 
-Drive firmware provides the DPK (Data Protection Key) to KMB when generating, loading, or deriving an MEK. The DPK is used in a KDF, along with the HEK, SEK, and MPKs, to derive the MEK secret, as illustrated in @sec:meks.
+Drive firmware provides a Data Protection Key (DPK) to KMB when generating, loading, or deriving an MEK. The DPK is used in a KDF, along with the HEK, SEK, and MPKs, to derive the MEK secret, as illustrated in @sec:meks.
 
 #### Example flow when generating or loading an MEK
 
@@ -602,7 +602,7 @@ In this flow, the DPK may be the imported key associated with a Key Per I/O key 
 
 ### HEKs and SEKs {#sec:heks-seks}
 
-KMB supports a pair of epoch keys: the HEK and SEK. Both must be available, i.e. non-zeroized, in order for MEKs to be loaded.
+KMB supports a pair of epoch keys: the Hard Epoch Key (HEK) and Soft Epoch Key (SEK). Both must be available, i.e. non-zeroized, in order for MEKs to be loaded.
 
 - The **HEK** is derived from seeds held in Caliptra's fuse block, and is never visible outside of Caliptra. If the HEK is zeroized, KMB does not allow MEKs to be loaded, with edge cases detailed in @sec:hek-lifecycle.
 - The **SEK** is managed by drive firmware, and may be stored in flash. If the SEK is zeroized, drive firmware is responsible for enforcing that MEKs are not loaded.
@@ -699,7 +699,7 @@ Figures [-@fig:mek-generate] and [-@fig:mek-load] elide the process of deriving 
 
 ##### Decrypting MEKs with the MDK
 
-Random MEKs are given two layers of encryption: an inner layer using the MDK, and an outer layer using the MEK secret. The MDK is derived in ROM upon cold reset, as described in @sec:reset-behavior and illustrated in @fig:mdk-derivation.
+Random MEKs are given two layers of encryption: an inner layer using the MEK Deobfuscation Key (MDK), and an outer layer using the MEK secret. The MDK is derived in ROM upon cold reset, as described in @sec:reset-behavior and illustrated in @fig:mdk-derivation.
 
 ![Deriving the MDK](./diagrams/mdk_derivation.drawio.svg){#fig:mdk-derivation}
 
