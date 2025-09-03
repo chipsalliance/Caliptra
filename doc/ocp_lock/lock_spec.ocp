@@ -2144,8 +2144,21 @@ Table: KMB mailbox command result codes {#tbl:kmb-mailbox-codes}
 |                          |             | drive encryption engine   |
 |                          |             | to execute a command.     |
 +--------------------------+-------------+---------------------------+
-| LOCK_ENGINE_CODE + u16   | 0x4443_xxxx | Vendor-specific error     |
-|                          | ("ECxx")    | code in the low 16 bits.  |
+| LOCK_ENGINE_ERR + u8     | 0x4C45_52xx | The low byte indicates    |
+|                          | ("LERx")    | the error code and ready  |
+|                          |             | state.                    |
+|                          |             |                           |
+|                          |             | - Bit 0: RDY field of the |
+|                          |             | encryption engine's CTRL  |
+|                          |             | register.                 |
+|                          |             | - Bits [3:1]: reserved    |
+|                          |             | - Bits [7:4]: ERR field   |
+|                          |             | of the encryption         |
+|                          |             | engine's CTRL register.   |
+|                          |             | See                       |
+|                          |             | @tbl:ee-ctrl-err-codes    |
+|                          |             | for an enumeration of     |
+|                          |             | code values.              |
 +--------------------------+-------------+---------------------------+
 | LOCK_BAD_ALGORITHM       | 0x4C42_414C | Unsupported algorithm,    |
 |                          | ("LBAL")    | or algorithm does not     |
@@ -2169,10 +2182,6 @@ Table: KMB mailbox command result codes {#tbl:kmb-mailbox-codes}
 | LOCK_MEK_CHKSUM_FAIL     | 0x4C4D_4346 | Error during MEK          |
 |                          | ("LMCF")    | derivation due to         |
 |                          |             | checksum mismatch.        |
-+--------------------------+-------------+---------------------------+
-| LOCK_EE_NOT_READY        | 0x4C45_4E52 | Encryption engine was     |
-|                          | ("LENR")    | not ready when the        |
-|                          |             | command was received.     |
 +--------------------------+-------------+---------------------------+
 | LOCK_HEK_NOT_AVAILABLE   | 0x4C48_4E41 | The operation requires    |
 |                          | ("LHNA")    | the HEK, which is         |
