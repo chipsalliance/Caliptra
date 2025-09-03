@@ -611,7 +611,7 @@ KMB supports a pair of epoch keys: the HEK and SEK. Both must be available, i.e.
 
 Zeroizing either the HEK or SEK is equivalent to performing a cryptographic erase. HEK zeroization is effectively a "hard" cryptographic erase, as it is highly difficult to recover secrets from a zeroized fuse bank.
 
-The drive must only provide HEK seeds or SEKs to KMB that are cryptographically-strong random values, because otherwise it is not possible to cryptographically erase data through zeroization of those values. Note that as depicted in @fig:hek-derivation, MCU ROM may provide an all-zeroes HEK seed to KMB, provided that it correctly indicates to KMB that the HEK seed is not randomized.
+The drive must only provide HEK seeds or SEKs to KMB that are cryptographically-strong random values, because otherwise it is not possible to cryptographically erase data through zeroization of those values. Note: as depicted in @fig:hek-derivation, MCU ROM may provide an all-zeroes HEK seed to KMB, provided that it correctly indicates to KMB that the HEK seed is not randomized.
 
 #### HEK lifecycle {#sec:hek-lifecycle}
 
@@ -740,10 +740,10 @@ The checksum is not derived from the MEK directly, because Caliptra hardware res
 An example flow where the MEK checksum would be useful is as follows:
 
 1. Drive firmware is instructed to establish a new MEK.
-2. Drive firmware produces the new MEK via [DERIVE_MEK](#sec:derive-mek-cmd), as part of the sequence specified in @sec:mek-command-sequence.
+2. Drive firmware instructs KMB to produce the new MEK via [DERIVE_MEK](#sec:derive-mek-cmd), as part of the sequence specified in @sec:mek-command-sequence.
 3. Upon success, drive firmware is given the derived-MEK's checksum, which it stores in non-volatile memory.
-4. On a subsequent boot, drive firmware is asked to re-establish the MEK it derived earlier.
-5. Drive firmware read its SEK into volatile memory at startup. However, the copy of the SEK held in volatile memory has suffered corruption, and a bit has flipped.
+4. On a subsequent boot, drive firmware reads is SEK into volatile memory, and is later asked to re-establish the MEK it derived in step 2.
+5. The copy of the SEK held in volatile memory has suffered corruption since it was last read from persistent storage, and a bit has flipped.
 6. Drive firmware invokes [DERIVE_MEK](#sec:derive-mek-cmd). As part of this command, drive firmware provides the derived-MEK checksum it saved in non-volatile storage.
 7. KMB detects the checksum mismatch and refuses to program the derived MEK. Drive firmware surfaces this failure to the host.
 
@@ -2422,36 +2422,38 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 |      | sequence described in @sec:hek-sek-lifecycle.            |           |
 +------+----------------------------------------------------------+-----------+
 | 8    | MEKs shall not be programmed while the SEK or HEK are    | Yes       |
-|      | zeroized. The drive shall only provide HEK seeds or SEKs |           |
-|      | that are cryptographically-strong random values. See     |           |
+|      | zeroized. See @sec:heks-seks.                            |           |
++------+----------------------------------------------------------+-----------+
+| 9    | The drive shall only provide HEK seeds or SEKs that are  | Yes       |
+|      | cryptographically-strong random values. See              |           |
 |      | @sec:heks-seks.                                          |           |
 +------+----------------------------------------------------------+-----------+
-| 9    | Drive firmware shall implement authorization             | Yes       |
+| 10   | Drive firmware shall implement authorization             | Yes       |
 |      | controls to gate lifecycle events that have the          |           |
 |      | potential to trigger data loss. See                      |           |
 |      | @sec:authorization.                                      |           |
 +------+----------------------------------------------------------+-----------+
-| 10   | The encryption engine shall ensure that AES-XTS          | Yes       |
+| 11   | The encryption engine shall ensure that AES-XTS          | Yes       |
 |      | Key_1 and Key_2 are not equal. See                       |           |
 |      | @sec:aes-xts-considerations.                             |           |
 +------+----------------------------------------------------------+-----------+
-| 11   | KMB shall have access to the SFRs defined in             | Yes       |
+| 12   | KMB shall have access to the SFRs defined in             | Yes       |
 |      | @tbl:kmb-ee-sfrs through the address defined by          |           |
 |      | OCP_LOCK_MEK_ADDRESS. See @sec:sfrs.                     |           |
 +------+----------------------------------------------------------+-----------+
-| 12   | MCU ROM shall configure registers                        | Yes       |
+| 13   | MCU ROM shall configure registers                        | Yes       |
 |      | SS_KEY_RELEASE_BASE_ADDR_L, SS_KEY_RELEASE_BASE_ADDR_H   |           |
 |      | and SS_KEY_RELEASE_SIZE, then setting CPTRA_FUSE_WR_DONE |           |
 |      | to prevent further modifications. Additionally,          |           |
 |      | OCP_LOCK_MEK_LENGTH must be set to 40h. See @sec:sfrs.   |           |
 +------+----------------------------------------------------------+-----------+
-| 13   | Upon KMB cold reset or firmware update reset, drive      | Yes       |
+| 14   | Upon KMB cold reset or firmware update reset, drive      | Yes       |
 |      | firmware shall enumerate HPKE keypairs supported by KMB  |           |
 |      | and advertise them to the host, if drive firmware        |           |
 |      | supports a host-facing API for doing so. See             |           |
 |      | @sec:hpke-transport-encryption.                          |           |
 +------+----------------------------------------------------------+-----------+
-| 14   | Integrations shall invoke Caliptra resets according to   | Yes       |
+| 15   | Integrations shall invoke Caliptra resets according to   | Yes       |
 |      | the directives given in @sec:reset-behavior.             |           |
 +------+----------------------------------------------------------+-----------+
 
