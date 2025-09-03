@@ -211,7 +211,7 @@ To safeguard user data stored on the drive, KMB defines a set of "protection key
   - All MEKs in use by the drive can be cryptographically erased by zeroizing either the SEK or HEK. New MEKs shall not be loadable until the zeroized epoch keys are regenerated.
   - KMB reports the zeroization state of the SEK and HEK, and therefore whether the drive is in a cryptographically erased state.
   - The SEK is managed by drive firmware and shall be held in rewritable storage, e.g. in flash memory.
-  - The HEK is managed by KMB and shall be held in fuses. This provides assurance that an advanced adversary is unable to recover key material that had been in use by the drive prior to the HEK zeroization.
+  - The HEK is derived from a seed held in fuses and is only visible to KMB hardware. This provides assurance that an advanced adversary is unable to recover key material that had been in use by the drive prior to HEK seed zeroization.
 
 The EPK, DPK, and set of configured MPKs are used together to derive an MEK secret, which protects a given MEK. The MEK protection is implemented as one of two methods:
 
@@ -254,10 +254,9 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 |                   |                                      | according to the constraints given in                       |               |
 |                   |                                      | @sec:hek-sek-lifecycle.                                     |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
-| HEK               | Contributes to the derivation of the | Derived from the HEK seed and the Caliptra Stable Key       | 22            |
-|                   | EPK. See @fig:mpk-generation for one | during cold reset. Held in the Key Vault and lost on cold   |               |
-|                   | of several flows where this is done. | reset.                                                      |               |
-|                   |                                      |                                                             |               |
+| HEK               | Contributes to the derivation of the | Derived from the HEK seed and UDS during cold reset. Held   | 22            |
+|                   | EPK. See @fig:mpk-generation for one | in the Key Vault and lost on cold reset.                    |               |
+|                   | of several flows where this is done. |                                                             |               |
 |                   |                                      | Rendered irrecoverable if the HEK seed or the DICE UDS are  |               |
 |                   |                                      | zeroized from persistent storage.                           |               |
 +-------------------+--------------------------------------+-------------------------------------------------------------+---------------+
@@ -640,7 +639,7 @@ Table: HEK lifecycle states {#tbl:hek-lifecycle-states}
 +--------------------------+--------------------------------+----------------+---------------------------------------------+
 | Production               | HEK slot 0 is unprogrammed.    | N/A            | HEK_UNAVAIL_EMPTY                           |
 +--------------------------+--------------------------------+----------------+---------------------------------------------+
-| Production               | HEK slot x is randomized.      | HEK slot x     | HEK_AVAIL_PROGRAMED                         |
+| Production               | HEK slot x is randomized.      | HEK slot x     | HEK_AVAIL_PROGRAMMED                        |
 +--------------------------+--------------------------------+----------------+---------------------------------------------+
 | Production               | HEK slot x is zeroized.        | N/A            | HEK_UNAVAIL_ZEROIZED                        |
 +--------------------------+--------------------------------+----------------+---------------------------------------------+
