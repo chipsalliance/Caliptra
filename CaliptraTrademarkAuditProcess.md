@@ -28,7 +28,7 @@ The objective of the Caliptra Trademark Auditing Process is to provide guideline
 
 This document defines an auditing process to be used by vendors to determine if the vendor’s products meet the Caliptra trademark requirements. The auditing process will be captured in a “Process” document that can be used by vendors to request permission to use the Caliptra trademark. Additionally, a “Checklist” document will be provided, which can be used by vendors to determine if the vendor is complying with the Caliptra Integration Specification. 
 
-The main objective of the [Checklist and evaluation methodology document](https://ghttps://github.com/chipsalliance/Caliptra/blob/main/CaliptraChecklistAndEvaluationMethodology.md) is to ensure the secure integration of Caliptra in another device, to ensure that Caliptra can leverage its main security functionality (security services) and remain secure. The main security functionality of Caliptra as a silicon RoT, when integrated, is to:
+The main objective of the [Checklist and evaluation methodology document](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraChecklistAndEvaluationMethodology.md) is to ensure the secure integration of Caliptra in another device, to ensure that Caliptra can leverage its main security functionality (security services) and remain secure. The main security functionality of Caliptra as a silicon RoT, when integrated, is to:
 
 * Cryptographically measure its own **code** and **configuration**   
 * Sign these measurements with a unique **attestation key**   
