@@ -104,27 +104,47 @@ references:
         affiliation: "Cloudflare"
     issued:
       year: 2025
-      month: 2
-    url: "https://datatracker.ietf.org/doc/html/draft-ietf-lamps-dilithium-certificates"
+      month: 6
+    url: "https://www.ietf.org/archive/id/draft-ietf-lamps-dilithium-certificates-12.html"
   - id: "draft-ietf-hpke-pq"
     title: "Post-Quantum and Post-Quantum/Traditional Hybrid Algorithms for HPKE"
     author:
       - family: "Barnes"
         given: "R."
+        affiliation: "Cisco"
     issued:
       year: 2025
       month: 6
-    url: "https://datatracker.ietf.org/doc/html/draft-ietf-hpke-pq"
+    url: "https://www.ietf.org/archive/id/draft-ietf-hpke-pq-01.html"
+  - id: "draft-irtf-cfrg-concrete-hybrid-kems"
+    title: "Concrete Hybrid PQ/T Key Encapsulation Mechanisms"
+    author:
+      - family: "Connolly"
+        given: "D."
+        affiliation: "SandboxAQ"
+      - family: "Barnes"
+        given: "R."
+        affiliation: "Cisco"
+    issued:
+      year: 2025
+      month: 7
+    url: "https://www.ietf.org/archive/id/draft-irtf-cfrg-concrete-hybrid-kems-00.html"
   - id: "draft-irtf-cfrg-hybrid-kems"
     title: "Hybrid PQ/T Key Encapsulation Mechanisms"
     author:
       - family: "Connolly"
         given: "D."
         affiliation: "SandboxAQ"
+      - family: "Barnes"
+        given: "R."
+        affiliation: "Cisco"
+      - family: "Grubbs"
+        given: "P."
+        affiliation: "University of Michigan"
     issued:
       year: 2025
-      month: 2
-    url: "https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hybrid-kems"
+      month: 7
+    url: "https://www.ietf.org/archive/id/draft-irtf-cfrg-hybrid-kems-05.html"
   - id: "caliptra-2.0-hw-spec"
     title: "Caliptra 2.0 Hardware Specification"
     publisher: "CHIPS Alliance"
