@@ -215,7 +215,7 @@ To safeguard user data stored on the drive, KMB defines a set of "protection key
 
 The EPK, DPK, and set of configured MPKs are used together to derive an MEK secret, which protects a given MEK. The MEK protection is implemented as one of two methods:
 
-- **MEK encryption** - the drive obtains a random MEK from KMB, encrypted by two keys: the MEK secret and the **MEK Deobfuscation Key (MDK)**, and is allowed to load that encrypted MEK into the encryption engine via KMB. This supports Opal or Enterprise use-cases.
+- **MEK encryption** - the drive obtains a random MEK from KMB, encrypted by two keys: the MEK secret and the **MEK Deobfuscation Key (MDK)**, and is allowed to load that wrapped MEK into the encryption engine via KMB. This supports Opal or Enterprise use-cases.
 
 - **MEK derivation** - the drive instructs KMB to derive an MEK from the MEK secret and load the MEK into the encryption engine. This may support either Opal, Enterprise, or Key Per I/O use-cases.
 
@@ -384,11 +384,9 @@ Table: Firmware-managed CSPs {#tbl:fw-managed-csps}
 | Random MEKs (upon    | Caliptra does not presently support a data path between its DRBG and its |
 | initial generation)  | AES engine. Therefore, when a random MEK is first generated, KMB         |
 |                      | firmware reads the random MEK from the DRBG, and then encrypts it with   |
-|                      | the MDK (inner layer) and MEK secret (outer layer). Caliptra's AES       |
-|                      | engine ensures that the results of any AES-ECB decryption operation      |
-|                      | using the MDK must be routed to the Key Vault. This ensures that after a |
-|                      | random MEK has first been generated and encrypted, the plaintext MEK     |
-|                      | will only be visible to the Key Vault.                                   |
+|                      | the MDK (inner layer) and MEK secret (outer layer). See @sec:mdk for     |
+|                      | additional details on the motivation for the inner layer of MDK          |
+|                      | encryption.                                                              |
 +----------------------+--------------------------------------------------------------------------+
 
 All keys held by KMB firmware are protected by Caliptra, and cannot be viewed by drive firmware.
@@ -399,7 +397,7 @@ In this specification, several flows involve deriving keys via a key derivation 
 
 $K_{OUT}$ = HMAC512($K_{IN}$, 0x01 || Label [ || 0x00 || Context])
 
-There is one exception to this in @sec:derive-mek, where CMAC instead of HMAC is used as the PRF for a particular instance of KDF. See @sec:mek-seed-decryption for details.
+There is one exception to this in @sec:derive-mek, where CMAC instead of HMAC is used as the PRF for a particular instance of KDF. See @sec:mek-seed-deobfuscation for details.
 
 #### Key Extraction
 
@@ -699,25 +697,27 @@ KMB allows an MEK to be bound to zero MPKs, which supports TCG flows that do not
 
 ![Establishing an MEK bound to zero MPKs](./diagrams/mek_secret_derivation_no_mpks.drawio.svg){#fig:mek-secret-derivation-no-mpks}
 
+##### Protecting MEKs with the MDK {#sec:mdk}
+
+Randomly-generated MEKs are encrypted at rest with AES-GCM, as illustrated in @sec:generate-load-random-mek. During initial MEK encryption, Caliptra's AES engine accepts the MEK plaintext from firmware and returns the ciphertext back to firmware. Later, during MEK decryption, Caliptra's AES engine accepts the MEK ciphertext from firmware and writes the decrypted plaintext to the Key Vault. From Caliptra hardware's perspective, AES-GCM encryption and decryption are the same operation. Therefore, if the MEK were protected with only a single layer of AES-GCM encryption, compromised KMB firmware could instruct Caliptra's AES engine to treat decryption like encryption and return the decrypted plaintext to firmware, trivially disclosing the MEK.
+
+To mitigate this, Caliptra hardware enforces that before an MEK can be loaded into the Key Vault, it must first pass through an AES-ECB decryption operation keyed using the MEK Deobfuscation Key (MDK). The MDK is derived in ROM upon cold reset, as described in @sec:reset-behavior and illustrated in @fig:mdk-derivation.
+
+Unlike with AES-GCM, Caliptra's AES engine can differentiate between encryption and decryption in AES-ECB mode. Hardware enforces that for any AES-ECB decryption operation using the Key Vault slot that holds the MDK, the result is always routed to the Key Vault. The MDK encryption layer therefore ensures that the plaintext MEK is never visible to KMB firmware when it is being decrypted.
+
+By deriving the MDK in ROM based on secrets that are not available to runtime firmware, KMB ensures that compromised runtime firmware cannot derive the MDK into a separate Key Vault slot, which could have looser protections for whether firmware can see the results of an AES-ECB decryption operation.
+
+![Deriving the MDK](./diagrams/mdk_derivation.drawio.svg){#fig:mdk-derivation}
+
 #### Generating and loading a random MEK {#sec:generate-load-random-mek}
 
 Figures [-@fig:mek-generate] and [-@fig:mek-load] elide the process of deriving the MEK secret, as those details are captured in @fig:mek-secret-derivation. When an MEK is generated or loaded, the inputs given in @fig:mek-secret-derivation are provided by drive firmware so that KMB may derive the MEK secret.
 
+Randomly-generated MEKs are given two layers of at-rest encryption: an inner AES-ECB layer using the MDK, and an outer AES-GCM layer using the MEK secret. The wrapped MEK's integrity tag is associated with the outer layer. The inner AES-ECB layer does not have its own MAC. Therefore the extra layer of encryption does not modify the size of the wrapped MEK. See @sec:wrapped-key for details on the format and layout of the wrapped MEK.
+
 ![Generating an MEK](./diagrams/mek_generate.drawio.svg){#fig:mek-generate}
 
 ![Loading an MEK](./diagrams/mek_load.drawio.svg){#fig:mek-load}
-
-##### Decrypting double-encrypted MEKs with the MDK
-
-Random MEKs are given two layers of encryption: an inner layer using the MEK Deobfuscation Key (MDK), and an outer layer using the MEK secret. The MDK is derived in ROM upon cold reset, as described in @sec:reset-behavior and illustrated in @fig:mdk-derivation.
-
-![Deriving the MDK](./diagrams/mdk_derivation.drawio.svg){#fig:mdk-derivation}
-
-The motivation for utilizing the MDK is this: AES-GCM encryption and decryption are the same operation according to Caliptra hardware. Therefore, if AES-GCM were the only layer of encryption, Caliptra hardware could not enforce that the decrypted plaintext MEK be only ever sent to the Key Vault. Compromised KMB firmware could instruct Caliptra hardware to route the decrypted MEK plaintext back to Caliptra SRAM, revealing the MEK.
-
-To mitigate this risk, KMB adds an inner layer of encryption, using AES-ECB, with the MDK held in a particular Key Vault slot. Caliptra hardware enforces that the results of AES-ECB decryption using this Key Vault slot are always routed to the Key Vault, preventing compromised KMB firmware from obtaining the MEK.
-
-The MDK is derived in ROM using secrets that are not available to runtime firmware. This ensures that compromised runtime firmware cannot re-derive the MDK into a separate Key Vault slot, which would have looser protections for whether firmware can see the results of an AES-ECB decryption operation.
 
 #### Deriving an MEK {#sec:derive-mek}
 
@@ -725,12 +725,12 @@ The MDK is derived in ROM using secrets that are not available to runtime firmwa
 
 ![Deriving an MEK](./diagrams/mek_derive.drawio.svg){#fig:mek-derive}
 
-##### Decrypting MEK seeds with the MDK {#sec:mek-seed-decryption}
+##### Deobfuscating MEK seeds with the MDK {#sec:mek-seed-deobfuscation}
 
 The MEK seed is calculated via CMAC instead of HMAC, and then "decrypted" via the MDK, for the following reasons:
 
-- The only way to populate the Key Vault slot that holds the MEK is via the AES engine operating in ECB-decrypt mode (where the key is taken from Key Vault slot 16, which holds the MDK).
-- The AES engine does not allow messages to be read from the Key Vault. Therefore we must derive a key from the MEK secret that is readable by firmware, so firmware can pass it as an AES message to compute the MEK.
+- As described in @sec:mdk, the only way to populate the Key Vault slot that holds the MEK is via the AES engine operating in ECB-decrypt mode (where the key is taken from the Key Vault slot that holds the MDK).
+- The AES engine does not allow messages to be read from the Key Vault. Therefore KMB must derive a key from the MEK secret that is readable by firmware, so firmware can pass it as an AES message to compute the MEK.
 - Since the MEK secret is in the Key Vault, the result of any HMAC operations would be required to go back to the Key Vault, and not be available to firmware.
 - The CMAC operation, by contrast, utilizes the AES engine in a manner that allows the results to be readable by firmware. Therefore CMAC is used to compute the MEK seed from the MEK secret.
 - The resulting MEK seed is then passed as an AES message to the AES engine, which uses it in a decryption operation to produce the derived MEK.
@@ -755,7 +755,7 @@ An example flow where the MEK checksum would be useful is as follows:
 
 In this example, if the user had proceeded to write data to the disk using the MEK derived in step 6, that data would not be recoverable on subsequent boots unless the SEK experienced the exact same bit flip pattern as in step 5. The derived-MEK checksum allows the drive to detect this scenario and alert the user. Note that there are other possible mechanisms for mitigating this risk. The use of derived-MEK checksums is optional.
 
-Note: a checksum is not produced for encrypted MEKs. For encrypted MEKs, any change in the inputs which produce the MEK secret would result in an error during AES-GCM decryption of the provided MEK.
+Note: a checksum is not produced for wrapped MEKs. For wrapped MEKs, any change in the inputs which produce the MEK secret would result in an error during AES-GCM decryption of the provided MEK.
 
 #### MEK command sequence {#sec:mek-command-sequence}
 
