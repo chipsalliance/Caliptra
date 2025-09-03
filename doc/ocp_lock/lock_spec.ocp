@@ -803,6 +803,8 @@ KMB exposes commands that allows drive firmware to manage the lifecycle of MPKs,
 
 This section defines expected behavior for KMB across each Caliptra reset type, as defined in [@{caliptra-2.0-integration-spec}].
 
+Table: Behavior on Caliptra reset types {#tbl:caliptra-reset-types}
+
 +------------------------+------------------------------------------------------------+
 | Caliptra reset type    | Behavior                                                   |
 +========================+============================================================+
@@ -1148,7 +1150,7 @@ By exposing this command in ROM, Caliptra de-privileges runtime compromise of dr
 
 Command Code: 0x5248_4D54 ("RHMT")
 
-Table: REPORT_HEK_METADATA input arguments
+Table: REPORT_HEK_METADATA input arguments {#tbl:report-hek-metadata-input-args}
 
 +-------------+------+--------------------------------------+
 | Name        | Type | Description                          |
@@ -1222,7 +1224,7 @@ Table: Conditions for setting seed_state and active_slot {#tbl:hek-metadata-cond
 | programmed.          |                            |                  |
 +----------------------+----------------------------+------------------+
 
-Table: REPORT_HEK_METADATA output arguments
+Table: REPORT_HEK_METADATA output arguments {#tbl:report-hek-metadata-output-args}
 
 +---------------+--------+--------------------------------------------------------+
 | Name          | Type   | Description                                            |
@@ -1241,7 +1243,7 @@ Allows drive firmware to determine if the encryption engine is ready to process 
 
 Command Code: 0x4753_5441 ("GSTA")
 
-Table: GET_STATUS input arguments
+Table: GET_STATUS input arguments {#tbl:get-status-input-args}
 
 +--------+------+--------------------------------------------------------------+
 | Name   | Type | Description                                                  |
@@ -1249,7 +1251,7 @@ Table: GET_STATUS input arguments
 | chksum | u32  | Checksum over other input arguments, computed by the caller. |
 +--------+------+--------------------------------------------------------------+
 
-Table: GET_STATUS output arguments
+Table: GET_STATUS output arguments {#tbl:get-status-output-args}
 
 +---------------+--------+--------------------------------------------------------+
 | Name          | Type   | Description                                            |
@@ -1271,7 +1273,7 @@ Allows drive firmware to determine the types of algorithms supported by KMB for 
 
 Command Code: 0x4741_4C47 ("GALG")
 
-Table: GET_ALGORITHMS input arguments
+Table: GET_ALGORITHMS input arguments {#tbl:get-algorithms-input-args}
 
 +--------+------+--------------------------------------------------------------+
 | Name   | Type | Description                                                  |
@@ -1325,7 +1327,7 @@ This command unloads all MEKs in the encryption engine.
 
 Command Code: 0x434C_4B43 ("CLKC")
 
-Table: CLEAR_KEY_CACHE input arguments
+Table: CLEAR_KEY_CACHE input arguments {#tbl:clear-key-cache-input-args}
 
 +-------------+------+---------------------------------------------------------+
 | Name        | Type | Description                                             |
@@ -1339,7 +1341,7 @@ Table: CLEAR_KEY_CACHE input arguments
 |             |      | complete.                                               |
 +-------------+------+---------------------------------------------------------+
 
-Table: CLEAR_KEY_CACHE output arguments
+Table: CLEAR_KEY_CACHE output arguments {#tbl:clear-key-cache-output-args}
 
 +-------------+------+--------------------------------------------------------+
 | Name        | Type | Description                                            |
@@ -1358,7 +1360,7 @@ This command returns a list of all currently-active HPKE handles for resources h
 
 Command Code: 0x4548_444C ("EHDL")
 
-Table: ENUMERATE_HPKE_HANDLES input arguments
+Table: ENUMERATE_HPKE_HANDLES input arguments {#tbl:enumerate-hpke-handles-input-args}
 
 +----------+------+--------------------------------------+
 | Name     | Type | Description                          |
@@ -1369,7 +1371,7 @@ Table: ENUMERATE_HPKE_HANDLES input arguments
 | reserved | u32  | Reserved.                            |
 +----------+------+--------------------------------------+
 
-Table: ENUMERATE_HPKE_HANDLES output arguments
+Table: ENUMERATE_HPKE_HANDLES output arguments {#tbl:enumerate-hpke-handles-output-args}
 
 +-------------------+---------------+---------------------------------------------+
 | Name              | Type          | Description                                 |
@@ -1388,7 +1390,7 @@ Table: ENUMERATE_HPKE_HANDLES output arguments
 |                   |               | tuples.                                     |
 +-------------------+---------------+---------------------------------------------+
 
-Table: HpkeHandle contents
+Table: HpkeHandle contents {#tbl:hpke-handle-contents}
 
 +----------------+------+---------------------------------------------+
 | Name           | Type | Description                                 |
@@ -1406,7 +1408,7 @@ This command generates a signed certificate for the specified HPKE public key us
 
 Command Code: 0x4548_504B ("EHPK")
 
-Table: ENDORSE_HPKE_PUB_KEY input arguments
+Table: ENDORSE_HPKE_PUB_KEY input arguments {#tbl:endorse-hpke-pub-key-input-args}
 
 +-----------------------+------+------------------------------------------------------+
 | Name                  | Type | Description                                          |
@@ -1422,7 +1424,7 @@ Table: ENDORSE_HPKE_PUB_KEY input arguments
 |                       |      | return public key.                                   |
 +-----------------------+------+------------------------------------------------------+
 
-Table: ENDORSE_HPKE_PUB_KEY output arguments
+Table: ENDORSE_HPKE_PUB_KEY output arguments {#tbl:endorse-hpke-pub-key-output-args}
 
 +-----------------+---------------------+------------------------------------------------+
 | Name            | Type                | Description                                    |
@@ -1452,7 +1454,7 @@ This command rotates the HPKE keypair indicated by the specified handle and stor
 
 Command Code: 0x5248_504B ("RHPK")
 
-Table: ROTATE_HPKE_KEY input arguments
+Table: ROTATE_HPKE_KEY input arguments {#tbl:rotate-hpke-key-input-args}
 
 +-------------+------+------------------------------------------------------+
 | Name        | Type | Description                                          |
@@ -1465,7 +1467,7 @@ Table: ROTATE_HPKE_KEY input arguments
 | hpke_handle | u32  | Handle for old HPKE keypair held in KMB memory.       |
 +-------------+------+------------------------------------------------------+
 
-Table: ROTATE_HPKE_KEY output arguments
+Table: ROTATE_HPKE_KEY output arguments {#tbl:rotate-hpke-key-output-args}
 
 +-------------+------+-------------------------------------------------+
 | Name        | Type | Description                                     |
@@ -1487,7 +1489,7 @@ This command unwraps the specified access key, generates a random MPK, then encr
 
 Command Code: 0x474D_504B ("GMPK")
 
-Table: GENERATE_MPK input arguments
+Table: GENERATE_MPK input arguments {#tbl:generate-mpk-input-args}
 
 +-------------------+-------------------------+--------------------------------------+
 | Name              | Type                    | Description                          |
@@ -1507,7 +1509,7 @@ Table: GENERATE_MPK input arguments
 |                   | #sec:sealed-access-key) |                                      |
 +-------------------+-------------------------+--------------------------------------+
 
-Table: GENERATE_MPK output arguments
+Table: GENERATE_MPK output arguments {#tbl:generate-mpk-output-args}
 
 +---------------+-------------------+------------------------------------------------+
 | Name          | Type              | Description                                    |
@@ -1532,7 +1534,7 @@ The drive stores the returned Locked MPK and zeroizes the old Locked MPK.
 
 Command Code: 0x5245_5750 ("REWP")
 
-Table: REWRAP_MPK input arguments
+Table: REWRAP_MPK input arguments {#tbl:rewrap-mpk-input-args}
 
 +--------------------+-------------------------+---------------------------------+
 | Name               | Type                    | Description                     |
@@ -1563,7 +1565,7 @@ Table: REWRAP_MPK input arguments
 |                    |                         | details.                        |
 +--------------------+-------------------------+---------------------------------+
 
-Table: REWRAP_MPK output arguments
+Table: REWRAP_MPK output arguments {#tbl:rewrap-mpk-output-args}
 
 +----------------+-------------------+-------------------------------------------+
 | Name           | Type              | Description                               |
@@ -1586,7 +1588,7 @@ This command decrypts \`sealed_access_key\`, then uses it to derive a Locked MPK
 
 Command Code: 0x524D_504B ("RMPK")
 
-Table: ENABLE_MPK input arguments
+Table: ENABLE_MPK input arguments {#tbl:enable-mpk-input-args}
 
 +-------------------+-------------------------+------------------------------+
 | Name              | Type                    | Description                  |
@@ -1606,7 +1608,7 @@ Table: ENABLE_MPK input arguments
 |                   | #sec:wrapped-key)       | access key.                  |
 +-------------------+-------------------------+------------------------------+
 
-Table: ENABLE_MPK output arguments
+Table: ENABLE_MPK output arguments {#tbl:enable-mpk-output-args}
 
 +-------------+-------------------+-------------------------------------------+
 | Name        | Type              | Description                               |
@@ -1629,7 +1631,7 @@ This command shall initialize the MEK secret seed as described in @fig:mek-secre
 
 Command Code: 0X494D_0B53 ("IMKS")
 
-Table: INITIALIZE_MEK_SECRET input arguments
+Table: INITIALIZE_MEK_SECRET input arguments {#tbl:initialize-mek-secret-input-args}
 
 +----------+--------+--------------------------------------+
 | Name     | Type   | Description                          |
@@ -1644,7 +1646,7 @@ Table: INITIALIZE_MEK_SECRET input arguments
 | dpk      | u8[32] | Data Protection Key.                 |
 +----------+--------+--------------------------------------+
 
-Table: INITIALIZE_MEK_SECRET output arguments
+Table: INITIALIZE_MEK_SECRET output arguments {#tbl:initialize-mek-secret-output-args}
 
 +-------------+------+-------------------------------------------+
 | Name        | Type | Description                               |
@@ -1668,7 +1670,7 @@ The MEK secret seed must already be initialized by [INITIALIZE_MEK_SECRET](#sec:
 
 Command Code: 0x4D4D_504B ("MMPK")
 
-Table: MIX_MPK input arguments
+Table: MIX_MPK input arguments {#tbl:mix-mpk-input-args}
 
 +-------------+-------------------+--------------------------------------+
 | Name        | Type              | Description                          |
@@ -1682,7 +1684,7 @@ Table: MIX_MPK input arguments
 |             | #sec:wrapped-key) |                                      |
 +-------------+-------------------+--------------------------------------+
 
-Table: MIX_MPK output arguments
+Table: MIX_MPK output arguments {#tbl:mix-mpk-output-args}
 
 +-------------+------+-------------------------------------------+
 | Name        | Type | Description                               |
@@ -1702,7 +1704,7 @@ This command is used by the host to check the input access key is associated wit
 
 Command Code: 0x5441_434B ("TACK")
 
-Table: TEST_ACCESS_KEY input arguments
+Table: TEST_ACCESS_KEY input arguments {#tbl:test-access-key-input-args}
 
 +-------------------+-------------------------+---------------------------------------+
 | Name              | Type                    | Description                           |
@@ -1723,7 +1725,7 @@ Table: TEST_ACCESS_KEY input arguments
 |                   | #sec:sealed-access-key) |                                       |
 +-------------------+-------------------------+---------------------------------------+
 
-Table: TEST_ACCESS_KEY output arguments
+Table: TEST_ACCESS_KEY output arguments {#tbl:test-access-key-output-args}
 
 +-------------+--------+------------------------------------------------------+
 | Name        | Type   | Description                                          |
@@ -1746,7 +1748,7 @@ This command generates a random 512-bit MEK and encrypts it using the MEK secret
 
 Command Code: 0x474D_454B ("GMEK")
 
-Table: GENERATE_MEK input arguments
+Table: GENERATE_MEK input arguments {#tbl:generate-mek-input-args}
 
 +----------+--------+-----------------------------------------------+
 | Name     | Type   | Description                                   |
@@ -1757,7 +1759,7 @@ Table: GENERATE_MEK input arguments
 | reserved | u32    | Reserved.                                     |
 +----------+--------+-----------------------------------------------+
 
-Table: GENERATE_MEK output arguments
+Table: GENERATE_MEK output arguments {#tbl:generate-mek-output-args}
 
 +-------------+-------------------+-------------------------------------------+
 | Name        | Type              | Description                               |
@@ -1784,7 +1786,7 @@ The decrypted MEK, specified metadata, and aux_metadata are loaded into the encr
 
 Command Code: 0x4C4D_454B ("LMEK")
 
-Table: LOAD_MEK input arguments
+Table: LOAD_MEK input arguments {#tbl:load-mek-input-args}
 
 +--------------+-------------------+--------------------------------------------+
 | Name         | Type              | Description                                |
@@ -1807,7 +1809,7 @@ Table: LOAD_MEK input arguments
 |              |                   | engine to complete.                        |
 +--------------+-------------------+--------------------------------------------+
 
-Table: LOAD_MEK output arguments
+Table: LOAD_MEK output arguments {#tbl:load-mek-output-args}
 
 +-------------+------+-------------------------------------------+
 | Name        | Type | Description                               |
@@ -1831,7 +1833,7 @@ The derived MEK, specified metadata, and aux_metadata are loaded into the encryp
 
 Command Code: 0x444D_454B ("DMEK")
 
-Table: DERIVE_MEK input arguments
+Table: DERIVE_MEK input arguments {#tbl:derive-mek-input-args}
 
 +--------------+--------+--------------------------------------------+
 | Name         | Type   | Description                                |
@@ -1855,7 +1857,7 @@ Table: DERIVE_MEK input arguments
 |              |        | engine to complete.                        |
 +--------------+--------+--------------------------------------------+
 
-Table: DERIVE_MEK output arguments
+Table: DERIVE_MEK output arguments {#tbl:derive-mek-output-args}
 
 +--------------+--------+-------------------------------------------+
 | Name         | Type   | Description                               |
@@ -1877,7 +1879,7 @@ This command causes the MEK associated to the specified metadata to be unloaded 
 
 Command Code: 0x554D_454B ("UMEK")
 
-Table: UNLOAD_MEK input arguments
+Table: UNLOAD_MEK input arguments {#tbl:unload-mek-input-args}
 
 +-------------+--------+-----------------------------------------------+
 | Name        | Type   | Description                                   |
@@ -1894,7 +1896,7 @@ Table: UNLOAD_MEK input arguments
 |             |        | engine to complete.                           |
 +-------------+--------+-----------------------------------------------+
 
-Table: UNLOAD_MEK output arguments
+Table: UNLOAD_MEK output arguments {#tbl:unload-mek-output-args}
 
 +-------------+------+-------------------------------------------+
 | Name        | Type | Description                               |
@@ -1914,7 +1916,7 @@ This command reports the state of the epoch keys. The drive indicates the state 
 
 Command Code: 0x5245_4B53 ("REKS")
 
-Table: REPORT_EPOCH_KEY_STATE input arguments
+Table: REPORT_EPOCH_KEY_STATE input arguments {#tbl:report-epoch-key-state-input-args}
 
 +-----------+--------+---------------------------------------+
 | Name      | Type   | Description                           |
@@ -1932,7 +1934,7 @@ Table: REPORT_EPOCH_KEY_STATE input arguments
 |           |        | signed IETF EAT.                      |
 +-----------+--------+---------------------------------------+
 
-Table: REPORT_EPOCH_KEY_STATE output arguments {#tbl:report-epoch-key-state-resp}
+Table: REPORT_EPOCH_KEY_STATE output arguments {#tbl:report-epoch-key-state-output-args}
 
 +------------------------+-------------+-------------------------------------------+
 | Name                   | Type        | Description                               |
@@ -2039,7 +2041,7 @@ See @fig:hek-sek-rotation for more details about the transitions between HEK sta
 
 ##### Calculation of hek_erasures_remaining {#sec:hek-erasures-remaining}
 
-The \`hek_erasures_remaining\` field in [REPORT_EPOCH_KEY_STATE](#tbl:report-epoch-key-state-resp) is based on the following values from [REPORT_HEK_METADATA](#sec:report-hek-metadata-cmd):
+The \`hek_erasures_remaining\` field in [REPORT_EPOCH_KEY_STATE](#tbl:report-epoch-key-state-output-args) is based on the following values from [REPORT_HEK_METADATA](#sec:report-hek-metadata-cmd):
 
 - total_slots
 - active_slot
@@ -2101,7 +2103,7 @@ Table: SealedAccessKey contents {#tbl:sealed-access-key-contents}
 
 AES-256-GCM is used for all wrapping and unwrapping.
 
-Table: WrappedKey contents
+Table: WrappedKey contents {#tbl:wrapped-key-contents}
 
 +--------------+------------------+--------------------------------------------+
 | Name         | Type             | Description                                |
@@ -2133,7 +2135,7 @@ The AAD for the encrypted message is constructed as \`key_type\` || \`salt\` || 
 
 Variants of WrappedKey will be used to reduce duplicating information in commands. The following names will be used for WrappedKeys of a specific \`key_type\` and \`key_len\`:
 
-Table: WrappedKey variants
+Table: WrappedKey variants {#tbl:wrapped-key-variants}
 
 +------------+-------------+---------+
 | Name       | key_type    | key_len |
