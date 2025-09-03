@@ -742,7 +742,7 @@ An example flow where the MEK checksum would be useful is as follows:
 1. Drive firmware is instructed to establish a new MEK.
 2. Drive firmware instructs KMB to produce the new MEK via [DERIVE_MEK](#sec:derive-mek-cmd), as part of the sequence specified in @sec:mek-command-sequence.
 3. Upon success, drive firmware is given the derived-MEK's checksum, which it stores in non-volatile memory.
-4. On a subsequent boot, drive firmware reads is SEK into volatile memory, and is later asked to re-establish the MEK it derived in step 2.
+4. On a subsequent boot, drive firmware reads the SEK into volatile memory, and is later asked to re-establish the MEK it derived in step 2.
 5. The copy of the SEK held in volatile memory has suffered corruption since it was last read from persistent storage, and a bit has flipped.
 6. Drive firmware invokes [DERIVE_MEK](#sec:derive-mek-cmd). As part of this command, drive firmware provides the derived-MEK checksum it saved in non-volatile storage.
 7. KMB detects the checksum mismatch and refuses to program the derived MEK. Drive firmware surfaces this failure to the host.
