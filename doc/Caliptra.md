@@ -1569,7 +1569,30 @@ Please refer to Caliptra subsystem Hardware specification.
 ### De-assertion
 - The `image_activated` signal must deassert when the `RECOVERY_CTRL` register byte 2 has value `0x0` (indicating image activation is cleared).
 
-## Platform component requirements for recovery support 
+# AXI Streaming Boot Sequence
+
+The I3C core alternatively allows streaming data or firmware by MCU over the AXI bus of the I3C module which is repurposed as a streaming boot interface while disabling I3C usage.
+The Caliptra MCU RISC-V core is responsible for driving the data copied from an external memory (e.g. QSPI interface) to the streaming boot FIFOs.
+The ROM running on the MCU core monitors the streaming boot block registers and performs the streaming boot flow.
+
+During the boot procedure the ROM will have to follow the following procedure:
+
+1. Set the I3C block to the "direct AXI" mode
+2. Poll the `DEVICE_STATUS` register and wait for the streaming boot to be enabled by the Caliptra core
+3. Read the `RECOVERY_STATUS` register and check if the streaming boot flow started
+4. Write to the `RECOVERY_CONTROL` register to set the streaming boot image configuration
+5. Write to the `INDIRECT_FIFO_CTRL` register to set the streaming boot image size
+6. Push the image/data to the streaming boot interface FIFOs:
+   1. Read the `INDIRECT_FIFO_STATUS` register to determine remaining space in the indirect FIFO
+   2. If the indirect FIFO is not full, write a chunk of data to the `TX_DATA_PORT` register
+   3. The above steps should be repeated until the whole streaming boot image is written to the FIFO
+7. Activate the new image setting `RECOVERY_CTRL` register by writing `0xf00` to the `REC_INTF_REG_W1C_ACCESS` register
+8. Read the `RECOVERY_STATUS` register to ensure the image has been activated
+
+The streaming boot image will be written in chunks with length equal to or less than `Max transfer size` defined in the `INDIRECT_FIFO_STATUS` register.
+Once the last data chunk is written to the FIFO, the Caliptra MCU ROM will write to the `RECOVERY_CTRL` CSR in the Streaming Boot register file indicating the transfer is complete.
+
+## Platform component requirements for recovery support
 
 1. The BMC, or a similar platform, should not send payload to streaming boot interface (/I3C target) device if `RECOVERY_CTRL` register has byte 2 indicating Image Activated. BMC must wait to clear the byte 2. (Streaming boot interface is responsible for clearing this byte by writing 1).
 2. The BMC, or a similar platform, sends payload to I3C target device in chunks of 256 bytes (header (4B) + FW bytes(256B) as I3C target transfer) only, unless it is the last write for the image. Before sending the payload, it reads FIFO empty status from `INDIRECT_FIFO_STATUS` register.
