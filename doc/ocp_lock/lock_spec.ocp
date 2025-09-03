@@ -1011,15 +1011,17 @@ Table: Offset OCP_LOCK_MEK_ADDRESS + 80h: CTRL – Control {#tbl:ee-ctrl-sfr}
 
 Table: CTRL error codes {#tbl:ee-ctrl-err-codes}
 
-+----------+--------------------+
-| Value    | Description        |
-+==========+====================+
-| 0h       | Command successful |
-+----------+--------------------+
-| 1h to 3h | Reserved           |
-+----------+--------------------+
-| 4h to Fh | Vendor Specific    |
-+----------+--------------------+
++----------+----------------------+
+| Value    | Description          |
++==========+======================+
+| 0h       | Command successful   |
++----------+----------------------+
+| 1h       | Invalid command code |
++----------+----------------------+
+| 2h to 3h | Reserved             |
++----------+----------------------+
+| 4h to Fh | Vendor Specific      |
++----------+----------------------+
 
 Table: CTRL command codes {#tbl:ee-ctrl-cmd-codes}
 
