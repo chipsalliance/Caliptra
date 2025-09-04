@@ -33,6 +33,10 @@ bibliography: bibliography.yaml
 |                |         | Illustrate usage of the internal    |
 |                |         | DRBG for drive-firmware-specific    |
 |                |         | use-cases.                          |
+|                |         |                                     |
+|                |         | Deprecate the "preconditioned key   |
+|                |         | extract" construct, and instead     |
+|                |         | combine keys using SP 800-108 KDFs. |
 +----------------+---------+-------------------------------------+
 
 \currenttemplateversion
@@ -424,31 +428,6 @@ In this specification, several flows involve deriving keys via a key derivation 
 $K_{OUT}$ = HMAC512($K_{IN}$, 0x01 || Label [ || 0x00 || Context])
 
 There is one exception to this in @sec:derive-mek, where CMAC instead of HMAC is used as the PRF for a particular instance of KDF. See @sec:mek-seed-deobfuscation for details.
-
-#### Key Extraction
-
-In this specification, several flows involve combining together multiple symmetric keys. NIST SP 800-133 [@{sp800-133r2}] section 6.3 provides a number of FIPS-approved methods for combining keys together; this specification leverages the HMAC-based key-extraction process detailed there.
-
-The keys being combined in this specification generally have different scopes and lifespans. For example, the HEK and SEK are long-lived per-drive keys, while the DPK is unique to each MEK.
-
-Section 6.3 of [@{sp800-133r2}] stipulates that each component key "**shall not** be used for any purpose other than the computation of a specific symmetric key K (i.e., a given component key **shall not** be used to generate more than one key)."
-
-A strict reading of this requirement would preclude, for example, combining the same EPK with different DPKs to produce different MEK secrets. Therefore, this specification defines the "Preconditioned Key Extract" operation, illustrated in @fig:preconditioned-key-extract.
-
-![Preconditioned Key Extract](./diagrams/preconditioned_key_extract.drawio.svg){#fig:preconditioned-key-extract}
-
-The input key is preconditioned using a unique identifier derived from the salt, before being combined with the salt using the SP 800-133 key-extraction process. Therefore each preconditioned key fed to the final HMAC step is unique to the given key mixing operation, and will not be re-used with a different salt to produce a different output key.
-
-Subsequent diagrams will use this operation when combining keys with different scopes or lifetimes.
-
-The design of this operation is informed by a number of constraints on Caliptra hardware. Keys in the Key Vault support the following symmetric cryptographic operations:
-
-  - Use as an AES key
-  - Use as an HMAC key or message (where the HMAC result is never revealed to firmware)
-
-Notably, if a key in the Key Vault is used as an HMAC message, it constitutes the entirety of the HMAC message. No concatenation with other data is possible. Therefore a key in the Key Vault cannot be used as e.g. an SP 800-108 KDF's context string, which must be concatenated with other values such as the block counter.
-
-The AES engine is used to compute the salt checksum because that is the only supported path for extracting an identifier from a key in Key Vault.
 
 #### Preconditioned AES {#sec:preconditioned-aes}
 
