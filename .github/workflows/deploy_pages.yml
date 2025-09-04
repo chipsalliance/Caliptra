@@ -59,7 +59,7 @@ jobs:
           # Ensure gh-pages is writable, since it was created via jekyll-build-pages' container.
           sudo chown -R $(id -u):$(id -g) gh-pages
           mkdir -p gh-pages/ocp-lock/specification/
-          cp doc/ocp_lock/OCP_LOCK_Specification_*.pdf gh-pages/ocp-lock/specification/
+          cp doc/ocp_lock/releases/OCP_LOCK_Specification_*.pdf gh-pages/ocp-lock/specification/
       - name: Upload artifacts for index
         uses: actions/upload-artifact@v4
         with:
