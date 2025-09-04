@@ -827,12 +827,10 @@ Table: Behavior on Caliptra reset types {#tbl:caliptra-reset-types}
 |                        | The VEK is not initialized upon cold reset, as it is       |
 |                        | generated lazily upon first use. See @sec:vek for details. |
 +------------------------+------------------------------------------------------------+
-| Warm reset             | The HEK, MDK, VEK, and HPKE keypairs are undisturbed.      |
-+------------------------+------------------------------------------------------------+
-| Firmware update reset  | The HEK, MDK, and VEK are undisturbed.                     |
-|                        |                                                            |
-|                        | HPKE keypairs are discarded prior to firmware update and   |
-|                        | are regenerated after update.                              |
+| Warm reset / firmware  | The HEK, MDK, and VEK are undisturbed.                     |
+| update reset           |                                                            |
+|                        | HPKE keypairs are discarded prior to reset and are         |
+|                        | regenerated after reset.                                   |
 +------------------------+------------------------------------------------------------+
 
 Caliptra cold boot / cold reset shall only be triggered by an NVMe subsystem reset [@{nvme-base-spec-2.2}] caused by main power being applied to the subsystem.
