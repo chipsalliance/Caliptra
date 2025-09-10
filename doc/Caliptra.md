@@ -1019,7 +1019,7 @@ Caliptra supports 32 LMS trees for the vendor and 1 tree for the owner. The SoC 
 
 Caliptra has an option starting in 2.0 to use ML-DSA-87 signatures in addition to ECDSA to support FIPS 204 and CNSA 2.0 requirements for category 5.
 
-Caliptra provides cryptographic servies to support ML-KEM (in addition to ECDH) key exchanges.
+Caliptra provides cryptographic services to support ML-KEM (in addition to ECDH) key exchanges.
 
 ### Key rotation
 
