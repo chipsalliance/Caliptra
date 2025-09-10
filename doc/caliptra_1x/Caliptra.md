@@ -1129,9 +1129,10 @@ Caliptra provides a HW API to do a SHA384 hash calculation. The SoC can access t
 **Notes:**
 
 1. The security state is latched at cptra\_rst\_b deassertion. If the security state is unlocked at this time, only TAP is opened.
-2. Changing the security state at a random time: cptra\_rst\_b deassertion does not unlock Caliptra JTAG.
-3. Changing the security state at a random time after cptra\_rst\_b: deassertion flushes out all internal Caliptra secrets, assets, key vault, and crypto intermediate state. The same is true for scan\_mode assertion.
-4. Scan mode assertion does not automatically open Caliptra JTAG.
+2. Changing the security state at a random time after cptra\_rst\_b deassertion: does not unlock Caliptra JTAG.
+3. Changing the security state at a random time after cptra\_rst\_b deassertion: transition from debug locked to debug unlocked has no effect until next reset.
+4. Setting scan mode at a random time after cptra\_pwrgood: flushes out all internal Caliptra secrets, assets, key vault, and crypto intermediate state.
+5. Scan mode assertion does not automatically open Caliptra JTAG.
 
 ### Architectural registers
 
