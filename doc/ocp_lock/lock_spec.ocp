@@ -21,6 +21,9 @@ bibliography: bibliography.yaml
 |                |         |                                     |
 |                |         | Rotate HPKE keypairs on warm reset  |
 |                |         | as well as firmware-update reset.   |
+|                |         |                                     |
+|                |         | Add response flag to                |
+|                |         | REPORT_HEK_METADATA command.        |
 +----------------+---------+-------------------------------------+
 
 \currenttemplateversion
@@ -1240,16 +1243,27 @@ Table: Conditions for setting seed_state and active_slot {#tbl:hek-metadata-cond
 
 Table: REPORT_HEK_METADATA output arguments {#tbl:report-hek-metadata-output-args}
 
-+---------------+--------+--------------------------------------------------------+
-| Name          | Type   | Description                                            |
-+===============+========+========================================================+
-| chksum        | u32    | Checksum over other output arguments, computed by      |
-|               |        | Caliptra.                                              |
-+---------------+--------+--------------------------------------------------------+
-| fips_status   | u32    | Indicates if the command is FIPS approved or an error. |
-+---------------+--------+--------------------------------------------------------+
-| reserved      | u32[4] | Reserved.                                              |
-+---------------+--------+--------------------------------------------------------+
++-------------+--------+--------------------------------------------------------+
+| Name        | Type   | Description                                            |
++=============+========+========================================================+
+| chksum      | u32    | Checksum over other output arguments, computed by      |
+|             |        | Caliptra.                                              |
++-------------+--------+--------------------------------------------------------+
+| fips_status | u32    | Indicates if the command is FIPS approved or an error. |
++-------------+--------+--------------------------------------------------------+
+| flags       | u32    | Additional information for the caller.                 |
+|             |        | See @tbl:report-hek-metadata-output-flags.             |
++-------------+--------+--------------------------------------------------------+
+| reserved    | u32[3] | Reserved.                                              |
++-------------+--------+--------------------------------------------------------+
+
+Table: REPORT_HEK_METADATA output flags {#tbl:report-hek-metadata-output-flags}
+
++---------------+---------------+--------------------------------------+
+| Name          | Offset        | Description                          |
++===============+===============+======================================+
+| HEK_AVAILABLE | Byte 0 bit 31 | When set indicates HEK is available. |
++---------------+---------------+--------------------------------------+
 
 #### GET_STATUS
 
