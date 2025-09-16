@@ -24,6 +24,11 @@ bibliography: bibliography.yaml
 |                |         |                                     |
 |                |         | Add response flag to                |
 |                |         | REPORT_HEK_METADATA command.        |
+|                |         |                                     |
+|                |         | Rename "Opal C_PIN" to "TCG C_PIN". |
+|                |         |                                     |
+|                |         | Rename REPORT_EPOCH_KEY_STATE to    |
+|                |         | GET_EPOCH_KEY_STATE.                |
 +----------------+---------+-------------------------------------+
 
 \currenttemplateversion
@@ -136,7 +141,7 @@ OCP L.O.C.K. (Layered Open-source Cryptographic Key management) provides secure 
 
 OCP L.O.C.K. was originally created as part of the Open Compute Project (OCP). The major revisions of the OCP L.O.C.K. specifications are published as part of Caliptra at OCP, as OCP L.O.C.K. is an extension to Caliptra. The evolving source code and documentation for Caliptra are in the repository within the CHIPS Alliance Project, a Series of LF Projects, LLC.
 
-OCP L.O.C.K. may be integrated within a variety of self-encrypting storage devices, and is not restricted exclusively to NVMe™. OCP L.O.C.K. is designed for compatibility with the TCG Storage Architecture [@{tcg-storage-architecture}], including support for TCG Opal[^opal] [@{tcg-opal}], TCG Enterprise [@{tcg-enterprise}], and Key Per I/O [@{tcg-kpio}] specifications.
+OCP L.O.C.K. may be integrated within a variety of self-encrypting storage devices, and is not restricted exclusively to NVMe™. OCP L.O.C.K. is designed for compatibility with the TCG Storage Architecture [@{tcg-storage-architecture}], including support for TCG Opal[^opal] [@{tcg-opal}], Enterprise [@{tcg-enterprise}], and Key Per I/O [@{tcg-kpio}] specifications.
 
 [^opal]: Opal in the context of this document includes the Opal Family of SSCs: Opal SSC, Opalite SSC, Ruby SSC. Pyrite is excluded as Pyrite SSDs are non-SED.
 
@@ -1938,13 +1943,13 @@ Table: UNLOAD_MEK output arguments {#tbl:unload-mek-output-args}
 | reserved    | u32  | Reserved.                                 |
 +-------------+------+-------------------------------------------+
 
-#### REPORT_EPOCH_KEY_STATE {#sec:report-epoch-key-state-cmd}
+#### GET_EPOCH_KEY_STATE {#sec:get-epoch-key-state-cmd}
 
 This command reports the state of the epoch keys. The drive indicates the state of the SEK, while KMB internally senses the state of the HEK.
 
-Command Code: 0x5245_4B53 ("REKS")
+Command Code: 0x4745_4B53 ("GEKS")
 
-Table: REPORT_EPOCH_KEY_STATE input arguments {#tbl:report-epoch-key-state-input-args}
+Table: GET_EPOCH_KEY_STATE input arguments {#tbl:get-epoch-key-state-input-args}
 
 +-----------+--------+---------------------------------------+
 | Name      | Type   | Description                           |
@@ -1962,7 +1967,7 @@ Table: REPORT_EPOCH_KEY_STATE input arguments {#tbl:report-epoch-key-state-input
 |           |        | signed IETF EAT.                      |
 +-----------+--------+---------------------------------------+
 
-Table: REPORT_EPOCH_KEY_STATE output arguments {#tbl:report-epoch-key-state-output-args}
+Table: GET_EPOCH_KEY_STATE output arguments {#tbl:get-epoch-key-state-output-args}
 
 +------------------------+-------------+-------------------------------------------+
 | Name                   | Type        | Description                               |
@@ -2069,7 +2074,7 @@ See @fig:hek-sek-rotation for more details about the transitions between HEK sta
 
 ##### Calculation of hek_erasures_remaining {#sec:hek-erasures-remaining}
 
-The \`hek_erasures_remaining\` field in [REPORT_EPOCH_KEY_STATE](#tbl:report-epoch-key-state-output-args) is based on the following values from [REPORT_HEK_METADATA](#sec:report-hek-metadata-cmd):
+The \`hek_erasures_remaining\` field in [GET_EPOCH_KEY_STATE](#tbl:get-epoch-key-state-output-args) is based on the following values from [REPORT_HEK_METADATA](#sec:report-hek-metadata-cmd):
 
 - total_slots
 - active_slot
