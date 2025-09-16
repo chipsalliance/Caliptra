@@ -29,6 +29,10 @@ bibliography: bibliography.yaml
 |                |         |                                     |
 |                |         | Rename REPORT_EPOCH_KEY_STATE to    |
 |                |         | GET_EPOCH_KEY_STATE.                |
+|                |         |                                     |
+|                |         | Illustrate usage of the internal    |
+|                |         | DRBG for drive-firmware-specific    |
+|                |         | use-cases.                          |
 +----------------+---------+-------------------------------------+
 
 \currenttemplateversion
@@ -818,6 +822,8 @@ Caliptra hardware [@{caliptra-2.0-hw-spec}] supports either an integrated or ext
 ![Integrated DRBG](./diagrams/drbg_internal.drawio.svg){#fig:drbg-internal}
 
 Host-provided entropy can be mixed into the DRBG state via the [CM_RANDOM_STIR](https://github.com/chipsalliance/caliptra-sw/tree/main-2.x/runtime#cm_random_stir) Caliptra mailbox command.
+
+Drive firmware can obtain randomness from Caliptra's DRBG via the [CM_RANDOM_GENERATE](https://github.com/chipsalliance/caliptra-sw/tree/main-2.x/runtime#cm_random_generate) Caliptra mailbox command.
 
 ### Authorization {#sec:authorization}
 
