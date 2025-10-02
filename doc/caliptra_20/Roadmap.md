@@ -1,20 +1,28 @@
 <p style="text-align: center;">Caliptra: A Datacenter System on a Chip (SoC) Root of Trust (RoT)</p>
 
-# Roadmap to 2.1
+# Schedule
 
-This document lays out our roadmap and items to get to Caliptra 2.1 Core and
+This document lays out our roadmap and items to get to Caliptra 2.0 and 2.1 Core and
 Subsystem.
 
 ## Timeline
 
+* Caliptra 2.0 SS
+    * HW release: Released
+    * Caliptra Core ROM release: Release Candidate - 10th October 2025, Final - 17th October 2025
+    * Caliptra Core FMC release: 31st October 2025
+    * Caliptra Core RT FW release: 31st October 2025
+    * Caliptra Subsystem FIPS Certificate availability: TBD
+    * ROM / Firmware Audit Completion: Matches individual release dates
+
 * Caliptra 2.1 SS
-    * HW release: End of August, 2025
-    * ROM release: TBD, expect 4-6 weeks after HW release
-    * FMC release: TBD
-    * RT FW release: TBD
-    * FIPS Certificate availability: TBD
-    * Audit Completion: TBD
-    * Target: earliest RTL integration in Sept 2025
+    * HW Release Candidate: Released
+    * HW Release: 10th October 2025
+    * Caliptra Core ROM release: 30th January 2026
+    * Caliptra Core FMC release: 27th February 2026
+    * Caliptra Core RT FW release: 27th February 2026
+    * Caliptra Subsystem FIPS Certificate availability: TBD
+    * ROM / Firmware Audit Completion: Matches individual release dates
 
 ## HW Features:
 
