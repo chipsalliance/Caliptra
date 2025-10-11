@@ -21,6 +21,11 @@ Top level things to know
 Per the [Charter](CaliptraWGTechnicalCharter.md), contributors to Caliptra
 must have signed the CHIPS CLA.
 
+## Contributing Process
+
+To contribute to any facet of the Caliptra Project (e.g., hardware, software, or other),
+follow the [Caliptra Contributing Process](doc/CaliptraContributingProcess.md) guide.
+
 ## Guidelines for code contributions
 
 * Changes must be made via pull request
@@ -67,7 +72,7 @@ must have signed the CHIPS CLA.
 * Private dev branches for organizations must integrate back to main
 * TODO: upload the schematic and reference, for RTL branch policy
 * `$major.8` tags must exist in `main`. At that point changes to RTL must follow
-  CCB rules below
+  the [RFC Process](doc/CaliptraContributingProcess.md).
 * `$major.9` tags for RTL mark the beginning of bug fixes only period.
 * Specific integrations should be forked off `main` into a release branch at a
   named tag. Example:
@@ -82,29 +87,4 @@ must have signed the CHIPS CLA.
   footer in its description. The `$SHA` points to the main branch commit ref.
 
 A known exception here is that the first commit of Caliptra public RTL already
-started at `0p8`
-
-## CCB Issues
-
-RTL design changes or additions after a `$major.5` tag must be bound to a GitHub
-issue, and the issue must include this questionnaire in its description.
-
-(Bug fixes do not need this step)
-
-* Is the RTL change due to a Spec change? (Yes/No)
-* Is the Spec change approved? (Yes/No)
-* Is the spec updated? (Yes/No)
-* Is the change needed in the `p8` or `$major.0` milestone?
-  - Note: What item qualifies as P1/MVP item is set by Caliptra Arch WG leads
-* Does it have silicon area impact? (Area size/No)
-* Does it have timing impact? (Breakdown/No)
-* If the change impacts ROM/FMC/RT, did the FW reps approve the change already? (Yes/No)
-* Why should the change be intercepted in `$major`?
-* Can the change be handled outside of Caliptra?
-* If there is a schedule impact to a `p8` or `$major.0` milestone, is it
-  approved by voting leads? (Yes/No)
-* If change completed (implies schedule impact is zero):
-  - Lint passing (Yes/No)
-  - Gate count delta (Count/No)
-  - Tests written for testing the change (Link to commit/No)
-* Existing smoke tests passing? – Yes/No
+started at `0p8`.
