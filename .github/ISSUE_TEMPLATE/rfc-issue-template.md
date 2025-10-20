@@ -12,7 +12,7 @@ assignees: ''
 
 ## Scope
 [edit] What parts of the project will be affected.
-* [edit] Overview of anticipated changes to specifications or other documentation (e.g. impacts to Trademark Compliance)
+* [edit] Overview of anticipated changes to specifications or other documentation (e.g. impacts to Trademark Compliance, specifications, repo structures, etc)
 
 ## Rationale
 [edit] The motivation and justification for the change, including why it is important to include in a specific Caliptra release version.
