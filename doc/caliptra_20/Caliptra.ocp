@@ -665,7 +665,7 @@ There are two ways of generating a UDS seed:
 To use the internal TRNG to generate the UDS seed during manufacturing in subsystem mode:
 
 1. When SoC life cycle is in MANUFACTURING MODE, set the manufacturing service register bit SS_DBG_MANUF_SERVICE_REG_REQ[2] through JTAG to request the UDS seed programming flow.
-2. Caliptra ROM will sample this bit on power up; when this bit is set and Caliptra ROM rechecks that the life cycle state is manufacturing mode and reads the iTRNG for a 512-bit value.
+2. Caliptra ROM will sample this bit on power up; when this bit is set, Caliptra ROM rechecks that the life cycle state is manufacturing mode and reads the iTRNG for a 512-bit value.
 3. Caliptra ROM writes the 512-bit value to the address available through registers named SS_UDS_SEED_BASE_ADDR_L and SS_UDS_SEED_BASE_ADDR_H (which are strapped by SoC at integration time) by using Caliptra's DMA.
 4. Caliptra ROM sets the corresponding status bit in SS_DBG_MANUF_SERVICE_REG_RSP to indicate the flow completion.
 5. Manufacturing flow will poll/read this bit and then do the fuse burning flow as specified by the fuse controller spec and SoC-specific VR methodologies (e.g., fuse macro voltage elevation flows).
