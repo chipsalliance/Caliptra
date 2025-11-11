@@ -1827,7 +1827,7 @@ Table: Caliptra Fuse Map {#tbl:caliptra-fuse-map}
 |                          |          |                 |                       | is scrambled using an obfuscation function.   |
 +--------------------------+----------+-----------------+-----------------------+-----------------------------------------------+
 | FIELD ENTROPY            | 256      | HW read,        | Device owner          | Field-programmable by the owner, used         |
-| (obfuscated)             |          | ROM write       | in-field programmable | to hedge against UDS disclosure in the        |
+| (obfuscated)             |          | ROM FMC RUNTIME | in-field programmable | to hedge against UDS disclosure in the        |
 |                          |          |                 |                       | supply chain.                                 |
 +--------------------------+----------+-----------------+-----------------------+-----------------------------------------------+
 | VENDOR PK HASH           | 384      | ROM FMC RUNTIME | SoC manufacturing     | SHA384 hash of the Vendor ECDSA P384          |
