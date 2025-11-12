@@ -37,6 +37,8 @@ bibliography: bibliography.yaml
 |                |         | Deprecate the "preconditioned key   |
 |                |         | extract" construct, and instead     |
 |                |         | combine keys using SP 800-108 KDFs. |
+|                |         |                                     |
+|                |         | Update HPKE labels to match IETF.   |
 +----------------+---------+-------------------------------------+
 
 \currenttemplateversion
@@ -503,7 +505,7 @@ Table: HPKE algorithm support {#tbl:hpke-algorithm-support}
 
 The definitions for the post-quantum KEMs are currently distributed across a number of documents. [@{draft-irtf-cfrg-hybrid-kems}] contains generic constructions, [@{draft-irtf-cfrg-concrete-hybrid-kems}] contains concrete parameterizations, and [@{draft-ietf-hpke-pq}] contains HPKE IANA code-point assignments.[^pq-kems]
 
-[^pq-kems]: As of this specification's publication, post-quantum HPKE KEMs are not fully ratified in IETF. However, the draft authors are confident that the IANA code points and associated definitions will not change before the drafts are finalized, with two exceptions for the ML-KEM-1024 + P-384 KEM parameterization specified in [@{draft-irtf-cfrg-concrete-hybrid-kems}]: the KDF will be updated from HKDF-SHA-256 to SHA3-256, and the label may be changed. The IETF editors expect to make these changes in September 2025. @fig:hpke-kem-hybrid, where this KEM is illustrated, uses the SHA3-256 KDF and the label currently specified in [@{draft-irtf-cfrg-concrete-hybrid-kems}].
+[^pq-kems]: As of this specification's publication, post-quantum HPKE KEMs are not fully ratified in IETF. However, the draft authors are confident that the IANA code points and associated definitions will not change before the drafts are finalized.
 
 Figures [-@fig:hpke-kem-mlkem], [-@fig:hpke-kem-hybrid], and [-@fig:hpke-kem-ecdh] illustrate each KEM algorithm. The details of how the AES-GCM key and IV are derived are illustrated in @fig:hpke-key-derivation.
 
