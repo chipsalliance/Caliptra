@@ -582,13 +582,13 @@ Caliptra ROM generates the Alias<sub>FMC</sub> certificate and endorses it with 
 |                                |              | Owner Public Key Hash
 |                                |              | PK Index (ECC/LMS)
 |                                |              | Anti-rollback disable
-|                                |              | LMS Verify/PQC Type
 |                                |              | ECC Revoke Fuse
 |                                |              | LMS Revoke Fuse
 |                                |              | ML-DSA Revoke Fuse
 |                                |              | SOC Manifest SVN
 |                                |              | [1] SHA384 digest of 
 |                                |              | Vendor Public Key Hash
+|                                |              | LMS Verify/PQC Type
 |                                |              | Lifecycle State
 |                                |              | Debug Lock
 |                                |              | [2] SHA384 digest of FMC
