@@ -240,8 +240,8 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Integrity of Firmware and Hardware*
 
 * **Checklist Item:**
-  * **Requirement:** The Caliptra RTL MUST match an official release.
-  * **Evaluation Methodology:** Manufacturers MUST demonstrate via the [provided tools](https://github.com/chipsalliance/caliptra-sw/tree/main/ci-tools/release/tools) that RTL matches an official release.
+  * **Requirement:** Changes to RTL files other than those in the Integrator RTL modification requirements MUST be published in a github issue and MUST obtain TAC approval for the change. See [RTL v1.0](https://github.com/chipsalliance/caliptra-rtl/blob/v1.0/docs/CaliptraIntegrationSpecification.md#integrator-rtl-modification-requirements), [RTL v1.1](https://github.com/chipsalliance/caliptra-rtl/blob/v1.1/docs/CaliptraIntegrationSpecification.md#integrator-rtl-modification-requirements).
+  * **Evaluation Methodology:** Manufacturers MUST show TAC-approved waivers for any RTL differences flagged by the [provided tools](https://github.com/chipsalliance/caliptra-sw/tree/main/ci-tools/release/tools).
 * **Checklist Item:**
   * **Requirement:** Netlists, layout, and other development collateral derived from the RTL MUST maintain the same behavior as the released RTL when Caliptra is in the [Production Non-Debug state](https://github.com/chipsalliance/Caliptra/blob/main/doc/Caliptra.md#caliptra-security-states).
   * **Evaluation Methodology:** Manufacturers MUST provide evidence that collateral derived from the released RTL has not had its behavior modified.
