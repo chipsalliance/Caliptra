@@ -53,7 +53,7 @@ sets out the charter governing the Caliptra project.
 
 ## Versioning
 
-Caliptra is released in independently versioned components: RTL, ROM, FMC and Runtime FW. They are all represented by 3 values: major.minor.patch (such as 1.0.2). The first 2 values, major.minor, correspond to a set of features caliptra supports. The patch value is incremented as new releases are made with bug fixes.
+Caliptra is released in independently versioned components: RTL, ROM, FMC and Runtime FW. They are all represented by 3 values: major.minor.patch (such as 1.0.2). The first 2 values, major.minor, correspond to a set of features caliptra supports. The patch value is incremented as new releases are made with bug fixes. Lastly, mutable firmware (FMC/FW) have security version numbers (SVNs) that are incremented as required by when addressing security-critical issues. These are specified with the label (svn/svn) for (FMC/FW) versions respectively.
 
 Not all components necessarily need to be of the same major.minor version to be compatible. Details are below:
 
@@ -61,7 +61,7 @@ Not all components necessarily need to be of the same major.minor version to be 
 Compatible Configurations:
 | RTL | ROM | Runtime FMC/FW |
 | --- | --- | --- |
-| 1.0.x | 1.0.x | 1.0.x |
+| 1.0.x | 1.0.x | 1.0.x (0/0) |
 
 ### Caliptra 1.1
 
@@ -80,8 +80,8 @@ Compatible Configurations:
 
 | RTL | ROM | Runtime FMC/FW |
 | --- | --- | --- |
-| 1.1.x | 1.1.x | 1.1.x |
-| 1.0.x | 1.0.x | 1.1.x |
+| 1.1.x | 1.1.x | 1.1.x (0/0) |
+| 1.0.x | 1.0.x | 1.1.x (0/0) |
 
 
 ### Caliptra 1.2
@@ -105,9 +105,9 @@ Compatible Configurations:
 
 | RTL | ROM | Runtime FMC/FW |
 | --- | --- | --- |
-| 1.1.x | 1.2.x | 1.2.x |
-| 1.1.x | 1.1.x | 1.2.x |
-| 1.0.x | 1.0.x | 1.2.x |
+| 1.1.x | 1.2.x | 1.2.x (0/0) |
+| 1.1.x | 1.1.x | 1.2.x (0/0) |
+| 1.0.x | 1.0.x | 1.2.x (0/0) |
 
 ### Caliptra 2.0
 
@@ -122,7 +122,7 @@ Compatible Configurations:
 
 | RTL | ROM | Runtime FMC/FW |
 | --- | --- | --- |
-| 2.0.x | 2.0.x | 2.0.x |
+| 2.0.x | 2.0.x | 2.0.x (0/0) |
 
 ## Test Dashboards
 
