@@ -54,7 +54,7 @@ To streamline the review of "large" changes, all RFCs must follow a standard for
 *   **Test Plan:** Required for any hardware changes to ensure quality, certifiability, maintainability.
 *   **Maintenance:** The individual or team responsible as the point of contact for this feature now and in the future. Contributors must provide a plan for ongoing maintenance.
 
-Caliptra provides a [template](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/configuring-issue-templates-for-your-repository) <insert link to actual template> for contributors to follow when filing an RFC.
+Caliptra provides a [template](../.github/ISSUE_TEMPLATE/rfc-issue-template.md) for contributors to follow when filing an RFC.
 
 ### RFC Approval Authority
 
