@@ -1,4 +1,4 @@
---
+---
 name: Caliptra Project RFC Issue Template
 about: Template for Caliptra contributors to file an RFC proposing changes that impact the Caliptra project.
 title: "[RFC] {RFC title here}"
