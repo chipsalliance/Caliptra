@@ -39,6 +39,9 @@ bibliography: bibliography.yaml
 |                |         | combine keys using SP 800-108 KDFs. |
 |                |         |                                     |
 |                |         | Update HPKE labels to match IETF.   |
+|                |         |                                     |
+|                |         | Fix INITIALIZE_MEK_SECRET mailbox   |
+|                |         | code                                |
 +----------------+---------+-------------------------------------+
 
 \currenttemplateversion
@@ -1649,7 +1652,7 @@ Table: ENABLE_MPK output arguments {#tbl:enable-mpk-output-args}
 
 This command shall initialize the MEK secret seed as described in @fig:mek-secret-derivation.
 
-Command Code: 0X494D_0B53 ("IMKS")
+Command Code: 0X494D_4B53 ("IMKS")
 
 Table: INITIALIZE_MEK_SECRET input arguments {#tbl:initialize-mek-secret-input-args}
 
