@@ -428,7 +428,7 @@ Combine the internal TRNG output with a Manufacturing time provided value to pro
 6. HVM, through JTAG or using the Caliptra SoC interface, sets “CPTRA\_DBG\_MANUF\_SERVICE\_REG” bit 0 to request a CSR.
 7. HVM, through JTAG or using the Caliptra SoC interface, writes to “CPTRA\_BOOTFSM\_GO” to allow Caliptra’s internal BootFSM to continue to bring up microcontroller out of reset.
 8. ROM reads the manufacturing state encoding from the “CPTRA\_DBG\_MANUF\_SERVICE\_REG” register, acquires the mailbox lock, and populates the Caliptra internal SRAM (the mailbox SRAM hardware structure is reused) with the CSR.
-9. HVM, through JTAG or using the SoC interface, polls for the “IDevID CSR ready" bit 24 that is set in “CPTRA\_FLOW\_STATUS” register.
+9. HVM, using the SoC interface, polls for the “IDevID CSR ready" bit 24 that is set in “CPTRA\_FLOW\_STATUS” register.
 10. HVM reads mbox\_status\[3:0\] to check if the data is ready to be read (DATA\_READY encoding).
 11. HVM must clear bit 0 of CPTRA\_DBG\_MANUF\_SERVICE\_REG, indicating that it completed reading the CSR.
 12. Caliptra ROM opens the Caliptra Mailbox for SoC usages, such as FW loading (if required in some HVM flows). The SoC is only allowed to request a lock of the AXI-exposed mailbox interface after this CSR operation is complete.
