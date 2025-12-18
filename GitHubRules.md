@@ -7,26 +7,28 @@ GitHub configuration.
 * Require approvals
 * Required number of approvals: 2 for spec and RTL, 1 for software
 * Dismiss stale pull request approvals when new commits are pushed
-* Allow auto-merge
 * Require review from code owners
 * Require conversation resolution before merging
 * Restrict who can dismiss pull request reviews
+* Require linear history
+* Disallow "merge commits"
 * Do not allow bypassing the above settings
 * Restrict who can push to matching branches: only relevant folks in
   [MAINTAINERS](MAINTAINERS.md) for `main` and `release/*` branches
 * For caliptra-rtl Repository
-  * Don't require non-linear history
-  * Allow "merge commits"
+  * "Restrict creation" is used with a pattern match to prevent creation
+    of reserved branch names
+  * "Lock branch" is used with a pattern match for reserved branch names
+  * Disallow auto-merge
 * For other Repositories
-  * Require linear history
-  * Disallow "merge commits"
+  * Allow auto-merge
 * Set "Actions" / "General" / "Fork pull request workflows from
   outside collborators" to "Require approval for all outside collaborators"
 
 Will not set
 * Allow force pushes
 * Allow deletions
-* Lock branch
+* Lock branch (exception: reserved branch names)
 * Allow specified actors to bypass required pull requests
 
 Will not set _yet_
