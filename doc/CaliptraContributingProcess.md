@@ -119,4 +119,4 @@ Upon acceptance of the RFC, Caliptra Consortium will assign a project maintainer
 | Project Maintainer | Paying members of the Caliptra Consortium and active contributors                                    |
 | SCA                | Side Channel Attacks                                                                                 |
 | SW                 | Software                                                                                             |
-| TAC                | Technical Advisory Council                                                                           |
+| TAC                | Technical Advisory Committee                                                                         |
