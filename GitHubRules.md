@@ -71,7 +71,7 @@ The following issue types are defined for all Caliptra repositories:
 
 During issue triage, an owner chooses the appropriate issue type based on the request. Issues that are simply requesting explanation or clarification of concepts will not be assigned any "type", as the conversation on the issue is sufficient for resolution.
 
-The "Bug" type is only assigned once Caliptra representatives have determined that the proposed problem is indeed a design flaw, as opposed to a misunderstanding of the code or specified Caliptra behavior. If a documentation error is deemed sufficiently egregious or misleading such that it may cause integrators to produce an incorrect design,the issue will be tagged as a Bug type, even if there is no corresponding flaw in the provided source code.
+The "Bug" type is only assigned once Caliptra representatives have determined that the proposed problem is indeed a design flaw, as opposed to a misunderstanding of the code or specified Caliptra behavior. If a documentation error is deemed sufficiently egregious or misleading such that it may cause integrators to produce an incorrect design, the issue will be tagged as a Bug type, even if there is no corresponding flaw in the provided source code.
 
 The "Feature" type is assigned for issues that propose new features to documentation or to source code. Note that community members who are proposing new features (that are not yet approved) must submit the issue using the RFC template, in adherance with the process defined in the [Caliptra Contributing Process](doc/CaliptraContributingProcess.md).
 
