@@ -593,7 +593,9 @@ Caliptra ROM generates the Alias<sub>FMC</sub> certificate and endorses it with 
 |                                |              | LMS Verify/PQC Type (u8)
 |                                |              | Lifecycle State (u8)
 |                                |              | Debug Lock (u8)
-|                                |              | PK Index (ECC/LMS)
+|                                |              | RT FW SVN from cold boot (u8)
+|                                |              | PK Index ECC (u8)
+|                                |              | PK Index PQC (u8)
 |                                |              | [2] SHA384 digest of FMC
 |                                |Type          | [0] CALIPTRA_2_X_FUSE_OWNER_INFO
 |                                |              | [1] CALIPTRA_2_X_FUSE_VENDOR_INFO
