@@ -577,23 +577,23 @@ Caliptra ROM generates the Alias<sub>FMC</sub> certificate and endorses it with 
 | tcg-dice-MultiTcbInfo          | Flags        | NOT_CONFIGURED if lifecycle is unprovisioned
 |                                |              | NOT_SECURE if lifecycle is manufacturing
 |                                |              | DEBUG if not debug locked
-|                                | SVN          | [2] firmware SVN
+|                                | SVN          | [2] Image Bundle FW SVN
 |                                | FWIDs        | [0] SHA384 digest of
 |                                |              | Owner Public Key Hash (sha-384)
-|                                |              | Owner public key hash in fuses flag (u8)
-|                                |              | Anti-rollback disable (u8)
+|                                |              | Owner public key Hash in fuses flag (u8) // Flag to indicate whether Owner Pub Key Hash is Fused  
+|                                |              | Anti-rollback disable Fuse (u8)
 |                                |              | ECC Revoke Fuse (u8)
 |                                |              | LMS Revoke Fuse (u32)
 |                                |              | ML-DSA Revoke Fuse (u8)
-|                                |              | RT FW min SVN Fuse - minimum SVN value (u8)
-|                                |              | SOC Manifest SVN - min SVN value (u8)
-|                                |              | SoC manifest min SVN - max SVN value (u8)
+|                                |              | Image Bundle FW min SVN Fuse - min SVN value (u8)
+|                                |              | Auth Manifest SoC min SVN Fuse - min SVN value (u8)
+|                                |              | Auth Manifest SoC max SVN Fuse - max SVN value (u8)
 |                                |              | [1] SHA384 digest of 
-|                                |              | Vendor Public Key Hash (sha-384)
-|                                |              | LMS Verify/PQC Type (u8)
-|                                |              | Lifecycle State (u8)
-|                                |              | Debug Lock (u8)
-|                                |              | RT FW SVN from cold boot (u8)
+|                                |              | Vendor Public Key Hash Fuse (sha-384)
+|                                |              | LMS Verify/PQC Type Fuse (u8)
+|                                |              | Lifecycle State Wire (u8)
+|                                |              | Debug Lock Wire (u8)
+|                                |              | Image Bundle FW SVN from cold boot (u8)
 |                                |              | PK Index ECC (u8)
 |                                |              | PK Index PQC (u8)
 |                                |              | [2] SHA384 digest of FMC
