@@ -61,6 +61,7 @@ Labels used:
 - `<major>.<minor>` (for example, `1.0`, `1.1`, `2.0`)
 - `documentation`
 - `validation`
+- `question`
 
 ### Types
 The following issue types are defined for all Caliptra repositories:
