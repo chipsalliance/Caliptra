@@ -579,17 +579,19 @@ Caliptra ROM generates the Alias<sub>FMC</sub> certificate and endorses it with 
 |                                |              | DEBUG if not debug locked
 |                                | SVN          | [2] firmware SVN
 |                                | FWIDs        | [0] SHA384 digest of
-|                                |              | Owner Public Key Hash
-|                                |              | Anti-rollback disable
-|                                |              | ECC Revoke Fuse
-|                                |              | LMS Revoke Fuse
-|                                |              | ML-DSA Revoke Fuse
-|                                |              | SOC Manifest SVN
+|                                |              | Owner Public Key Hash (sha-384)
+|                                |              | Owner public key hash in fuses flag (u8)
+|                                |              | Anti-rollback disable (u8)
+|                                |              | ECC Revoke Fuse (u8)
+|                                |              | LMS Revoke Fuse (u32)
+|                                |              | ML-DSA Revoke Fuse (u8)
+|                                |              | SOC Manifest SVN - min SVN value (u8)
+|                                |              | SoC manifest min SVN - max SVN value (u8)
 |                                |              | [1] SHA384 digest of 
-|                                |              | Vendor Public Key Hash
-|                                |              | LMS Verify/PQC Type
-|                                |              | Lifecycle State
-|                                |              | Debug Lock
+|                                |              | Vendor Public Key Hash (sha-384)
+|                                |              | LMS Verify/PQC Type (u8)
+|                                |              | Lifecycle State (u8)
+|                                |              | Debug Lock (u8)
 |                                |              | PK Index (ECC/LMS)
 |                                |              | [2] SHA384 digest of FMC
 |                                |Type          | [0] CALIPTRA_2_X_FUSE_OWNER_INFO
