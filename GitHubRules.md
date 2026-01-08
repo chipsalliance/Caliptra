@@ -61,7 +61,6 @@ Labels used:
 - `<major>.<minor>` (for example, `1.0`, `1.1`, `2.0`)
 - `documentation`
 - `validation`
-- `question`
 
 ### Types
 The following issue types are defined for all Caliptra repositories:
@@ -69,8 +68,11 @@ The following issue types are defined for all Caliptra repositories:
 * Bug
 * Feature
 * Errata
+* Question
 
-During issue triage, an owner chooses the appropriate issue type based on the request. Issues that are simply requesting explanation or clarification of concepts will not be assigned any "type", as the conversation on the issue is sufficient for resolution.
+During issue triage, an owner chooses the appropriate issue type based on the request.
+
+Issues that are simply requesting explanation or clarification of concepts will be assigned the "Question" type, though the type may later be changed if the discussion reveals that a change is necessary.
 
 The "Bug" type is only assigned once Caliptra representatives have determined that the proposed problem is indeed a design flaw, as opposed to a misunderstanding of the code or specified Caliptra behavior. If a documentation error is deemed sufficiently egregious or misleading such that it may cause integrators to produce an incorrect design, the issue will be tagged as a Bug type, even if there is no corresponding flaw in the provided source code.
 
