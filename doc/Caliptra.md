@@ -585,6 +585,7 @@ Caliptra ROM generates the Alias<sub>FMC</sub> certificate and endorses it with 
 |                                |              | ECC Revoke Fuse (u8)
 |                                |              | LMS Revoke Fuse (u32)
 |                                |              | ML-DSA Revoke Fuse (u8)
+|                                |              | RT FW min SVN Fuse - minimum SVN value (u8)
 |                                |              | SOC Manifest SVN - min SVN value (u8)
 |                                |              | SoC manifest min SVN - max SVN value (u8)
 |                                |              | [1] SHA384 digest of 
