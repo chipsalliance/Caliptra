@@ -118,13 +118,14 @@ Additional Features
   - IDevID CSR HMAC Signing
   - Crypto Offload Mailbox Services
 
+\*\*\* Only RTL release versions 2.0.2+ should be used due to ROM compatibility requirements.
+
 Compatible Configurations:
 
 | RTL | ROM | Runtime FMC/FW |
 | --- | --- | --- |
 | 2.0.2+ | 2.0.x | 2.0.x (0/0) |
 
-Note: only RTL release versions 2.0.2+ should be used due to ROM compatibility requirements.
 
 ## Test Dashboards
 
