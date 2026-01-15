@@ -1562,6 +1562,12 @@ Because warm reset is a pin input to Caliptra, Caliptra may not be idle when a w
 **Note:** Subsystem mode's warm reset flow is the same as above, except the warm reset action is triggered/managed by MCU.
 
 
+### Random Number Generator
+
+TRNG is the digital logic and algorithms that are required for random number generation. It requires a physical entropy source input. See the Caliptra hardware specification and integration specification [here](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/) for more information on the implementation and connectivity of TRNG.
+ - For SoCs that want to use their own legacy TRNG, Caliptra provides a HW API to push the random number on the request/response handshake. Details on this are also available in the Caliptra hardware specification and integration specification. This mode is advised for early development but discouraged for production tape outs due to the lower security assurances of an external TRNG.
+ - In Subsystem mode, Caliptra integrators are required to use the internal TRNG.
+
 ### Mailbox
 
 The Caliptra Mailbox is a 256 KiB buffer that is used to exchange data between the SoC and the Caliptra microcontroller.
@@ -1646,11 +1652,11 @@ These mailbox commands extend Caliptra's cryptographic support to include SHA, H
 The [runtime firmware specification](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#cryptographic-mailbox-commands-new-in-20) contains further details.
 
 
-#### Hash calculation HW API (Subsystem mode only)
+### Hash calculation HW API (Subsystem mode only)
 
-Caliptra provides a HW API to do a SHA384 hash calculation. The SoC can access the accelerator through the Caliptra FW API only in subsystem mode. Caliptra FW API uses the internal SHA accelerator and its DMA widget be hash the required data and present it back to Calitpra FW.
+Caliptra provides a HW API to do a SHA384 hash calculation. The SoC can access the accelerator through the Caliptra FW API only in subsystem mode. Caliptra FW API uses the internal SHA accelerator and its DMA widget to hash the required data and present it back to Calitpra FW.
 
-#### JTAG/TAP debug
+### JTAG/TAP debug
 
 ![Debug flow](./images/Caliptra_boot_flow6.png){#fig:debug-flow}
 
@@ -1752,11 +1758,11 @@ Note: These are injected as TAP register read/write commands as defined in the [
 5. Setting scan mode at a random time after cptra\_pwrgood: flushes out all internal Caliptra secrets, assets, key vault, and crypto intermediate state.
 6. Scan mode assertion does not automatically open Caliptra JTAG.
 
-#### Architectural registers
+### Architectural registers
 
 These registers are accessible over AXI to be read according to the register access permissions. For more information, see the register reference manual at <https://ereg.caliptra.org>.
 
-#### Fuse requirements
+### Fuse requirements
 
 Fuse registers are programmable whenever IP goes through reset (after cptra\_rst\_b asserts and de-asserts) and before the fuse registers are locked from writes. If the lock was set, the writes are dropped. The lock is sticky across a warm reset.
 
@@ -1767,7 +1773,7 @@ To ensure that the security claims of Caliptra are achieved, specific fuse prote
 * For the production lifecycle state, if JTAG is enabled pre or post SoC reset, then Caliptra's dedicated fuses shall not be accessible (shall not be readable, shall not be writable) by Caliptra or other SoC IP. This restriction shall be applicable to Caliptra's fuse shadow registers as well (see [Physical Attack Countermeasures](#physical-attack-countermeasures)).
 * SoC should ensure that the integrity of each fuse is maintained through the life of the part. The integrity of the fuses can be maintained by fuse redundancy, ECC, or other means determined sufficient by the SoC.
 
-##### Fuse programming
+#### Fuse programming
 
 All fuse based cryptographic keying material and seeds (for example, UDS Seed) shall be generated (on-chip or off-chip) per requirements described in [@{ocp-attestation-spec}].
 
@@ -1775,7 +1781,7 @@ SoC shall support in-field programmable fusing. [Fuse Map](#fuse-map) shows whic
 
 SoC shall support a field entropy programming API. The API shall support retrieving an input value from an external interface. It should cryptographically mix that value with the output of an on-die TRNG to generate the field entropy value. The API implementation shall burn the field entropy value into the first available field entropy fuse slot (or fail if no slots are available). Caliptra is expected to be in any security state. The device owner is expected to call this API in a “clean room environment” to minimize risk of attack on the programming process. In Subsystem mode, SoC may use MCU RT FW for these actions.
 
-##### Fuse zeroing
+#### Fuse zeroing
 
 Caliptra assumes that the unfused value in fuses is '0' and the fused value is '1'. With this context, zeroization refers to destroying a secret value by fusing it to all ones.
 
@@ -1789,7 +1795,7 @@ For SoCs that intend to achieve FIPS 140-3 CMVP certification with Caliptra:
 * SoC shall ensure authorization for this API to guard against denial-of-service attacks. The authorization design is left to the vendor.
 * Note: In Subsystem mode, SoC should use MCU RT FW with the corresponding subsystem HW components for these actions.
 
-##### Fuse map
+#### Fuse map
 
 **FIXME:** Needs updates for Caliptra 2p0 & Subsystem
 The following table describes Caliptra's fuse map:
