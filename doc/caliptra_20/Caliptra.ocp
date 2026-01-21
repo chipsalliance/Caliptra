@@ -6,7 +6,7 @@ project: Security
 authors: [(See Acknowledgements section)]
 bibliography: bibliography.yaml
 geometry: "left=0.5in,right=0.5in"
-date: 
+date:
 ...
 ---
 
@@ -586,7 +586,7 @@ See [Provisioning IDevID During Manufacturing](#sec:idev-during-manufacturing) f
 
 Caliptra shall support field-programmable entropy, which factors into the device's LDevID identity. The [LDevID certificate](#ldevid-certificate) is endorsed by IDevID and in turn endorses the FMC alias key. Caliptra supports both classic and post-quantum algorithms for endorsement based on ECDSA Secp384r1 and PQC MLDSA-87, respectively.
 
-Caliptra's field-programmable entropy shall consist of two 16-byte slots. All slots are used to derive LDevID. An owner may decide to program as few or as many slots as they wish. Upon programming new entropy, on the next reset the device begins wielding its fresh LDevID. Owners need to validate the new LDevID by using IDevID.
+Caliptra's field-programmable entropy shall consist of four 8-byte slots. All slots are used to derive LDevID. An owner may decide to program as few or as many slots as they wish. Upon programming new entropy, on the next reset the device begins wielding its fresh LDevID. Owners need to validate the new LDevID by using IDevID.
 
 #### Commentary: threat analysis
 
@@ -655,18 +655,20 @@ The owner key, when represented in fuses or in the FMC's alias certificate, is a
 
 ![Subsystem Mode: UDS manufacturing flow](./images/Manuf-UDS-Flow.png){width=512px #fig:subsystem-uds-manufacturing-flow}
 
-There are three ways of generating a UDS_SEED
-Use the internal TRNG to directly generate a 384-bit random number.
-Use an entity external to Caliptra such as an HSM or SoC-specific methodology to produce UDS-seed 384-bit random number that is pushed into the fuse controller (same as Caliptra 1.0).
-Combine the internal TRNG output with a Manufacturing time provided value to produce a 384-bit output.
+There are two ways of generating a UDS seed:
+
+1. Use the internal TRNG to directly generate a 512-bit random number.
+2. Use an entity external to Caliptra such as an HSM or SoC-specific methodology to produce the 512-bit random number for the UDS seed that is pushed into the fuse controller (same as Caliptra 1.0).
 
 **UDS Manufacturing**
 
-1. When SoC life cycle is in MANUFACTURING MODE, manufacturing service register bit [CPTRA_DBG_MANUF_SERVICE_REG[2]] is set to request for UDS seed programming flow.
-2. Caliptra ROM will sample this bit on power up; when this bit is set and Caliptra ROM rechecks that the life cycle state is manufacturing mode, it reads the iTRNG for a 512-bit value.
-3. Caliptra ROM writes the 512-bit value to the address available through a register named UDS_SEED_OFFSET which is strapped by SoC at integration time by using DMA HW assist macro available at ROM’s disposal.
-4. Caliptra ROM sets the corresponding status bit in CPTRA_DBG_MANUF_SERVICE_REG to indicate the flow completion.
-5. Manufacturing flow will poll/read this bit and then do the fuse burning flow as specified by the fuse controller spec and SoC specific VR methodologies (eg. Fuse macro voltage elevation flows etc.).
+To use the internal TRNG to generate the UDS seed during manufacturing in subsystem mode:
+
+1. When SoC life cycle is in MANUFACTURING MODE, set the manufacturing service register bit [SS_DBG_MANUF_SERVICE_REG_REQ[2]](https://chipsalliance.github.io/caliptra-rtl/v2_0/internal-regs/?p=clp.soc_ifc_reg.SS_DBG_MANUF_SERVICE_REG_REQ#UDS_PROGRAM_REQ.desc) through JTAG to request the UDS seed programming flow.
+2. Caliptra ROM will sample this bit on power up; when this bit is set, Caliptra ROM rechecks that the life cycle state is manufacturing mode and reads the iTRNG for a 512-bit value.
+3. Caliptra ROM writes the 512-bit value to the address available through registers named SS_UDS_SEED_BASE_ADDR_L and SS_UDS_SEED_BASE_ADDR_H (which are strapped by SoC at integration time) by using Caliptra's DMA.
+4. Caliptra ROM sets the corresponding status bit in SS_DBG_MANUF_SERVICE_REG_RSP to indicate the flow completion.
+5. Manufacturing flow will poll/read this bit and then do the fuse burning flow as specified by the fuse controller spec and SoC-specific VR methodologies (e.g., fuse macro voltage elevation flows).
 
 ### Provisioning IDevID during manufacturing {#sec:idev-during-manufacturing}
 
@@ -1093,6 +1095,7 @@ For PCR0 and PCR1, ROM issues the following extend operations in order:
 4. Digest of FMC
 
 Caliptra ROM fails to boot if the following values do not remain constant across a hitless update:
+
 * Owner public key hash
 * ECDSA vendor public key index
 * MLDSA-87 vendor public key index
@@ -1248,7 +1251,7 @@ Caliptra firmware is composed of two images: an FMC image and an application fir
 
 To verify the firmware, Caliptra ROM performs the following steps:
 
-1. Calculates the hash of the vendor [key descriptors](#tbl:pub-key-descriptor) in the preamble and compares it against the hash in fuses (key_manifest_pk_hash). If the lifecycle is not "unprovisioned" and the hashes do not match, the boot fails.
+1. Calculates the hash of the vendor [key](#tbl:ecc-pub-key-descriptor) [descriptors](#tbl:pqc-pub-key-descriptor) in the preamble and compares it against the hash in fuses (key_manifest_pk_hash). If the lifecycle is not "unprovisioned" and the hashes do not match, the boot fails.
 2. Calculates the hashes of the active vendor public keys and compares it against the hashes in the key descriptors identified by the corresponding active key indices.
 3. Calculates the hash of the owner public keys in the preamble and compares it against the hash in fuses (owner_pk_hash). If the owner_pk_hash fuse is not zero (i.e., unprovisioned) and hashes do not match, the boot fails. See the [Owner authorization](#owner-authorization) section.
 4. Ensures the vendor public key(s) selected by the preamble indices are not revoked based on fuse: key_manifest_pk_hash_mask for ECDSA public key, pqc_revocation for LMS or MLDSA public key.
@@ -1263,7 +1266,10 @@ To verify the firmware, Caliptra ROM performs the following steps:
 
 In addition to cold boot, Caliptra ROM performs firmware verification on hitless updates. See the [hitless update](#hitless-update) section for details.
 
-Fields in Tables [-@tbl:fw-manifest-preamble], [-@tbl:pub-key-descriptor], [-@tbl:fw-manifest-header], and [-@tbl:toc] are little endian unless described otherwise.
+Fields in Tables [-@tbl:fw-manifest-preamble], [-@tbl:ecc-pub-key-descriptor], [-@tbl:pqc-pub-key-descriptor], [-@tbl:fw-manifest-header], and [-@tbl:toc] that are 4-byte dwords are little endian unless described otherwise.
+Hashes must be stored with each 32-bit dword having swapped endianness from the SHA2 standard byte order.
+Signatures are stored in the byte order indicated in the standard.
+
 
 Table: Firmware manifest preamble {#tbl:fw-manifest-preamble}
 
@@ -1271,15 +1277,15 @@ Table: Firmware manifest preamble {#tbl:fw-manifest-preamble}
 | Field                   | Size (bytes) | Description                                            |
 +=========================+==============+========================================================+
 | Firmware Manifest       | 4            | Magic Number marking the start of the package          |
-| Marker                  |              | manifest. The value must be 0x434D414E (‘CMAN’ in      |
-|                         |              | ASCII)                                                 |
+| Marker                  |              | manifest. The value must be 0x434D4E32 (‘CMN2’ in      |
+|                         |              | ASCII) in big endian order                             |
 +-------------------------+--------------+--------------------------------------------------------+
 | Firmware Manifest Size  | 4            | Size of the full manifest structure                    |
 +-------------------------+--------------+--------------------------------------------------------+
 | Firmware Manifest Type  | 4            | **Byte0:** - Type                                      |
 |                         |              |                                                        |
-|                         |              | - 0x1 – ECDSA & LMS Keys                               |
-|                         |              | - 0x2 – ECDSA & MLDSA Keys                             |
+|                         |              | - 0x1 – ECDSA & MLDSA Keys                             |
+|                         |              | - 0x3 – ECDSA & LMS Keys                               |
 |                         |              |                                                        |
 |                         |              | **Byte1-Byte3:** Reserved                              |
 +-------------------------+--------------+--------------------------------------------------------+
@@ -1345,12 +1351,6 @@ Table: Firmware manifest preamble {#tbl:fw-manifest-preamble}
 |                         |              | header hashed using SHA512 (4627 bytes + 1 Reserved    |
 |                         |              | byte).                                                 |
 +-------------------------+--------------+--------------------------------------------------------+
-| Owner ECDSA Key         | 52           | Public Key Descriptor for ECDSA key                    |
-| Descriptor              |              |                                                        |
-+-------------------------+--------------+--------------------------------------------------------+
-| Owner LMS or MLDSA Key  | 52           | Public Key Descriptor for LMS or MLDSA key             |
-| Descriptor              |              |                                                        |
-+-------------------------+--------------+--------------------------------------------------------+
 | Owner ECDSA Public Key  | 96           | ECDSA P384 public key used to verify the Firmware      |
 |                         |              | Manifest Header Signature.                             |
 |                         |              |                                                        |
@@ -1404,29 +1404,43 @@ Table: Firmware manifest preamble {#tbl:fw-manifest-preamble}
 | Reserved                | 8            | Reserved 8 bytes                                       |
 +-------------------------+--------------+--------------------------------------------------------+
 
-Table: Public Key Descriptor {#tbl:pub-key-descriptor}
+Table: ECC Manufacturer Public Key Descriptor {#tbl:ecc-pub-key-descriptor}
 
 +------------------------+--------------+------------------------------------------------------+
 | Field                  | Size (bytes) | Description                                          |
 +========================+==============+======================================================+
-| Key Descriptor Version | 1            | Version of the Key Descriptor. The value must be 0x1 |
+| Key Descriptor Version | 2            | Version of the Key Descriptor. The value must be 0x2 |
 |                        |              | for Caliptra 2.x                                     |
 +------------------------+--------------+------------------------------------------------------+
-| Intent                 | 1            | Type of the descriptor                               |
-|                        |              |                                                      |
-|                        |              | - 0x1 - Vendor                                       |
-|                        |              | - 0x2 - Owner                                        |
-+------------------------+--------------+------------------------------------------------------+
-| Key Type               | 1            | Type of the key in the descriptor                    |
-|                        |              |                                                      |
-|                        |              | - 0x1 - ECC                                          |
-|                        |              | - 0x2 - LMS                                          |
-|                        |              | - 0x3 - MLDSA                                        |
+| Reserved               | 1            |                                                      |
 +------------------------+--------------+------------------------------------------------------+
 | Key Hash Count         | 1            | Number of valid public key hashes                    |
 +------------------------+--------------+------------------------------------------------------+
 | Public Key Hash(es)    | 48 * n       | List of valid and invalid (if any) SHA2-384 public   |
-|                        |              | key hashes. ECDSA: n = 4, LMS: n = 32, MLDSA: n = 4  |
+|                        |              | key hashes. ECDSA: n = 4.                            |
+|                        |              | Note: hashes must be stored with each 32-bit dword   |
+|                        |              | having swapped endianness                            |
++------------------------+--------------+------------------------------------------------------+
+
+Table: PQC Manufacturer Public Key Descriptor {#tbl:pqc-pub-key-descriptor}
+
++------------------------+--------------+------------------------------------------------------+
+| Field                  | Size (bytes) | Description                                          |
++========================+==============+======================================================+
+| Key Descriptor Version | 2            | Version of the Key Descriptor. The value must be 0x2 |
+|                        |              | for Caliptra 2.x                                     |
++------------------------+--------------+------------------------------------------------------+
+| Key Type               | 1            | Type of the key in the descriptor                    |
+|                        |              |                                                      |
+|                        |              | - 0x1 - MLDSA                                        |
+|                        |              | - 0x3 - LMS                                          |
++------------------------+--------------+------------------------------------------------------+
+| Key Hash Count         | 1            | Number of valid public key hashes                    |
++------------------------+--------------+------------------------------------------------------+
+| Public Key Hash(es)    | 48 * n       | List of valid and invalid (if any) SHA2-384 public   |
+|                        |              | key hashes. LMS: n = 32, MLDSA: n = 4.               |
+|                        |              | Note: hashes must be stored with each 32-bit dword   |
+|                        |              | having swapped endianness                            |
 +------------------------+--------------+------------------------------------------------------+
 
 Table: Firmware manifest header {#tbl:fw-manifest-header}
@@ -1445,6 +1459,7 @@ Table: Firmware manifest header {#tbl:fw-manifest-header}
 |                       |              | key.                                                   |
 +-----------------------+--------------+--------------------------------------------------------+
 | Flags                 | 4            | Feature flags.                                         |
+|                       |              |                                                        |
 |                       |              | - **Bit0:** - Interpret the pl0_axi_user field. If     |
 |                       |              | not set, all AXI_USERs are PL1                         |
 |                       |              | - **Bit1-Bit31:** Reserved                             |
@@ -1456,9 +1471,8 @@ Table: Firmware manifest header {#tbl:fw-manifest-header}
 |                       |              | its AXI_USER. The AXI_USER is wired through AXI.       |
 +-----------------------+--------------+--------------------------------------------------------+
 | TOC Digest            | 48           | SHA384 Digest of table of contents.                    |
-+-----------------------+--------------+--------------------------------------------------------+
-| SVN                   | 4            | Security Version Number for the firmware, checked      |
-|                       |              | against the SVN fuses.                                 |
+|                       |              | Note: hashes must be stored with each 32-bit dword     |
+|                       |              | having swapped endianness                              |
 +-----------------------+--------------+--------------------------------------------------------+
 | Vendor Data           | 40           | Vendor Data.                                           |
 |                       |              |                                                        |
@@ -1493,9 +1507,15 @@ Table: Table of contents {#tbl:toc}
 |                    |              |                                                         |
 |                    |              | - **0x0000_0001:** Executable                           |
 +--------------------+--------------+---------------------------------------------------------+
-| Image Revision     | 20           | Git Commit hash of the build                            |
+| Image Revision     | 20           | git commit SHA1 hash of the build                       |
 +--------------------+--------------+---------------------------------------------------------+
 | Image Version      | 4            | Firmware release number                                 |
++--------------------+--------------+---------------------------------------------------------+
+| Image SVN          | 4            | Security Version Number for the firmware, checked       |
+|                    |              | against the FW SVN fuses. FMC TOC entry's SVN field is  |
+|                    |              | ignored.                                                |
++--------------------+--------------+---------------------------------------------------------+
+| Reserved.          | 4            |                                                         |
 +--------------------+--------------+---------------------------------------------------------+
 | Image Load Address | 4            | Load address                                            |
 +--------------------+--------------+---------------------------------------------------------+
@@ -1506,6 +1526,8 @@ Table: Table of contents {#tbl:toc}
 | Image Size         | 4            | Image Size                                              |
 +--------------------+--------------+---------------------------------------------------------+
 | Image Hash         | 48           | SHA384 hash of image                                    |
+|                    |              | Note: hashes must be stored with each 32-bit dword      |
+|                    |              | having swapped endianness                               |
 +--------------------+--------------+---------------------------------------------------------+
 
 #### Post-Quantum Cryptography (PQC) requirements
@@ -1806,12 +1828,12 @@ Table: Caliptra Fuse Map {#tbl:caliptra-fuse-map}
 | Name                     | Size     | ACL             | Fuse programming time | Description                                   |
 |                          | (bits)   |                 |                       |                                               |
 +==========================+==========+=================+=======================+===============================================+
-| UDS SEED (obfuscated)    | 512      | ROM             | SoC manufacturing     | DICE Unique Device Secret Seed. This          |
-|                          |          |                 |                       | seed is unique per device. The seed           |
+| UDS SEED (obfuscated)    | 512      | HW read,        | SoC manufacturing     | DICE Unique Device Secret Seed. This          |
+|                          |          | ROM write       |                       | seed is unique per device. The seed           |
 |                          |          |                 |                       | is scrambled using an obfuscation function.   |
 +--------------------------+----------+-----------------+-----------------------+-----------------------------------------------+
-| FIELD ENTROPY            | 256      | ROM             | Device owner          | Field-programmable by the owner, used         |
-| (obfuscated)             |          |                 | in-field programmable | to hedge against UDS disclosure in the        |
+| FIELD ENTROPY            | 256      | HW read,        | Device owner          | Field-programmable by the owner, used         |
+| (obfuscated)             |          | ROM FMC RUNTIME | in-field programmable | to hedge against UDS disclosure in the        |
 |                          |          |                 |                       | supply chain.                                 |
 +--------------------------+----------+-----------------+-----------------------+-----------------------------------------------+
 | VENDOR PK HASH           | 384      | ROM FMC RUNTIME | SoC manufacturing     | SHA384 hash of the Vendor ECDSA P384          |
@@ -1869,11 +1891,10 @@ Table: Caliptra Fuse Map {#tbl:caliptra-fuse-map}
 | MANUF DEBUG UNLOCK TOKEN | 512      | ROM             | SoC manufacturing     | Digest value for manufacturing debug unlock   |
 |                          |          |                 |                       | token secret value for authorization.         |
 +--------------------------+----------+-----------------+-----------------------+-----------------------------------------------+
-| PQC Key Type             | 2        | ROM FMC RUNTIME | In-field programmable | One-hot encoded selection of PQC key type     |
-|                          |          |                 |                       | for firmware validation.                      |
+| PQC Key Type             | 2        | ROM FMC RUNTIME | In-field programmable | PQC key type for firmware validation.         |
 |                          |          |                 |                       |                                               |
-|                          |          |                 |                       | - **Bit 0** - MLDSA                           |
-|                          |          |                 |                       | - **Bit 1** - LMS                             |
+|                          |          |                 |                       | - 0x1 - MLDSA                                 |
+|                          |          |                 |                       | - 0x3 - LMS                                   |
 +--------------------------+----------+-----------------+-----------------------+-----------------------------------------------+
 | SOC MANIFEST SVN         | 128      | ROM FMC RUNTIME | In-field programmable | One-hot encoded value for the SOC             |
 |                          |          |                 |                       | authorization manifest minimum supported      |
