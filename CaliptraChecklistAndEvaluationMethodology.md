@@ -55,7 +55,7 @@ This checklist is built from these specifications with the goal to help ensure t
 
 # Checklist Summary
 
-The following is a consolidated list of all requirements to ensure comprehensive coverage:
+The following is a consolidated list of all requirements and recommendations to ensure comprehensive coverage.
 
 1. **Assets**  
    * UDS Seed and Field Entropy  
@@ -80,6 +80,9 @@ The following is a consolidated list of all requirements to ensure comprehensive
    * Production Process Security  
    * Flaw Remediation Process
 
+**By default, recommmendations, like requirements, MUST be followed unless there is sufficent, documented, and approved justification otherwise.**
+
+
 # Checklist Areas
 
 ## Assets
@@ -95,13 +98,13 @@ The following is a consolidated list of all requirements to ensure comprehensive
   * **Requirement:** The confidentiality and integrity of the UDS seed MUST be protected during generation, storage, and provisioning. Access to this asset must be strictly controlled, and any temporary storage MUST be sanitized after use.  
   * **Evaluation Methodology:** Manufacturers MUST detail the security measures employed during the handling of the UDS seed, including access controls, secure storage practices, and sanitization procedures.  
 * **Checklist Item:**  
-  * **Requirement**: Field Entropy SHOULD be generated on die, and not be exposed outside the die.  
+  * **Recommendation**: Field Entropy SHOULD be generated on die, and not be exposed outside the die.  
   * **Evaluation Methodology**: Manufacturers SHOULD detail the generation process for, and document exposure of field entropy.
 
 #### *Access to Fuses*
 
 * **Checklist Item:**  
-  * **Requirement:** Access to the fuses containing the UDS seed and field entropy SHOULD be restricted exclusively to the mechanisms needed for loading these values into Caliptra's fuse registers. No other components or firmware should have read or write access, except for essential hardware functions like fuse sense and distribution logic.  
+  * **Recommendation:** Access to the fuses containing the UDS seed and field entropy SHOULD be restricted exclusively to the mechanisms needed for loading these values into Caliptra's fuse registers. No other components or firmware should have read or write access, except for essential hardware functions like fuse sense and distribution logic.  
   * **Evaluation Methodology:** Manufacturers SHOULD provide architectural diagrams and RTL code excerpts demonstrating that only authorized hardware mechanisms can access these fuses.
 
 ### FW Authentication Keys
@@ -111,8 +114,8 @@ The following is a consolidated list of all requirements to ensure comprehensive
   * **Requirement:** Signature generation operations using the firmware authentication key MUST only be allowed by authorized entities.
   * **Requirement:** Firmware authentication keys MUST be stored in a manner that prevents disclosure of private key material. The manner of storage MUST only permit keys to be exported or copied to systems that enforce the same controls on usage and disclosure of the key.
   * **Requirement:** Signature generation operations using the firmware authentication key MUST be logged.
-  * **Requirement:** Firmware authentication keys SHOULD be created and stored in a Hardware Security Module (HSM).
-  * **Requirement:** Firmware authentication keys SHOULD require multi-party authentication to perform signing operations.
+  * **Recommendation:** Firmware authentication keys SHOULD be created and stored in a Hardware Security Module (HSM).
+  * **Recommendation:** Firmware authentication keys SHOULD require multi-party authentication to perform signing operations.
   * **Evaluation Methodology:** Manufacturers MUST describe their key management practices, including storage solutions, access controls, and procedures to prevent unauthorized usage.
 
 ### IDEVID Generation and Endorsement Flow
@@ -145,31 +148,31 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Access Control*
 
 * **Checklist Item:**  
-  * **Requirement:** Fuses containing Caliptra secrets SHOULD NOT be readable or writable by any mutable code in the SoC. Access SHOULD be restricted to secure hardware mechanisms and essential hardware functions like fuse sense and distribution logic.
+  * **Recommendation:** Fuses containing Caliptra secrets SHOULD NOT be readable or writable by any mutable code in the SoC. Access SHOULD be restricted to secure hardware mechanisms and essential hardware functions like fuse sense and distribution logic.
   * **Evaluation Methodology:** Manufacturers SHOULD provide hardware design documentation showing access controls on fuse read/write mechanisms, ensuring only authorized hardware components can access these fuses.
 
 #### *JTAG and Debug Interfaces*
 
 * **Checklist Item:**  
-  * **Requirement:** When JTAG or other debug interfaces are enabled, they SHOULD NOT allow access to Caliptra's fuses or fuse shadow registers containing secrets. This applies to both pre and post SoC reset states.  
+  * **Recommendation:** When JTAG or other debug interfaces are enabled, they SHOULD NOT allow access to Caliptra's fuses or fuse shadow registers containing secrets. This applies to both pre and post SoC reset states.  
   * **Evaluation Methodology:** Manufacturers SHOULD explain how debug interfaces are managed to prevent unauthorized access to sensitive fuses, including any hardware or firmware controls in place.
 
 #### *Integrity Maintenance*
 
 * **Checklist Item:**  
-  * **Requirement:** The integrity of each fuse SHOULD be maintained throughout the lifespan of the device to prevent degradation or tampering that could affect security.  
+  * **Recommendation:** The integrity of each fuse SHOULD be maintained throughout the lifespan of the device to prevent degradation or tampering that could affect security.  
   * **Evaluation Methodology:** Manufacturers SHOULD describe the techniques used to ensure fuse integrity, such as redundancy, error correction codes (ECC), or other protective measures.
 
 #### *In-Field Programmable Fuses*
 
 * **Checklist Item:**  
-  * **Requirement:** Authorization mechanisms SHOULD be implemented for in-field programmable fuses to prevent unauthorized updates that could lead to denial-of-service or other attacks.  
+  * **Recommendation:** Authorization mechanisms SHOULD be implemented for in-field programmable fuses to prevent unauthorized updates that could lead to denial-of-service or other attacks.  
   * **Evaluation Methodology:** Manufacturers SHOULD document the authorization processes required to program fuses in the field, including cryptographic protections or authentication steps.
 
 #### *Caliptra SVN (Security Version Number) Management*
 
 * **Checklist Item:**  
-  * **Requirement:** Before updating any Caliptra SVN fuses, the SoC SHOULD verify that the firmware integrity and authenticity have been validated, and that the new SVN is greater than the current one.  
+  * **Recommendation:** Before updating any Caliptra SVN fuses, the SoC SHOULD verify that the firmware integrity and authenticity have been validated, and that the new SVN is greater than the current one.  
   * **Evaluation Methodology:** Manufacturers SHOULD describe the SVN update process, including checks performed to prevent unauthorized or erroneous updates.
 
 ## Interfaces
@@ -177,7 +180,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 ### *Mailbox Interface Compliance*
 
 * **Checklist Item:**  
-  * **Requirement:** The SoC Manager SHOULD implement the mailbox interface according to the Caliptra specification, ensuring proper handling of commands and status registers. Using the Caliptra Libraries (RUST and C version) provided by the Caliptra WG release is recommended as a reference codebase.  
+  * **Recommendation:** The SoC Manager SHOULD implement the mailbox interface according to the Caliptra specification, ensuring proper handling of commands and status registers. Using the Caliptra Libraries (RUST and C version) provided by the Caliptra WG release is recommended as a reference codebase.  
   * **Evaluation Methodology:** Manufacturers SHOULD provide evidence, such as interface specifications or test results, demonstrating compliance with the mailbox interface requirements.
 
 ### *Debug Interface Management*
@@ -197,8 +200,8 @@ The following is a consolidated list of all requirements to ensure comprehensive
 ### *Boot and Initialization Process*
 
 * **Checklist Item:**
-  * **Requirement:** SOC firmware that interacts with Caliptra as the privileged PA\_USER MUST be measured, and those measurements MUST be submitted to Caliptra. Other SOC firmware SHOULD be measured. Configuration data that modifies the security properties of firmware MUST also be measured. 
-  * **Requirement:** Measurements of firmware and configuration MUST be submitted to Caliptra before execution of the firmware, or usage of the configuration data. Measurements MUST be submitted to Caliptra by the same entity that collected the measurement (e.g. SOC FMC cannot pass measurements to SOC FW for submission to the Caliptra mailbox).   
+  * **Requirement:** Measurements of firmware and configuration MUST be submitted to Caliptra before execution of the firmware, or usage of the configuration data. Measurements MUST be submitted to Caliptra by the same entity that collected the measurement (e.g. SOC FMC cannot pass measurements to SOC FW for submission to the Caliptra mailbox). 
+  * **Recommendation:** SOC firmware that interacts with Caliptra as the privileged PA\_USER MUST be measured, and those measurements MUST be submitted to Caliptra. Other SOC firmware SHOULD be measured. Configuration data that modifies the security properties of firmware MUST also be measured.   
   * **Evaluation Methodology:** Manufacturers MUST provide a detailed description of how measurements are communicated to Caliptra.  
 
 ### *Caliptra PA\_USER Management*
@@ -210,7 +213,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 ### *Random Number Generator (RNG) Implementation*
 
 * **Checklist Item:**  
-  * **Requirement:** If an RNG is included in the Caliptra Wrapper, it SHOULD be securely implemented, and its design SHOULD meet applicable cryptographic standards. The source of entropy (internal or external) SHOULD be specified.  
+  * **Recommendation:** If an RNG is included in the Caliptra Wrapper, it SHOULD be securely implemented, and its design SHOULD meet applicable cryptographic standards. The source of entropy (internal or external) SHOULD be specified.  
   * **Evaluation Methodology:** Manufacturers SHOULD demonstrate that the RNG, including entropy sources, is compliant with standards like [NIST SP 800-90A](https://csrc.nist.gov/pubs/sp/800/90/a/r1/final), [SP 800-90B](https://csrc.nist.gov/pubs/sp/800/90/b/final), [SP 800-90C](https://csrc.nist.gov/pubs/sp/800/90/c/4pd).
 
 ## Specific Functionality
@@ -230,7 +233,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 ### *Log Functionality in SoC*
 
 * **Checklist Item:**
-  * **Requirement:** The SoC SHOULD implement logging functionality that allows the compounded measurements stored by Caliptra to be reconstructed.
+  * **Recommendation:** The SoC SHOULD implement logging functionality that allows the compounded measurements stored by Caliptra to be reconstructed.
   * **Evaluation Methodology:** Manufacturers SHOULD describe the logging mechanism, including how logs are structured and how they integrate with Caliptra's measurement processes.
 
 ## Secure Processes
@@ -252,7 +255,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Testing and Verification*
 
 * **Checklist Item:**  
-  * **Requirement:** The product SHOULD undergo thorough testing and verification during development, focusing on both functional correctness and security aspects. This includes testing of specific features and security mechanisms.  
+  * **Recommendation:** The product SHOULD undergo thorough testing and verification during development, focusing on both functional correctness and security aspects. This includes testing of specific features and security mechanisms.  
   * **Evaluation Methodology:** Manufacturers SHOULD present test plans, results, and security analyses covering critical functionalities such as:  
     * Field programmable entropy API  
     * Generation and endorsement of attestation messages  
