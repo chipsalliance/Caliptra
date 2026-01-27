@@ -58,6 +58,15 @@ Caliptra provides a [template](../.github/ISSUE_TEMPLATE/rfc-issue-template.md) 
 
 ### RFC Approval Authority
 
+**RFC Review and Ratification Process**
+The following process should be used to review and ratify RFCs:
+Open RFCs GitHub issues should be presented to RFC review committee by (browsing the RFC dashboard) either:
+the RFC representative from the TAC company that proposed the RFC (if the RFC was proposed by a TAC company), or
+by inviting the original proposer of the RFC to the relevant RFC review meeting where the RFC will be initial presented (the proposer should leave the meeting after presenting the RFC and answering any questions before any voting commences) 
+New RFCs should be tabled for exactly 2 weeks (or until the next RFC review meeting) to provide RFC reviewers ample opportunity to review their contents offline.
+Prior to voting on an RFC, all open questions on an RFC should be either addressed or resolved in the respective GitHub issue (or shared document) where the RFC resides.
+After the review period has passed, an RFC should be voted on by the review committee, with a simple majority (3 out of 4 votes) required to pass. The outcome of the vote should be noted on the respective GitHub issue, and either left open or closed accordingly.
+
 Final approval authority for all RFCs rests with the **TAC**. Proposed RFCs should be discussed by project maintainers asynchronously in the GitHub issue, but should be formally reviewed and approved by the TAC during a **bi-weekly review**. Once the TAC approves an RFC, corresponding PRs can be submitted for review. Implementation of an RFC may begin on a contributor's forked repo for purposes of experimentation and providing more implementation details in the RFC itself, however, PRs containing the implementation should not be made against the upstream repository until approval is given.
 
 ## Implementation
