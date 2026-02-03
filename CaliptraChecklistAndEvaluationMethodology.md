@@ -43,7 +43,10 @@ By adhering to the checklist and employing the specified evaluation methodologie
 
 ### Key Words
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119).
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT" in this document are to be interpreted as requirements.
+The key words "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as recommendations.
+
+**By default, recommmendations, like requirements, MUST be followed unless there is sufficent, documented, and approved justification otherwise.**
 
 # Caliptra Documentation
 
@@ -79,9 +82,6 @@ The following is a consolidated list of all requirements and recommendations to 
    * Development Process Integrity  
    * Production Process Security  
    * Flaw Remediation Process
-
-**By default, recommmendations, like requirements, MUST be followed unless there is sufficent, documented, and approved justification otherwise.**
-
 
 # Checklist Areas
 
@@ -201,7 +201,8 @@ The following is a consolidated list of all requirements and recommendations to 
 
 * **Checklist Item:**
   * **Requirement:** Measurements of firmware and configuration MUST be submitted to Caliptra before execution of the firmware, or usage of the configuration data. Measurements MUST be submitted to Caliptra by the same entity that collected the measurement (e.g. SOC FMC cannot pass measurements to SOC FW for submission to the Caliptra mailbox). 
-  * **Recommendation:** SOC firmware that interacts with Caliptra as the privileged PA\_USER MUST be measured, and those measurements MUST be submitted to Caliptra. Other SOC firmware SHOULD be measured. Configuration data that modifies the security properties of firmware MUST also be measured.   
+  * **Requirement:** SOC firmware that interacts with Caliptra as the privileged PA\_USER MUST be measured, and those measurements MUST be submitted to Caliptra. Configuration data that modifies the security properties of firmware MUST also be measured.   
+  * **Recommendation:** Other SOC firmware SHOULD be measured. 
   * **Evaluation Methodology:** Manufacturers MUST provide a detailed description of how measurements are communicated to Caliptra.  
 
 ### *Caliptra PA\_USER Management*
