@@ -200,8 +200,10 @@ The following is a consolidated list of all requirements and recommendations to 
 ### *Boot and Initialization Process*
 
 * **Checklist Item:**
-  * **Requirement:** Measurements of firmware and configuration MUST be submitted to Caliptra before execution of the firmware, or usage of the configuration data. Measurements MUST be submitted to Caliptra by the same entity that collected the measurement (e.g. SOC FMC cannot pass measurements to SOC FW for submission to the Caliptra mailbox). 
-  * **Requirement:** SOC firmware that interacts with Caliptra as the privileged PA\_USER MUST be measured, and those measurements MUST be submitted to Caliptra. Configuration data that modifies the security properties of firmware MUST also be measured.   
+  * **Requirement:** SOC firmware that interacts with Caliptra as the privileged PA_USER, including RTM firmware, MUST be measured, and those measurements MUST be submitted to Caliptra.
+  * **Requirement:** Configuration data that modifies the security properties of measured firmware MUST also be measured.   
+  * **Requirement:** Measurements of all firmware and configuration MUST be *collected* before execution of the firmware or usage of the configuration data. 
+  * **Requirement:** Measurements MUST be submitted to Caliptra by the same entity that collected the measurement (e.g. SOC FMC cannot pass measurements to SOC FW for submission to the Caliptra mailbox). 
   * **Recommendation:** Other SOC firmware SHOULD be measured. 
   * **Evaluation Methodology:** Manufacturers MUST provide a detailed description of how measurements are communicated to Caliptra.  
 
