@@ -114,8 +114,8 @@ The following is a consolidated list of all requirements and recommendations to 
   * **Requirement:** Signature generation operations using the firmware authentication key MUST only be allowed by authorized entities.
   * **Requirement:** Firmware authentication keys MUST be stored in a manner that prevents disclosure of private key material. The manner of storage MUST only permit keys to be exported or copied to systems that enforce the same controls on usage and disclosure of the key.
   * **Requirement:** Signature generation operations using the firmware authentication key MUST be logged.
-  * **Requirement*:** Firmware authentication keys MUST be created and stored in a Hardware Security Module (HSM).
-  * **Requirement*:** Firmware authentication keys MUST require multi-party authentication to perform signing operations.
+  * **Recommendation:** Firmware authentication keys SHOULD be created and stored in a Hardware Security Module (HSM).
+  * **Recommendation:** Firmware authentication keys SHOULD require multi-party authentication to perform signing operations.
   * **Evaluation Methodology:** Manufacturers MUST describe their key management practices, including storage solutions, access controls, and procedures to prevent unauthorized usage.
 
 ### IDEVID Generation and Endorsement Flow
@@ -160,8 +160,8 @@ The following is a consolidated list of all requirements and recommendations to 
 #### *Integrity Maintenance*
 
 * **Checklist Item:**  
-  * **Requirement*:** The integrity of each fuse MUST be maintained throughout the lifespan of the device to prevent degradation or tampering that could affect security.  
-  * **Evaluation Methodology:** Manufacturers MUST describe the techniques used to ensure fuse integrity, such as redundancy, error correction codes (ECC), or other protective measures.
+  * **Recommendation:** The integrity of each fuse SHOULD be maintained throughout the lifespan of the device to prevent degradation or tampering that could affect security.  
+  * **Evaluation Methodology:** Manufacturers SHOULD describe the techniques used to ensure fuse integrity, such as redundancy, error correction codes (ECC), or other protective measures.
 
 #### *In-Field Programmable Fuses*
 
@@ -204,8 +204,8 @@ The following is a consolidated list of all requirements and recommendations to 
   * **Requirement:** Configuration data that modifies the security properties of measured firmware MUST also be measured.   
   * **Requirement:** Measurements of all firmware and configuration MUST be *collected* before execution of the firmware or usage of the configuration data. 
   * **Requirement:** Measurements MUST be submitted to Caliptra by the same entity that collected the measurement (e.g. SOC FMC cannot pass measurements to SOC FW for submission to the Caliptra mailbox). 
-  * **Requirement*:** Other SOC firmware MUST be measured. 
-  * **Evaluation Methodology:** Manufacturers MUST provide a detailed description of how measurements are communicated to Caliptra.  
+  * **Recommendation:** Other SOC firmware SHOULD be measured. 
+  * **Evaluation Methodology:** Manufacturers SHOULD provide a detailed description of how measurements are communicated to Caliptra.  
 
 ### *Caliptra PA\_USER Management*
 
@@ -258,8 +258,8 @@ The following is a consolidated list of all requirements and recommendations to 
 #### *Testing and Verification*
 
 * **Checklist Item:**  
-  * **Requirement*:** The product MUST undergo thorough testing and verification during development, focusing on both functional correctness and security aspects. This includes testing of specific features and security mechanisms.  
-  * **Evaluation Methodology:** Manufacturers MUST present test plans, results, and security analyses covering critical functionalities such as:  
+  * **Recommendation:** The product SHOULD undergo thorough testing and verification during development, focusing on both functional correctness and security aspects. This includes testing of specific features and security mechanisms.  
+  * **Evaluation Methodology:** Manufacturers SHOULD present test plans, results, and security analyses covering critical functionalities such as:  
     * Field programmable entropy API  
     * Generation and endorsement of attestation messages  
     * CSR generation and handling  
