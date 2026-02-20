@@ -39,6 +39,8 @@ bibliography: bibliography.yaml
 |                |         | combine keys using SP 800-108 KDFs. |
 |                |         |                                     |
 |                |         | Update HPKE labels to match IETF.   |
+|                |         |                                     |
+|                |         | Update REWRAP_MPK command language. |
 +----------------+---------+-------------------------------------+
 
 \currenttemplateversion
@@ -1548,7 +1550,7 @@ Table: GENERATE_MPK output arguments {#tbl:generate-mpk-output-args}
 
 #### REWRAP_MPK {#sec:rewrap-mpk-cmd}
 
-This command unwraps current_access_key and encrypted new_access_key from sealed_access_keys. Then current_access_key is used to decrypt new_access_key. The specified MPK is decrypted using its current Locked MPK encryption key, then re-encrypted with its new Locked MPK encryption key. The new Locked MPK is returned.
+This command follows the Access Key [rotation](#sec:mpk-access-key-rotation) flow.
 
 The drive stores the returned Locked MPK and zeroizes the old Locked MPK.
 
