@@ -14,6 +14,7 @@
 
 # Table of Contents
 - [Introduction](#introduction)
+- [Trademark Type Selection](#trademark-type-selection)
 - [Caliptra Trademark Auditing Process](#caliptra-trademark-auditing-process)
   - [Suggestion](#suggestion)
   - [Roles](#roles)
@@ -35,6 +36,36 @@ The main objective of the [Checklist and evaluation methodology document](https:
 * Provide an interface for storing additional measurements
 * **Report measurements** to a host and/or external entity, which can further verify the authenticity and integrity of the device (a.k.a Attestation)  
 * Furthermore, Caliptra offers **DICE hardware identity service**.
+
+# Trademark Type Selection
+
+The Caliptra project recognizes two trademark types, each corresponding to a
+distinct integration architecture. Before any audit engagement begins, the
+integrator MUST declare which trademark type is being pursued for the Target of
+Evaluation (TOE):
+
+* **Caliptra Core Trademark (Passive Mode)** — for integrations of the Caliptra
+  Core using the Passive Mode architecture, where the AXI DMA interface is
+  inactive and the SoC provides the SoC Manager and firmware loading.
+* **Caliptra Subsystem Trademark** — for integrations of the full Caliptra
+  Subsystem (introduced in Caliptra 2.0), including Caliptra Core, Life Cycle
+  Controller, Fuse Controller, I3C, MCU, and MCI.
+
+This declaration MUST be made at the outset of the audit process — at minimum,
+it must be included in the initial submission or the engagement letter between
+the manufacturer and the laboratory. A single product (TOE) may receive only
+one Caliptra trademark. A company may hold both trademark types on different
+products.
+
+The elected trademark type determines:
+
+1. The applicable integration architecture and its corresponding integration
+   specifications.
+2. The audit scope for the laboratory evaluation.
+3. Which sections of the [Checklist and Evaluation Methodology](CaliptraChecklistAndEvaluationMethodology.md)
+   apply — specifically, the common requirements (Part I) plus the
+   trademark-type-specific requirements for the elected track (Part II for Core
+   or Part III for Subsystem).
 
 # Caliptra Trademark Auditing Process
 
@@ -156,7 +187,7 @@ This section considers some specific questions and suggestions for discussion on
 ## Typical Process for Obtaining the Caliptra Trademark
 
 1. The manufacturer contacts a licensed laboratory.  
-2. The laboratory and manufacturer agree on terms and sign a contract to help respond to the documentation required within the checklist and methodology document.  
+2. The laboratory and manufacturer agree on terms and sign a contract to help respond to the documentation required within the checklist and methodology document. As part of this engagement, the manufacturer declares in writing which trademark type (Caliptra Core or Caliptra Subsystem) is being pursued for the TOE. This declaration determines the audit scope and the applicable sections of the checklist.  
 3. The laboratory and manufacturer communicate and jointly, when aligned, provide an application for Caliptra Trademark Usage for a TOE to Caliptra Trademark Owner TAC, signed by both laboratory and manufacturer.  
 4. It is the manufacturer's responsibility to provide a self-assessment of why the checklist requirements are fulfilled, together with other necessary information for the laboratory.  
 5. The laboratory evaluates and assesses the TOE using the provided filled-in checklist and the evaluation methodology. Iterations with the manufacturer are expected until all issues are resolved, as judged by the laboratory.  
