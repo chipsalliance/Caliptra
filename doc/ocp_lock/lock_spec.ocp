@@ -501,7 +501,7 @@ Table: HPKE algorithm support {#tbl:hpke-algorithm-support}
 +===========+=====================+===========+================================+
 | KEM       | ML-KEM-1024         | 0x0042    | PQ and PQ/T Hybrid Algorithms  |
 |           +---------------------+-----------+ for HPKE                       |
-|           | ML-KEM-1024 + P-384 | 0x0052    | [@{draft-ietf-hpke-pq}]        |
+|           | ML-KEM-1024 + P-384 | 0x0051    | [@{draft-ietf-hpke-pq}]        |
 |           +---------------------+-----------+--------------------------------+
 |           | P-384               | 0x0011    | draft-ietf-hpke-hpke           |
 |           |                     |           | [@{draft-ietf-hpke-hpke}]      |
