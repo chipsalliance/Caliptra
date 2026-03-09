@@ -495,21 +495,21 @@ An HPKE variant relies on three types of algorithms: KEM, KDF, and AEAD. @tbl:hp
 
 Table: HPKE algorithm support {#tbl:hpke-algorithm-support}
 
-+-----------+---------------------+-----------+--------------------------------+
-| Algorithm | Algorithm           | IANA code | Reference document             |
-| type      |                     | point     |                                |
-+===========+=====================+===========+================================+
-| KEM       | ML-KEM-1024         | 0x0042    | PQ and PQ/T Hybrid Algorithms  |
-|           +---------------------+-----------+ for HPKE                       |
-|           | ML-KEM-1024 + P-384 | 0x0051    | [@{draft-ietf-hpke-pq}]        |
-|           +---------------------+-----------+--------------------------------+
-|           | P-384               | 0x0011    | draft-ietf-hpke-hpke           |
-|           |                     |           | [@{draft-ietf-hpke-hpke}]      |
-+-----------+---------------------+-----------+                                |
-| KDF       | HKDF-SHA384         | 0x0002    |                                |
-+-----------+---------------------+-----------+                                |
-| AEAD      | AES-256-GCM         | 0x0002    |                                |
-+-----------+---------------------+-----------+--------------------------------+
++-----------+---------------------+-----------+-------------------------------+
+| Algorithm | Algorithm           | IANA code | Reference document            |
+| type      |                     | point     |                               |
++===========+=====================+===========+===============================+
+| KEM       | ML-KEM-1024         | 0x0042    | PQ and PQ/T Hybrid Algorithms |
+|           +---------------------+-----------+ for HPKE                      |
+|           | ML-KEM-1024 + P-384 | 0x0051    | [@{draft-ietf-hpke-pq}]       |
+|           +---------------------+-----------+-------------------------------+
+|           | P-384               | 0x0011    | Hybrid Public Key Encryption  |
+|           |                     |           | [@{draft-ietf-hpke-hpke}]     |
++-----------+---------------------+-----------+                               |
+| KDF       | HKDF-SHA384         | 0x0002    |                               |
++-----------+---------------------+-----------+                               |
+| AEAD      | AES-256-GCM         | 0x0002    |                               |
++-----------+---------------------+-----------+-------------------------------+
 
 The definitions for the post-quantum KEMs are currently distributed across a number of documents. [@{draft-irtf-cfrg-hybrid-kems}] contains generic constructions, [@{draft-irtf-cfrg-concrete-hybrid-kems}] contains concrete parameterizations, and [@{draft-ietf-hpke-pq}] contains HPKE IANA code-point assignments.[^pq-kems]
 
@@ -1466,7 +1466,7 @@ Table: ENDORSE_HPKE_PUB_KEY output arguments {#tbl:endorse-hpke-pub-key-output-a
 | reserved        | u32                 | Reserved.                                      |
 +-----------------+---------------------+------------------------------------------------+
 | pub_key_len     | u32                 | Length of HPKE public key                      |
-|                 |                     | (\`Npk\` in ietf-draft-hpke-hpke).             |
+|                 |                     | (\`Npk\` in [@{draft-ietf-hpke-hpke}]).        |
 +-----------------+---------------------+------------------------------------------------+
 | endorsement_len | u32                 | Length of endorsement data. Zero if            |
 |                 |                     | \`endorsement_algorithm\` is 0h.               |
