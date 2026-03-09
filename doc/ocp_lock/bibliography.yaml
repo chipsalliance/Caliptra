@@ -80,13 +80,13 @@ references:
       year: 2018
       month: 8
     url: "https://datatracker.ietf.org/doc/html/rfc8446"
-  - id: "ietf-rfc9180"
+  - id: "draft-ietf-hpke-hpke"
     title: "Hybrid Public Key Encryption"
     publisher: "IETF"
     issued:
-      year: 2022
-      month: 2
-    url: "https://datatracker.ietf.org/doc/html/rfc9180"
+      year: 2026
+      month: 3
+    url: "https://datatracker.ietf.org/doc/html/draft-ietf-hpke-hpke-03"
   - id: "draft-ietf-lamps-dilithium-certificates"
     title: "Internet X.509 Public Key Infrastructure: Algorithm Identifiers for ML-DSA"
     author:
@@ -114,8 +114,8 @@ references:
         affiliation: "Cisco"
     issued:
       year: 2025
-      month: 6
-    url: "https://www.ietf.org/archive/id/draft-ietf-hpke-pq-01.html"
+      month: 11
+    url: "https://www.ietf.org/archive/id/draft-ietf-hpke-pq-03.html"
   - id: "draft-irtf-cfrg-concrete-hybrid-kems"
     title: "Concrete Hybrid PQ/T Key Encapsulation Mechanisms"
     author:
@@ -127,8 +127,8 @@ references:
         affiliation: "Cisco"
     issued:
       year: 2025
-      month: 7
-    url: "https://www.ietf.org/archive/id/draft-irtf-cfrg-concrete-hybrid-kems-00.html"
+      month: 11
+    url: "https://www.ietf.org/archive/id/draft-irtf-cfrg-concrete-hybrid-kems-02.html"
   - id: "draft-irtf-cfrg-hybrid-kems"
     title: "Hybrid PQ/T Key Encapsulation Mechanisms"
     author:
@@ -142,9 +142,9 @@ references:
         given: "P."
         affiliation: "University of Michigan"
     issued:
-      year: 2025
-      month: 7
-    url: "https://www.ietf.org/archive/id/draft-irtf-cfrg-hybrid-kems-05.html"
+      year: 2026
+      month: 1
+    url: "https://www.ietf.org/archive/id/draft-irtf-cfrg-hybrid-kems-08.html"
   - id: "caliptra-2.0-hw-spec"
     title: "Caliptra 2.0 Hardware Specification"
     publisher: "CHIPS Alliance"
