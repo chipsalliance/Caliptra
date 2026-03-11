@@ -101,8 +101,8 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Access to Fuses*
 
 * **Checklist Item:**  
-  * **Requirement:** Access to the fuses containing the UDS seed and field entropy SHOULD be restricted exclusively to the mechanisms needed for loading these values into Caliptra's fuse registers. No other components or firmware should have read or write access, except for essential hardware functions like fuse sense and distribution logic.  
-  * **Evaluation Methodology:** Manufacturers SHOULD provide architectural diagrams and RTL code excerpts demonstrating that only authorized hardware mechanisms can access these fuses.
+  * **Requirement:** Access to the fuses containing the UDS seed and field entropy MUST be restricted exclusively to the mechanisms needed for loading these values into Caliptra's fuse registers. No other components or firmware may have read or write access, except for essential hardware functions like fuse sense and distribution logic.  
+  * **Evaluation Methodology:** Manufacturers MUST provide architectural diagrams and RTL code excerpts demonstrating that only authorized hardware mechanisms can access these fuses.
 
 ### FW Authentication Keys
 
@@ -145,20 +145,20 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Access Control*
 
 * **Checklist Item:**  
-  * **Requirement:** Fuses containing Caliptra secrets SHOULD NOT be readable or writable by any mutable code in the SoC. Access SHOULD be restricted to secure hardware mechanisms and essential hardware functions like fuse sense and distribution logic.
-  * **Evaluation Methodology:** Manufacturers SHOULD provide hardware design documentation showing access controls on fuse read/write mechanisms, ensuring only authorized hardware components can access these fuses.
+  * **Requirement:** Fuses containing Caliptra secrets MUST NOT be readable or writable by any mutable code in the SoC. Access MUST be restricted to secure hardware mechanisms and essential hardware functions like fuse sense and distribution logic.
+  * **Evaluation Methodology:** Manufacturers MUST provide hardware design documentation showing access controls on fuse read/write mechanisms, ensuring only authorized hardware components can access these fuses.
 
 #### *JTAG and Debug Interfaces*
 
 * **Checklist Item:**  
-  * **Requirement:** When JTAG or other debug interfaces are enabled, they SHOULD NOT allow access to Caliptra's fuses or fuse shadow registers containing secrets. This applies to both pre and post SoC reset states.  
-  * **Evaluation Methodology:** Manufacturers SHOULD explain how debug interfaces are managed to prevent unauthorized access to sensitive fuses, including any hardware or firmware controls in place.
+  * **Requirement:** When JTAG or other debug interfaces are enabled, they MUST NOT allow access to Caliptra's fuses or fuse shadow registers containing secrets. This applies to both pre and post SoC reset states.  
+  * **Evaluation Methodology:** Manufacturers MUST explain how debug interfaces are managed to prevent unauthorized access to sensitive fuses, including any hardware or firmware controls in place.
 
 #### *Integrity Maintenance*
 
 * **Checklist Item:**  
-  * **Requirement:** The integrity of each fuse SHOULD be maintained throughout the lifespan of the device to prevent degradation or tampering that could affect security.  
-  * **Evaluation Methodology:** Manufacturers SHOULD describe the techniques used to ensure fuse integrity, such as redundancy, error correction codes (ECC), or other protective measures.
+  * **Requirement:** The integrity of each fuse MUST be maintained throughout the lifespan of the device to prevent degradation or tampering that could affect security.  
+  * **Evaluation Methodology:** Manufacturers MUST describe the techniques used to ensure fuse integrity, such as redundancy, error correction codes (ECC), or other protective measures.
 
 #### *In-Field Programmable Fuses*
 
