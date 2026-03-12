@@ -51,6 +51,9 @@ bibliography: bibliography.yaml
 |                |         | GET_HPKE_PUB_KEY and remove         |
 |                |         | endorsement from KMB. Endorsement   |
 |                |         | is now performed by MCU using DPE.  |
+|                |         |                                     |
+|                |         | Updated HEK seed states to match    |
+|                |         | EKP v1.00rc31.                      |
 +----------------+---------+-------------------------------------+
 
 \currenttemplateversion
@@ -1193,56 +1196,80 @@ Table: REPORT_HEK_METADATA input arguments {#tbl:report-hek-metadata-input-args}
 
 Table: HEK seed state values {#tbl:hek-seed-state-values}
 
-+-------------+----------------------------+
-| Value       | Description                |
-+=============+============================+
-| 0h          | HEK_SEED_UNAVAIL_EMPTY     |
-+-------------+----------------------------+
-| 1h          | HEK_SEED_UNAVAIL_ZEROIZED  |
-+-------------+----------------------------+
-| 2h          | HEK_SEED_UNAVAIL_CORRUPTED |
-+-------------+----------------------------+
-| 3h          | HEK_SEED_AVAIL_PROGRAMMED  |
-+-------------+----------------------------+
-| 4h          | HEK_SEED_AVAIL_UNERASABLE  |
-+-------------+----------------------------+
-| 5h to FFFFh | Reserved                   |
-+-------------+----------------------------+
++-------------+------------------------------+
+| Value       | Description                  |
++=============+==============================+
+| 0h          | HEK_UNUSED                   |
++-------------+------------------------------+
+| 1h          | HEK_PROGRAMMED               |
++-------------+------------------------------+
+| 2h          | HEK_PROGRAMMED_PENDING_RESET |
++-------------+------------------------------+
+| 3h          | HEK_PROGRAMMED_CORRUPTED     |
++-------------+------------------------------+
+| 4h          | HEK_PERMANENT                |
++-------------+------------------------------+
+| 5h          | HEK_SANITIZED                |
++-------------+------------------------------+
+| 6h          | HEK_SANITIZED_PENDING_RESET  |
++-------------+------------------------------+
+| 7h          | HEK_SANITIZED_CORRUPTED      |
++-------------+------------------------------+
+| 8h to FFFFh | Reserved                     |
++-------------+------------------------------+
 
 MCU ROM shall adhere to @tbl:hek-metadata-conditions when populating the HEK metadata.
 
 Table: Conditions for setting seed_state and active_slot {#tbl:hek-metadata-conditions}
 
-+----------------------+----------------------------+------------------+
-| Condition            | Value of seed_state        | Value of         |
-|                      |                            | active_slot      |
-+======================+============================+==================+
-| All HEK seed slots   | HEK_SEED_UNAVAIL_EMPTY     | 0                |
-| are blank.           |                            |                  |
-+----------------------+----------------------------+------------------+
-| One or more HEK seed | HEK_SEED_UNAVAIL_ZEROIZED  | The last slot    |
-| slots are zeroized,  |                            | that was         |
-| and either the next  |                            | zeroized.        |
-| seed slot is blank,  |                            |                  |
-| or there are no      |                            |                  |
-| remaining seed       |                            |                  |
-| slots.               |                            |                  |
-+----------------------+----------------------------+------------------+
-| A HEK seed slot has  | HEK_SEED_UNAVAIL_CORRUPTED | The slot that    |
-| been corrupted by    |                            | is corrupted.    |
-| an interrupted       |                            |                  |
-| write.               |                            |                  |
-+----------------------+----------------------------+------------------+
-| A HEK seed slot has  | HEK_SEED_AVAIL_PROGRAMMED  | The slot that    |
-| been programmed      |                            | is programmed    |
-| with randomness.     |                            | with randomness. |
-+----------------------+----------------------------+------------------+
-| All HEK seed slots   | HEK_SEED_AVAIL_UNERASABLE  | The last slot    |
-| have been zeroized   |                            | that was         |
-| and the perma-HEK    |                            | zeroized.        |
-| mode bit has been    |                            |                  |
-| programmed.          |                            |                  |
-+----------------------+----------------------------+------------------+
++--------------------------+------------------------------+----------------+
+| Condition                | Value of seed_state          | Value of       |
+|                          |                              | active_slot    |
++==========================+==============================+================+
+| All HEKs are blank and   | HEK_UNUSED                   | 0              |
+| yet to be                |                              |                |
+| programmed.              |                              |                |
++--------------------------+------------------------------+----------------+
+| The active HEK seed      | HEK_PROGRAMMED               | The programmed |
+| slot has been            |                              | slot.          |
+| populated with           |                              |                |
+| randomness and the SD    |                              |                |
+| has been programmed      |                              |                |
+| with the active HEK      |                              |                |
+| seed.                    |                              |                |
++--------------------------+------------------------------+----------------+
+| The active HEK seed      | HEK_PROGRAMMED_PENDING_RESET | The slot that  |
+| slot has been            |                              | is pending     |
+| populated but not yet    |                              | reset.         |
+| programmed to the SD.    |                              |                |
++--------------------------+------------------------------+----------------+
+| The active HEK seed      | HEK_PROGRAMMED_CORRUPTED     | The slot that  |
+| slot has been corrupted  |                              | is corrupted.  |
+| when a write was         |                              |                |
+| attempted.               |                              |                |
++--------------------------+------------------------------+----------------+
+| The perma-HEK  mode bit  | HEK_PERMANENT                | The final      |
+| has been has been set.   |                              | slot.          |
+| MCU ROM will             |                              |                |
+| always write a sanitized |                              |                |
+| HEK seed.                |                              |                |
++--------------------------+------------------------------+----------------+
+| The active HEK seed      | HEK_SANITIZED                | The slot       |
+| slot has been            |                              | that was       |
+| sanitized and            |                              | sanitized.     |
+| programmed to the SD.    |                              |                |
++--------------------------+------------------------------+----------------+
+| The active HEK seed slot | HEK_SANITIZED_PENDING_RESET  | The slot       |
+| has been sanitized       |                              | that was       |
+| but SD needs to reset    |                              | sanitized.     |
+| to program the sanitized |                              |                |
+| HEK.                     |                              |                |
++--------------------------+------------------------------+----------------+
+| The active HEK seed slot | HEK_SANITIZED_CORRUPT        | The slot       |
+| has attempted            |                              | that attempted |
+| sanitization but failed  |                              | sanitization   |
+| during the attempt.      |                              | but failed.    |
++--------------------------+------------------------------+----------------+
 
 Table: REPORT_HEK_METADATA output arguments {#tbl:report-hek-metadata-output-args}
 
