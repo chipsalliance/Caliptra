@@ -145,7 +145,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Access Control*
 
 * **Checklist Item:**  
-  * **Requirement:** Fuses containing Caliptra secrets MUST NOT be readable or writable by any mutable code in the SoC. Access MUST be restricted to secure hardware mechanisms and essential hardware functions like fuse sense and distribution logic.
+  * **Requirement:** Fuses containing Caliptra secrets MUST NOT be readable by any mutable code in the SoC. Access MUST be restricted to secure hardware mechanisms and essential hardware functions like fuse sense and distribution logic.
   * **Evaluation Methodology:** Manufacturers MUST provide hardware design documentation showing access controls on fuse read/write mechanisms, ensuring only authorized hardware components can access these fuses.
 
 #### *JTAG and Debug Interfaces*
@@ -157,8 +157,8 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Integrity Maintenance*
 
 * **Checklist Item:**  
-  * **Requirement:** The integrity of each fuse MUST be maintained throughout the lifespan of the device to prevent degradation or tampering that could affect security.  
-  * **Evaluation Methodology:** Manufacturers MUST describe the techniques used to ensure fuse integrity, such as redundancy, error correction codes (ECC), or other protective measures.
+  * **Requirement:** The integrity of each fuse SHOULD be maintained throughout the lifespan of the device to prevent degradation or tampering that could affect security.  
+  * **Evaluation Methodology:** Manufacturers SHOULD describe the techniques used to ensure fuse integrity, such as redundancy, error correction codes (ECC), or other protective measures.
 
 #### *In-Field Programmable Fuses*
 
