@@ -17,7 +17,7 @@ bibliography: bibliography.yaml
 +----------------+---------+-------------------------------------+
 | [TBD]          | [TBD]   | Minor formatting and grammar fixes. |
 |                |         |                                     |
-|                |         | Change KDF labels.                  |
+|                |         | Change and add missing KDF label.   |
 |                |         |                                     |
 |                |         | Rotate HPKE keypairs on warm reset  |
 |                |         | as well as firmware-update reset.   |
