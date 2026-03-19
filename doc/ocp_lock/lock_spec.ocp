@@ -58,6 +58,17 @@ bibliography: bibliography.yaml
 |                |         |                                     |
 |                |         | HEK seed lifecycle requirement      |
 |                |         | changes.                            |
+|                |         |                                     |
+|                |         | Remove salt from Wrapped Key AAD.   |
+|                |         |                                     |
+|                |         | Add padding and kem_ciphertext      |
+|                |         | upper bound to SealedAccessKey.     |
+|                |         |                                     |
+|                |         | Add upper bound to Wrapped Key      |
+|                |         | metadata and info len.              |
+|                |         |                                     |
+|                |         | Add upper bound to public key       |
+|                |         | in GET_HPKE_PUB_KEY.                |
 +----------------+---------+-------------------------------------+
 
 \currenttemplateversion
@@ -1388,22 +1399,22 @@ Table: GET_HPKE_PUB_KEY input arguments {#tbl:get-hpke-pub-key-input-args}
 
 Table: GET_HPKE_PUB_KEY output arguments {#tbl:get-hpke-pub-key-output-args}
 
-+-----------------+---------------------+------------------------------------------------+
-| Name            | Type                | Description                                    |
-+=================+=====================+================================================+
-| chksum          | u32                 | Checksum over other output arguments, computed |
-|                 |                     | by Caliptra.                                   |
-+-----------------+---------------------+------------------------------------------------+
-| fips_status     | u32                 | Indicates if the command is FIPS approved or   |
-|                 |                     | an error.                                      |
-+-----------------+---------------------+------------------------------------------------+
-| reserved        | u32                 | Reserved.                                      |
-+-----------------+---------------------+------------------------------------------------+
-| pub_key_len     | u32                 | Length of HPKE public key                      |
-|                 |                     | (\`Npk\` in [@{draft-ietf-hpke-hpke}]).        |
-+-----------------+---------------------+------------------------------------------------+
-| pub_key         | u8[pub_key_len]     | HPKE public key.                               |
-+-----------------+---------------------+------------------------------------------------+
++-------------+----------+--------------------------------------------------+
+| Name        | Type     | Description                                      |
++=============+==========+==================================================+
+| chksum      | u32      | Checksum over other output arguments, computed   |
+|             |          | by Caliptra.                                     |
++-------------+----------+--------------------------------------------------+
+| fips_status | u32      | Indicates if the command is FIPS approved or     |
+|             |          | an error.                                        |
++-------------+----------+--------------------------------------------------+
+| reserved    | u32      | Reserved.                                        |
++-------------+----------+--------------------------------------------------+
+| pub_key_len | u32      | Length of HPKE public key                        |
+|             |          | (\`Npk\` in [@{draft-ietf-hpke-hpke}]).          |
++-------------+----------+--------------------------------------------------+
+| pub_key     | u8[1665] | HPKE public key. Size returned in `pub_key_len`. |
++-------------+----------+--------------------------------------------------+
 
 #### ROTATE_HPKE_KEY {#sec:rotate-hpke-key-cmd}
 
@@ -1448,23 +1459,24 @@ Command Code: 0x474D_504B ("GMPK")
 
 Table: GENERATE_MPK input arguments {#tbl:generate-mpk-input-args}
 
-+-------------------+-------------------------+--------------------------------------+
-| Name              | Type                    | Description                          |
-+===================+=========================+======================================+
-| chksum            | u32                     | Checksum over other input arguments, |
-|                   |                         | computed by the caller.              |
-+-------------------+-------------------------+--------------------------------------+
-| reserved          | u32                     | Reserved.                            |
-+-------------------+-------------------------+--------------------------------------+
-| sek               | u8[32]                  | Soft Epoch Key.                      |
-+-------------------+-------------------------+--------------------------------------+
-| metadata_len      | u32                     | Length of the metadata argument.     |
-+-------------------+-------------------------+--------------------------------------+
-| metadata          | u8[metadata_len]        | Metadata for the MPK.                |
-+-------------------+-------------------------+--------------------------------------+
-| sealed_access_key | [SealedAccessKey](      | HPKE-sealed access key.              |
-|                   | #sec:sealed-access-key) |                                      |
-+-------------------+-------------------------+--------------------------------------+
++-------------------+-------------------------+-------------------------------------------+
+| Name              | Type                    | Description                               |
++===================+=========================+===========================================+
+| chksum            | u32                     | Checksum over other input arguments,      |
+|                   |                         | computed by the caller.                   |
++-------------------+-------------------------+-------------------------------------------+
+| reserved          | u32                     | Reserved.                                 |
++-------------------+-------------------------+-------------------------------------------+
+| sek               | u8[32]                  | Soft Epoch Key.                           |
++-------------------+-------------------------+-------------------------------------------+
+| metadata_len      | u32                     | Length of the metadata field.             |
++-------------------+-------------------------+-------------------------------------------+
+| metadata          | u8[32]                  | Metadata associated with the wrapped key. |
+|                   |                         | Size returned in `metadata_len`.          |
++-------------------+-------------------------+-------------------------------------------+
+| sealed_access_key | [SealedAccessKey](      | HPKE-sealed access key.                   |
+|                   | #sec:sealed-access-key) |                                           |
++-------------------+-------------------------+-------------------------------------------+
 
 Table: GENERATE_MPK output arguments {#tbl:generate-mpk-output-args}
 
@@ -1960,9 +1972,13 @@ Table: SealedAccessKey contents {#tbl:sealed-access-key-contents}
 +----------------+-----------------------+------------------------------------------------+
 | info_len       | u32                   | Length of the info field.                      |
 +----------------+-----------------------+------------------------------------------------+
-| info           | u8[info_len]          | Info to use with HPKE unwrap.                  |
+| info           | u8[256]               | Info to use with HPKE unwrap. Size returned    |
+|                |                       | in `info_len`.                                 |
 +----------------+-----------------------+------------------------------------------------+
-| kem_ciphertext | u8[Nenc]              | HPKE encapsulated key.                         |
+| kem_ciphertext | u8[1665]              | HPKE encapsulated key. Cipher text size is     |
+|                |                       | defined by the KEM algorithm.                  |
++----------------+-----------------------+------------------------------------------------+
+| padding        | u8[3]                 | Reserved.                                      |
 +----------------+-----------------------+------------------------------------------------+
 | ak_ciphertext  | u8[access_key_len+Nt] | Access key ciphertext and authentication tag.  |
 +----------------+-----------------------+------------------------------------------------+
@@ -1975,33 +1991,34 @@ AES-256-GCM is used for all wrapping and unwrapping.
 
 Table: WrappedKey contents {#tbl:wrapped-key-contents}
 
-+--------------+------------------+--------------------------------------------+
-| Name         | Type             | Description                                |
-+==============+==================+============================================+
-| key_type     | u16              | Type of the wrapped key.                   |
-|              |                  |                                            |
-|              |                  | - 0h: Reserved                             |
-|              |                  | - 1h: LOCKED_MPK (ciphertext held at rest) |
-|              |                  | - 2h: ENABLED_MPK (ciphertext held in RAM) |
-|              |                  | - 3h: WRAPPED_MEK                          |
-|              |                  | - 4h to FFFFh: Reserved                    |
-+--------------+------------------+--------------------------------------------+
-| reserved     | u16              | Reserved.                                  |
-+--------------+------------------+--------------------------------------------+
-| salt         | u8[12]           | Random salt for the given wrapped key.     |
-+--------------+------------------+--------------------------------------------+
-| metadata_len | u32              | Length of the metadata field.              |
-+--------------+------------------+--------------------------------------------+
-| key_len      | u32              | Length of the encrypted key.               |
-+--------------+------------------+--------------------------------------------+
-| iv           | u8[12]           | Initialization vector for AES operation.   |
-+--------------+------------------+--------------------------------------------+
-| metadata     | u8[metadata_len] | Metadata associated with the wrapped key.  |
-+--------------+------------------+--------------------------------------------+
-| ciphertext   | u8[key_len+16]   | Key ciphertext and authentication tag.     |
-+--------------+------------------+--------------------------------------------+
++--------------+----------------+--------------------------------------------+
+| Name         | Type           | Description                                |
++==============+================+============================================+
+| key_type     | u16            | Type of the wrapped key.                   |
+|              |                |                                            |
+|              |                | - 0h: Reserved                             |
+|              |                | - 1h: LOCKED_MPK (ciphertext held at rest) |
+|              |                | - 2h: ENABLED_MPK (ciphertext held in RAM) |
+|              |                | - 3h: WRAPPED_MEK                          |
+|              |                | - 4h to FFFFh: Reserved                    |
++--------------+----------------+--------------------------------------------+
+| reserved     | u16            | Reserved.                                  |
++--------------+----------------+--------------------------------------------+
+| salt         | u8[12]         | Random salt for the given wrapped key.     |
++--------------+----------------+--------------------------------------------+
+| metadata_len | u32            | Length of the metadata field.              |
++--------------+----------------+--------------------------------------------+
+| key_len      | u32            | Length of the encrypted key.               |
++--------------+----------------+--------------------------------------------+
+| iv           | u8[12]         | Initialization vector for AES operation.   |
++--------------+----------------+--------------------------------------------+
+| metadata     | u8[32]         | Metadata associated with the wrapped key.  |
+|              |                | Size returned in `metadata_len`.           |
++--------------+----------------+--------------------------------------------+
+| ciphertext   | u8[key_len+16] | Key ciphertext and authentication tag.     |
++--------------+----------------+--------------------------------------------+
 
-The AAD for the encrypted message is constructed as \`key_type\` || \`salt\` || \`metadata_len\` || \`metadata\`.
+The AAD for the encrypted message is constructed as \`key_type\` || \`metadata_len\` || \`metadata\`.
 
 Variants of WrappedKey will be used to reduce duplicating information in commands. The following names will be used for WrappedKeys of a specific \`key_type\` and \`key_len\`:
 
