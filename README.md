@@ -131,9 +131,9 @@ Compatible Configurations:
 Additional Features
   - Support ML-KEM in Adams Bridge
   - Support for ML-DSA External-Mu mode in Adams Bridge
-  - Support OCP LOCK
+  - Support OCP L.O.C.K.
   - Support for AES DMA mode
-  - Caliptra Core mailbox size reduced to 16 KiB
+  - Caliptra Core mailbox size reduced to 16 KiB in subsystem mode
 
 Compatible Configurations:
 
