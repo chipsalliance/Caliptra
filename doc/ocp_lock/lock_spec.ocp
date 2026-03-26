@@ -480,7 +480,7 @@ For each MPK to which a given MEK is bound, the host is expected to supply the M
 
 #### Transport encryption for MPK access keys {#sec:hpke-transport-encryption}
 
-KMB maintains a set of HPKE keypairs, one per HPKE algorithm that KMB supports. Each HPKE public key is endorsed by the MCU using the MCU Firmware DPE Context. HPKE keypairs are randomly generated on KMB startup, and mapped to unique handles. Keypairs may be periodically rotated. Drive firmware is responsible for enumerating the available HPKE public keys and exposing them to the user via a host interface. See @sec:host-apis for how the public keys may be presented to the host.
+KMB maintains a set of HPKE keypairs, one per HPKE algorithm that KMB supports. HPKE keypairs are randomly generated on KMB startup, and mapped to unique handles. Keypairs may be periodically rotated. Drive firmware is responsible for enumerating the available HPKE public keys and exposing them to the user via a host interface. See @sec:host-apis for how the public keys may be presented to the host.
 
 When a user wishes to generate or enable an MPK (which is required prior to loading any MEKs bound to that MPK), the user performs the following steps:
 
@@ -534,9 +534,15 @@ The HPKE sequence number is incremented for each decryption operation performed 
 
 ##### HPKE public key retrieval
 
-Upon request, KMB provides the public key for a given HPKE keypair. Drive firmware is then responsible for endorsing the public key using the MCU Firmware DPE Context.
+Upon request, KMB provides the public key for a given HPKE keypair. Drive firmware is then responsible for endorsing the public key.
+
+##### HPKE public key endorsement
+
+Drive firmware creates a certificate endorsing the HPKE public key retrieved from KMB. The certificate is signed by the MCU Firmware DPE context.
 
 The endorsement includes the HPKEIdentifiers extension as defined in [@{tcg-mek-mpa}], with the \`kem_id\`, \`kdf_id\`, and \`aead_id\` identifiers populated based on the HPKE keypair's algorithms. See @tbl:hpke-algorithm-support for the algorithm identifiers supported by KMB.
+
+![HPKE public key endorsement](./diagrams/hpke_pub_key_endorsement.drawio.svg){#fig:hpke-endorsement}
 
 #### MPK lifecycle
 
