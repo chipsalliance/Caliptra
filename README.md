@@ -126,6 +126,23 @@ Compatible Configurations:
 | --- | --- | --- |
 | 2.0.2+ | 2.0.x | 2.0.x (0/0) |
 
+### Caliptra 2.1
+
+Additional Features
+  - Support ML-KEM in Adams Bridge
+  - Support for ML-DSA External-Mu mode in Adams Bridge
+  - Support OCP LOCK
+  - Support for AES DMA mode
+  - Caliptra Core mailbox size reduced to 16 KiB
+
+\*\*\* Only RTL release versions 2.1.2+ should be used due to ROM compatibility requirements.
+
+Compatible Configurations:
+
+| RTL | ROM | Runtime FMC/FW |
+| --- | --- | --- |
+| 2.1.x | 2.1.x | 2.1.x (0/0) |
+
 
 ## Test Dashboards
 
