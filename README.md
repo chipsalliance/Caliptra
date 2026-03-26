@@ -135,8 +135,6 @@ Additional Features
   - Support for AES DMA mode
   - Caliptra Core mailbox size reduced to 16 KiB
 
-\*\*\* Only RTL release versions 2.1.2+ should be used due to ROM compatibility requirements.
-
 Compatible Configurations:
 
 | RTL | ROM | Runtime FMC/FW |
