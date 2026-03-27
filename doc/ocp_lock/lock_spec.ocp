@@ -51,6 +51,9 @@ bibliography: bibliography.yaml
 |                |         | GET_HPKE_PUB_KEY and remove         |
 |                |         | endorsement from KMB. Endorsement   |
 |                |         | is now performed by MCU using DPE.  |
+|                |         |                                     |
+|                |         | Make KMB mailbox fault handling     |
+|                |         | generic and reference caliptra-sw.  |
 +----------------+---------+-------------------------------------+
 
 \currenttemplateversion
@@ -2171,75 +2174,13 @@ Table: WrappedKey variants {#tbl:wrapped-key-variants}
 
 #### Fault handling
 
-A KMB mailbox command can fail to complete in the following ways:
+KMB mailbox command failures are surfaced by the \`cptra_fw_error_fatal\` and \`cptra_fw_error_non_fatal\` registers. For a comprehensive list of error codes and their definitions, integrators should refer to the Caliptra software reference implementation and specifications.
 
-- An ill-formed command.
-- Encryption engine timeout.
-- Encryption engine reported error.
+- Runtime error codes and mailbox status codes are documented in the Caliptra Runtime Specification [@{caliptra-sw-runtime}].
+- ROM error codes are documented in the Caliptra ROM Specification [@{caliptra-sw-rom}].
+- The complete set of error code constants is defined in the Caliptra Error library [@{caliptra-sw-error}].
 
-In all of these cases, the error is reported in the command return status.
-
-KMB mailbox errors should generally result in an error being surfaced to the host.
-
-Table: KMB mailbox command result codes {#tbl:kmb-mailbox-codes}
-
-+--------------------------+-------------+---------------------------+
-| Name                     | Value       | Description               |
-+==========================+=============+===========================+
-| LOCK_ENGINE_TIMEOUT      | 0x4C45_544F | Timeout occurred when     |
-|                          | ("LETO")    | communicating with the    |
-|                          |             | drive encryption engine   |
-|                          |             | to execute a command.     |
-+--------------------------+-------------+---------------------------+
-| LOCK_ENGINE_ERR + u8     | 0x4C45_52xx | The low byte indicates    |
-|                          | ("LERx")    | the error code and ready  |
-|                          |             | state.                    |
-|                          |             |                           |
-|                          |             | - Bit 0: RDY field of the |
-|                          |             | encryption engine's CTRL  |
-|                          |             | register.                 |
-|                          |             | - Bits [3:1]: reserved    |
-|                          |             | - Bits [7:4]: ERR field   |
-|                          |             | of the encryption         |
-|                          |             | engine's CTRL register.   |
-|                          |             | See                       |
-|                          |             | @tbl:ee-ctrl-err-codes    |
-|                          |             | for an enumeration of     |
-|                          |             | code values.              |
-+--------------------------+-------------+---------------------------+
-| LOCK_BAD_ALGORITHM       | 0x4C42_414C | Unsupported algorithm,    |
-|                          | ("LBAL")    | or algorithm does not     |
-|                          |             | match the given handle.   |
-+--------------------------+-------------+---------------------------+
-| LOCK_BAD_HANDLE          | 0x4C42_4841 | Unknown handle.           |
-|                          | ("LBHA")    |                           |
-+--------------------------+-------------+---------------------------+
-| LOCK_KEM_DECAPSULATION   | 0x4C4B_4445 | Error during KEM          |
-|                          | ("LKDE")    | decapsulation.            |
-+--------------------------+-------------+---------------------------+
-| LOCK_ACCESS_KEY_UNWRAP   | 0x4C41_4B55 | Error during access key   |
-|                          | ("LAKU")    | decryption.               |
-+--------------------------+-------------+---------------------------+
-| LOCK_MPK_DECRYPT         | 0x4C50_4445 | Error during MPK          |
-|                          | ("LPDE")    | decryption.               |
-+--------------------------+-------------+---------------------------+
-| LOCK_MEK_DECRYPT         | 0x4C4D_4445 | Error during MEK          |
-|                          | ("LMDE")    | decryption.               |
-+--------------------------+-------------+---------------------------+
-| LOCK_MEK_CHKSUM_FAIL     | 0x4C4D_4346 | Error during MEK          |
-|                          | ("LMCF")    | derivation due to         |
-|                          |             | checksum mismatch.        |
-+--------------------------+-------------+---------------------------+
-| LOCK_HEK_NOT_AVAILABLE   | 0x4C48_4E41 | The operation requires    |
-|                          | ("LHNA")    | the HEK, which is         |
-|                          |             | unavailable.              |
-+--------------------------+-------------+---------------------------+
-| LOCK_MEK_NOT_INITIALIZED | 0x4C4D_4E49 | MIX_MPK, GENERATE_MEK,    |
-|                          | ("LMNI")    | LOAD_MEK, or DERIVE_MEK   |
-|                          |             | were called without first |
-|                          |             | invoking                  |
-|                          |             | INITIALIZE_MEK_SECRET.    |
-+--------------------------+-------------+---------------------------+
+In general, KMB mailbox errors should be surfaced to the host. Errors may be caused by ill-formed commands, timeouts, or errors reported by the encryption engine. When an encryption engine error occurs, the error code surfaced by Caliptra includes the state of the encryption engine's CTRL register.
 
 ## Host APIs {#sec:host-apis}
 

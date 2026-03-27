@@ -185,3 +185,15 @@ references:
     accessed:
       year: 2025
       month: 7
+  - id: "caliptra-sw-runtime"
+    title: "Caliptra Runtime Firmware Specification (v2.1)"
+    publisher: "CHIPS Alliance"
+    url: "https://github.com/chipsalliance/caliptra-sw/blob/7da3b01b8b1806af0ec491c5e3e3e7cac91a3561/runtime/README.md"
+  - id: "caliptra-sw-rom"
+    title: "Caliptra ROM Specification (v2.1)"
+    publisher: "CHIPS Alliance"
+    url: "https://github.com/chipsalliance/caliptra-sw/blob/7da3b01b8b1806af0ec491c5e3e3e7cac91a3561/rom/dev/README.md"
+  - id: "caliptra-sw-error"
+    title: "Caliptra Error Code Definitions (v2.1)"
+    publisher: "CHIPS Alliance"
+    url: "https://github.com/chipsalliance/caliptra-sw/blob/7da3b01b8b1806af0ec491c5e3e3e7cac91a3561/error/src/lib.rs"
