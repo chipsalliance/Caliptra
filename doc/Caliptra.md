@@ -504,7 +504,7 @@ Caliptra does not consume the IDevID certificate. Caliptra needs attributes of t
     * 3 = raw
 * Reserved (bytes 1 to 3)
 * Subject Key ID (bytes 4 to 23): if Flags = 3, the IDevID Subject Key Identifier to use as the LDevID Authority Key Identifier.
-* UEID type (byte 24): UEID type as defined in [IETF RATS specification](https://www.ietf.org/archive/id/draft-ietf-rats-eat-21.html#section-4.2.1.1). Used for TCG UEID extension.
+* UEID type (byte 24): UEID type as defined in the [IETF EAT specification](https://www.rfc-editor.org/rfc/rfc9711.html#section-4.2.1.1). Used for TCG UEID extension.
 * Reserved (bytes 25 to 27)
 * Manufacturer Serial Number (bytes 28 to 43): the 128-bit unique serial number of the device to be used for the TCG UEID extension in the Caliptra-generated LDevID, Alias<sub>FMC</sub>, and Alias<sub>RT</sub> certificates.
 
