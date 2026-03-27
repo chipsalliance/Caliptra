@@ -54,6 +54,14 @@ bibliography: bibliography.yaml
 |                |         |                                     |
 |                |         | Make KMB mailbox fault handling     |
 |                |         | generic and reference caliptra-sw.  |
+|                |         |                                     |
+|                |         | Remove salt from Wrapped Key AAD.   |
+|                |         |                                     |
+|                |         | Add padding and kem_ciphertext      |
+|                |         | upper bound to SealedAccessKey.     |
+|                |         |                                     |
+|                |         | Add upper bound to Wrapped Key      |
+|                |         | metadata and info len.              |
 +----------------+---------+-------------------------------------+
 
 \currenttemplateversion
@@ -1526,7 +1534,8 @@ Table: GENERATE_MPK input arguments {#tbl:generate-mpk-input-args}
 +-------------------+-------------------------+--------------------------------------+
 | sek               | u8[32]                  | Soft Epoch Key.                      |
 +-------------------+-------------------------+--------------------------------------+
-| metadata_len      | u32                     | Length of the metadata argument.     |
+| metadata_len      | u32                     | Length of the metadata argument. Max |
+|                   |                         | value of 32.                         |
 +-------------------+-------------------------+--------------------------------------+
 | metadata          | u8[metadata_len]        | Metadata for the MPK.                |
 +-------------------+-------------------------+--------------------------------------+
@@ -2113,11 +2122,14 @@ Table: SealedAccessKey contents {#tbl:sealed-access-key-contents}
 |                |                       | value associated with a bit value indicated as |
 |                |                       | supported in @tbl:get-algorithms-output-args.  |
 +----------------+-----------------------+------------------------------------------------+
-| info_len       | u32                   | Length of the info field.                      |
+| info_len       | u32                   | Length of the info field. Max value of 256.    |
 +----------------+-----------------------+------------------------------------------------+
 | info           | u8[info_len]          | Info to use with HPKE unwrap.                  |
 +----------------+-----------------------+------------------------------------------------+
-| kem_ciphertext | u8[Nenc]              | HPKE encapsulated key.                         |
+| kem_ciphertext | u8[Nenc]              | HPKE encapsulated key. Max value of Nenc is    |
+|                |                       | 1665.                                          |
++----------------+-----------------------+------------------------------------------------+
+| padding        | u8[3]                 | Reserved.                                      |
 +----------------+-----------------------+------------------------------------------------+
 | ak_ciphertext  | u8[access_key_len+Nt] | Access key ciphertext and authentication tag.  |
 +----------------+-----------------------+------------------------------------------------+
@@ -2156,7 +2168,7 @@ Table: WrappedKey contents {#tbl:wrapped-key-contents}
 | ciphertext   | u8[key_len+16]   | Key ciphertext and authentication tag.     |
 +--------------+------------------+--------------------------------------------+
 
-The AAD for the encrypted message is constructed as \`key_type\` || \`salt\` || \`metadata_len\` || \`metadata\`.
+The AAD for the encrypted message is constructed as \`key_type\` || \`metadata_len\` || \`metadata\`.
 
 Variants of WrappedKey will be used to reduce duplicating information in commands. The following names will be used for WrappedKeys of a specific \`key_type\` and \`key_len\`:
 
