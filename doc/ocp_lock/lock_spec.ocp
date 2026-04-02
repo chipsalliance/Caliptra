@@ -45,7 +45,8 @@ bibliography: bibliography.yaml
 |                |         | Fix INITIALIZE_MEK_SECRET mailbox   |
 |                |         | code                                |
 |                |         |                                     |
-|                |         | Update HPKE references.             |
+|                |         | Update HPKE references and          |
+|                |         | diagrams.                           |
 |                |         |                                     |
 |                |         | Rename ENDORSE_HPKE_PUB_KEY to      |
 |                |         | GET_HPKE_PUB_KEY and remove         |
