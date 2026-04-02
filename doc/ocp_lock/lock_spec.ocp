@@ -22,8 +22,8 @@ bibliography: bibliography.yaml
 |                |         | Rotate HPKE keypairs on warm reset  |
 |                |         | as well as firmware-update reset.   |
 |                |         |                                     |
-|                |         | Add response flag to                |
-|                |         | REPORT_HEK_METADATA command.        |
+|                |         | Modified the REPORT_HEK_METADATA    |
+|                |         | command.                            |
 |                |         |                                     |
 |                |         | Rename "Opal C_PIN" to "TCG C_PIN". |
 |                |         |                                     |
@@ -54,6 +54,9 @@ bibliography: bibliography.yaml
 |                |         |                                     |
 |                |         | Make KMB mailbox fault handling     |
 |                |         | generic and reference caliptra-sw.  |
+|                |         |                                     |
+|                |         | HEK seed lifecycle requirement      |
+|                |         | changes.                            |
 +----------------+---------+-------------------------------------+
 
 \currenttemplateversion
@@ -644,7 +647,7 @@ The drive must only provide HEK seeds or SEKs to KMB that are cryptographically-
 
 #### HEK lifecycle {#sec:hek-lifecycle}
 
-Caliptra with L.O.C.K. features a series of n 256-bit HEK slots present in a fuse bank, dubbed HEK~0~..HEK~n-1~, where 4 ≤ n ≤ 16. The vendor is responsible for determining the number of HEK slots available in fuses. These HEK slots are programmed and read by MCU, via the Caliptra fuse controller. MCU is responsible for transitioning each HEK slot individually from blank → randomized → zeroized. HEK~x~ shall only be randomized once HEK~x-1~ has been zeroized. MCU shall zeroize a HEK slot by blowing every bit.
+Caliptra with L.O.C.K. features a series of n 256-bit HEK slots present in a fuse bank, dubbed HEK~0~..HEK~n-1~, where 4 ≤ n ≤ 16. The vendor is responsible for determining the number of HEK slots available in fuses. These HEK slots are programmed and read by MCU, via the Caliptra fuse controller. MCU is responsible for transitioning each HEK slot individually from blank → randomized → zeroized. MCU shall zeroize a HEK slot by blowing every bit.
 
 Each HEK slot contains a HEK seed. MCU ROM reads the currently-randomized HEK slot from fuses during cold reset, and passes its contents to Caliptra Core via a fuse register.
 
@@ -653,30 +656,6 @@ There are two edge cases where the HEK is available even if there is no randomiz
 - To enable pre-production testing, if Caliptra is in the Unprovisioned or Manufacturing lifecycle state, the HEK is available.
 
 - To enable lengthening the useful lifespan of the storage device, once all HEK slots have been zeroized, the device can be permanently transitioned into a mode where the HEK is available. A field-programmable "permanent-HEK" logical fuse bit is allocated to determine whether this mode is active.
-
-@tbl:hek-lifecycle-states describes the states between which the HEK transitions over the lifespan of the device. The lifecycle state of the HEK is determined by Caliptra's [lifecycle state](https://github.com/chipsalliance/Caliptra/blob/c0fa71e/doc/Caliptra.md#caliptra-security-states) as well as the state of the HEK fuse bank.
-
-Table: HEK lifecycle states {#tbl:hek-lifecycle-states}
-
-+--------------------------+--------------------------------+----------------+---------------------------------------------+
-| Caliptra lifecycle state | HEK fuse state, where x is the | HEK seed value | [Reported HEK state](#tbl:hek-state-values) |
-|                          | current HEK slot               |                |                                             |
-+==========================+================================+================+=============================================+
-| Unprovisioned or         | [Any]                          | 0x0000...      | HEK_AVAIL_UNERASABLE                        |
-| Manufacturing            |                                |                |                                             |
-+--------------------------+--------------------------------+----------------+---------------------------------------------+
-| Production               | HEK slot 0 is unprogrammed.    | N/A            | HEK_UNAVAIL_EMPTY                           |
-+--------------------------+--------------------------------+----------------+---------------------------------------------+
-| Production               | HEK slot x is randomized.      | HEK slot x     | HEK_AVAIL_PROGRAMMED                        |
-+--------------------------+--------------------------------+----------------+---------------------------------------------+
-| Production               | HEK slot x is zeroized.        | N/A            | HEK_UNAVAIL_ZEROIZED                        |
-+--------------------------+--------------------------------+----------------+---------------------------------------------+
-| Production               | HEK slot x is corrupted.       | N/A            | HEK_UNAVAIL_CORRUPTED                       |
-+--------------------------+--------------------------------+----------------+---------------------------------------------+
-| Production               | Every HEK slot is zeroized,    | 0x0000...      | HEK_AVAIL_UNERASABLE                        |
-|                          | and the permanent-HEK fuse bit |                |                                             |
-|                          | has been set.                  |                |                                             |
-+--------------------------+--------------------------------+----------------+---------------------------------------------+
 
 In addition to the HEK seed, the HEK is derived from Caliptra's DICE UDS. The mechanism used to compute the HEK is described in @fig:hek-derivation. This flow is performed across MCU ROM and Caliptra ROM upon KMB startup.
 
@@ -690,20 +669,15 @@ Note: the HEK is derived before REPORT_HEK_METADATA is invoked due to IDevID hav
 
 #### HEK and SEK lifecycle {#sec:hek-sek-lifecycle}
 
-@fig:hek-sek-rotation illustrates the case where a drive ships with four HEK slots.
-
-![HEK and SEK state machine](./diagrams/hek_sek_rotation.drawio.svg){#fig:hek-sek-rotation}
-
-Drive firmware is responsible for performing each state transition, including programming and zeroizing HEK seeds and entering perma-HEK mode.
+Drive firmware is responsible for managing the HEK and SEK lifecycle, including programming and zeroizing HEK seeds and entering perma-HEK mode.
 
 A device out of manufacturing must be in the production lifecycle state and have a randomized HEK.
 
-Drive firmware is responsible for enforcing that HEK and SEK programming / zeroization follows the state machine illustrated in @fig:hek-sek-rotation. Specifically:
+Drive firmware is responsible for enforcing the following:
 
 - The SEK shall only be programmed once the HEK is available.
 - The HEK seed shall only be zeroized once the SEK is zeroized.
 - The HEK seed shall only be zeroized after it has been randomized or corrupted.
-- The next HEK seed shall only be programmed once the prior HEK seed has been zeroized.
 - Perma-HEK mode shall only be enabled once all HEK seeds have been zeroized.
 
 Drive firmware is responsible for zeroizing the encryption engine's key cache when the SEK transitions from randomized to zeroized. HEK transitions involve power cycles and therefore the key cache is implicitly zeroized across such transitions.
@@ -1194,64 +1168,21 @@ Table: REPORT_HEK_METADATA input arguments {#tbl:report-hek-metadata-input-args}
 | active_slot | u16  | Currently-active HEK seed slot.      |
 |             |      | Zero-indexed.                        |
 +-------------+------+--------------------------------------+
-| seed_state  | u16  | HEK seed state. See                  |
-|             |      | @tbl:hek-seed-state-values.          |
+| seed_state  | u16  | HEK seed state:                      |
+|             |      |                                      |
+|             |      | - 1h: HEK_PROGRAMMED                 |
+|             |      | - 4h: HEK_PROGRAMMED_EMPTY           |
+|             |      | - all others: HEK_UNAVAILABLE        |
 +-------------+------+--------------------------------------+
 | padding     | u16  | Reserved.                            |
 +-------------+------+--------------------------------------+
 
-Table: HEK seed state values {#tbl:hek-seed-state-values}
+The \`HEK_AVAILABLE\` flag in the response (@tbl:report-hek-metadata-output-flags) indicates whether Caliptra has successfully derived the HEK. Caliptra determines HEK availability based on its current lifecycle state and the \`seed_state\` reported by MCU ROM:
 
-+-------------+----------------------------+
-| Value       | Description                |
-+=============+============================+
-| 0h          | HEK_SEED_UNAVAIL_EMPTY     |
-+-------------+----------------------------+
-| 1h          | HEK_SEED_UNAVAIL_ZEROIZED  |
-+-------------+----------------------------+
-| 2h          | HEK_SEED_UNAVAIL_CORRUPTED |
-+-------------+----------------------------+
-| 3h          | HEK_SEED_AVAIL_PROGRAMMED  |
-+-------------+----------------------------+
-| 4h          | HEK_SEED_AVAIL_UNERASABLE  |
-+-------------+----------------------------+
-| 5h to FFFFh | Reserved                   |
-+-------------+----------------------------+
-
-MCU ROM shall adhere to @tbl:hek-metadata-conditions when populating the HEK metadata.
-
-Table: Conditions for setting seed_state and active_slot {#tbl:hek-metadata-conditions}
-
-+----------------------+----------------------------+------------------+
-| Condition            | Value of seed_state        | Value of         |
-|                      |                            | active_slot      |
-+======================+============================+==================+
-| All HEK seed slots   | HEK_SEED_UNAVAIL_EMPTY     | 0                |
-| are blank.           |                            |                  |
-+----------------------+----------------------------+------------------+
-| One or more HEK seed | HEK_SEED_UNAVAIL_ZEROIZED  | The last slot    |
-| slots are zeroized,  |                            | that was         |
-| and either the next  |                            | zeroized.        |
-| seed slot is blank,  |                            |                  |
-| or there are no      |                            |                  |
-| remaining seed       |                            |                  |
-| slots.               |                            |                  |
-+----------------------+----------------------------+------------------+
-| A HEK seed slot has  | HEK_SEED_UNAVAIL_CORRUPTED | The slot that    |
-| been corrupted by    |                            | is corrupted.    |
-| an interrupted       |                            |                  |
-| write.               |                            |                  |
-+----------------------+----------------------------+------------------+
-| A HEK seed slot has  | HEK_SEED_AVAIL_PROGRAMMED  | The slot that    |
-| been programmed      |                            | is programmed    |
-| with randomness.     |                            | with randomness. |
-+----------------------+----------------------------+------------------+
-| All HEK seed slots   | HEK_SEED_AVAIL_UNERASABLE  | The last slot    |
-| have been zeroized   |                            | that was         |
-| and the perma-HEK    |                            | zeroized.        |
-| mode bit has been    |                            |                  |
-| programmed.          |                            |                  |
-+----------------------+----------------------------+------------------+
+- If Caliptra is in the \`Unprovisioned\` or \`Manufacturing\` lifecycle state, the HEK is always available.
+- If Caliptra is in the \`Production\` lifecycle state, the HEK is available if:
+  - \`seed_state\` is \`HEK_PROGRAMMED\` AND the HEK seed fuse is not empty (not all 0s and not all 1s).
+  - OR \`seed_state\` is \`HEK_PROGRAMMED_EMPTY\`.
 
 Table: REPORT_HEK_METADATA output arguments {#tbl:report-hek-metadata-output-args}
 
@@ -2003,93 +1934,6 @@ Table: SEK state values {#tbl:sek-state-values}
 | 2h to FFFFh | Reserved       |
 +-------------+----------------+
 
-The value reported from @tbl:hek-state-values depends on Caliptra's current lifecycle state as well as the \`seed_state\` value from [REPORT_HEK_METADATA](#sec:report-hek-metadata-cmd).
-
-Table: HEK state values {#tbl:hek-state-values}
-
-+-------+-----------------------+--------------------------------------+
-| Value | State                 | Description                          |
-|       |                       |                                      |
-|       |                       |                                      |
-+=======+=======================+======================================+
-| 0h    | HEK_UNAVAIL_EMPTY     | The drive has transitioned to the    |
-|       |                       | Production life cycle state and a    |
-|       |                       | HEK has not yet been provisioned.    |
-|       |                       |                                      |
-|       |                       | Reported if \`seed_state\` is        |
-|       |                       | HEK_SEED_UNAVAIL_EMPTY.              |
-+-------+-----------------------+--------------------------------------+
-| 1h    | HEK_UNAVAIL_ZEROIZED  | The current HEK has been zeroized.   |
-|       |                       |                                      |
-|       |                       | Reported if \`seed_state\` is        |
-|       |                       | HEK_SEED_UNAVAIL_ZEROIZED.           |
-+-------+-----------------------+--------------------------------------+
-| 2h    | HEK_UNAVAIL_CORRUPTED | The current HEK slot is corrupted.   |
-|       |                       |                                      |
-|       |                       | Reported if \`seed_state\` is        |
-|       |                       | HEK_SEED_UNAVAIL_CORRUPTED.          |
-+-------+-----------------------+--------------------------------------+
-| 3h    | HEK_AVAIL_PROGRAMMED  | A randomized HEK is provisioned in   |
-|       |                       | the current slot.                    |
-|       |                       |                                      |
-|       |                       | Reported if \`seed_state\` is        |
-|       |                       | HEK_SEED_AVAIL_PROGRAMMED.           |
-+-------+-----------------------+--------------------------------------+
-| 4h    | HEK_AVAIL_UNERASABLE  | The HEK is not used to provide       |
-|       |                       | sanitization capabilities. In this   |
-|       |                       | state, data written to the storage   |
-|       |                       | device cannot be cryptographically   |
-|       |                       | erased via HEK zeroization.          |
-|       |                       |                                      |
-|       |                       | Reported if Caliptra is not in the   |
-|       |                       | production lifecycle state or if     |
-|       |                       | \`seed_state\` is                    |
-|       |                       | HEK_SEED_AVAIL_UNERASABLE.           |
-|       |                       |                                      |
-|       |                       | KMB internally derives a HEK in this |
-|       |                       | state, but the HEK is derived from   |
-|       |                       | non-erasable secrets.                |
-+-------+-----------------------+--------------------------------------+
-| 5h to | Reserved              | Reserved.                            |
-| FFFFh |                       |                                      |
-+-------+-----------------------+--------------------------------------+
-
-Operations that use the HEK are disallowed in all \`HEK_UNAVAIL_*\` states.
-
-See @tbl:hek-lifecycle-states for more information about the relationship between HEKs and Caliptra lifecycle states.
-
-HEK_AVAIL_UNERASABLE → HEK_UNAVAIL_EMPTY is a one-way transition that the device vendor is expected to trigger by advancing the Caliptra lifecycle state to Production.
-
-HEK_UNAVAIL_ZEROIZED → HEK_AVAIL_UNERASABLE is a one-way transition that the device owner can trigger once all HEK slots have been zeroized.
-
-See @fig:hek-sek-rotation for more details about the transitions between HEK states.
-
-##### Calculation of hek_erasures_remaining {#sec:hek-erasures-remaining}
-
-The \`hek_erasures_remaining\` field in [GET_EPOCH_KEY_STATE](#tbl:get-epoch-key-state-output-args) is based on the following values from [REPORT_HEK_METADATA](#sec:report-hek-metadata-cmd):
-
-- total_slots
-- active_slot
-- seed_state
-
-The calculation is as follows:
-
-$$
-\text{seed\_is\_erased}= 
-\begin{cases}
-    true & \text{if seed\_state}=\text{HEK\_SEED\_UNAVAIL\_ZEROIZED}\\
-    true & \text{if seed\_state}=\text{HEK\_SEED\_AVAIL\_UNERASABLE}\\
-    false & \text{otherwise}
-\end{cases}
-$$
-$$
-\text{hek\_erasures\_remaining}=\text{total\_slots}-\text{active\_slot}- 
-\begin{cases}
-    1 & \text{if seed\_is\_erased}\\
-    0 & \text{otherwise}
-\end{cases}
-$$
-
 #### Common mailbox types
 
 This section defines common types used to interface between drive firmware and KMB. These types are common patterns found in both requests and responses.
@@ -2388,42 +2232,39 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 |      | [-@sec:hek-lifecycle] and                                |           |
 |      | [-@sec:report-hek-metadata-cmd].                         |           |
 +------+----------------------------------------------------------+-----------+
-| 7    | HEK and SEK programming/zeroization shall adhere to the  | Yes       |
-|      | sequence described in @sec:hek-sek-lifecycle.            |           |
-+------+----------------------------------------------------------+-----------+
-| 8    | MEKs shall not be programmed while the SEK or HEK are    | Yes       |
+| 7    | MEKs shall not be programmed while the SEK or HEK are    | Yes       |
 |      | zeroized. See @sec:heks-seks.                            |           |
 +------+----------------------------------------------------------+-----------+
-| 9    | The drive shall only provide HEK seeds or SEKs that are  | Yes       |
+| 8    | The drive shall only provide HEK seeds or SEKs that are  | Yes       |
 |      | cryptographically-strong random values. See              |           |
 |      | @sec:heks-seks.                                          |           |
 +------+----------------------------------------------------------+-----------+
-| 10   | Drive firmware shall implement authorization             | Yes       |
+| 9    | Drive firmware shall implement authorization             | Yes       |
 |      | controls to gate lifecycle events that have the          |           |
 |      | potential to trigger data loss. See                      |           |
 |      | @sec:authorization.                                      |           |
 +------+----------------------------------------------------------+-----------+
-| 11   | The encryption engine shall ensure that AES-XTS          | Yes       |
+| 10   | The encryption engine shall ensure that AES-XTS          | Yes       |
 |      | Key_1 and Key_2 are not equal. See                       |           |
 |      | @sec:aes-xts-considerations.                             |           |
 +------+----------------------------------------------------------+-----------+
-| 12   | KMB shall have access to the SFRs defined in             | Yes       |
+| 11   | KMB shall have access to the SFRs defined in             | Yes       |
 |      | @tbl:kmb-ee-sfrs through the address defined by          |           |
 |      | OCP_LOCK_MEK_ADDRESS. See @sec:sfrs.                     |           |
 +------+----------------------------------------------------------+-----------+
-| 13   | MCU ROM shall configure registers                        | Yes       |
+| 12   | MCU ROM shall configure registers                        | Yes       |
 |      | SS_KEY_RELEASE_BASE_ADDR_L, SS_KEY_RELEASE_BASE_ADDR_H   |           |
 |      | and SS_KEY_RELEASE_SIZE, then setting CPTRA_FUSE_WR_DONE |           |
 |      | to prevent further modifications. Additionally,          |           |
 |      | OCP_LOCK_MEK_LENGTH must be set to 40h. See @sec:sfrs.   |           |
 +------+----------------------------------------------------------+-----------+
-| 14   | Upon KMB cold reset or firmware update reset, drive      | Yes       |
+| 13   | Upon KMB cold reset or firmware update reset, drive      | Yes       |
 |      | firmware shall enumerate HPKE keypairs supported by KMB  |           |
 |      | and advertise them to the host, if drive firmware        |           |
 |      | supports a host-facing API for doing so. See             |           |
 |      | @sec:hpke-transport-encryption.                          |           |
 +------+----------------------------------------------------------+-----------+
-| 15   | Integrations shall invoke Caliptra resets according to   | Yes       |
+| 14   | Integrations shall invoke Caliptra resets according to   | Yes       |
 |      | the directives given in @sec:reset-behavior.             |           |
 +------+----------------------------------------------------------+-----------+
 
