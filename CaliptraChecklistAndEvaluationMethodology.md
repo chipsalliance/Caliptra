@@ -15,7 +15,7 @@
 
 # Introduction
 
-The **Caliptra Checklist and Evaluation Methodology** document serves as a comprehensive guide for ensuring the secure and correct integration of the Caliptra intellectual property (IP) into a system-on-chip (SoC). Caliptra is a hardware root-of-trust (RoT) IP designed to provide foundational security services within a computing system. Proper integration of Caliptra is crucial to maintaining the overall security posture of the final product.
+The **Caliptra Checklist and Evaluation Methodology** document serves as a comprehensive guide for ensuring the secure and correct integration of the Caliptra intellectual property (IP) into a system-on-chip (SoC). Caliptra is a hardware root-of-trust (RoT) IP designed to provide foundational security services within a computing system. Proper integration of Caliptra is crucial to enabling these security services and maintaining the overall security posture of the final product.
 
 This document outlines detailed requirements and evaluation methodologies across various domains, including asset management, interface implementations, and secure process adherence. The primary goals are to:
 
@@ -51,7 +51,7 @@ The Caliptra Specification is maintained within the [ChipsAlliance Caliptra repo
 
 The [HW specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraHardwareSpecification.md) and [HW integration specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md) also have their own live links. For previous versions of the hardware specification, go to the location that is tagged with that release version.
 
-This checklist is built from these specifications with the goal to help ensure that Caliptra is integrated correctly within a design.
+This checklist is built from these specifications with the goal to help ensure that Caliptra is integrated correctly within a design. To demonstrate compliance with this checklist, vendors must provide necessary collateral to security auditors, which may include documentation such as: integrated RTL, synthesized netlist reports, GLS FEV reports, SoC boot diagrams, etc. Some integration requirements may not be verified through tool reports or through code analysis. For such requirements, integrators must provide documentation summarizing plans and procedures (for example, generation of an obfuscation key in compliance with NIST).
 
 # Checklist Summary
 
