@@ -69,6 +69,10 @@ bibliography: bibliography.yaml
 |                |         |                                     |
 |                |         | Add upper bound to public key       |
 |                |         | in GET_HPKE_PUB_KEY.                |
+|                |         |                                     |
+|                |         | Allow Write-only AUX and Metadata   |
+|                |         | registers for the encryption        |
+|                |         | engine.                             |
 +----------------+---------+-------------------------------------+
 
 \currenttemplateversion
@@ -942,13 +946,15 @@ Within KMB, loaded MEKs are only ever present in the Key Vault, so that they can
 
 Table: Offset OCP_LOCK_MEK_ADDRESS + 40h: METD – Metadata {#tbl:ee-metd-sfr}
 
-+-------+------+-------+--------------------------------------------------------------+
-| Bytes | Type | Reset | Description                                                  |
-+=======+======+=======+==============================================================+
-| 19:00 | RW   | 0h    | **Metadata (METD):** This field specifies metadata that      |
-|       |      |       | is vendor specific and specifies the entry in the encryption |
-|       |      |       | engine for the MEK.                                          |
-+-------+------+-------+--------------------------------------------------------------+
++-------+--------------+-------+--------------------------------------------------------------+
+| Bytes | Type         | Reset | Description                                                  |
++=======+==============+=======+==============================================================+
+| 19:00 | RW/WO[^type] | 0h    | **Metadata (METD):** This field specifies metadata that      |
+|       |              |       | is vendor specific and specifies the entry in the encryption |
+|       |              |       | engine for the MEK.                                          |
++-------+--------------+-------+--------------------------------------------------------------+
+
+[^type]: Register shall be either read write or write only.
 
 KMB and the encryption engine must be the only components which have access to MEKs. Each MEK is associated with non-secret metadata, in order for the MEK to be used for any key-related operations including data I/O. The **METD** field is used to convey this metadata.
 
@@ -972,12 +978,12 @@ The above examples are not the only possible values of **METD**. Vendors may des
 
 Table: OCP_LOCK_MEK_ADDRESS + 60h: AUX – Auxiliary Data {#tbl:ee-aux-sfr}
 
-+-------+------+-------+----------------------------------------------------------+
-| Bytes | Type | Reset | Description                                              |
-+=======+======+=======+==========================================================+
-| 31:00 | RW   | 0h    | **Auxiliary Data (AUX):** This field specifies auxiliary |
-|       |      |       | data associated to the MEK.                              |
-+-------+------+-------+----------------------------------------------------------+
++-------+-------+-------+----------------------------------------------------------+
+| Bytes | Type  | Reset | Description                                              |
++=======+=======+=======+==========================================================+
+| 31:00 | RW/WO | 0h    | **Auxiliary Data (AUX):** This field specifies auxiliary |
+|       |       |       | data associated to the MEK.                              |
++-------+-------+-------+----------------------------------------------------------+
 
 The **AUX** field supports vendor-specific features on MEKs. KMB itself only supports fundamental functionalities in order to minimize attack surfaces on MEKs. Moreover, vendors are free to design and implement their own MEK-related functionality within the encryption engine, as long as that functionality cannot be used to exfiltrate MEKs. In order to support these functionalities, some data may be associated and stored with an MEK, and the **AUX** field facilitates this association.
 
