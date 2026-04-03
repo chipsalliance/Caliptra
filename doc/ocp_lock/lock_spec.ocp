@@ -73,6 +73,10 @@ bibliography: bibliography.yaml
 |                |         | Allow Write-only AUX and Metadata   |
 |                |         | registers for the encryption        |
 |                |         | engine.                             |
+|                |         |                                     |
+|                |         | Removed "MPK secrets" entry from    |
+|                |         | CSP table. This was a duplicate of  |
+|                |         | "MEK secrets".                      |
 +----------------+---------+-------------------------------------+
 
 \currenttemplateversion
@@ -375,10 +379,6 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 |                   |                                      |                                                             |                |
 |                   |                                      | Rendered irrecoverable if the SEK, HEK seed, or DICE UDS    |                |
 |                   |                                      | are zeroized from persistent storage.                       |                |
-+-------------------+--------------------------------------+-------------------------------------------------------------+----------------+
-| MPK secrets       | Contributes to the derivation of an  | Derived from a sequence of MPKs. When held by Caliptra, the | 20             |
-|                   | MEK secret. See                      | MPK secret is held in the Key Vault and is zeroized after   |                |
-|                   | @fig:mek-secret-derivation.          | an MEK secret is derived.                                   |                |
 +-------------------+--------------------------------------+-------------------------------------------------------------+----------------+
 | DPKs              | Contributes to the derivation of an  | Managed outside of Caliptra. When held by Caliptra, the     | N/A            |
 |                   | MEK secret. See                      | DPK is held in volatile memory and is zeroized after each   |                |
