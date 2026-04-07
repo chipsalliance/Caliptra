@@ -89,7 +89,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 #### *Generation and Provisioning*
 
 * **Checklist Item:**  
-  * **Requirement:** The UDS seed and field entropy MUST be statistically uniquely generated using a cryptographically secure random number generator (CSRNG) seeded by an entropy source compliant with [NIST Entropy Source Certification](https://csrc.nist.gov/projects/cryptographic-module-validation-program/entropy-validations) SP 800-90B.
+  * **Requirement:** The UDS seed MUST be statistically uniquely generated using a cryptographically secure random number generator (CSRNG) seeded by an entropy source compliant with [NIST Entropy Source Certification](https://csrc.nist.gov/projects/cryptographic-module-validation-program/entropy-validations) SP 800-90B.
   * **Evaluation Methodology:** Manufacturers MUST provide documentation demonstrating compliance with applicable standards for entropy and random number generation.   
 * **Checklist Item:**  
   * **Requirement:** The confidentiality and integrity of the UDS seed MUST be protected during generation, storage, and provisioning. Access to this asset must be strictly controlled, and any temporary storage MUST be sanitized after use.  
