@@ -77,6 +77,9 @@ bibliography: bibliography.yaml
 |                |         | Removed "MPK secrets" entry from    |
 |                |         | CSP table. This was a duplicate of  |
 |                |         | "MEK secrets".                      |
+|                |         |                                     |
+|                |         | Removed Compliance entry 7. This    |
+|                |         | shall now be enforced by KMB.       |
 +----------------+---------+-------------------------------------+
 
 \currenttemplateversion
@@ -2256,39 +2259,36 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 |      | [-@sec:hek-lifecycle] and                                |           |
 |      | [-@sec:report-hek-metadata-cmd].                         |           |
 +------+----------------------------------------------------------+-----------+
-| 7    | MEKs shall not be programmed while the SEK or HEK are    | Yes       |
-|      | zeroized. See @sec:heks-seks.                            |           |
-+------+----------------------------------------------------------+-----------+
-| 8    | The drive shall only provide HEK seeds or SEKs that are  | Yes       |
+| 7    | The drive shall only provide HEK seeds or SEKs that are  | Yes       |
 |      | cryptographically-strong random values. See              |           |
 |      | @sec:heks-seks.                                          |           |
 +------+----------------------------------------------------------+-----------+
-| 9    | Drive firmware shall implement authorization             | Yes       |
+| 8    | Drive firmware shall implement authorization             | Yes       |
 |      | controls to gate lifecycle events that have the          |           |
 |      | potential to trigger data loss. See                      |           |
 |      | @sec:authorization.                                      |           |
 +------+----------------------------------------------------------+-----------+
-| 10   | The encryption engine shall ensure that AES-XTS          | Yes       |
+| 9    | The encryption engine shall ensure that AES-XTS          | Yes       |
 |      | Key_1 and Key_2 are not equal. See                       |           |
 |      | @sec:aes-xts-considerations.                             |           |
 +------+----------------------------------------------------------+-----------+
-| 11   | KMB shall have access to the SFRs defined in             | Yes       |
+| 10   | KMB shall have access to the SFRs defined in             | Yes       |
 |      | @tbl:kmb-ee-sfrs through the address defined by          |           |
 |      | OCP_LOCK_MEK_ADDRESS. See @sec:sfrs.                     |           |
 +------+----------------------------------------------------------+-----------+
-| 12   | MCU ROM shall configure registers                        | Yes       |
+| 11   | MCU ROM shall configure registers                        | Yes       |
 |      | SS_KEY_RELEASE_BASE_ADDR_L, SS_KEY_RELEASE_BASE_ADDR_H   |           |
 |      | and SS_KEY_RELEASE_SIZE, then setting CPTRA_FUSE_WR_DONE |           |
 |      | to prevent further modifications. Additionally,          |           |
 |      | OCP_LOCK_MEK_LENGTH must be set to 40h. See @sec:sfrs.   |           |
 +------+----------------------------------------------------------+-----------+
-| 13   | Upon KMB cold reset or firmware update reset, drive      | Yes       |
+| 12   | Upon KMB cold reset or firmware update reset, drive      | Yes       |
 |      | firmware shall enumerate HPKE keypairs supported by KMB  |           |
 |      | and advertise them to the host, if drive firmware        |           |
 |      | supports a host-facing API for doing so. See             |           |
 |      | @sec:hpke-transport-encryption.                          |           |
 +------+----------------------------------------------------------+-----------+
-| 14   | Integrations shall invoke Caliptra resets according to   | Yes       |
+| 13   | Integrations shall invoke Caliptra resets according to   | Yes       |
 |      | the directives given in @sec:reset-behavior.             |           |
 +------+----------------------------------------------------------+-----------+
 
