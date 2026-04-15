@@ -6,12 +6,14 @@
 - [Introduction](#introduction)
 - [Caliptra Documentation](#caliptra-documentation)
 - [Checklist Summary](#checklist-summary)
-- [Checklist Areas](#checklist-areas)
+- [Part I: Common Requirements](#part-i-common-requirements)
   - [Assets](#assets)
   - [Interfaces](#interfaces)
   - [SoC Root of Trust (RoT)](#soc-root-of-trust-rot)
   - [Specific Functionality](#specific-functionality)
-  - [Secure Process](#secure-processes)
+  - [Secure Processes](#secure-processes)
+- [Part II: Caliptra Core Trademark — Additional Requirements (Passive Mode)](#part-ii-caliptra-core-trademark--additional-requirements-passive-mode)
+- [Part III: Caliptra Subsystem Trademark — Additional Requirements](#part-iii-caliptra-subsystem-trademark--additional-requirements)
 
 # Introduction
 
@@ -38,6 +40,12 @@ The checklist items have been developed through a thorough analysis of:
 * **Feedback and collaboration:** Integrating input from various stakeholders, including security experts and industry professionals, to refine the checklist and address potential gaps.
 
 * **Asset-based analysis:** Identifying critical assets within the Caliptra integration context and tailoring requirements to protect these assets effectively.
+
+> **Document Structure:** This checklist is divided into three parts.
+> Evaluators MUST apply **Part I (Common Requirements)** to all integrations,
+> plus the part that corresponds to the elected trademark type:
+> **Part II** for the *Caliptra Core Trademark (Passive Mode)*, or
+> **Part III** for the *Caliptra Subsystem Trademark*.
 
 By adhering to the checklist and employing the specified evaluation methodologies, manufacturers and evaluators can work collaboratively to ensure that the Caliptra integration meets stringent security requirements, thereby bolstering the trustworthiness of the final product.
 
@@ -80,7 +88,11 @@ The following is a consolidated list of all requirements to ensure comprehensive
    * Production Process Security  
    * Flaw Remediation Process
 
-# Checklist Areas
+# Part I: Common Requirements
+
+The requirements in this section apply to **all** Caliptra integrations,
+regardless of whether the integrator is pursuing the Caliptra Core Trademark
+(Passive Mode) or the Caliptra Subsystem Trademark.
 
 ## Assets
 
@@ -189,7 +201,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 ### *Interface Implementation*
 
 * **Checklist Item:**  
-  * **Requirement:** Interfaces to Caliptra MUST adhere to the SoC Integration Requirements of the RTL release that was used. See [RTL v1.0](https://github.com/chipsalliance/caliptra-rtl/blob/v1.0/docs/CaliptraIntegrationSpecification.md#soc-integration-requirements), [RTL v1.1](https://github.com/chipsalliance/caliptra-rtl/blob/v1.1/docs/CaliptraIntegrationSpecification.md#soc-integration-requirements).
+  * **Requirement:** Interfaces to Caliptra MUST adhere to the SoC Integration Requirements of the RTL release that was used. See [RTL v1.0](https://github.com/chipsalliance/caliptra-rtl/blob/v1.0/docs/CaliptraIntegrationSpecification.md#soc-integration-requirements), [RTL v1.1](https://github.com/chipsalliance/caliptra-rtl/blob/v1.1/docs/CaliptraIntegrationSpecification.md#soc-integration-requirements). Integrators pursuing the **Caliptra Subsystem Trademark** must additionally consult the Caliptra Subsystem Integration Specification for Subsystem-specific interface requirements.
   * **Evaluation Methodology:** Manufacturers MUST show correct implementation of interfaces, following the definitions in the caliptra-rtl repo.
 
 ## SoC Root of Trust (RoT)
@@ -201,11 +213,11 @@ The following is a consolidated list of all requirements to ensure comprehensive
   * **Requirement:** Measurements of firmware and configuration MUST be submitted to Caliptra before execution of the firmware, or usage of the configuration data. Measurements MUST be submitted to Caliptra by the same entity that collected the measurement (e.g. SOC FMC cannot pass measurements to SOC FW for submission to the Caliptra mailbox).   
   * **Evaluation Methodology:** Manufacturers MUST provide a detailed description of how measurements are communicated to Caliptra.  
 
-### *Caliptra PA\_USER Management*
+### *Caliptra PA_USER (1.X) or AXI_USER (2.X) Management*
 
 * **Checklist Item:**  
-  * **Requirement:** The management of Caliptra's PA\_USER MUST ensure isolation and protection of privileged operations, preventing unprivileged users from forging measurements or accessing privileged functions.
-  * **Evaluation Methodology:** Manufacturers MUST document how PA\_USER is mapped in hardware and the mechanisms in place to isolate privileged operations from unprivileged ones.
+  * **Requirement:** The management of Caliptra's PA\_USER (for 1.X implementations) or AXI_USER (for 2.X implementations) MUST ensure isolation and protection of privileged operations, preventing unprivileged users from forging measurements or accessing privileged functions.
+  * **Evaluation Methodology:** Manufacturers MUST document how the applicable USER values are mapped in hardware and the mechanisms in place to isolate privileged operations from unprivileged ones.
 
 ### *Random Number Generator (RNG) Implementation*
 
@@ -215,7 +227,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
 
 ## Specific Functionality
 
-### *Caliptra Mode Selection and State Handling*
+### *Caliptra Life Cycle Selection and State Handling*
 
 * **Checklist Item:**  
   * **Requirement:** Where SoC behavior necessary to meet other requirements in this document is conditioned on SoC lifecycle state, the SoC MUST ensure that its own lifecycle is in a state that meets the requirements here prior to transitioning Caliptra's operational mode from unprovisioned to manufacturing or production.  
@@ -277,3 +289,194 @@ The following is a consolidated list of all requirements to ensure comprehensive
 * **Checklist Item:**  
   * **Requirement:** There MUST be a defined process for handling reported vulnerabilities, including assessment, communication, and deployment of security updates or mitigations.  
   * **Evaluation Methodology:** Manufacturers MUST provide their flaw remediation policy. This policy must describe how vulnerabilities are received (e.g., bug bounty programs), evaluated, and prioritized, and how updates are securely delivered to devices in the field. Procedures for notifying stakeholders and compliance with relevant regulations should also be described.
+
+---
+
+# Part II: Caliptra Core Trademark — Additional Requirements (Passive Mode)
+
+The requirements in this section apply **only** to integrations pursuing the
+**Caliptra Core Trademark (Passive Mode)**. All requirements in Part I also
+apply.
+
+## RTL Configuration — Core Mode
+
+* **Checklist Item:**
+  * **Requirement:** The macro `CALIPTRA_MODE_SUBSYSTEM` MUST NOT be defined in
+    `config_defines.svh` or in any build process. Defining this macro activates
+    Subsystem-mode behavior and is incompatible with a Caliptra Core Trademark integration.
+  * **Evaluation Methodology:** Manufacturers MUST provide the `config_defines.svh`
+    used in the integration and demonstrate that `CALIPTRA_MODE_SUBSYSTEM` is
+    absent.
+
+## DMA Assist Engine Isolation
+
+* **Checklist Item:**
+  * **Requirement:** All AXI manager output interfaces of the Caliptra IP MUST
+    be tied to logic 0 and MUST NOT be connected to the SoC AXI interconnect.
+    The DMA assist block is inactive in Passive Mode and must not be wired to any
+    SoC interconnect fabric.
+  * **Evaluation Methodology:** Manufacturers MUST provide RTL or integration
+    schematics demonstrating that all AXI manager signals from Caliptra are
+    grounded and not routed to the SoC interconnect.
+
+## SHA Accelerator Access Restriction
+
+* **Checklist Item:**
+  * **Requirement:** The SHA accelerator block MUST be inaccessible to SoC
+    components in Passive Mode. AXI streaming mode is disabled; the SHA
+    accelerator is available only in Caliptra-internal mailbox mode. No SoC
+    agent may access the SHA accelerator via any path.
+  * **Evaluation Methodology:** Manufacturers MUST demonstrate through RTL
+    review or architecture documentation that no SoC agent has a path to the
+    SHA accelerator, and that AXI streaming mode is not enabled. There shall
+    not be any AXI manager with an AXI_USER value corresponding to the value
+    driven for the strap `strap_ss_caliptra_dma_axi_user`, due to the use of
+    this signal as a gating condition for SHA accelerator access via AXI.
+
+## Subsystem Strap Isolation
+
+* **Checklist Item:**
+  * **Requirement:** All `strap_ss_*` Subsystem-mode strap signals MUST be tied
+    to logic 0. The signals `ss_debug_intent`, `cptra_obf_field_entropy_vld`,
+    `cptra_obf_field_entropy`, `cptra_obf_uds_seed_vld`, and
+    `cptra_obf_uds_seed` MUST be tied to 0.
+  * **Evaluation Methodology:** Manufacturers MUST provide RTL evidence
+    (e.g., tie-off assertions or integration top-level wiring) demonstrating
+    that all listed strap signals are permanently grounded.
+
+## TRNG Configuration (Core)
+
+* **Checklist Item:**
+  * **Requirement:** The internal TRNG (`CALIPTRA_INTERNAL_TRNG`) is optional in
+    Core Trademark integrations. If the internal TRNG is not enabled, the SoC
+    MUST provide a compliant external TRNG via the Caliptra TRNG HW API. If the
+    internal TRNG is used, the TRNG self-test threshold registers
+    (`CPTRA_iTRNG_ENTROPY_CONFIG0` and `CPTRA_iTRNG_ENTROPY_CONFIG1`) MUST NOT
+    be left at 0, as a zero value disables entropy self-testing.
+  * **Evaluation Methodology:** Manufacturers MUST document the TRNG configuration
+    choice, provide evidence of the TRNG source (internal or external), and, if
+    the internal TRNG is enabled, demonstrate that the self-test threshold
+    registers are set to non-zero values.
+
+---
+
+# Part III: Caliptra Subsystem Trademark — Additional Requirements
+
+The requirements in this section apply **only** to integrations pursuing the
+**Caliptra Subsystem Trademark**. All requirements in Part I also apply.
+
+## RTL Configuration — Subsystem Mode
+
+### *Caliptra Subsystem Build Configuration*
+
+* **Checklist Item:**
+  * **Requirement:** The macro `CALIPTRA_MODE_SUBSYSTEM` MUST be defined in
+    as part of the product build processes. The macro `CALIPTRA_INTERNAL_TRNG`
+    MUST also be defined.
+  * **Evaluation Methodology:** Manufacturers MUST provide materials from build
+    system or final contents of `config_defines.svh` demonstrating that
+    `CALIPTRA_MODE_SUBSYSTEM` and `CALIPTRA_INTERNAL_TRNG` are defined.
+
+### *TRNG Configuration*
+
+* **Checklist Item:**
+  * **Requirement:** The internal TRNG is mandatory in Subsystem mode.
+    `CALIPTRA_INTERNAL_TRNG` MUST be defined. The TRNG self-test threshold
+    registers (`CPTRA_iTRNG_ENTROPY_CONFIG0` and `CPTRA_iTRNG_ENTROPY_CONFIG1`)
+    MUST be set to non-zero values to enable entropy self-testing. All requirements
+    defined in the Caliptra Core Integration Specification for implementing
+    Internal TRNG must be followed.
+  * **Evaluation Methodology:** Manufacturers MUST demonstrate that
+    `CALIPTRA_INTERNAL_TRNG` is defined and that both TRNG self-test threshold
+    registers are configured to non-zero values.
+
+## Subsystem Components Taken As-Is
+
+* **Checklist Item:**
+  * **Requirement:** The full Caliptra Subsystem — comprising Caliptra Core (as
+    indicated by the submodule pointer in the caliptra-ss repo as of the release
+    tag), Life Cycle Controller (LCC), Fuse Controller, I3C with OCP streaming boot
+    interface (as indicated by the submodule pointer in the caliptra-ss repo as of
+    the release tag), Manufacturer Control Unit (MCU), and Manufacturer Control
+    Interface (MCI) — MUST be integrated as-is, without internal modification unless
+    explicitly permitted, to ensure hardware transparency and consistency. Refer to
+    the Caliptra Subsystem Integration Specification.
+  * **Evaluation Methodology:** Manufacturers MUST demonstrate, via the provided
+    release-verification tools, that all Subsystem components are verifiably
+    derived from official Caliptra Subsystem releases without internal
+    modification, except as permitted in the Subsystem Integration Specification.
+
+## AXI DMA Engine Connectivity
+
+* **Checklist Item:**
+  * **Requirement:** The AXI DMA assist engine MUST be connected to the SoC AXI
+    interconnect. AXI AxUSER signals MUST pass through unmodified to all AXI
+    subordinates.
+  * **Evaluation Methodology:** Manufacturers MUST provide architecture
+    documentation and RTL evidence showing that the DMA engine is wired to the
+    SoC interconnect and that AxUSER signals are propagated without
+    modification.
+
+## SHA Accelerator Access Restriction (Subsystem)
+
+* **Checklist Item:**
+  * **Requirement:** The SHA accelerator MUST be accessible only via Caliptra’s
+    AXI DMA block. No SoC agent may access the SHA accelerator directly. The
+    SHA accelerator enforces this restriction via AXI AxUSER checking; the
+    integrator MUST configure `strap_ss_caliptra_dma_axi_user` to correctly
+    identify Caliptra’s DMA transactions.
+  * **Evaluation Methodology:** Manufacturers MUST provide strap configuration
+    documentation and demonstrate, via RTL or architecture review, that no
+    direct SoC path to the SHA accelerator exists and that AxUSER checking is
+    correctly configured.
+
+## Mailbox and External Staging Area
+
+* **Checklist Item:**
+  * **Requirement:** The Caliptra Core mailbox SRAM MUST be configured to 16 KiB.
+    An external staging area MUST be provisioned and accessible to Caliptra via
+    the AXI DMA interface for firmware image transfer.
+  * **Evaluation Methodology:** Manufacturers MUST provide memory map
+    documentation confirming the 16 KiB mailbox size and demonstrating that an
+    appropriately sized and accessible external staging area is configured.
+
+## Subsystem Straps Configuration
+
+* **Checklist Item:**
+  * **Requirement:** All `strap_ss_*` Subsystem-mode strap signals MUST be
+    properly configured per the Caliptra Subsystem Integration Specification.
+    These signals MUST NOT be tied to 0.
+  * **Evaluation Methodology:** Manufacturers MUST provide strap configuration
+    documentation showing non-zero, specification-compliant values for all
+    `strap_ss_*` signals.
+
+## OCP Streaming Boot
+
+* **Checklist Item:**
+  * **Requirement:** OCP streaming boot via the I3C interface MUST be implemented
+    in compliance with the OCP Recovery specification.
+  * **Evaluation Methodology:** Manufacturers MUST provide documentation or test
+    evidence demonstrating compliance with the OCP Recovery specification for
+    the I3C streaming boot path.
+
+## Production Debug Unlock
+
+* **Checklist Item:**
+  * **Requirement:** The Production Debug Unlock Architecture MUST be used.
+    The simple JTAG security-state mechanism used in Passive Mode (Core
+    Trademark) is not applicable to Subsystem integrations.
+  * **Evaluation Methodology:** Manufacturers MUST document the debug unlock
+    mechanism implemented and demonstrate that it conforms to the Production
+    Debug Unlock Architecture defined in the Caliptra Subsystem Integration
+    Specification.
+
+## Subsystem Fuse Map (TODO update this verbiage)
+
+* **Checklist Item:**
+  * **Requirement:** The integrator MUST implement the Caliptra Subsystem fuse
+    map including all fuses defined in the Caliptra Core fuse map and (... FIXME ...).
+    Refer to the fuse map section of the Caliptra Subsystem
+    Integration Specification.
+  * **Evaluation Methodology:** Manufacturers MUST provide fuse map
+    documentation demonstrating that both the Caliptra Core fuse map and the
+    Subsystem-specific fuse map are fully implemented.
