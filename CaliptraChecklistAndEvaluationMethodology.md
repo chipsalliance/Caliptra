@@ -57,7 +57,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The Caliptra Specification is maintained within the [ChipsAlliance Caliptra repository](https://github.com/chipsalliance/Caliptra/blob/main/doc/Caliptra.md).  This is a live link. Each generation, the main specification will be updated and the older specifications will be maintained for reference for designs based on that specification.  For example, here is the specification for [Calitpra 1.X](https://github.com/chipsalliance/Caliptra/blob/main/doc/caliptra_1x/Caliptra.md).
 
-The [HW specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraHardwareSpecification.md) and [HW integration specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md) also have their own live links. For previous versions of the hardware specification, go to the location that is tagged with that release version.
+The [HW specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraHardwareSpecification.md) and [HW integration specification](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md) also have their own live links. For previous versions of the hardware specification, download the official release from [Releases](https://github.com/chipsalliance/caliptra-rtl/releases) and review the corresponding documentation in the `docs` folder.
 
 This checklist is built from these specifications with the goal to help ensure that Caliptra is integrated correctly within a design. To demonstrate compliance with this checklist, vendors must provide necessary collateral to security auditors, which may include documentation such as: integrated RTL, synthesized netlist reports, GLS FEV reports, SoC boot diagrams, etc. Some integration requirements may not be verified through tool reports or through code analysis. For such requirements, integrators must provide documentation summarizing plans and procedures (for example, generation of an obfuscation key in compliance with NIST).
 
@@ -209,8 +209,8 @@ regardless of whether the integrator is pursuing the Caliptra Core Trademark
 ### *Boot and Initialization Process*
 
 * **Checklist Item:**
-  * **Requirement:** SOC firmware that interacts with Caliptra as the privileged PA\_USER MUST be measured, and those measurements MUST be submitted to Caliptra. Other SOC firmware SHOULD be measured. Configuration data that modifies the security properties of firmware MUST also be measured. 
-  * **Requirement:** Measurements of firmware and configuration MUST be submitted to Caliptra before execution of the firmware, or usage of the configuration data. Measurements MUST be submitted to Caliptra by the same entity that collected the measurement (e.g. SOC FMC cannot pass measurements to SOC FW for submission to the Caliptra mailbox).   
+  * **Requirement:** SoC firmware that interacts with Caliptra as the privileged PA\_USER MUST be measured, and those measurements MUST be submitted to Caliptra. Other SoC firmware SHOULD be measured. Configuration data that modifies the security properties of firmware MUST also be measured. 
+  * **Requirement:** Measurements of firmware and configuration MUST be submitted to Caliptra before execution of the firmware, or usage of the configuration data. Measurements MUST be submitted to Caliptra by the same entity that collected the measurement (e.g. SoC FMC cannot pass measurements to SoC FW for submission to the Caliptra mailbox).   
   * **Evaluation Methodology:** Manufacturers MUST provide a detailed description of how measurements are communicated to Caliptra.  
 
 ### *Caliptra PA_USER (1.X) or AXI_USER (2.X) Management*
@@ -249,18 +249,6 @@ regardless of whether the integrator is pursuing the Caliptra Core Trademark
 
 ### Development Process
 
-#### *Integrity of Firmware and Hardware*
-
-* **Checklist Item:**
-  * **Requirement:** The Caliptra RTL MUST be from an official release or TAC approved modification. Changes to the RTL other than those documented in the Integrator RTL Modification Requirements MUST be published to GitHub to obtain approval for the modification. Refer to docs/CaliptraIntegrationSpecification.md (section "Integrator RTL Modification Requirements") from the official release that was consumed for integration, as listed in [Releases](https://github.com/chipsalliance/caliptra-rtl/releases).
-  * **Evaluation Methodology:** Manufacturers MUST show all changes made to RTL files. Manufacturers MUST show that changes to files in the Integrator RTL modification list are limited to the scope described in those requirements, and MUST show TAC approval for other changes. The [audit tools](https://github.com/chipsalliance/caliptra-rtl/tree/main/tools) can be used to identify changes.
-* **Checklist Item:**
-  * **Requirement:** Netlists, layout, and other development collateral derived from the RTL MUST maintain the same behavior as the released RTL when Caliptra is in the [Production Non-Debug state](https://github.com/chipsalliance/Caliptra/blob/main/doc/Caliptra.md#caliptra-security-states).
-  * **Evaluation Methodology:** Manufacturers MUST provide evidence that collateral derived from the released RTL has not had its behavior modified.
-* **Checklist Item:**
-  * **Requirement:** Cryptographic hashes of the Caliptra ROM and firmware (FMC and RT) MUST match reference hashes of official Caliptra releases.
-  * **Evaluation Methodology:** Manufacturers MUST demonstrate that the SHA384 hashes of ROM and firmware match those of official releases.
-
 #### *Testing and Verification*
 
 * **Checklist Item:**  
@@ -280,9 +268,9 @@ regardless of whether the integrator is pursuing the Caliptra Core Trademark
 #### *Debugging Controls*
 
 * **Checklist Item:**  
-  * **Requirement:** The SOC Manager MUST put Caliptra into a debug state when the SOC is operating in a mode that permits the usage of code/data which differs from the measurements submitted to Caliptra.
-  * **Requirement:** The SOC Manager MUST put Caliptra into a debug state any time test or debug logic allows read or write access to Caliptra logic or SRAM.
-  * **Evaluation Methodology:** Manufacturers MUST describe how debugging is enabled for the SOC and for Caliptra, including any fuse settings, access controls, and procedures to disable debugging interfaces.
+  * **Requirement:** The SoC MUST put Caliptra into a debug state when the SoC is operating in a mode that permits the usage of code/data which differs from the measurements submitted to Caliptra.
+  * **Requirement:** The SoC MUST put Caliptra into a debug state any time test or debug logic allows read or write access to Caliptra logic or SRAM.
+  * **Evaluation Methodology:** In Caliptra Core mode the debug state transition must be handled by the SoC manager, and in Caliptra Subsystem mode the SoC must follow the debug unlock procedure. Manufacturers MUST describe how debugging is enabled for the SoC and for Caliptra, including any fuse settings, access controls, and procedures to disable debugging interfaces.
 
 #### *Flaw Remediation Process*
 
@@ -298,7 +286,9 @@ The requirements in this section apply **only** to integrations pursuing the
 **Caliptra Core Trademark (Passive Mode)**. All requirements in Part I also
 apply.
 
-## RTL Configuration — Core Mode
+## RTL Configuration
+
+### *Core Mode*
 
 * **Checklist Item:**
   * **Requirement:** The macro `CALIPTRA_MODE_SUBSYSTEM` MUST NOT be defined in
@@ -308,7 +298,23 @@ apply.
     used in the integration and demonstrate that `CALIPTRA_MODE_SUBSYSTEM` is
     absent.
 
-## DMA Assist Engine Isolation
+### *TRNG Configuration (Core)*
+
+* **Checklist Item:**
+  * **Requirement:** The internal TRNG (`CALIPTRA_INTERNAL_TRNG`) is optional in
+    Core Trademark integrations. If the internal TRNG is not enabled, the SoC
+    MUST provide a compliant external TRNG via the Caliptra TRNG HW API. If the
+    internal TRNG is used, the TRNG self-test threshold registers
+    (`CPTRA_iTRNG_ENTROPY_CONFIG0` and `CPTRA_iTRNG_ENTROPY_CONFIG1`) MUST NOT
+    be left at 0, as a zero value disables entropy self-testing.
+  * **Evaluation Methodology:** Manufacturers MUST document the TRNG configuration
+    choice, provide evidence of the TRNG source (internal or external), and, if
+    the internal TRNG is enabled, demonstrate that the self-test threshold
+    registers are set to non-zero values.
+
+## Interface Connectivity
+
+### *DMA Assist Engine Isolation*
 
 * **Checklist Item:**
   * **Requirement:** All AXI manager output interfaces of the Caliptra IP MUST
@@ -319,7 +325,7 @@ apply.
     schematics demonstrating that all AXI manager signals from Caliptra are
     grounded and not routed to the SoC interconnect.
 
-## SHA Accelerator Access Restriction
+### *SHA Accelerator Access Restriction*
 
 * **Checklist Item:**
   * **Requirement:** The SHA accelerator block MUST be inaccessible to SoC
@@ -333,7 +339,7 @@ apply.
     driven for the strap `strap_ss_caliptra_dma_axi_user`, due to the use of
     this signal as a gating condition for SHA accelerator access via AXI.
 
-## Subsystem Strap Isolation
+### *Subsystem Strap Isolation*
 
 * **Checklist Item:**
   * **Requirement:** All `strap_ss_*` Subsystem-mode strap signals MUST be tied
@@ -344,19 +350,21 @@ apply.
     (e.g., tie-off assertions or integration top-level wiring) demonstrating
     that all listed strap signals are permanently grounded.
 
-## TRNG Configuration (Core)
+## Secure Processes
+
+### Development Process
+
+#### *Integrity of Hardware and ROM*
 
 * **Checklist Item:**
-  * **Requirement:** The internal TRNG (`CALIPTRA_INTERNAL_TRNG`) is optional in
-    Core Trademark integrations. If the internal TRNG is not enabled, the SoC
-    MUST provide a compliant external TRNG via the Caliptra TRNG HW API. If the
-    internal TRNG is used, the TRNG self-test threshold registers
-    (`CPTRA_iTRNG_ENTROPY_CONFIG0` and `CPTRA_iTRNG_ENTROPY_CONFIG1`) MUST NOT
-    be left at 0, as a zero value disables entropy self-testing.
-  * **Evaluation Methodology:** Manufacturers MUST document the TRNG configuration
-    choice, provide evidence of the TRNG source (internal or external), and, if
-    the internal TRNG is enabled, demonstrate that the self-test threshold
-    registers are set to non-zero values.
+  * **Requirement:** The Caliptra RTL MUST be from an official release or TAC approved modification. Changes to the RTL other than those documented in the Integrator RTL Modification Requirements MUST be published to GitHub to obtain approval for the modification. Refer to docs/CaliptraIntegrationSpecification.md (section "Integrator RTL Modification Requirements") from the official release that was consumed for integration, as listed in [Releases](https://github.com/chipsalliance/caliptra-rtl/releases).
+  * **Evaluation Methodology:** Manufacturers MUST show all changes made to RTL files. Manufacturers MUST show that changes to files in the Integrator RTL modification list are limited to the scope described in those requirements, and MUST show TAC approval for other changes. The [audit tools](https://github.com/chipsalliance/caliptra-rtl/tree/main/tools) can be used to identify changes.
+* **Checklist Item:**
+  * **Requirement:** Netlists, layout, and other development collateral derived from the RTL MUST maintain the same behavior as the released RTL when Caliptra is in the [Production Non-Debug state](https://github.com/chipsalliance/Caliptra/blob/main/doc/Caliptra.md#caliptra-security-states).
+  * **Evaluation Methodology:** Manufacturers MUST provide evidence that collateral derived from the released RTL has not had its behavior modified.
+* **Checklist Item:**
+  * **Requirement:** Cryptographic hash of the Caliptra ROM used in final hardware design MUST match reference hash of official Caliptra releases.
+  * **Evaluation Methodology:** Manufacturers MUST demonstrate that the SHA384 hash of ROM matches that of the official release that is integrated.
 
 ---
 
@@ -390,7 +398,9 @@ The requirements in this section apply **only** to integrations pursuing the
     `CALIPTRA_INTERNAL_TRNG` is defined and that both TRNG self-test threshold
     registers are configured to non-zero values.
 
-## Subsystem Components Taken As-Is
+## Secure Processes
+
+### *Integrity of Hardware and ROM*
 
 * **Checklist Item:**
   * **Requirement:** The full Caliptra Subsystem — comprising Caliptra Core (as
@@ -464,7 +474,9 @@ The requirements in this section apply **only** to integrations pursuing the
 * **Checklist Item:**
   * **Requirement:** The Production Debug Unlock Architecture MUST be used.
     The simple JTAG security-state mechanism used in Passive Mode (Core
-    Trademark) is not applicable to Subsystem integrations.
+    Trademark) is not applicable to Subsystem integrations. Any SoC DFT
+    or TAP access must be initiated through the Caliptra Subsystem Debug
+    Unlock procedure.
   * **Evaluation Methodology:** Manufacturers MUST document the debug unlock
     mechanism implemented and demonstrate that it conforms to the Production
     Debug Unlock Architecture defined in the Caliptra Subsystem Integration
