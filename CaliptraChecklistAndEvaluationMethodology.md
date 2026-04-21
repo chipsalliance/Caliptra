@@ -7,11 +7,6 @@
 - [Caliptra Documentation](#caliptra-documentation)
 - [Checklist Summary](#checklist-summary)
 - [Part I: Common Requirements](#part-i-common-requirements)
-  - [Assets](#assets)
-  - [Interfaces](#interfaces)
-  - [SoC Root of Trust (RoT)](#soc-root-of-trust-rot)
-  - [Specific Functionality](#specific-functionality)
-  - [Secure Processes](#secure-processes)
 - [Part II: Caliptra Core Trademark — Additional Requirements (Passive Mode)](#part-ii-caliptra-core-trademark--additional-requirements-passive-mode)
 - [Part III: Caliptra Subsystem Trademark — Additional Requirements](#part-iii-caliptra-subsystem-trademark--additional-requirements)
 
