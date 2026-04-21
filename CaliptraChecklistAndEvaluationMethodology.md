@@ -41,12 +41,6 @@ The checklist items have been developed through a thorough analysis of:
 
 * **Asset-based analysis:** Identifying critical assets within the Caliptra integration context and tailoring requirements to protect these assets effectively.
 
-> **Document Structure:** This checklist is divided into three parts.
-> Evaluators MUST apply **Part I (Common Requirements)** to all integrations,
-> plus the part that corresponds to the elected trademark type:
-> **Part II** for the *Caliptra Core Trademark (Passive Mode)*, or
-> **Part III** for the *Caliptra Subsystem Trademark*.
-
 By adhering to the checklist and employing the specified evaluation methodologies, manufacturers and evaluators can work collaboratively to ensure that the Caliptra integration meets stringent security requirements, thereby bolstering the trustworthiness of the final product.
 
 ### Key Words
@@ -63,30 +57,62 @@ This checklist is built from these specifications with the goal to help ensure t
 
 # Checklist Summary
 
-The following is a consolidated list of all requirements to ensure comprehensive coverage:
+The following is a consolidated list of all requirements to ensure comprehensive coverage.
+Evaluators MUST apply **Part I** to all integrations, plus the part corresponding to the
+elected trademark: **Part II** for the *Caliptra Core Trademark (Passive Mode)*, or
+**Part III** for the *Caliptra Subsystem Trademark*.
 
-1. **Assets**  
-   * UDS Seed and Field Entropy  
-   * Firmware Authentication Keys  
-   * IDEVID Generation and Endorsement Flow  
-   * Obfuscation Key  
-   * Fuses Management  
+**Part I: Common Requirements**
+
+1. **Assets**
+   * UDS Seed and Field Entropy
+   * FW Authentication Keys
+   * IDEVID Generation and Endorsement Flow
+   * Obfuscation Key
+   * Fuses
 2. **Interfaces**
-   * Mailbox Interface Compliance    
-   * Debug Interface Management  
-   * Interface Wires Implementation  
-3. **SoC Root of Trust (RoT)**  
-   * Boot and Initialization Process Compliance  
-   * Handling of Caliptra PA_USER Management  
-   * Random Number Generator (RNG) Implementation    
-4. **Specific Functionality**  
-   * Caliptra Mode Selection and State Handling  
-   * Error Handling Mechanisms  
-   * Logging Functionality in SoC  
-5. **Secure Processes**  
-   * Development Process Integrity  
-   * Production Process Security  
-   * Flaw Remediation Process
+   * Mailbox Interface Compliance
+   * Debug Interface Management
+   * Hardware Implementation
+3. **SoC Root of Trust (RoT)**
+   * Boot and Initialization Process
+   * Caliptra Privileged USER Management
+   * Random Number Generator (RNG) Implementation
+4. **Specific Functionality**
+   * Caliptra Life Cycle Selection and State Handling
+   * Error Handling
+   * Log Functionality in SoC
+5. **Secure Processes**
+   * Development Process — Testing and Verification
+   * Production Process — Debugging Controls
+   * Production Process — Flaw Remediation Process
+
+**Part II: Caliptra Core Trademark — Additional Requirements (Passive Mode)**
+
+1. **RTL Configuration**
+   * Core Mode
+   * TRNG Configuration (Core)
+2. **Interface Connectivity**
+   * DMA Assist Engine Isolation
+   * SHA Accelerator Access Restriction
+   * Subsystem Strap Isolation
+3. **Secure Processes**
+   * Development Process — Integrity of Hardware and ROM
+
+**Part III: Caliptra Subsystem Trademark — Additional Requirements**
+
+1. **RTL Configuration — Subsystem Mode**
+   * Caliptra Subsystem Build Configuration
+   * TRNG Configuration
+2. **Interface Connectivity**
+   * AXI DMA Engine Connectivity
+   * SHA Accelerator Access Restriction (Subsystem)
+   * Subsystem Straps Configuration
+3. **OCP Streaming Boot**
+4. **Production Debug Unlock**
+5. **Subsystem Fuse Map**
+6. **Secure Processes**
+   * Integrity of Hardware and ROM
 
 # Part I: Common Requirements
 
@@ -209,11 +235,11 @@ regardless of whether the integrator is pursuing the Caliptra Core Trademark
 ### *Boot and Initialization Process*
 
 * **Checklist Item:**
-  * **Requirement:** SoC firmware that interacts with Caliptra as the privileged PA\_USER MUST be measured, and those measurements MUST be submitted to Caliptra. Other SoC firmware SHOULD be measured. Configuration data that modifies the security properties of firmware MUST also be measured. 
+  * **Requirement:** SoC firmware that interacts with Caliptra as the privileged PA_USER (for 1.X implementations) or AXI_USER (for 2.X implementations) MUST be measured, and those measurements MUST be submitted to Caliptra. Other SoC firmware SHOULD be measured. Configuration data that modifies the security properties of firmware MUST also be measured. 
   * **Requirement:** Measurements of firmware and configuration MUST be submitted to Caliptra before execution of the firmware, or usage of the configuration data. Measurements MUST be submitted to Caliptra by the same entity that collected the measurement (e.g. SoC FMC cannot pass measurements to SoC FW for submission to the Caliptra mailbox).   
   * **Evaluation Methodology:** Manufacturers MUST provide a detailed description of how measurements are communicated to Caliptra.  
 
-### *Caliptra PA_USER (1.X) or AXI_USER (2.X) Management*
+### *Caliptra Privileged USER Management*
 
 * **Checklist Item:**  
   * **Requirement:** The management of Caliptra's PA_USER (for 1.X implementations) or AXI_USER (for 2.X implementations) MUST ensure isolation and protection of privileged operations, preventing unprivileged users from forging measurements or accessing privileged functions.
@@ -405,28 +431,6 @@ The requirements in this section apply **only** to integrations pursuing the
     `CALIPTRA_INTERNAL_TRNG` is defined and that both TRNG self-test threshold
     registers are configured to non-zero values.
 
-## Secure Processes
-
-### *Integrity of Hardware and ROM*
-
-* **Checklist Item:**
-  * **Requirement:** The full Caliptra Subsystem RTL MUST be from an official release
-    or TAC approved modification. Changes to the RTL other than those documented in
-    the Integrator RTL Modification Requirements MUST be published to GitHub to obtain
-    approval for the modification. This requirement applies to the top-level wrapper
-    of Caliptra Subsystem and all underlying components as defined in the Caliptra
-    Subsystem Hardware Specification. For Caliptra Core and I3C core, the integrated
-    code must exactly match the design from the submodule pointer that is part of the
-    released Subsystem design. Caliptra Core ROM must also be consumed as-is from a
-    compatible official release. Refer to the Caliptra Subsystem Integration
-    Specification (section [Integration Considerations](#integration-considerations)) from the
-    official release that was consumed for integration, as listed in
-    [Releases](https://github.com/chipsalliance/caliptra-ss/releases).
-  * **Evaluation Methodology:** Manufacturers MUST show all changes made to Subsystem
-    RTL files. Manufacturers MUST show that changes to files in the Integrator RTL
-    modification list are limited to the scope described in those requirements, and
-    MUST show TAC approval for other changes.
-
 ## Interface Connectivity
 
 ### *AXI DMA Engine Connectivity*
@@ -494,3 +498,25 @@ The requirements in this section apply **only** to integrations pursuing the
   * **Evaluation Methodology:** Manufacturers MUST provide fuse map
     documentation demonstrating that both the Caliptra Core fuse map and the
     Subsystem-specific fuse map are fully implemented.
+
+## Secure Processes
+
+### *Integrity of Hardware and ROM*
+
+* **Checklist Item:**
+  * **Requirement:** The full Caliptra Subsystem RTL MUST be from an official release
+    or TAC approved modification. Changes to the RTL other than those documented in
+    the Integrator RTL Modification Requirements MUST be published to GitHub to obtain
+    approval for the modification. This requirement applies to the top-level wrapper
+    of Caliptra Subsystem and all underlying components as defined in the Caliptra
+    Subsystem Hardware Specification. For Caliptra Core and I3C core, the integrated
+    code must exactly match the design from the submodule pointer that is part of the
+    released Subsystem design. Caliptra Core ROM must also be consumed as-is from a
+    compatible official release. Refer to the Caliptra Subsystem Integration
+    Specification (section [Integration Considerations](#integration-considerations)) from the
+    official release that was consumed for integration, as listed in
+    [Releases](https://github.com/chipsalliance/caliptra-ss/releases).
+  * **Evaluation Methodology:** Manufacturers MUST show all changes made to Subsystem
+    RTL files. Manufacturers MUST show that changes to files in the Integrator RTL
+    modification list are limited to the scope described in those requirements, and
+    MUST show TAC approval for other changes.
