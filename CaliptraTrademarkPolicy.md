@@ -80,9 +80,10 @@ Project itself.
 
 The Caliptra project defines two distinct integration architectures, each with
 its own trademark. Integrators MUST elect which trademark type they are pursuing
-prior to initiating the certification process. Only one trademark type is
-granted per product (Target of Evaluation, or TOE). A company may hold both
-trademarks on different products.
+when following the certification process, as this determines the audit scope and
+applicable sections from [Checklist and Evaluation Methodology](CaliptraChecklistAndEvaluationMethodology.md). Only one
+trademark type is granted per product (Target of Evaluation, or TOE). A company
+may hold both trademarks on different products.
 
 ### Caliptra Core Trademark (Passive Mode)
 
@@ -91,8 +92,8 @@ integrations in which the Caliptra Core is embedded directly in the SoC
 using the legacy integration architecture supported since Caliptra 1.0. In this
 configuration, the AXI DMA interface is disabled, external SoC components
 cannot access the SHA accelerator (for integrations of 2.0 and later versions),
-and the SoC is responsible for providing the SoC Manager and loading Caliptra
-firmware.
+and the SoC is responsible for providing the SoC Manager, lifecycle control, and
+loading Caliptra firmware.
 
 ### Caliptra Subsystem Trademark
 
@@ -100,19 +101,8 @@ The **Caliptra Subsystem Trademark** applies to integrations that adopt the full
 Caliptra Subsystem architecture introduced in Caliptra 2.0. This configuration
 incorporates Caliptra Core together with a Life Cycle Controller (LCC),
 Fuse Controller, OCP streaming boot interface, Manufacturer Control
-Unit (MCU), and Manufacturer Control Interface (MCI). The AXI DMA engine is
-active and connected to the SoC interconnect, and the internal TRNG is
-mandatory.
-
-### Trademark Election Requirement
-
-When initiating the certification process, the integrator MUST declare, in
-writing, which trademark type (Caliptra Core or Caliptra Subsystem) is being
-pursued for the TOE. This election determines the applicable integration
-architecture, the audit scope, and which sections of the
-[Checklist and Evaluation Methodology](CaliptraChecklistAndEvaluationMethodology.md)
-apply. The elected trademark type cannot be changed mid-audit without
-restarting the process for the new type.
+Unit (MCU), and Manufacturer Control Interface (MCI). In this configuration
+Caliptra operates with an active profile.
 
 ## Technical Specifications & Caliptra Certification
 
