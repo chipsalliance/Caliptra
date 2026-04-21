@@ -802,7 +802,7 @@ Integrators may elect to utilize either MEK generation or MEK derivation when es
 
 #### AES-XTS considerations {#sec:aes-xts-considerations}
 
-The MEK sent to the encryption engine may be used as an AES-XTS key. FIPS 140-3 IG [@{fips-140-3-ig}] section C.I states that in AES-XTS, the key is "parsed as the concatenation of two AES keys, denoted by *Key_1* and *Key_2*, that are 128 [or 256] bits long... *Key_1* and *Key_2* shall be generated and/or established independently according to the rules for component symmetric keys from NIST **SP 800-133rev2**, Sec. 6.3. The module **shall** check explicitly that *Key_1* ≠ *Key_2*, regardless of how *Key_1* and *Key_2* are obtained."
+The MEK sent to the encryption engine may be used as an AES-XTS key. FIPS 140-3 IG [@{fips-140-3-ig}] section C.I states that in AES-XTS, the key is "parsed as the concatenation of two AES keys, denoted by *Key~1~* and *Key~2~*, that are 128 [or 256] bits long... *Key~1~* and *Key~2~* shall be generated and/or established independently according to the rules for component symmetric keys from NIST **SP 800-133rev2**, Sec. 6.3. The module **shall** check explicitly that *Key~1~* ≠ *Key~2~*, regardless of how *Key~1~* and *Key~2~* are obtained."
 
 SP 800-133 [@{sp800-133r2}] section 6.3 states: "The independent generation/establishment of the component keys K~1~, ..., K~n~ is interpreted in a computational and a statistical sense; that is, the computation of any particular K~i~ value does not depend on any one or more of the other K~i~ values, and it is not feasible to use knowledge of any proper subset of the K~i~ values to obtain any information about the remaining K~i~ values."
 
@@ -810,7 +810,16 @@ SP 800-108 [@{sp800-108r1}] section 4 states that "the output of a key-derivatio
 
 As the MEK sent to the encryption engine is either randomly or pseudorandomly generated, it satisfies the above constraints. Disjoint segments of derived keying material computed from a pseudorandom function are statistically and computationally independent.
 
-When in AES-XTS mode, the encryption engine will be responsible for performing the inequality check for Key_1 and Key_2 stipulated by FIPS 140-3 IG section C.I. If this check fails, the encryption engine must report a vendor-defined error. This document does not specify how drive firmware should handle this error case.
+KMB explicitly checks the inequality between *Key~1~* and *Key~2~* at specific steps in the following commands:
+- [GENERATE_MEK](#sec:generate-mek-cmd): after generating a plain MEK (on `512-bit MEK` in @fig:mek-generate),
+- [LOAD_MEK](#sec:load-mek-cmd): before AES-ECB decryption (on `Single-encrypted MEK` in @fig:mek-load),
+- [DERIVE_MEK](#sec:derive-mek-cmd): before AES-ECB decryption (on `MEK seed` in @fig:mek-derive).
+
+Since AES-ECB decryption (`Dec(key, data)`) with a fixed key is a 128-bit-wise permutation, `Dec(K, A) = Dec(K, B)` holds if and only if `A = B` holds for any AES key `K` and any 128-bit data `A` and `B`. Therefore KMB can verify inequality of the resulting `512-bit MEK` by checking with the data before AES-ECB decryption: `Single-encrypted MEK` and `MEK seed`.
+
+When [DERIVE_MEK](#sec:derive-mek-cmd) fails the inequality check, KMB regenerates `MEK seed` by applying additional KDFs using the same label, `"ocp_lock_mek_seed"`, until the check passes. Similarly, [GENERATE_MEK](#sec:generate-mek-cmd) repeatedly samples a randomness until the generated key satisfies the inequality. Instead of repeating infinitely, KMB only repeats *26 times* and returns an error if all attempts were failed. Under the (pseudo-)randomness assumption of underlying PRNG and KDF, this will give high enough probability to generate/derive a key passing the inequality check. With 26 repetitions, The probability to get an error is roughly one out of 10^1000^.
+
+In order to support both 256-bit and 512-bit AES-XTS keys, KMB checks both 128-bit-wise inequality and 256-bit-wise inequality. Thus, any MEK generated/loaded by KMB complies with AES-XTS key requirements. Vendors may elect to additionally implement an inequality check mechanism within their own encryption engines.
 
 ### Random key generation via DRBG
 
@@ -1094,7 +1103,18 @@ Table: CTRL command codes {#tbl:ee-ctrl-cmd-codes}
 | 3h       | **Zeroize**: Unload all of the MEKs from the encryption   |
 |          | engine (i.e., zeroize the encryption engine MEKs).        |
 +----------+-----------------------------------------------------------+
-| 4h to Fh | Reserved                                                  |
+| 4h       | **Load KAT MEK**: Load a fixed MEK, along with the        |
+|          | auxiliary metadata specified by the **AUX** field, into   |
+|          | the encryption engine as specified by the **METD** field. |
+|          | The fixed MEK is as follows in hex string:                |
+|          | ```                                                       |
+|          | 0000 0000 0000 0000 0000 0000 0000 0000                   |
+|          | 1111 1111 1111 1111 1111 1111 1111 1111                   |
+|          | 2222 2222 2222 2222 2222 2222 2222 2222                   |
+|          | 3333 3333 3333 3333 3333 3333 3333 3333                   |
+|          | ```                                                       |
++----------+-----------------------------------------------------------+
+| 5h to Fh | Reserved                                                  |
 +----------+-----------------------------------------------------------+
 
 From KMB, the Control register is the register to write a command and receive its execution result. From its counterpart, the encryption engine, the Control register is used to receive a command and write its execution result.
@@ -1311,7 +1331,7 @@ Table: GET_ALGORITHMS output arguments {#tbl:get-algorithms-output-args}
 
 Each of the \`hpke_algorithms\` and \`access_key_sizes\` fields shall be reported as a non-zero value.
 
-#### CLEAR_KEY_CACHE
+#### CLEAR_KEY_CACHE {#sec:clear-key-cache-cmd}
 
 This command unloads all MEKs in the encryption engine.
 
@@ -1856,7 +1876,7 @@ Table: DERIVE_MEK output arguments {#tbl:derive-mek-output-args}
 | mek_checksum | u8[16] | Checksum calculated for the derived MEK.  |
 +--------------+--------+-------------------------------------------+
 
-#### UNLOAD_MEK
+#### UNLOAD_MEK {#sec:unload-mek-cmd}
 
 This command causes the MEK associated to the specified metadata to be unloaded for the key cache of the encryption engine. The metadata format is vendor-defined and specifies the information to the encryption engine on where within the key cache, the MEK is loaded.
 
@@ -1960,6 +1980,58 @@ Table: SEK state values {#tbl:sek-state-values}
 +-------------+----------------+
 | 2h to FFFFh | Reserved       |
 +-------------+----------------+
+
+#### LOAD_KAT_MEK {#sec:load-kat-mek-cmd}
+
+This command loads a fixed MEK into the encryption engine. The following hex value will be used as the MEK:
+```
+0000 0000 0000 0000 0000 0000 0000 0000
+1111 1111 1111 1111 1111 1111 1111 1111
+2222 2222 2222 2222 2222 2222 2222 2222
+3333 3333 3333 3333 3333 3333 3333 3333
+```
+
+This value is intentionally selected to avoid potential endianness issues and to comply with FIPS 140-3 requirements for the key used in AES-XTS ([AES-XTS considerations](#sec:aes-xts-considerations)). AES-XTS uses a 256-bit (resp. 512-bit) key, and its first 128-bit (resp. 256-bit) half and second 128-bit (resp. 256-bit) half shall not be identical. With the selected MEK, any 256-bit or 512-bit substring satisfies this condition.
+
+The command loads the fixed MEK, specified metadata, and aux_metadata into the encryption engine. The formats of metadata and aux_metadata are vendor-defined and will act as an identifier and additional information for the loaded MEK.
+
+The MEK loaded with this command is intended only for Known Answer Test (KAT) purposes of the underlying block cipher in the encryption engine. The loaded MEK should be immediately unloaded by using [UNLOAD_MEK](#sec:unload-mek-cmd) or [CLEAR_KEY_CACHE](#sec:clear-key-cache-cmd) once the KAT is complete. Using this MEK for user data encryption will compromise all data protection mechanism integrated within a storage device.
+
+Command Code: 0x4C4B_4154 ("LKAT")
+
+Table: LOAD_KAT_MEK input arguments {#tbl:load-kat-mek-input-args}
+
++--------------+-------------------+--------------------------------------------+
+| Name         | Type              | Description                                |
++==============+===================+============================================+
+| chksum       | u32               | Checksum over other input arguments,       |
+|              |                   | computed by the caller.                    |
++--------------+-------------------+--------------------------------------------+
+| reserved     | u32               | Reserved.                                  |
++--------------+-------------------+--------------------------------------------+
+| metadata     | u8[20]            | Metadata for MEK to load into the drive    |
+|              |                   | encryption engine (i.e. NSID + LBA range). |
++--------------+-------------------+--------------------------------------------+
+| aux_metadata | u8[32]            | Auxiliary metadata for the MEK             |
+|              |                   | (optional; i.e. operation mode).           |
++--------------+-------------------+--------------------------------------------+
+| cmd_timeout  | u32               | Timeout in ms for command to encryption    |
+|              |                   | engine to complete.                        |
++--------------+-------------------+--------------------------------------------+
+
+Table: LOAD_KAT_MEK output arguments {#tbl:load-kat-mek-output-args}
+
++-------------+------+-------------------------------------------+
+| Name        | Type | Description                               |
++=============+======+===========================================+
+| chksum      | u32  | Checksum over other output arguments,     |
+|             |      | computed by Caliptra.                     |
++-------------+------+-------------------------------------------+
+| fips_status | u32  | Indicates if the command is FIPS approved |
+|             |      | or an error.                              |
++-------------+------+-------------------------------------------+
+| reserved    | u32  | Reserved.                                 |
++-------------+------+-------------------------------------------+
 
 #### Common mailbox types
 
@@ -2273,28 +2345,28 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 |      | potential to trigger data loss. See                      |           |
 |      | @sec:authorization.                                      |           |
 +------+----------------------------------------------------------+-----------+
-| 9    | The encryption engine shall ensure that AES-XTS          | Yes       |
-|      | Key_1 and Key_2 are not equal. See                       |           |
-|      | @sec:aes-xts-considerations.                             |           |
-+------+----------------------------------------------------------+-----------+
-| 10   | KMB shall have access to the SFRs defined in             | Yes       |
+| 9    | KMB shall have access to the SFRs defined in             | Yes       |
 |      | @tbl:kmb-ee-sfrs through the address defined by          |           |
 |      | OCP_LOCK_MEK_ADDRESS. See @sec:sfrs.                     |           |
 +------+----------------------------------------------------------+-----------+
-| 11   | MCU ROM shall configure registers                        | Yes       |
+| 10   | MCU ROM shall configure registers                        | Yes       |
 |      | SS_KEY_RELEASE_BASE_ADDR_L, SS_KEY_RELEASE_BASE_ADDR_H   |           |
 |      | and SS_KEY_RELEASE_SIZE, then setting CPTRA_FUSE_WR_DONE |           |
 |      | to prevent further modifications. Additionally,          |           |
 |      | OCP_LOCK_MEK_LENGTH must be set to 40h. See @sec:sfrs.   |           |
 +------+----------------------------------------------------------+-----------+
-| 12   | Upon KMB cold reset or firmware update reset, drive      | Yes       |
+| 11   | Upon KMB cold reset or firmware update reset, drive      | Yes       |
 |      | firmware shall enumerate HPKE keypairs supported by KMB  |           |
 |      | and advertise them to the host, if drive firmware        |           |
 |      | supports a host-facing API for doing so. See             |           |
 |      | @sec:hpke-transport-encryption.                          |           |
 +------+----------------------------------------------------------+-----------+
-| 13   | Integrations shall invoke Caliptra resets according to   | Yes       |
+| 12   | Integrations shall invoke Caliptra resets according to   | Yes       |
 |      | the directives given in @sec:reset-behavior.             |           |
++------+----------------------------------------------------------+-----------+
+| 13   | The encryption engine shall not allow user data to be    | Yes       |
+|      | encrypted with the MEK loaded by                         |           |
+|      | [LOAD_KAT_MEK](#sec:load-kat-mek-cmd) command.           |           |
 +------+----------------------------------------------------------+-----------+
 
 ## Repository location
