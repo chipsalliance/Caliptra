@@ -89,7 +89,7 @@ may hold both trademarks on different products.
 
 The **Caliptra Core Trademark** (also referred to as Passive Mode) applies to
 integrations in which the Caliptra Core is embedded directly in the SoC
-using the legacy integration architecture supported since Caliptra 1.0. In this
+using the integration architecture supported since Caliptra 1.0. In this
 configuration, the AXI DMA interface is disabled, external SoC components
 cannot access the SHA accelerator (for integrations of 2.0 and later versions),
 and the SoC is responsible for providing the SoC Manager, lifecycle control, and
