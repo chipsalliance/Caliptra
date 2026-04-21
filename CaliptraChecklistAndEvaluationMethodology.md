@@ -336,12 +336,14 @@ apply.
 
 * **Checklist Item:**
   * **Requirement:** All AXI manager output interfaces of the Caliptra IP MUST
-    be tied to logic 0 and MUST NOT be connected to the SoC AXI interconnect.
+    NOT be connected to the SoC AXI interconnect and input signals MUST be tied
+    to 0.
     The DMA assist block is inactive in Passive Mode and must not be wired to any
     SoC interconnect fabric.
   * **Evaluation Methodology:** Manufacturers MUST provide RTL or integration
     schematics demonstrating that all AXI manager signals from Caliptra are
-    grounded and not routed to the SoC interconnect.
+    unconnected and not routed to the SoC interconnect, with all input signals
+    tied to ground.
 
 ### *SHA Accelerator Access Restriction*
 
