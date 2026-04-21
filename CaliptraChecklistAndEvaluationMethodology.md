@@ -462,16 +462,6 @@ The requirements in this section apply **only** to integrations pursuing the
     documentation showing specification-compliant values for all
     `strap_ss_*` signals.
 
-## Mailbox and External Staging Area
-
-* **Checklist Item:**
-  * **Requirement:** The Caliptra Core mailbox SRAM MUST be configured to 16 KiB.
-    An external staging area MUST be provisioned and accessible to Caliptra via
-    the AXI DMA interface for firmware image transfer.
-  * **Evaluation Methodology:** Manufacturers MUST provide memory map
-    documentation confirming the 16 KiB mailbox size and demonstrating that an
-    appropriately sized and accessible external staging area is configured.
-
 ## OCP Streaming Boot
 
 * **Checklist Item:**
