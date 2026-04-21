@@ -329,23 +329,30 @@ apply.
 
 * **Checklist Item:**
   * **Requirement:** The SHA accelerator block MUST be inaccessible to SoC
-    components in Passive Mode. AXI streaming mode is disabled; the SHA
+    components when Caliptra Core is integrated in Passive mode, if integrating
+    version 2.0 or later. In such designs, AXI streaming mode is disabled; the SHA
     accelerator is available only in Caliptra-internal mailbox mode. No SoC
     agent may access the SHA accelerator via any path.
   * **Evaluation Methodology:** Manufacturers MUST demonstrate through RTL
     review or architecture documentation that no SoC agent has a path to the
-    SHA accelerator, and that AXI streaming mode is not enabled. There shall
-    not be any AXI manager with an AXI_USER value corresponding to the value
-    driven for the strap `strap_ss_caliptra_dma_axi_user`, due to the use of
-    this signal as a gating condition for SHA accelerator access via AXI.
+    SHA accelerator, and that AXI streaming mode is not enabled. The value
+    driven for the strap `strap_ss_caliptra_dma_axi_user` is used as a
+    gating condition for SHA accelerator access via AXI. There shall
+    not be a path from any SoC AXI manager that drives this AXI_USER value
+    to Caliptra Core's AXI subordinate interface. This requirement applies
+    for Caliptra Core release versions 2.0.0 and later.
 
 ### *Subsystem Strap Isolation*
 
 * **Checklist Item:**
-  * **Requirement:** All `strap_ss_*` Subsystem-mode strap signals MUST be tied
-    to logic 0. The signals `ss_debug_intent`, `cptra_obf_field_entropy_vld`,
+  * **Requirement:** All `strap_ss_*` Subsystem-mode strap signals (except for
+    strap_ss_caliptra_dma_axi_user) MUST be tied to logic 0.
+    The signals `ss_debug_intent`, `cptra_obf_field_entropy_vld`,
     `cptra_obf_field_entropy`, `cptra_obf_uds_seed_vld`, and
     `cptra_obf_uds_seed` MUST be tied to 0.
+    Integrators may need to drive a non-zero value on the strap
+    `strap_ss_caliptra_dma_axi_user` to maintain compliance with
+    [SHA Accelerator Access Restriction](#SHA-Accelerator-Access-Restriction).
   * **Evaluation Methodology:** Manufacturers MUST provide RTL evidence
     (e.g., tie-off assertions or integration top-level wiring) demonstrating
     that all listed strap signals are permanently grounded.
@@ -417,7 +424,9 @@ The requirements in this section apply **only** to integrations pursuing the
     derived from official Caliptra Subsystem hardware releases without internal
     modification, except as permitted in the Subsystem Integration Specification.
 
-## AXI DMA Engine Connectivity
+## Interface Connectivity
+
+### *AXI DMA Engine Connectivity*
 
 * **Checklist Item:**
   * **Requirement:** The AXI DMA assist engine MUST be connected to the SoC AXI
@@ -428,7 +437,7 @@ The requirements in this section apply **only** to integrations pursuing the
     SoC interconnect and that AxUSER signals are propagated without
     modification.
 
-## SHA Accelerator Access Restriction (Subsystem)
+### *SHA Accelerator Access Restriction (Subsystem)*
 
 * **Checklist Item:**
   * **Requirement:** The SHA accelerator MUST be accessible only via Caliptra’s
@@ -441,6 +450,15 @@ The requirements in this section apply **only** to integrations pursuing the
     direct SoC path to the SHA accelerator exists and that AxUSER checking is
     correctly configured.
 
+### *Subsystem Straps Configuration*
+
+* **Checklist Item:**
+  * **Requirement:** All `strap_ss_*` Subsystem-mode strap signals MUST be
+    properly configured per the Caliptra Subsystem Integration Specification.
+  * **Evaluation Methodology:** Manufacturers MUST provide strap configuration
+    documentation showing specification-compliant values for all
+    `strap_ss_*` signals.
+
 ## Mailbox and External Staging Area
 
 * **Checklist Item:**
@@ -450,16 +468,6 @@ The requirements in this section apply **only** to integrations pursuing the
   * **Evaluation Methodology:** Manufacturers MUST provide memory map
     documentation confirming the 16 KiB mailbox size and demonstrating that an
     appropriately sized and accessible external staging area is configured.
-
-## Subsystem Straps Configuration
-
-* **Checklist Item:**
-  * **Requirement:** All `strap_ss_*` Subsystem-mode strap signals MUST be
-    properly configured per the Caliptra Subsystem Integration Specification.
-    These signals MUST NOT be tied to 0.
-  * **Evaluation Methodology:** Manufacturers MUST provide strap configuration
-    documentation showing non-zero, specification-compliant values for all
-    `strap_ss_*` signals.
 
 ## OCP Streaming Boot
 
