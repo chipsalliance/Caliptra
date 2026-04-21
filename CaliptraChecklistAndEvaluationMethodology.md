@@ -198,11 +198,11 @@ regardless of whether the integrator is pursuing the Caliptra Core Trademark
   * **Requirement:** The debug interfaces, including JTAG, MUST be securely managed to prevent unauthorized access to Caliptra internals or sensitive data.  
   * **Evaluation Methodology:** Manufacturers MUST explain how debug interfaces are controlled, including secure enable/disable mechanisms, and how they prevent unauthorized access to Caliptra.
 
-### *Interface Implementation*
+### *Hardware Implementation*
 
 * **Checklist Item:**  
-  * **Requirement:** Interfaces to Caliptra MUST adhere to the SoC Integration Requirements of the RTL release that was used. See [RTL v1.0](https://github.com/chipsalliance/caliptra-rtl/blob/v1.0/docs/CaliptraIntegrationSpecification.md#soc-integration-requirements), [RTL v1.1](https://github.com/chipsalliance/caliptra-rtl/blob/v1.1/docs/CaliptraIntegrationSpecification.md#soc-integration-requirements). Integrators pursuing the **Caliptra Subsystem Trademark** must additionally consult the Caliptra Subsystem Integration Specification for Subsystem-specific interface requirements.
-  * **Evaluation Methodology:** Manufacturers MUST show correct implementation of interfaces, following the definitions in the caliptra-rtl repo.
+  * **Requirement:** Hardware implementation of Caliptra MUST adhere to the SoC Integration Requirements of the RTL release that was used. Refer to docs/CaliptraIntegrationSpecification.md (section "SoC integration requirements") from the official release that was consumed for integration, as listed in [Releases](https://github.com/chipsalliance/caliptra-rtl/releases).
+  * **Evaluation Methodology:** Manufacturers MUST show the hardware implementation complies to the integration requirements in the caliptra-rtl repo. Note: the scope of the RTL integration requirements are limited to the hardware instantiation and do not cover firmware capabilities.
 
 ## SoC Root of Trust (RoT)
 
