@@ -35,36 +35,6 @@ This document defines the process to be used by auditors to determine if the ven
 * **Report measurements** to a host and/or external entity, which can further verify the authenticity and integrity of the device (a.k.a Attestation)  
 * Furthermore, Caliptra offers **DICE hardware identity service**.
 
-# Trademark Type Selection
-
-The Caliptra project recognizes two trademark types, each corresponding to a
-distinct integration architecture. Before any audit engagement begins, the
-integrator MUST declare which trademark type is being pursued for the Target of
-Evaluation (TOE):
-
-* **Caliptra Core Trademark (Passive Mode)** — for integrations of the Caliptra
-  Core using the Passive Mode architecture, where the AXI DMA interface is
-  inactive and the SoC provides the SoC Manager and firmware loading.
-* **Caliptra Subsystem Trademark** — for integrations of the full Caliptra
-  Subsystem (introduced in Caliptra 2.0), including Caliptra Core, Life Cycle
-  Controller, Fuse Controller, I3C, MCU, and MCI.
-
-This declaration MUST be made at the outset of the audit process — at minimum,
-it must be included in the initial submission or the engagement letter between
-the manufacturer and the laboratory. A single product (TOE) may receive only
-one Caliptra trademark. A company may hold both trademark types on different
-products.
-
-The elected trademark type determines:
-
-1. The applicable integration architecture and its corresponding integration
-   specifications.
-2. The audit scope for the laboratory evaluation.
-3. Which sections of the [Checklist and Evaluation Methodology](CaliptraChecklistAndEvaluationMethodology.md)
-   apply — specifically, the common requirements (Part I) plus the
-   trademark-type-specific requirements for the elected track (Part II for Core
-   or Part III for Subsystem).
-
 # Caliptra Trademark Auditing Process
 
 The checklist describes the specific requirements to be reviewed by a third-party laboratory. 
