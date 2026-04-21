@@ -403,17 +403,18 @@ The requirements in this section apply **only** to integrations pursuing the
 ### *Integrity of Hardware and ROM*
 
 * **Checklist Item:**
-  * **Requirement:** The full Caliptra Subsystem — comprising Caliptra Core (as
-    indicated by the submodule pointer in the caliptra-ss repo as of the release
-    tag), Life Cycle Controller (LCC), Fuse Controller, I3C with OCP streaming boot
-    interface (as indicated by the submodule pointer in the caliptra-ss repo as of
-    the release tag), Manufacturer Control Unit (MCU), and Manufacturer Control
-    Interface (MCI) — MUST be integrated as-is, without internal modification unless
-    explicitly permitted, to ensure hardware transparency and consistency. Refer to
-    the Caliptra Subsystem Integration Specification.
+  * **Requirement:** The full Caliptra Subsystem MUST be integrated as-is, without
+    internal modification unless explicitly permitted, to ensure hardware
+    transparency and consistency. Refer to the Caliptra Subsystem Integration
+    Specification for allowed modifications. This requirement refers to the
+    top-level wrapper of Caliptra Subsystem and all underlying components as
+    defined in the Caliptra Subsystem Hardware Specification.
+    For Caliptra Core and I3C core, the integrated code must exactly match the design
+    from the submodule pointer that is part of the released Subsystem design.
+    Caliptra Core ROM must also be consumed as-is from a compatible official release.
   * **Evaluation Methodology:** Manufacturers MUST demonstrate, via the provided
     release-verification tools, that all Subsystem components are verifiably
-    derived from official Caliptra Subsystem releases without internal
+    derived from official Caliptra Subsystem hardware releases without internal
     modification, except as permitted in the Subsystem Integration Specification.
 
 ## AXI DMA Engine Connectivity
