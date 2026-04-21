@@ -77,7 +77,7 @@ The following is a consolidated list of all requirements to ensure comprehensive
    * Interface Wires Implementation  
 3. **SoC Root of Trust (RoT)**  
    * Boot and Initialization Process Compliance  
-   * Handling of Caliptra PA\_USER Management  
+   * Handling of Caliptra PA_USER Management  
    * Random Number Generator (RNG) Implementation    
 4. **Specific Functionality**  
    * Caliptra Mode Selection and State Handling  
@@ -201,8 +201,8 @@ regardless of whether the integrator is pursuing the Caliptra Core Trademark
 ### *Hardware Implementation*
 
 * **Checklist Item:**  
-  * **Requirement:** Hardware implementation of Caliptra MUST adhere to the SoC Integration Requirements of the RTL release that was used. Refer to docs/CaliptraIntegrationSpecification.md (section "SoC integration requirements") from the official release that was consumed for integration, as listed in [Releases](https://github.com/chipsalliance/caliptra-rtl/releases).
-  * **Evaluation Methodology:** Manufacturers MUST show the hardware implementation complies to the integration requirements in the caliptra-rtl repo. Note: the scope of the RTL integration requirements are limited to the hardware instantiation and do not cover firmware capabilities.
+  * **Requirement:** Hardware implementation of Caliptra MUST adhere to the SoC Integration Requirements of the RTL release that was used. Refer to docs/CaliptraIntegrationSpecification.md (section "SoC integration requirements") from the official release that was consumed for integration, as listed in [Releases](https://github.com/chipsalliance/caliptra-rtl/releases). Integrators pursuing the **Caliptra Subsystem Trademark** must additionally consult the Caliptra Subsystem Integration Specification for Subsystem-specific integration requirements.
+  * **Evaluation Methodology:** Manufacturers MUST show the hardware implementation complies to the integration requirements in the caliptra-rtl repo and, if pursuing the Caliptra Subsystem Trademark, also complies to the integration requirements in the caliptra-ss repo. Note: the scope of the RTL integration requirements are limited to the hardware and ROM instantiation and do not cover firmware capabilities.
 
 ## SoC Root of Trust (RoT)
 
@@ -216,7 +216,7 @@ regardless of whether the integrator is pursuing the Caliptra Core Trademark
 ### *Caliptra PA_USER (1.X) or AXI_USER (2.X) Management*
 
 * **Checklist Item:**  
-  * **Requirement:** The management of Caliptra's PA\_USER (for 1.X implementations) or AXI_USER (for 2.X implementations) MUST ensure isolation and protection of privileged operations, preventing unprivileged users from forging measurements or accessing privileged functions.
+  * **Requirement:** The management of Caliptra's PA_USER (for 1.X implementations) or AXI_USER (for 2.X implementations) MUST ensure isolation and protection of privileged operations, preventing unprivileged users from forging measurements or accessing privileged functions.
   * **Evaluation Methodology:** Manufacturers MUST document how the applicable USER values are mapped in hardware and the mechanisms in place to isolate privileged operations from unprivileged ones.
 
 ### *Random Number Generator (RNG) Implementation*
