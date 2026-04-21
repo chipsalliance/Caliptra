@@ -101,17 +101,14 @@ elected trademark: **Part II** for the *Caliptra Core Trademark (Passive Mode)*,
 
 **Part III: Caliptra Subsystem Trademark — Additional Requirements**
 
-1. **RTL Configuration — Subsystem Mode**
-   * Caliptra Subsystem Build Configuration
-   * TRNG Configuration
-2. **Interface Connectivity**
+1. **Interface Connectivity**
    * AXI DMA Engine Connectivity
    * SHA Accelerator Access Restriction (Subsystem)
    * Subsystem Straps Configuration
-3. **OCP Streaming Boot**
-4. **Production Debug Unlock**
-5. **Subsystem Fuse Map**
-6. **Secure Processes**
+2. **OCP Streaming Boot**
+3. **Production Debug Unlock**
+4. **Subsystem Fuse Map**
+5. **Secure Processes**
    * Integrity of Hardware and ROM
 
 # Part I: Common Requirements
@@ -405,31 +402,6 @@ apply.
 
 The requirements in this section apply **only** to integrations pursuing the
 **Caliptra Subsystem Trademark**. All requirements in Part I also apply.
-
-## RTL Configuration — Subsystem Mode
-
-### *Caliptra Subsystem Build Configuration*
-
-* **Checklist Item:**
-  * **Requirement:** The macro `CALIPTRA_MODE_SUBSYSTEM` MUST be defined in
-    as part of the product build processes. The macro `CALIPTRA_INTERNAL_TRNG`
-    MUST also be defined.
-  * **Evaluation Methodology:** Manufacturers MUST provide materials from build
-    system or final contents of `config_defines.svh` demonstrating that
-    `CALIPTRA_MODE_SUBSYSTEM` and `CALIPTRA_INTERNAL_TRNG` are defined.
-
-### *TRNG Configuration*
-
-* **Checklist Item:**
-  * **Requirement:** The internal TRNG is mandatory in Subsystem mode.
-    `CALIPTRA_INTERNAL_TRNG` MUST be defined. The TRNG self-test threshold
-    registers (`CPTRA_iTRNG_ENTROPY_CONFIG0` and `CPTRA_iTRNG_ENTROPY_CONFIG1`)
-    MUST be set to non-zero values to enable entropy self-testing. All requirements
-    defined in the Caliptra Core Integration Specification for implementing
-    Internal TRNG must be followed.
-  * **Evaluation Methodology:** Manufacturers MUST demonstrate that
-    `CALIPTRA_INTERNAL_TRNG` is defined and that both TRNG self-test threshold
-    registers are configured to non-zero values.
 
 ## Interface Connectivity
 
