@@ -1265,8 +1265,8 @@ For SoCs that intend to achieve FIPS 140-3 CMVP certification with Caliptra:
 * SoC shall indicate that zeroization has occurred by statically asserting GENERIC_INPUT_WIRE[0] to Caliptra.
 * SoC shall set Caliptra’s security state to DebugUnlock by ORing it with the zeroization status signal.
 * SoC shall expose Caliptra architectural registers as API for a tester to read.
-* SoC shall ensure authorization for this API to guard against denial-of-service attacks. The authorization design is left to the vendor.
-* Note: In Subsystem mode, SoC should use MCU RT FW with the corresponding subsystem HW components for these actions.
+* SoC shall ensure authorization for this API to guard against denial-of-service attacks.
+* Note: In Subsystem mode: SoC should use MCU ROM with the corresponding subsystem HW components for these actions. Authorization is handled via the PPD pin.
 
 ### Fuse map
 
