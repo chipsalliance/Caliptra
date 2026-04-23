@@ -1577,7 +1577,104 @@ Please refer to Caliptra subsystem Hardware specification.
 ### De-assertion
 - The `image_activated` signal must deassert when the `RECOVERY_CTRL` register byte 2 has value `0x0` (indicating image activation is cleared).
 
-## Platform component requirements for recovery support 
+# AXI Streaming Boot Sequence
+
+The I3C core alternatively allows streaming data or firmware by MCU over the AXI bus of the I3C module which is repurposed as a streaming boot interface while disabling I3C usage.
+The Caliptra MCU RISC-V core is responsible for driving the data copied from an external memory interface (e.g. QSPI) to the streaming boot FIFOs.
+The ROM running on the MCU core monitors the streaming boot block registers and performs the streaming boot flow.
+
+During the boot procedure the ROM will have to follow the following procedure:
+
+1. Set the I3C core to the "direct AXI" mode:
+    ```c
+    i3c_reg_data = lsu_read_32(SOC_I3CCSR_I3C_EC_SOCMGMTIF_REC_INTF_CFG);
+    i3c_reg_data |= I3CCSR_I3C_EC_SOCMGMTIF_REC_INTF_CFG_REC_INTF_BYPASS_MASK;
+    lsu_write_32(SOC_I3CCSR_I3C_EC_SOCMGMTIF_REC_INTF_CFG, i3c_reg_data);
+    ```
+2. Poll the `DEVICE_STATUS` register and wait for the streaming boot to be enabled by the Caliptra core:
+    ```c
+    while (1) {
+        i3c_reg_data = lsu_read_32(SOC_I3CCSR_I3C_EC_SECFWRECOVERYIF_DEVICE_STATUS_0);
+        i3c_reg_data = i3c_reg_data & 0x00000003;
+        if (i3c_reg_data == 0x00000003) {
+            break;
+        }
+        mcu_sleep(1000);
+    }
+    ```
+3. Read the `RECOVERY_STATUS` register and check if the streaming boot flow started:
+    ```c
+    i3c_reg_data = lsu_read_32(SOC_I3CCSR_I3C_EC_SECFWRECOVERYIF_RECOVERY_STATUS);
+    if (i3c_reg_data != 0x00000001) {
+        // error
+    }
+    ```
+4. Write to the `RECOVERY_CONTROL` register to set the streaming boot image configuration:
+    ```c
+    i3c_reg_data = 0x00000000;
+    lsu_write_32(SOC_I3CCSR_I3C_EC_SECFWRECOVERYIF_RECOVERY_CTRL, i3c_reg_data);
+    ```
+5. Write to the `INDIRECT_FIFO_CTRL_0` register to set the FIFO reset:
+    ```c
+    i3c_reg_data = 0x00000100;
+    lsu_write_32(SOC_I3CCSR_I3C_EC_SECFWRECOVERYIF_INDIRECT_FIFO_CTRL_0, i3c_reg_data);
+    ```
+6. Write to the `INDIRECT_FIFO_CTRL_1` register to set the streaming boot image size:
+    ```c
+    i3c_reg_data = lsu_read_32(0x10000000);
+    image_size = i3c_reg_data;
+    lsu_write_32(SOC_I3CCSR_I3C_EC_SECFWRECOVERYIF_INDIRECT_FIFO_CTRL_1, i3c_reg_data);
+    ```
+7. Push the image/data to the streaming boot interface FIFOs:
+    1. Read the `INDIRECT_FIFO_STATUS` register to determine remaining space in the indirect FIFO
+        1. If the indirect FIFO is not full, write a chunk of data to the `TX_DATA_PORT` register
+        2. If the indirect FIFO is full, wait for the `INDIRECT_FIFO_STATUS_0.FULL` field to deassert
+    2. The above steps should be repeated until the whole streaming boot image is written to the FIFO
+    ```c
+    for (it = 0; it < image_size; ++it) {
+      i3c_reg_data = lsu_read_32(SOC_I3CCSR_I3C_EC_SECFWRECOVERYIF_INDIRECT_FIFO_STATUS_0);
+      while (i3c_reg_data & I3CCSR_I3C_EC_SECFWRECOVERYIF_INDIRECT_FIFO_STATUS_0_FULL_MASK != 0) {
+          i3c_reg_data = lsu_read_32(SOC_I3CCSR_I3C_EC_SECFWRECOVERYIF_INDIRECT_FIFO_STATUS_0);
+          mcu_sleep(1000);
+      }
+      i3c_reg_data = lsu_read_32(0x10000004 + 4*it);
+      lsu_write_32(SOC_I3CCSR_I3C_EC_TTI_TX_DATA_PORT, i3c_reg_data);
+    }
+    ```
+8. Enable `payload_available` wire by writing `0x01` to the `REC_INTF_CFG.REC_PAYLOAD_DONE` register field:
+    ```c
+    i3c_reg_data = lsu_read_32(SOC_I3CCSR_I3C_EC_SOCMGMTIF_REC_INTF_CFG);
+    i3c_reg_data |= I3CCSR_I3C_EC_SOCMGMTIF_REC_INTF_CFG_REC_PAYLOAD_DONE_MASK;
+    lsu_write_32(SOC_I3CCSR_I3C_EC_SOCMGMTIF_REC_INTF_CFG, i3c_reg_data);
+    ```
+9. Activate the new image setting `RECOVERY_CTRL` register by writing `0xf00` to the `REC_INTF_REG_W1C_ACCESS` register:
+    ```c
+    i3c_reg_data = 0x00000F00;
+    lsu_write_32(SOC_I3CCSR_I3C_EC_SOCMGMTIF_REC_INTF_REG_W1C_ACCESS, i3c_reg_data);
+    ```
+10. Read the `RECOVERY_STATUS` register to ensure the image has been activated:
+    ```c
+    while(1){
+        i3c_reg_data = lsu_read_32(SOC_I3CCSR_I3C_EC_SECFWRECOVERYIF_RECOVERY_STATUS);
+        if( i3c_reg_data != 0x00000002 || i3c_reg_data != 0x00000003 || i3c_reg_data != 0x00000004) { 
+            VPRINTF(LOW, "I3C core recovery status is not set to expected value\n");
+            err_count++;
+        }
+        if (i3c_reg_data == 0x00000003) {
+            VPRINTF(LOW, "I3C core recovery status is set to 0x3\n");
+            break;
+        }
+        mcu_sleep(1000);
+    }
+    ```
+
+The streaming boot image will be written in chunks with length equal to or less than `Max transfer size` defined in the `INDIRECT_FIFO_STATUS` register.
+Once the last data chunk is written to the FIFO, the Caliptra MCU ROM will write to the `RECOVERY_CTRL` CSR in the Streaming Boot register file indicating the transfer is complete.
+
+An example of the AXI Streaming Boot Sequence is available in the Caliptra SS test suite as [mcu_axi_streaming_boot_test_rom](https://github.com/chipsalliance/caliptra-ss/tree/main/src/integration/test_suites/mcu_axi_streaming_boot_test_rom/mcu_axi_streaming_boot_test_rom.c) test.
+
+
+## Platform component requirements for recovery support
 
 1. The BMC, or a similar platform, should not send payload to streaming boot interface (/I3C target) device if `RECOVERY_CTRL` register has byte 2 indicating Image Activated. BMC must wait to clear the byte 2. (Streaming boot interface is responsible for clearing this byte by writing 1).
 2. The BMC, or a similar platform, sends payload to I3C target device in chunks of 256 bytes (header (4B) + FW bytes(256B) as I3C target transfer) only, unless it is the last write for the image. Before sending the payload, it reads FIFO empty status from `INDIRECT_FIFO_STATUS` register.
