@@ -35,9 +35,9 @@ sets out the charter governing the Caliptra project.
   * [Caliptra Core Hardware Specification](https://github.com/chipsalliance/caliptra-rtl/blob/v1.1/docs/CaliptraHardwareSpecification.md)
   * [Caliptra Core Hardware Integration
     Specification](https://github.com/chipsalliance/caliptra-rtl/blob/v1.1/docs/CaliptraIntegrationSpecification.md)
-  * [ROM 1.x](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md)
-  * [FMC](https://github.com/chipsalliance/caliptra-sw/blob/main/fmc/README.md)
-  * [Runtime](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md)
+  * [ROM 1.x](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/rom/dev/README.md)
+  * [FMC](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/fmc/README.md)
+  * [Runtime](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md)
 
 ### Caliptra 2.x:
   * [Main Caliptra specification 2.0 - Version 1.0](https://github.com/chipsalliance/Caliptra/blob/main/doc/caliptra_20/Caliptra.md)
@@ -46,9 +46,9 @@ sets out the charter governing the Caliptra project.
     Specification 2.0.1](https://github.com/chipsalliance/caliptra-rtl/blob/v2.0.1/docs/CaliptraIntegrationSpecification.md)
   * [Caliptra Subsystem Hardware Specification - Version 1.0rc1](https://github.com/chipsalliance/caliptra-ss/blob/main/docs/CaliptraSSHardwareSpecification.md)
   * [Caliptra Subsystem Integration Specification - Version 1.0rc1](https://github.com/chipsalliance/caliptra-ss/blob/main/docs/CaliptraSSIntegrationSpecification.md)
-  * [ROM 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/rom/dev/README.md)
-  * [FMC 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/fmc/README.md)
-  * [Runtime 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/runtime/README.md)
+  * [ROM 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main/rom/dev/README.md)
+  * [FMC 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main/fmc/README.md)
+  * [Runtime 2.x - WIP](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md)
   * [MCU Firmware and SDK specification - WIP](https://chipsalliance.github.io/caliptra-mcu-sw/)
 
 ## Versioning
@@ -87,16 +87,16 @@ Compatible Configurations:
 ### Caliptra 1.2
 
 Additional Features
-  - [Manifest-based Authorization](https://github.com/chipsalliance/caliptra-sw/blob/main/auth-manifest/README.md)
-    - [SET_AUTH_MANIFEST](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#set_auth_manifest)
-    - [AUTHORIZE_AND_STASH](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#authorize_and_stash)
+  - [Manifest-based Authorization](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/auth-manifest/README.md)
+    - [SET_AUTH_MANIFEST](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#set_auth_manifest)
+    - [AUTHORIZE_AND_STASH](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#authorize_and_stash)
   - Deferred retrieval of IDEV CSR**
-    - [GET_IDEVID_CSR](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#get_idevid_csr)
-  - Self-signed FMC Alias CSR
-    - [GET_FMC_ALIAS_CSR](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#get_fmc_alias_csr)
+    - [GET_IDEVID_CSR](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#get_idevid_csr)
+  - Self-signed FMC Alias certificate
+    - [GET_FMC_ALIAS_CERT](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#get_fmc_alias_cert)
   - DPE export of CDI
-    - [SIGN_WITH_EXPORTED_ECDSA](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#sign_with_exported_ecdsa)
-    - [REVOKE_EXPORTED_CDI_HANDLE](https://github.com/chipsalliance/caliptra-sw/blob/main/runtime/README.md#revoke_exported_cdi_handle)
+    - [SIGN_WITH_EXPORTED_ECDSA](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#sign_with_exported_ecdsa)
+    - [REVOKE_EXPORTED_CDI_HANDLE](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#revoke_exported_cdi_handle)
   - DPE max cert size increased to 6kB
 
 \*\* Requires 1.2 ROM
@@ -158,8 +158,8 @@ The Caliptra code base and documentation are split across several repositories:
 | [Primary repository](https://github.com/chipsalliance/caliptra)  | [Issues](https://github.com/chipsalliance/caliptra/issues),      [PRs](https://github.com/chipsalliance/caliptra/pulls),      [Security advisories](https://github.com/chipsalliance/caliptra/security/advisories)      | This repository, with admin boilerplate and docs |
 | [Adams Bridge RTL](https://github.com/chipsalliance/adams-bridge)  | [Issues](https://github.com/chipsalliance/adams-bridge/issues),      [PRs](https://github.com/chipsalliance/adams-bridge/pulls),      [Security advisories](https://github.com/chipsalliance/adams-bridge/security/advisories)      | The primary repository with Adams Bridge Post-Quantum Cryptography hardware accelerator |
 | [Caliptra RTL](https://github.com/chipsalliance/caliptra-rtl)     | [Issues](https://github.com/chipsalliance/caliptra-rtl/issues),  [PRs](https://github.com/chipsalliance/caliptra-rtl/pulls),  [Security advisories](https://github.com/chipsalliance/caliptra-rtl/security/advisories), [internal registers](https://chipsalliance.github.io/caliptra-rtl/main/internal-regs/), [external registers](https://chipsalliance.github.io/caliptra-rtl/main/external-regs/)  | The primary repository with immutable RTL |
-| [Caliptra Software 1.x](https://github.com/chipsalliance/caliptra-sw) | [Issues](https://github.com/chipsalliance/caliptra-sw/issues),   [PRs](https://github.com/chipsalliance/caliptra-sw/pulls),   [Security advisories](https://github.com/chipsalliance/caliptra-sw/security/advisories)   | Caliptra software (ROM, FMC, runtime firmware), and libraries/tools needed to build and test |
-| [Caliptra Software 2.x](https://github.com/chipsalliance/caliptra-sw/tree/main-2.x) | [Issues](https://github.com/chipsalliance/caliptra-sw/issues),   [PRs](https://github.com/chipsalliance/caliptra-sw/pulls),   [Security advisories](https://github.com/chipsalliance/caliptra-sw/security/advisories)   | Caliptra software (ROM, FMC, runtime firmware), and libraries/tools needed to build and test |
+| [Caliptra Software 1.x](https://github.com/chipsalliance/caliptra-sw/tree/caliptra-1.x) | [Issues](https://github.com/chipsalliance/caliptra-sw/issues),   [PRs](https://github.com/chipsalliance/caliptra-sw/pulls),   [Security advisories](https://github.com/chipsalliance/caliptra-sw/security/advisories)   | Caliptra software (ROM, FMC, runtime firmware), and libraries/tools needed to build and test |
+| [Caliptra Software 2.x](https://github.com/chipsalliance/caliptra-sw/tree/main) | [Issues](https://github.com/chipsalliance/caliptra-sw/issues),   [PRs](https://github.com/chipsalliance/caliptra-sw/pulls),   [Security advisories](https://github.com/chipsalliance/caliptra-sw/security/advisories)   | Caliptra software (ROM, FMC, runtime firmware), and libraries/tools needed to build and test |
 | [Caliptra DPE](https://github.com/chipsalliance/caliptra-dpe)     | [Issues](https://github.com/chipsalliance/caliptra-dpe/issues),  [PRs](https://github.com/chipsalliance/caliptra-dpe/pulls),  [Security advisories](https://github.com/chipsalliance/caliptra-dpe/security/advisories)  | An implementation of a TCG DICE Protection Environment profile |
 | [Caliptra U-Reg](https://github.com/chipsalliance/caliptra-ureg)  | [Issues](https://github.com/chipsalliance/caliptra-ureg/issues), [PRs](https://github.com/chipsalliance/caliptra-ureg/pulls), [Security advisories](https://github.com/chipsalliance/caliptra-ureg/security/advisories) | General-purpose libraries and tools for manipulating MMIO registers from Rust |
 | [Caliptra Subsystem](https://github.com/chipsalliance/caliptra-ss)| [Issues](https://github.com/chipsalliance/caliptra-ss/issues), [PRs](https://github.com/chipsalliance/caliptra-ss/pulls), [Security advisories](https://github.com/chipsalliance/caliptra-ss/security/advisories), [registers](https://chipsalliance.github.io/caliptra-ss/main/regs/) | Caliptra Subsystem including Manufacturer Control Unit (MCU) and peripherals |
@@ -169,7 +169,7 @@ The Caliptra code base and documentation are split across several repositories:
 The GitHub config parameters for all of the branches are documented in a [local
 file](https://github.com/chipsalliance/Caliptra/blob/main/GitHubRules.md).
 
-GitHub branch names for `caliptra-sw` are documented in its [BRANCHING_STRATEGY.md](https://github.com/chipsalliance/caliptra-sw/blob/main-2.x/BRANCHING_STRATEGY.md) document.
+GitHub branch names for `caliptra-sw` are documented [here](https://github.com/chipsalliance/Caliptra/issues/586).
 
 ### Convenience repository URLs
 
