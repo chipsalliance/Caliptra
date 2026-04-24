@@ -76,6 +76,8 @@ bibliography: bibliography.yaml
 |                |         |                                     |
 |                |         | Removed Compliance entry 7. This    |
 |                |         | shall now be enforced by KMB.       |
+|                |         |                                     |
+|                |         | Update EKP notice.                  |
 +----------------+---------+-------------------------------------+
 
 \currenttemplateversion
@@ -2319,6 +2321,6 @@ Therefore a given encryption key may safely be used in at most $2^{80.5}$ precon
 
 # EAT format for attesting to the epoch key state {#sec:eat-format}
 
-This format is currently under development within TCG as part of the Hard Cryptographic Purge feature set[^crypto-purge].
+This format is currently under public review within TCG Storage as part of the Epoch Key Purge feature set[^crypto-purge].
 
-[^crypto-purge]: <https://trustedcomputinggroup.org/trusted-computing-group-storage-work-group-call-for-participation/>
+[^crypto-purge]: <https://trustedcomputinggroup.org/wp-content/uploads/TCG_Storage_Epoch_Key_Purge_Feature_v1_00_r0_32_30032026-RC1.pdf>
