@@ -76,6 +76,34 @@ modified Caliptra logos in association with any other product, service, or
 entity, other than in reference to the Caliptra Specification or Caliptra
 Project itself.
 
+## Caliptra Trademark Tracks
+
+The Caliptra project defines two distinct integration architectures, each with
+its own trademark. Integrators MUST elect which trademark type they are pursuing
+when following the certification process, as this determines the audit scope and
+applicable sections from [Checklist and Evaluation Methodology](CaliptraChecklistAndEvaluationMethodology.md). Only one
+trademark type is granted per product (Target of Evaluation, or TOE). A company
+may hold both trademarks on different products.
+
+### Caliptra Core Trademark (Passive Mode)
+
+The **Caliptra Core Trademark** (also referred to as Passive Mode) applies to
+integrations in which the Caliptra Core is embedded directly in the SoC
+using the integration architecture supported since Caliptra 1.0. In this
+configuration, the AXI DMA interface is disabled, external SoC components
+cannot access the SHA accelerator (for integrations of 2.0 and later versions),
+and the SoC is responsible for providing the SoC Manager, lifecycle control, and
+loading Caliptra firmware.
+
+### Caliptra Subsystem Trademark
+
+The **Caliptra Subsystem Trademark** applies to integrations that adopt the full
+Caliptra Subsystem architecture introduced in Caliptra 2.0. This configuration
+incorporates Caliptra Core together with a Life Cycle Controller (LCC),
+Fuse Controller, OCP streaming boot interface, Manufacturer Control
+Unit (MCU), and Manufacturer Control Interface (MCI). In this configuration
+Caliptra operates with an active profile.
+
 ## Technical Specifications & Caliptra Certification
 
 Any person may utilize and implement the designs shared in the Caliptra GitHub
@@ -89,14 +117,19 @@ In order to be eligible for Caliptra Certification, an implementation of the
 Caliptra designs must meet the standards of the Caliptra Technical Framework
 (“Technical Framework”) approved by the Caliptra Workgroup Technical Advisory
 Committee, as described in the [Caliptra Workgroup Technical
-Charter](CaliptraWGTechnicalCharter.md).
+Charter](CaliptraWGTechnicalCharter.md). Certification is specific to the
+elected trademark type (Core or Subsystem) and the particular TOE for which it
+is sought.
 
 Please refer to the [Caliptra Trademark Audit
 Process](CaliptraTrademarkAuditProcess.md) for a description of the steps
 required to achieve technical certification. A detailed breakdown of the
 technical criteria used to meet certification guidelines is laid out in the
-[Checklist and Evlauation
-Methodology](CaliptraChecklistAndEvaluationMethodology.md) document.
+[Checklist and Evaluation
+Methodology](CaliptraChecklistAndEvaluationMethodology.md) document, which is
+organized into common requirements (applicable to all integrations) and
+trademark-type-specific requirements (applicable to Core or Subsystem
+integrations respectively).
 
 ## Role of the Caliptra TAC
 
