@@ -26,8 +26,7 @@ bibliography: bibliography.yaml
 |                |         |                                     |
 |                |         | Rename "Opal C_PIN" to "TCG C_PIN". |
 |                |         |                                     |
-|                |         | Rename REPORT_EPOCH_KEY_STATE to    |
-|                |         | GET_EPOCH_KEY_STATE.                |
+|                |         | Remove REPORT_EPOCH_KEY_STATE.      |
 |                |         |                                     |
 |                |         | Illustrate usage of the internal    |
 |                |         | DRBG for drive-firmware-specific    |
@@ -1107,12 +1106,11 @@ Table: CTRL command codes {#tbl:ee-ctrl-cmd-codes}
 |          | auxiliary metadata specified by the **AUX** field, into   |
 |          | the encryption engine as specified by the **METD** field. |
 |          | The fixed MEK is as follows in hex string:                |
-|          | ```                                                       |
-|          | 0000 0000 0000 0000 0000 0000 0000 0000                   |
-|          | 1111 1111 1111 1111 1111 1111 1111 1111                   |
-|          | 2222 2222 2222 2222 2222 2222 2222 2222                   |
-|          | 3333 3333 3333 3333 3333 3333 3333 3333                   |
-|          | ```                                                       |
+|          |                                                           |
+|          | `0000 0000 0000 0000 0000 0000 0000 0000`\                |
+|          | `1111 1111 1111 1111 1111 1111 1111 1111`\                |
+|          | `2222 2222 2222 2222 2222 2222 2222 2222`\                |
+|          | `3333 3333 3333 3333 3333 3333 3333 3333`                 |
 +----------+-----------------------------------------------------------+
 | 5h to Fh | Reserved                                                  |
 +----------+-----------------------------------------------------------+
@@ -1912,74 +1910,6 @@ Table: UNLOAD_MEK output arguments {#tbl:unload-mek-output-args}
 +-------------+------+-------------------------------------------+
 | reserved    | u32  | Reserved.                                 |
 +-------------+------+-------------------------------------------+
-
-#### GET_EPOCH_KEY_STATE {#sec:get-epoch-key-state-cmd}
-
-This command reports the state of the epoch keys. The drive indicates the state of the SEK, while KMB internally senses the state of the HEK.
-
-Command Code: 0x4745_4B53 ("GEKS")
-
-Table: GET_EPOCH_KEY_STATE input arguments {#tbl:get-epoch-key-state-input-args}
-
-+-----------+--------+---------------------------------------+
-| Name      | Type   | Description                           |
-+===========+========+=======================================+
-| chksum    | u32    | Checksum over other input arguments,  |
-|           |        | computed by the caller.               |
-+-----------+--------+---------------------------------------+
-| reserved  | u32    | Reserved.                             |
-+-----------+--------+---------------------------------------+
-| sek_state | u16    | SEK state. See @tbl:sek-state-values. |
-+-----------+--------+---------------------------------------+
-| padding   | u16    | Reserved.                             |
-+-----------+--------+---------------------------------------+
-| nonce     | u8[16] | Freshness nonce to be included in the |
-|           |        | signed IETF EAT.                      |
-+-----------+--------+---------------------------------------+
-
-Table: GET_EPOCH_KEY_STATE output arguments {#tbl:get-epoch-key-state-output-args}
-
-+------------------------+-------------+-------------------------------------------+
-| Name                   | Type        | Description                               |
-+========================+=============+===========================================+
-| chksum                 | u32         | Checksum over other output arguments,     |
-|                        |             | computed by Caliptra.                     |
-+------------------------+-------------+-------------------------------------------+
-| fips_status            | u32         | Indicates if the command is FIPS approved |
-|                        |             | or an error.                              |
-+------------------------+-------------+-------------------------------------------+
-| reserved               | u32         | Reserved.                                 |
-+------------------------+-------------+-------------------------------------------+
-| hek_erasures_remaining | u16         | Remaining number of times the HEK may be  |
-|                        |             | erased.                                   |
-|                        |             |                                           |
-|                        |             | See @sec:hek-erasures-remaining for how   |
-|                        |             | this field is calculated.                 |
-+------------------------+-------------+-------------------------------------------+
-| hek_state              | u16         | State of the currently-active HEK. See    |
-|                        |             | @tbl:hek-state-values.                    |
-+------------------------+-------------+-------------------------------------------+
-| sek_state              | u16         | SEK state from the input argument.        |
-+------------------------+-------------+-------------------------------------------+
-| eat_len                | u16         | Total length of the IETF EAT.             |
-+------------------------+-------------+-------------------------------------------+
-| nonce                  | u8[16]      | Nonce from the input argument.            |
-+------------------------+-------------+-------------------------------------------+
-| eat                    | u8[eat_len] | CBOR-encoded and signed IETF EAT.         |
-|                        |             | See @sec:eat-format for the format.       |
-+------------------------+-------------+-------------------------------------------+
-
-Table: SEK state values {#tbl:sek-state-values}
-
-+-------------+----------------+
-| Value       | Description    |
-+=============+================+
-| 0h          | SEK_ZEROIZED   |
-+-------------+----------------+
-| 1h          | SEK_PROGRAMMED |
-+-------------+----------------+
-| 2h to FFFFh | Reserved       |
-+-------------+----------------+
 
 #### LOAD_KAT_MEK {#sec:load-kat-mek-cmd}
 
