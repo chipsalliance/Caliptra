@@ -405,7 +405,7 @@ The owner key, when represented in fuses or in the FMC's alias certificate, is a
 There are two ways of generating a UDS seed:
 
 1. Use the internal TRNG to directly generate a 512-bit random number.
-2. Use an entity external to Caliptra such as an HSM or SoC-specific methodology to produce the 512-bit random number for the UDS seed that is pushed into the fuse controller (same as Caliptra 1.0).
+2. Use an entity external to Caliptra such as an HSM or SoC-specific methodology to produce the 512-bit random number for the UDS seed that is pushed into the fuse controller (same as Caliptra 1.X).
 
 **UDS Manufacturing**
 
