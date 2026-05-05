@@ -1089,7 +1089,7 @@ TRNG is the digital logic and algorithms that are required for random number gen
 
 ## Mailbox
 
-The Caliptra Mailbox is a buffer (256 KiB in core mode, 16 KiB in subsystem mode) that is used to exchange data between the SoC and the Caliptra microcontroller.
+The Caliptra Mailbox is a buffer that is used to exchange data between the SoC and the Caliptra microcontroller.
 
 The SoC communicates with the mailbox over an AXI interface. This allows the SoC to identify the device that is using the interface. This ensures that the mailbox, control registers, and fuses are read or written only by the appropriate device.
 
