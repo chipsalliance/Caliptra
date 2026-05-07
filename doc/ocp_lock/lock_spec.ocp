@@ -1,6 +1,6 @@
 ---
 title: "OCP L.O.C.K."
-version: 1.1 (RC1)
+version: 1.1
 type: BASE
 project: NVMe™
 authors: [(See Acknowledgements section)]
@@ -15,7 +15,7 @@ bibliography: bibliography.yaml
 +================+=========+=====================================+
 | September 2025 | 1.0     | Initial release                     |
 +----------------+---------+-------------------------------------+
-| [TBD]          | [TBD]   | Minor formatting and grammar fixes. |
+| May 2026       | 1.1     | Minor formatting and grammar fixes. |
 |                |         |                                     |
 |                |         | Change and add missing KDF labels.  |
 |                |         |                                     |
@@ -91,14 +91,6 @@ bibliography: bibliography.yaml
 \listoftables
 
 ---
-
-# Outstanding work
-
-This version of the spec (1.1RC1) has been prepared with the expectation that only the following items will change in the final 1.1 version:
-
-- A mailbox command will be added to KMB that orchestrates an Encryption Engine FIPS self-test.
-- An Encryption Engine CTRL command will be added to commence a FIPS self-test with a well-known MEK.
-- KMB's responsibility will be extended to verify the inequality of each half of the AES-XTS key used by the Encryption Engine.
 
 # License
 
