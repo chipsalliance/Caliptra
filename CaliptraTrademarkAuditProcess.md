@@ -148,6 +148,7 @@ This section considers some specific questions and suggestions for discussion on
       * The validity time of the Caliptra Trademark Usage has expired.  
       * Critical vulnerabilities have been discovered in either the integration of Caliptra, or Caliptra, that would fail a new Caliptra Trademark audit, and the vulnerabilities have not, or cannot, be mitigated.  
       * New threats have emerged that were not considered in the Caliptra Trademark Process, and that critically effects the security.
+  * **Suggestion**: A granted Caliptra Trademark Usage is valid for a specific version of Caliptra and will not be revoked if there is a critical vulnerability discovered in this version of Caliptra.
   * **Suggestion**: There is validity time granted for each Caliptra Trademark usage.  
   * **Suggestion**: Caliptra 1.X will in time be replaced by Caliptra 2.X with PQC compliance. A date will be set for when the grant of using Caliptra trademark with Caliptra 1.X will no longer be given because it doesn't support PQC algorithms.  After that date, no other Calitpra 1.X trademarks will be given.
 
