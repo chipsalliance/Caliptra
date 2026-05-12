@@ -3,7 +3,11 @@ title: "OCP L.O.C.K."
 version: 1.1 (RC3)
 type: BASE
 project: NVMe™
-authors: [(See Acknowledgements section)]
+authors: 
+  - Jeff Andersen
+  - Carl Lundin
+  - Zach Halvorsen
+  - Gwangbae Choi
 bibliography: bibliography.yaml
 ...
 ---
