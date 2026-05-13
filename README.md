@@ -125,7 +125,7 @@ Compatible Configurations:
 | Configuration | RTL | ROM | Runtime FMC/FW |
 | --- | --- | --- | --- |
 | Core | 2.0.2+ | 2.0.x | 2.0.x (0/0) |
-| Subsystem | 1.0.x | 2.0.x | 2.0.x (0/0) |
+| Subsystem | 2.0.2+ | 2.0.x | 2.0.x (0/0) |
 
 ### Caliptra 2.1
 
@@ -141,7 +141,7 @@ Compatible Configurations:
 | Configuration | RTL | ROM | Runtime FMC/FW |
 | --- | --- | --- | --- |
 | Core | 2.1.x | 2.1.x | 2.1.x (0/0) |
-| Subsystem | 1.1.x | 2.1.x | 2.1.x (0/0) |
+| Subsystem | 2.1.2+ | 2.1.x | 2.1.x (0/0) |
 
 
 ## Test Dashboards
