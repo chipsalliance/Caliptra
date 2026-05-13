@@ -331,7 +331,7 @@ See [Provisioning IDevID During Manufacturing](#provisioning-idevid-during-manuf
 
 Caliptra shall support field-programmable entropy, which factors into the device's LDevID identity. The [LDevID certificate](#ldevid-certificate) is endorsed by IDevID and in turn endorses the FMC alias key. Caliptra supports both classic and post-quantum algorithms for endorsement based on ECDSA Secp384r1 and PQC MLDSA-87, respectively.
 
-Caliptra's field-programmable entropy shall consist of two 16-byte slots. All slots are used to derive LDevID. An owner may decide to program as few or as many slots as they wish. Upon programming new entropy, on the next reset the device begins wielding its fresh LDevID. Owners need to validate the new LDevID by using IDevID.
+Caliptra's field-programmable entropy shall consist of four 8-byte slots. All slots are used to derive LDevID. An owner may decide to program as few or as many slots as they wish. Upon programming new entropy, on the next reset the device begins wielding its fresh LDevID. Owners need to validate the new LDevID by using IDevID.
 
 ### Commentary: threat analysis
 
@@ -354,7 +354,7 @@ Vendors have incentives to mitigate these threats. The vendor identity chain sec
 
 Ultimately though, IDevID is not renewable. Renewable security, often referred to as trusted computing base recovery, is a base design principle in Caliptra. Therefore, it is a design goal to reduce the operational dependency on IDevID. Field entropy and LDevID satisfy this need.
 
-Field entropy is a limited resource, consisting of only two 16-byte slots of one-time programmable fuses. It is not generally expected that a second-hand purchaser can program all or even any of these slots. Caliptra's DICE identity remains usable even after all field entropy slots are programmed, so this feature does not preclude a circular economy. Field entropy is a feature primarily designed for users who purchase new parts.
+Field entropy is a limited resource, consisting of only four 8-byte slots of one-time programmable fuses. It is not generally expected that a second-hand purchaser can program all or even any of these slots. Caliptra's DICE identity remains usable even after all field entropy slots are programmed, so this feature does not preclude a circular economy. Field entropy is a feature primarily designed for users who purchase new parts.
 
 Field entropy and LDevID are intended to hedge against attackers with the following abilities:
 
@@ -402,17 +402,20 @@ The owner key, when represented in fuses or in the FMC's alias certificate, is a
 
 *Figure 6: Subsystem Mode: UDS manufacturing flow*
 
-There are three ways of generating a UDS_SEED
-Use the internal TRNG to directly generate a 384-bit random number.
-Use an entity external to Caliptra such as an HSM or SoC-specific methodology to produce UDS-seed 384-bit random number that is pushed into the fuse controller (same as Caliptra 1.0).
-Combine the internal TRNG output with a Manufacturing time provided value to produce a 384-bit output.
+There are two ways of generating a UDS seed:
+
+1. Use the internal TRNG to directly generate a 512-bit random number.
+2. Use an entity external to Caliptra such as an HSM or SoC-specific methodology to produce the 512-bit random number for the UDS seed that is pushed into the fuse controller (same as Caliptra 1.X).
 
 **UDS Manufacturing**
-1. When SoC life cycle is in MANUFACTURING MODE, manufacturing service register bit [CPTRA_DBG_MANUF_SERVICE_REG[2]] is set to request for UDS seed programming flow.
-2. Caliptra ROM will sample this bit on power up; when this bit is set and Caliptra ROM rechecks that the life cycle state is manufacturing mode, it reads the iTRNG for a 512-bit value.
-3. Caliptra ROM writes the 512-bit value to the address available through a register named UDS_SEED_OFFSET which is strapped by SoC at integration time by using DMA HW assist macro available at ROM’s disposal.
-4. Caliptra ROM sets the corresponding status bit in CPTRA_DBG_MANUF_SERVICE_REG to indicate the flow completion.
-5. Manufacturing flow will poll/read this bit and then do the fuse burning flow as specified by the fuse controller spec and SoC specific VR methodologies (eg. Fuse macro voltage elevation flows etc.).
+
+To use the internal TRNG to generate the UDS seed during manufacturing in subsystem mode:
+
+1. When SoC life cycle is in MANUFACTURING MODE, set the manufacturing service register bit [SS_DBG_MANUF_SERVICE_REG_REQ\[2\]](https://chipsalliance.github.io/caliptra-rtl/v2_1/internal-regs/?p=clp.soc_ifc_reg.SS_DBG_MANUF_SERVICE_REG_REQ#UDS_PROGRAM_REQ.desc) through JTAG to request the UDS seed programming flow.
+2. Caliptra ROM will sample this bit on power up; when this bit is set, Caliptra ROM rechecks that the life cycle state is manufacturing mode and reads the iTRNG for a 512-bit value.
+3. Caliptra ROM writes the 512-bit value to the address available through registers named SS_UDS_SEED_BASE_ADDR_L and SS_UDS_SEED_BASE_ADDR_H (which are strapped by SoC at integration time) by using Caliptra’s DMA.
+4. Caliptra ROM sets the corresponding status bit in SS_DBG_MANUF_SERVICE_REG_RSP to indicate the flow completion.
+5. Manufacturing flow will poll/read this bit and then do the fuse burning flow as specified by the fuse controller spec and SoC-specific VR methodologies (e.g., fuse macro voltage elevation flows).
 
 ## Provisioning IDevID during manufacturing
 
@@ -766,6 +769,7 @@ For PCR0 and PCR1, ROM issues the following extend operations in order:
 4. Digest of FMC
 
 Caliptra ROM fails to boot if the following values do not remain constant across a hitless update:
+
 * Owner public key hash
 * ECDSA vendor public key index
 * MLDSA-87 vendor public key index
@@ -847,7 +851,7 @@ The corresponding journey measurement computation is the chained extension of \[
 
 ## Anti-rollback support
 
-Caliptra shall provide fuse banks (refer to *Table 21: Caliptra Fuse Map*) that are used for storing monotonic counters to provide anti-rollback enforcement for Caliptra mutable firmware. Each distinctly signed boot stage shall be associated with its own anti-rollback fuse field. Together with the vendor, Caliptra allows owners to enforce strong anti-rollback requirements, in addition to supporting rollback to a previous firmware version. This is a critical capability for hyperscalers.
+Caliptra shall provide fuse banks (refer to *Table 22: Caliptra Fuse Map*) that are used for storing monotonic counters to provide anti-rollback enforcement for Caliptra mutable firmware. Each distinctly signed boot stage shall be associated with its own anti-rollback fuse field. Together with the vendor, Caliptra allows owners to enforce strong anti-rollback requirements, in addition to supporting rollback to a previous firmware version. This is a critical capability for hyperscalers.
 
 Caliptra firmware shall include an SVN value in the signed header. If the firmware's SVN value is less than the current counter value in the fuse bank, Caliptra shall refuse to boot that firmware, regardless of whether the signature is valid.
 
@@ -915,14 +919,14 @@ As shown in *Table 15: POST/CAST usage*, since the cryptographic algorithms requ
 
 Caliptra supports verifying firmware with ECDSA P384 and MLDSA-87 signatures and [Leighton-Micali Hash-based Signatures (LMS)](#post-quantum-cryptography-pqc-requirements) in accordance with the requirements described in [Reference 3](#ref-3).
 
-Caliptra firmware is composed of two images: an FMC image and an application firmware image. A single firmware manifest describes these images. The manifest consists of a preamble (*Table 16*), a header (*Table 17*), and a Table of Contents (TOC) (*Table 18*). The image layout is shown in *Figure 7: firmware image layout*.
+Caliptra firmware is composed of two images: an FMC image and an application firmware image. A single firmware manifest describes these images. The manifest consists of a preamble (*Table 16*), a header (*Table 19*), and a Table of Contents (TOC) (*Table 20*). The image layout is shown in *Figure 7: firmware image layout*.
 
 ![](./images/fw-img-bundle.svg)
 
 *Figure 7: Firmware image layout*
 
 To verify the firmware, Caliptra ROM performs the following steps:
-1. Calculates the hash of the vendor [key descriptors](#table-17-public-key-descriptor) in the preamble and compares it against the hash in fuses (key_manifest_pk_hash). If the lifecycle is not "unprovisioned" and the hashes do not match, the boot fails.
+1. Calculates the hash of the vendor [key](#table-17-ecc-manufacturer-public-key-descriptor) [descriptors](#table-18-pqc-manufacturer-public-key-descriptor) in the preamble and compares it against the hash in fuses (key_manifest_pk_hash). If the lifecycle is not "unprovisioned" and the hashes do not match, the boot fails.
 2. Calculates the hashes of the active vendor public keys and compares it against the hashes in the key descriptors identified by the corresponding active key indices.
 3. Calculates the hash of the owner public keys in the preamble and compares it against the hash in fuses (owner_pk_hash). If the owner_pk_hash fuse is not zero (i.e., unprovisioned) and hashes do not match, the boot fails. See the [Owner authorization](#owner-authorization) section.
 4. Ensures the vendor public key(s) selected by the preamble indices are not revoked based on fuse: key_manifest_pk_hash_mask for ECDSA public key, pqc_revocation for LMS or MLDSA public key.
@@ -939,13 +943,15 @@ In addition to cold boot, Caliptra ROM performs firmware verification on hitless
 
 *Table 16: Firmware manifest preamble*
 
-Fields are little endian unless described otherwise.
+Fields that are 4-byte dwords are little endian unless described otherwise.
+Hashes must be stored with each 32-bit dword having swapped endianness from the SHA2 standard byte order.
+Signatures are stored in the byte order indicated in the standard.
 
 | Field | Size (bytes) | Description|
 |-------|--------|------------|
-| Firmware Manifest Marker | 4 | Magic Number marking the start of the package manifest. The value must be 0x434D414E (‘CMAN’ in ASCII)|
+| Firmware Manifest Marker | 4 | Magic Number marking the start of the package manifest. The value must be 0x434D4E32 (‘CMN2’ in ASCII) in big endian order|
 | Firmware Manifest Size | 4 | Size of the full manifest structure |
-| Firmware Manifest Type | 4 |  **Byte0:** - Type <br> 0x1 – ECDSA & LMS Keys <br> 0x2 – ECDSA & MLDSA Keys <br> **Byte1-Byte3:** Reserved|
+| Firmware Manifest Type | 4 |  **Byte0:** - Type <br> 0x1 – ECDSA & MLDSA Keys <br> 0x3 – ECDSA & LMS Keys <br> **Byte1-Byte3:** Reserved|
 | Vendor ECDSA Key Descriptor | 196 | Public Key Descriptor for ECDSA keys |
 | Vendor LMS or MLDSA Key Descriptor | 1540 | Public Key Descriptor for LMS (1540 bytes) or MLDSA (196 bytes + 1344 unused bytes) keys |
 | Active ECDSA Key Index | 4 | Public Key Index for the active ECDSA key |
@@ -954,28 +960,36 @@ Fields are little endian unless described otherwise.
 | Active LMS or MLDSA Key | 2592 | LMS public key (48 bytes + 2544 unused bytes) used to verify the Firmware Manifest Header Signature. <br> **tree_type:** LMS Algorithm Type (4 bytes, big endian) Must equal 12. <br> **otstype:** LM-OTS Algorithm Type (4 bytes, big endian) Must equal 7. <br> **id:**  (16 bytes) <br> **digest:**  (24 bytes) <br><br>**OR**<br><br>MLDSA-87 public key used to verify the Firmware Manifest Header Signature. <br> (2592 bytes)|
 | Vendor ECDSA Signature | 96 | Vendor ECDSA P384 signature of the Firmware Manifest header hashed using SHA384. <br> **R-Coordinate:** Random Point (48 bytes, big endian) <br> **S-Coordinate:** Proof (48 bytes, big endian) |
 | Vendor LMS or MLDSA Signature | 4628 | Vendor LMS signature (1620 bytes + 3008 unused bytes) of the Firmware Manifest header hashed using SHA384. <br> **q:** Leaf of the Merkle tree where the OTS public key appears (4 bytes) <br> **ots:** LM-OTS Signature (1252 bytes) <br> **tree_type:** LMS Algorithm Type (4 bytes, big endian) Must equal 12. <br> **tree_path:** Path through the tree from the leaf associated with the LM-OTS signature to the root. (360 bytes) <br><br>**OR**<br><br> Vendor MLDSA-87 signature of the Firmware Manifest header hashed using SHA512 (4627 bytes + 1 Reserved byte).|
-| Owner ECDSA Key Descriptor | 52 | Public Key Descriptor for ECDSA key |
-| Owner LMS or MLDSA Key Descriptor | 52 | Public Key Descriptor for LMS or MLDSA key |
 | Owner ECDSA Public Key | 96 | ECDSA P384 public key used to verify the Firmware Manifest Header Signature. <br> **X-Coordinate:** Public Key X-Coordinate (48 bytes, big endian) <br> **Y-Coordinate:** Public Key Y-Coordinate (48 bytes, big endian)|
 | Owner LMS or MLDSA Public Key | 2592 | LMS public key (48 bytes + 2544 unused bytes)  used to verify the Firmware Manifest Header Signature. <br> **tree_type:** LMS Algorithm Type (4 bytes, big endian) Must equal 12. <br> **otstype:** LM-OTS Algorithm Type (4 bytes, big endian) Must equal 7. <br> **id:**  (16 bytes) <br> **digest:**  (24 bytes) <br><br>**OR**<br><br>MLDSA-87 public key used to verify the Firmware Manifest Header Signature. <br> (2592 bytes)|
 | Owner ECDSA Signature | 96 | Vendor ECDSA P384 signature of the Firmware Manifest header hashed using SHA384. <br> **R-Coordinate:** Random Point (48 bytes, big endian) <br> **S-Coordinate:** Proof (48 bytes, big endian) |
 | Owner LMS or MLDSA Signature | 4628 | Owner LMS signature (1620 bytes + 3008 unused bytes) of the Firmware Manifest header hashed using SHA384. <br> **q:** Leaf of the Merkle tree where the OTS public key appears (4 bytes) <br> **ots:** LM-OTS Signature (1252 bytes) <br> **tree_type:** LMS Algorithm Type (4 bytes, big endian) Must equal 12. <br> **tree_path:** Path through the tree from the leaf associated with the LM-OTS signature to the root. (360 bytes) <br><br>**OR**<br><br> Owner MLDSA-87 signature of the Firmware Manifest header hashed using SHA512 (4627 bytes + 1 Reserved byte).|
 | Reserved | 8 | Reserved 8 bytes |
 
-#### *Table 17: Public Key Descriptor*
+#### *Table 17: ECC Manufacturer Public Key Descriptor*
 
 Fields are little endian unless described otherwise.
 
 | Field | Size (bytes) | Description|
 |-------|--------|------------|
-| Key Descriptor Version | 1 | Version of the Key Descriptor. The value must be 0x1 for Caliptra 2.x |
-| Intent | 1 | Type of the descriptor <br> 0x1 - Vendor  <br> 0x2 - Owner |
-| Key Type | 1 | Type of the key in the descriptor <br> 0x1 - ECC  <br> 0x2 - LMS <br> 0x3 - MLDSA |
-| Key Hash Count | 1 | Number of valid public key hashes  |
-| Public Key Hash(es) | 48 * n | List of valid and invalid (if any) SHA2-384 public key hashes. ECDSA: n = 4, LMS: n = 32, MLDSA: n = 4 |
+| Key Descriptor Version | 2 | Version of the Key Descriptor. The value must be 0x2 for Caliptra 2.x |
+| Reserved | 1 | |
+| Key Hash Count | 1 | Number of valid public key hashes |
+| Public Key Hash(es) | 48 * n | List of valid and invalid (if any) SHA2-384 public key hashes. ECDSA: n = 4. <br> Note: hashes must be stored with each 32-bit dword having swapped endianness |
+
+#### *Table 18: PQC Manufacturer Public Key Descriptor*
+
+Fields are little endian unless described otherwise.
+
+| Field | Size (bytes) | Description|
+|-------|--------|------------|
+| Key Descriptor Version | 2 | Version of the Key Descriptor. The value must be 0x2 for Caliptra 2.x |
+| Key Type | 1 | Type of the key in the descriptor <br> 0x1 - MLDSA <br> 0x3 - LMS |
+| Key Hash Count | 1 | Number of valid public key hashes |
+| Public Key Hash(es) | 48 * n | List of valid and invalid (if any) SHA2-384 public key hashes. LMS: n = 32, MLDSA: n = 4. <br> Note: hashes must be stored with each 32-bit dword having swapped endianness |
 <br>
 
-*Table 18: Firmware manifest header*
+*Table 19: Firmware manifest header*
 
 Fields are little endian unless described otherwise.
 
@@ -984,15 +998,14 @@ Fields are little endian unless described otherwise.
 | Revision | 8 | 8-byte version of the firmware image bundle |
 | Vendor ECDSA public key hash index | 4 | The hint to ROM to indicate which ECDSA public key hash it should use to validate the active ECDSA public key. |
 | Vendor LMS or MLDSA public key hash index | 4 | The hint to ROM to indicate which LMS or MLDSA public key hash it should use to validate the active public key. |
-| Flags | 4 | Feature flags. <br> **Bit0:** - Interpret the pl0_axi_user field. If not set, all AXI_USERs are PL1 <br>**Bit1-Bit31:** Reserved |
+| Flags | 4 | Feature flags. <br><br> **Bit0:** - Interpret the pl0_axi_user field. If not set, all AXI_USERs are PL1 <br>**Bit1-Bit31:** Reserved |
 | TOC Entry Count | 4 | Number of entries in TOC. |
 | PL0 AXI_USER | 4 | The AXI_USER with PL0 privileges. This value is used by the RT FW to verify the caller privilege against its AXI_USER. The AXI_USER is wired through AXI. |
-| TOC Digest | 48 | SHA384 Digest of table of contents. |
-| SVN | 4 | Security Version Number for the firmware, checked against the SVN fuses. |
+| TOC Digest | 48 | SHA384 Digest of table of contents. <br> Note: hashes must be stored with each 32-bit dword having swapped endianness |
 | Vendor Data | 40 | Vendor Data. <br> **Not Before:** Vendor Start Date [ASN1 Time Format] for Caliptra-issued certificates (15 bytes) <br> **Not After:** Vendor End Date [ASN1 Time Format] for Caliptra-issued certificates (15 bytes) <br> **Reserved:** (10 bytes) |
 | Owner Data | 40 | Owner Data. <br> **Not Before:** Owner Start Date [ASN1 Time Format] for Caliptra-issued certificate. Takes precedence over vendor start date (15 bytes) <br> **Not After:** Owner End Date [ASN1 Time Format] for Caliptra-issued certificates. Takes precedence over vendor end date (15 bytes) <br> **Reserved:** (10 bytes) |
 
-*Table 19: Table of contents*
+*Table 20: Table of contents*
 
 Fields are little endian unless described otherwise.
 
@@ -1000,13 +1013,15 @@ Fields are little endian unless described otherwise.
 |-------|--------|------------|
 | TOC Entry Id | 4 | TOC Entry ID. The fields can have the following values: <br> **0x0000_0001:** FMC  <br> **0x0000_0002:** Runtime |
 | Image Type | 4 | Image Type that defines the format of the image section <br> **0x0000_0001:** Executable |
-| Image Revision | 20 | Git Commit hash of the build |
+| Image Revision | 20 | git commit SHA1 hash of the build |
 | Image Version | 4 | Firmware release number |
+| Image SVN | 4 | Security Version Number for the firmware, checked against the FW SVN fuses. FMC TOC entry's SVN field is ignored. |
+| Reserved | 4 | |
 | Image Load Address | 4 | Load address |
 | Image Entry Point | 4 | Entry point to start the execution from  |
 | Image Offset | 4 | Offset from beginning of the image |
 | Image Size | 4 | Image Size |
-| Image Hash | 48 | SHA384 hash of image |
+| Image Hash | 48 | SHA384 hash of image <br> Note: hashes must be stored with each 32-bit dword having swapped endianness |
 
 ### Post-Quantum Cryptography (PQC) requirements
 
@@ -1074,7 +1089,7 @@ TRNG is the digital logic and algorithms that are required for random number gen
 
 ## Mailbox
 
-The Caliptra Mailbox is a 128 KiB buffer that is used to exchange data between the SoC and the Caliptra microcontroller.
+The Caliptra Mailbox is a buffer that is used to exchange data between the SoC and the Caliptra microcontroller.
 
 The SoC communicates with the mailbox over an AXI interface. This allows the SoC to identify the device that is using the interface. This ensures that the mailbox, control registers, and fuses are read or written only by the appropriate device.
 
@@ -1179,7 +1194,7 @@ Caliptra provides a HW API to do a SHA384 hash calculation. The SoC can access t
 7. Microcontroller executes the appropriate debug service.
 8. Specific SoC interface registers are accessible over the JTAG interface in debug (or manufacturing mode). The following are the JTAG register addresses for these registers.
 
-*Table 20: JTAG accessible registers*
+*Table 21: JTAG accessible registers*
 
 | Register name | JTAG address | Accessibility |
 |---------------|--------------|---------------|
@@ -1273,12 +1288,12 @@ For SoCs that intend to achieve FIPS 140-3 CMVP certification with Caliptra:
 **FIXME:** Needs updates for Caliptra 2p0 & Subsystem
 The following table describes Caliptra's fuse map:
 
-*Table 21: Caliptra Fuse Map*
+*Table 22: Caliptra Fuse Map*
 
 | **Name**                        | **Size (bits)** | **ACL**         | **Fuse programming time**                       | **Description** |
 | ------------------------------- | --------------- | --------------- | ----------------------------------------------- | --------------- |
-| UDS SEED (obfuscated)           | 512             | ROM             | SoC manufacturing                               | DICE Unique Device Secret Seed. This seed is unique per device. The seed is scrambled using an obfuscation function. |
-| FIELD ENTROPY (obfuscated)      | 256             | ROM             | Device owner in-field programmable              | Field-programmable by the owner, used to hedge against UDS disclosure in the supply chain. |
+| UDS SEED (obfuscated)           | 512             | HW read, ROM write | SoC manufacturing                               | DICE Unique Device Secret Seed. This seed is unique per device. The seed is scrambled using an obfuscation function. |
+| FIELD ENTROPY (obfuscated)      | 256             | HW read, ROM FMC RUNTIME | Device owner in-field programmable              | Field-programmable by the owner, used to hedge against UDS disclosure in the supply chain. |
 | VENDOR PK HASH                  | 384             | ROM FMC RUNTIME | SoC manufacturing                               | SHA384 hash of the Vendor ECDSA P384 and LMS or MLDSA Public Key Descriptors. |
 | ECC REVOCATION                  | 4               | ROM FMC RUNTIME | In-field programmable                           | One-hot encoded list of revoked Vendor ECDSA P384 Public Keys (up to 4 keys). |
 | OWNER PK HASH                   | 384             | ROM FMC RUNTIME | In-field programmable                           | SHA384 hash of the Owner ECDSA P384 and LMS or MLDSA Public Keys. |
@@ -1292,7 +1307,7 @@ The following table describes Caliptra's fuse map:
 | MLDSA REVOCATION                | 4               | ROM             | In-field programmable                           | One-hot encoded list of revoked Vendor MLDSA Public Keys (up to 4 keys). |
 | SOC STEPPING ID                 | 16              | ROM FMC RUNTIME | SoC manufacturing                               | Identifier assigned by vendor to differentiate silicon steppings. |
 | MANUF_DEBUG_UNLOCK_TOKEN        | 512             | ROM             | SoC manufacturing                               | Digest value for manufacturing debug unlock token secret value for authorization. |
-| PQC Key Type                    | 2               | ROM FMC RUNTIME | In-field programmable                           | One-hot encoded selection of PQC key type for firmware validation. <br> - **Bit 0** - MLDSA <br> - **Bit 1** - LMS<br>|
+| PQC Key Type                    | 2               | ROM FMC RUNTIME | In-field programmable                           | PQC key type for firmware validation. <br> - 0x1 - MLDSA <br> - 0x3 - LMS<br>|
 | SOC MANIFEST SVN                | 128             | ROM FMC RUNTIME | In-field programmable                           | One-hot encoded value for the SOC authorization manifest minimum supported SVN. |
 | SOC MANIFEST MAX SVN            | 8               | ROM FMC RUNTIME | In-field programmable                           | Maximum value for the SOC authorization manifest SVN. |
 | HEK RATCHET SEED                | 256             | ROM             | In-field programmable                           | OCP L.O.C.K. seed used by hardware to generate HEK |
@@ -1302,7 +1317,7 @@ The following table describes Caliptra's fuse map:
 
 This section describes Caliptra error reporting and handling.
 
-*Table 22: Hardware and firmware error types*
+*Table 23: Hardware and firmware error types*
 
 | | Fatal errors | Non-fatal errors |
 | :- | - | - |
