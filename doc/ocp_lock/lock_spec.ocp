@@ -1,6 +1,6 @@
 ---
 title: "OCP L.O.C.K."
-version: 1.1
+version: 1.1 (RC3)
 type: BASE
 project: NVMe™
 authors: [(See Acknowledgements section)]
@@ -15,7 +15,7 @@ bibliography: bibliography.yaml
 +================+=========+=====================================+
 | September 2025 | 1.0     | Initial release                     |
 +----------------+---------+-------------------------------------+
-| May 2026       | 1.1     | Minor formatting and grammar fixes. |
+| May 2026       | 1.1_RC1 | Minor formatting and grammar fixes. |
 |                |         |                                     |
 |                |         | Change and add missing KDF labels.  |
 |                |         |                                     |
@@ -78,6 +78,11 @@ bibliography: bibliography.yaml
 |                |         | shall now be enforced by KMB.       |
 |                |         |                                     |
 |                |         | Update EKP notice.                  |
++----------------+---------+-------------------------------------+
+| May 2026       | 1.1_RC2 | Add KMB AES-XTS Equality check and  | 
+|                |         | Encryption Engine self-test.        |
++----------------+---------+-------------------------------------+
+| May 2026       | 1.1_RC3 | Remove KMB firmware notice.         |
 +----------------+---------+-------------------------------------+
 
 \currenttemplateversion
@@ -875,8 +880,6 @@ OCP L.O.C.K. defines two interfaces:
 
 - The [encryption engine interface](#sec:encryption-engine-interface) is exposed from the vendor-implemented encryption engine to KMB, and defines a standard mechanism for programming MEKs and control messages.
 - The [mailbox interface](#sec:mailbox-interface) is exposed from KMB to storage drive firmware, and enables the drive to manage MEKs and associated keys.
-
-***Note: as of this specification's publication, KMB firmware has not yet been implemented. As such, certain details of the interface specification are subject to change. This notice will be removed once firmware has been implemented.***
 
 ### Encryption engine interface {#sec:encryption-engine-interface}
 
