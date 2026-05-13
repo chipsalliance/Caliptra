@@ -53,7 +53,7 @@ sets out the charter governing the Caliptra project.
 
 ## Versioning
 
-Caliptra is released in independently versioned components: RTL, ROM, FMC and Runtime FW. They are all represented by 3 values: major.minor.patch (such as 1.0.2). The first 2 values, major.minor, correspond to a set of features caliptra supports. The patch value is incremented as new releases are made with bug fixes. Lastly, mutable firmware (FMC/FW) have security version numbers (SVNs) that are incremented as required by when addressing security-critical issues. These are specified with the label (svn/svn) for (FMC/FW) versions respectively.
+Caliptra is released in independently versioned components: Core/RTL, ROM, FMC, Runtime FW, and Subsystem. They are all represented by 3 values: major.minor.patch (such as 1.0.2). The first 2 values, major.minor, correspond to a set of features caliptra supports. The patch value is incremented as new releases are made with bug fixes. Lastly, mutable firmware (FMC/FW) have security version numbers (SVNs) that are incremented as required by when addressing security-critical issues. These are specified with the label (svn/svn) for (FMC/FW) versions respectively.
 
 Not all components necessarily need to be of the same major.minor version to be compatible. Details are below:
 
@@ -122,9 +122,10 @@ Additional Features
 
 Compatible Configurations:
 
-| RTL | ROM | Runtime FMC/FW |
-| --- | --- | --- |
-| 2.0.2+ | 2.0.x | 2.0.x (0/0) |
+| Configuration | RTL | ROM | Runtime FMC/FW |
+| --- | --- | --- | --- |
+| Core | 2.0.2+ | 2.0.x | 2.0.x (0/0) |
+| Subsystem | 1.0.x | 2.0.x | 2.0.x (0/0) |
 
 ### Caliptra 2.1
 
@@ -137,9 +138,10 @@ Additional Features
 
 Compatible Configurations:
 
-| RTL | ROM | Runtime FMC/FW |
-| --- | --- | --- |
-| 2.1.x | 2.1.x | 2.1.x (0/0) |
+| Configuration | RTL | ROM | Runtime FMC/FW |
+| --- | --- | --- | --- |
+| Core | 2.1.x | 2.1.x | 2.1.x (0/0) |
+| Subsystem | 1.1.x | 2.1.x | 2.1.x (0/0) |
 
 
 ## Test Dashboards
