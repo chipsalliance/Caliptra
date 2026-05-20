@@ -8,7 +8,9 @@
 
 This document defines the **Caliptra Trademark Versioning Scheme**: a versioning scheme for the set of documents that an integrator's product is audited against in order to receive the Caliptra Trademark license.
 
-The scheme is deliberately independent of the version numbers used by Caliptra code releases (RTL, ROM, FMC, Runtime FW, Subsystem). Caliptra code components are versioned using semantic versioning as `major.minor.patch`, and not all components share the same `major.minor` at a given point in time (see the *Versioning* section of the repository [`README.md`](../../README.md)). A single ratified version of the Trademark requirements can cover multiple Caliptra release lines at once — for example, Caliptra 1.1 and Caliptra 2.1 may be covered under the same Trademark Edition even though their integration requirements differ substantially. The precise set of Caliptra release lines covered by any given Edition is defined by that Edition's [Compatibility Matrix](#4-compatibility-matrix-and-applicability) (not by a fuzzy notion of "all releases that exist at ratification time"); the Compatibility Matrix is itself versioned alongside the Edition and updated by ratified [Revisions](#5-revisions-versus-new-editions). Tying Trademark version numbers to any single component's `major.minor.patch` would make this multi-release coverage impossible.
+The scheme is deliberately independent of the version numbers used by Caliptra code releases (RTL, ROM, FMC, Runtime FW, Subsystem). Caliptra code components are versioned using semantic versioning as `major.minor.patch`, and not all components share the same `major.minor` at a given point in time (see the *Versioning* section of the repository [`README.md`](../../README.md)). A single ratified version of the Trademark requirements can be applicable to multiple Caliptra release lines at once — for example, Caliptra 1.1 and Caliptra 2.1 may both be in scope for the same Trademark Edition even though their integration requirements differ substantially. The precise set of Caliptra release versions in scope for any given Edition is defined by that Edition's [Compatibility Matrix](#4-compatibility-matrix-and-applicability); the Compatibility Matrix is itself versioned alongside the Edition and updated by ratified [Revisions](#5-revisions-versus-new-editions). Tying Trademark version numbers to any single component's `major.minor.patch` would make this multi-release applicability impossible.
+
+> **No implicit license.** Listing a Caliptra release line in an Edition's Compatibility Matrix does **not** itself license the Caliptra Trademark to any product, vendor, or integration. The Compatibility Matrix defines *applicability* — the set of Caliptra releases on which an integrator may **pursue** a Caliptra Trademark license under this Edition by completing the audit defined by the Edition's frozen Policy, Audit Process, and Checklist. A Trademark license is issued only upon successful completion of that audit and the issuance of a [Statement of Conformance](#33-tags) cited against a specific revision tag. Throughout this document and the Edition Index, language such as "applicable to", "in scope for", "addressed by", and "eligible under" refers strictly to this scope of applicability, never to an automatic or implicit license.
 
 This document defines:
 
@@ -30,14 +32,14 @@ A **Trademark Edition** is identified by a single uppercase Latin letter, beginn
 | Edition revision (tag) | `edition-<identifier>-r<N>`, `N` ≥ 1              | `edition-A-r1`, `edition-A-r2`, `edition-B-r1`        |
 | Human-readable label   | `Edition <identifier> rev <N>`                    | `Edition A rev 1`, `Edition B rev 3`                  |
 
-**Rationale.** Uppercase letters share no characters with `major.minor.patch` component versions; the `edition/` branch prefix and `edition-` tag prefix prevent collision with code-release tags such as `v1.1` in `caliptra-rtl` or `caliptra-1.1` branches in `caliptra-sw`. The `-rN` revision counter is intentionally a flat integer (not `x.y.z`) to underscore that revisions never introduce substantive change to the Trademark requirements; they pin newly-released Caliptra patches into the Edition's Compatibility Matrix and apply editorial corrections — see [§5](#5-revisions-versus-new-editions).
+**Rationale.** Uppercase letters share no characters with `major.minor.patch` component versions; the `edition/` branch prefix and `edition-` tag prefix prevent collision with code-release tags such as `v2.0.1` in [`caliptra-rtl`](https://github.com/chipsalliance/caliptra-rtl) or `caliptra-1.1` branches in [`caliptra-sw`](https://github.com/chipsalliance/caliptra-sw). The `-rN` revision counter is intentionally a flat integer (not `x.y.z`) to underscore that revisions never introduce substantive change to the Trademark requirements; they raise patch pins in the Edition's Compatibility Matrix and apply editorial corrections — see [§5](#5-revisions-versus-new-editions).
 
 ### 2.1. Edition Lifecycle Status
 
 Each Edition has a lifecycle status independent of its identifier. Defined status values:
 
 - **Active** — A ratified Edition that is a valid target for new audits. Every Edition enters the **Active** status upon ratification (i.e., when its `edition/<identifier>` branch is cut and its `edition-<identifier>-r1` tag is applied) and carries the full authority of the Caliptra Trademark requirements regardless of whether later, more comprehensive Editions are anticipated.
-- **Superseded** — A later Edition has replaced this one for the Caliptra `Major.Minor` release lines that the later Edition covers. Trademark licenses previously issued under a Superseded Edition remain valid; new audits against the Superseded Edition for those release lines SHOULD instead target an Active Edition that covers them. An Edition remains the authoritative target for any `Major.Minor` release line it covers that is not covered by any later Active Edition.
+- **Superseded** — A later Edition has replaced this one for the Caliptra `Major.Minor` release lines that the later Edition is applicable to. Trademark licenses previously issued under a Superseded Edition remain valid; new audits SHOULD instead target an Active Edition that is applicable to the integrator's release line. An Edition remains the authoritative target for any `Major.Minor` release line it addresses that is not addressed by any later Active Edition.
 - **Withdrawn** — The TAC has formally revoked this Edition as a target for new audits. Trademark licenses previously issued under a Withdrawn Edition remain valid; **no new Trademark licenses may be issued on the basis of a Withdrawn Edition** after its effective withdrawal date. The transition into `Withdrawn` is performed via a revision on the Edition's own branch — see [§5.5](#55-withdrawal-of-a-ratified-edition).
 
 The status of every Edition is recorded in the [Edition Index](README.md) on `main` and in that Edition's `EditionStatus.md` on its branch. `EditionStatus.md` on the Edition branch is the source of truth; the Edition Index on `main` mirrors it. Any status transition (Active → Superseded, or Active → Withdrawn) is therefore applied by a revision on the Edition branch (updating `EditionStatus.md`) accompanied by a corresponding PR on `main` that updates the Edition Index.
@@ -95,23 +97,23 @@ Each Edition branch contains a single `doc/trademark/CompatibilityMatrix.md`. Th
 
 ### 4.1. Structure
 
-The matrix lists every covered Caliptra release line as a row keyed by its `Major.Minor` version (e.g., `Caliptra 1.1`, `Caliptra 1.2`, `Caliptra 2.0`). Each row enumerates, for every relevant Caliptra component repository, **both** the covered `Major.Minor` version **and** the **minimum patch level** on that minor that this Edition covers. The components tracked are at minimum:
+The matrix lists every Caliptra release line in scope for this Edition as a row keyed by its `Major.Minor` version (e.g., `Caliptra 1.1`, `Caliptra 1.2`, `Caliptra 2.0`). Each row enumerates, for every relevant Caliptra component repository, **both** the in-scope `Major.Minor` version **and** the **minimum patch level** on that minor for which this Edition is applicable. The components tracked are at minimum:
 
-- [`caliptra-rtl`](https://github.com/chipsalliance/caliptra-rtl) — RTL release.
-- [`caliptra-sw`](https://github.com/chipsalliance/caliptra-sw) — ROM, FMC, and Runtime FW releases (versioned independently within `caliptra-sw`; cite the upstream tag form, including FMC/FW SVN where applicable).
-- [`caliptra-ss`](https://github.com/chipsalliance/caliptra-ss) — Subsystem release, where the row's coverage qualifier indicates Subsystem applicability.
+- [`caliptra-rtl`](https://github.com/chipsalliance/caliptra-rtl) — RTL release, pinned as the upstream `v<major>.<minor>.<patch>` tag.
+- [`caliptra-sw`](https://github.com/chipsalliance/caliptra-sw) — ROM, FMC, and Runtime FW releases. ROM, FMC, and Runtime FW are versioned **independently** within `caliptra-sw`; each row therefore pins a minimum `major.minor.patch` per artifact, with FMC and Runtime FW additionally pinning a minimum SVN (FMC_SVN/FW_SVN) per the repo-root [`README.md`](../../README.md) versioning convention.
+- [`caliptra-ss`](https://github.com/chipsalliance/caliptra-ss) — Subsystem release, where the row's applicability qualifier indicates Subsystem applicability.
 
-Each row also carries a **coverage qualifier** indicating which checklist sections apply to the row (e.g., `Core-only`, `Core + Subsystem`). Patch-level pins are recorded as the upstream `Major.Minor.patch` (and, for mutable firmware, the FMC/FW SVN pair) that represents the *minimum* release an integrator may consume on that line under this Edition.
+Each row also carries an **applicability qualifier** indicating which checklist sections apply to the row (e.g., `Core-only`, `Core + Subsystem`). Patch-level pins are recorded as the upstream `Major.Minor.patch` (and, for mutable firmware, the FMC/FW SVN pair) that represents the *minimum* release an integrator may consume on that line under this Edition.
 
-A row's patch pins MAY be updated by a subsequent revision of the same Edition — see [§5.1](#51-criteria-for-an-edition-revision--rn1).
+A row's patch pins MAY be raised by a subsequent revision of the same Edition — see [§5.1](#51-criteria-for-an-edition-revision--rn1). A row's patch pins MUST NOT be lowered (relaxed) by a revision.
 
 ### 4.2. Normative clauses
 
 The following clauses appear in every Edition's `CompatibilityMatrix.md` and govern the relationship between an Edition and Caliptra release versions:
 
-> **Scope of applicability.** Each row of this Compatibility Matrix identifies a Caliptra `Major.Minor` release line and the minimum patch level (and minimum FMC/FW SVN, where applicable) on that line covered by this Edition. An integration is eligible under this Edition only if, for every Caliptra component listed in the row, the integration consumes a release that is **at or above** the minimum pinned by this Edition's current revision and is on the **same** `Major.Minor` line as the pinned release.
+> **Scope of applicability.** Each row of this Compatibility Matrix identifies a Caliptra `Major.Minor` release line and the minimum patch level (and minimum FMC/FW SVN, where applicable) on that line for which this Edition is applicable. An integration is eligible to pursue a Caliptra Trademark license under this Edition only if, for every Caliptra component listed in the row, the integration consumes a release that is **at or above** the minimum pinned by this Edition's current revision and is on the **same** `Major.Minor` line as the pinned release. Listing a release line in this matrix does not by itself license the Caliptra Trademark to any product; it establishes only that the line is in scope for audit under this Edition.
 
-> **Patch coverage is by explicit ratification, not automatic.** Patch releases of Caliptra components published *after* this Edition revision's tag was applied are **not** automatically covered by this Edition. Coverage of newly-published patch releases is established by ratifying a new revision of this Edition that raises the relevant patch pin (see [§5.1](#51-criteria-for-an-edition-revision--rn1) criterion 3). Until that revision is ratified and tagged, the last pinned patch level remains the binding floor.
+> **Patch applicability is by explicit ratification, not automatic.** Patch releases of Caliptra components published *after* this Edition revision's tag was applied are **not** automatically in scope for this Edition. Applicability to a newly-published patch release is established by ratifying a new revision of this Edition that raises the relevant patch pin (see [§5.1](#51-criteria-for-an-edition-revision--rn1) criterion 3). Until that revision is ratified and tagged, the last pinned patch level remains the binding floor.
 
 > **Integrator obligation.** Integrators pursuing the Caliptra Trademark under this Edition MUST integrate at or above every minimum release pinned by this Edition's Compatibility Matrix for every component listed in their target row. A Statement of Conformance that cites this Edition but consumes an upstream release below the pinned minimum is invalid.
 
@@ -123,7 +125,7 @@ Patch releases of Caliptra components are, by the project's versioning conventio
 
 ## 5. Revisions Versus New Editions
 
-The scheme distinguishes two operations: a **revision** of an existing Edition (no substantive change to requirements, but may pin newer patch releases or fix factual references) and a **new Edition** (a new branch and `-r1` tag, required when substantive changes are needed or when new `Major.Minor` Caliptra release lines must be covered).
+The scheme distinguishes two operations: a **revision** of an existing Edition (no substantive change to requirements, but may raise patch pins or fix factual references) and a **new Edition** (a new branch and `-r1` tag, required when substantive changes are needed or when new `Major.Minor` Caliptra release lines must be brought into scope).
 
 Both operations require **unanimous approval of all TAC Voting Members** — there are no lightweight, non-unanimous changes to a ratified Edition once it has been published. The distinction between a revision and a new Edition determines *what artifact is produced* (a new tag on an existing branch vs. a new branch), not the rigor of governance applied.
 
@@ -132,21 +134,21 @@ Both operations require **unanimous approval of all TAC Voting Members** — the
 A change qualifies as a revision on the existing Edition branch **if and only if** *all* of the following hold:
 
 1. The change does **not** add, remove, or modify any normative requirement on integrators. ("Normative" means any statement using the RFC 2119 keywords used in the Checklist: `MUST`, `MUST NOT`, `SHALL`, `SHALL NOT`, `REQUIRED`, `RECOMMENDED`, `SHOULD`, `SHOULD NOT`, `MAY`, `OPTIONAL`.)
-2. The change does **not** add or remove any covered Caliptra `Major.Minor` release line from the Compatibility Matrix, and does **not** lower (relax) any existing minimum patch pin.
+2. The change does **not** add or remove any in-scope Caliptra `Major.Minor` release line from the Compatibility Matrix, and does **not** lower (relax) any existing minimum patch pin.
 3. The change is one (or more) of the following editorial categories:
    - **Typographical and clarification fixes** — typos, broken cross-references, ambiguous wording made unambiguous without changing meaning, restatement of intent for readability.
    - **Factual upstream-reference corrections** — corrections to the upstream `caliptra-rtl` / `caliptra-sw` / `caliptra-ss` tag, branch, or repository references named in the Compatibility Matrix where the upstream reference itself was misstated, renamed, or relocated. These are editorial because the *intent* of the original ratification (which upstream release is in scope) is preserved; only the citation is corrected.
-   - **Patch-coverage updates** — raising the minimum patch pin (or minimum FMC/FW SVN) for an already-covered `Major.Minor` line to incorporate newly-published upstream patch releases. This is the mechanism by which Editions track patch releases of Caliptra components; see [§4.2](#42-normative-clauses).
+   - **Patch-applicability updates** — raising the minimum patch pin (or minimum FMC/FW SVN) for an already-in-scope `Major.Minor` line to bring newly-published upstream patch releases into scope of this Edition. This is the mechanism by which Editions track patch releases of Caliptra components; see [§4.2](#42-normative-clauses).
    - **Lifecycle status transitions** — updating `EditionStatus.md` to mark the Edition as `Superseded` or `Withdrawn`, with the associated metadata required by [§2.1](#21-edition-lifecycle-status) and [§5.5](#55-withdrawal-of-a-ratified-edition).
 4. The Compatibility Matrix is not modified in any way other than those permitted in criterion 3.
 
-If a change does not fit cleanly within these categories — for example, if it would alter the substance of any integration requirement, add or remove a checklist item, or change the set of Caliptra `Major.Minor` lines that the Edition covers — it MUST be ratified as a new Edition instead.
+If a change does not fit cleanly within these categories — for example, if it would alter the substance of any integration requirement, add or remove a checklist item, or change the set of Caliptra `Major.Minor` lines in scope for the Edition — it MUST be ratified as a new Edition instead.
 
 ### 5.2. Criteria triggering a new Edition
 
 A change **must** trigger a new Edition (a new `edition/<next-identifier>` branch) if **any** of the following hold:
 
-1. A new Caliptra `Major.Minor` release has been published since the current Edition was ratified, and the TAC wishes the Trademark scheme to cover it.
+1. A new Caliptra `Major.Minor` release has been published since the current Edition was ratified, and the TAC wishes the Trademark scheme to be applicable to it.
 2. A substantive change to the Trademark requirements is being introduced — i.e., any change that does not meet all four criteria in [§5.1](#51-criteria-for-an-edition-revision--rn1) (in particular, any change to a normative requirement on integrators).
 3. The TAC formally supersedes the current Edition (e.g., as part of a coordinated rebaseline of the Trademark requirements).
 
@@ -208,11 +210,11 @@ The Edition identifier is intentionally and visibly distinct from Caliptra compo
 
 | Concept                              | Example                  | Notes                                                                                  |
 | ------------------------------------ | ------------------------ | -------------------------------------------------------------------------------------- |
-| Caliptra RTL release                 | `v2.1`                   | A semver tag in [`caliptra-rtl`](https://github.com/chipsalliance/caliptra-rtl) (see that repository's `HWReleaseProcess.md`). |
-| Caliptra ROM release                 | `2.0.2`                  | A `major.minor.patch` version in [`caliptra-sw`](https://github.com/chipsalliance/caliptra-sw). |
+| Caliptra RTL release                 | `v2.0.1`                 | A semver tag in [`caliptra-rtl`](https://github.com/chipsalliance/caliptra-rtl) (see that repository's `HWReleaseProcess.md`). |
+| Caliptra ROM release                 | `2.0.2`                  | A `major.minor.patch` version produced from [`caliptra-sw`](https://github.com/chipsalliance/caliptra-sw); ROM, FMC, and Runtime FW are versioned independently within `caliptra-sw`. |
 | Caliptra FMC/FW version              | `2.1.0 (1/3)`            | `major.minor.patch (FMC_SVN/FW_SVN)` per the repository `README.md`.                   |
 | Caliptra Trademark Edition (identifier) | `Edition A`           | A letter in the Latin alphabet; no integers.                                           |
 | Caliptra Trademark Edition (branch)  | `edition/A`              | Git branch in this repository.                                                         |
 | Caliptra Trademark Edition (revision tag) | `edition-A-r1`     | Git tag in this repository; the citable compliance reference.                          |
 
-Integrators claiming the Caliptra Trademark MUST identify **both** (i) the Caliptra release line they integrate and the specific upstream tags used, and (ii) the Trademark Edition revision tag they were audited against. Consumers can then determine, by consulting the Edition's Compatibility Matrix, whether the integrator's Caliptra release line is actually covered under the cited Edition.
+Integrators claiming the Caliptra Trademark MUST identify **both** (i) the Caliptra release line they integrate and the specific upstream tags used, and (ii) the Trademark Edition revision tag they were audited against. Consumers can then determine, by consulting the Edition's Compatibility Matrix, whether the integrator's Caliptra release line is actually in scope for the cited Edition.
