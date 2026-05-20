@@ -4,6 +4,8 @@
 
 **Version 1.0**
 
+> **Living working draft.** This file on `main` is the working draft of the Caliptra Trademark Audit Process. To cite a frozen version of this document for compliance purposes, refer to the corresponding `edition/<identifier>` branch and `edition-<identifier>-r<N>` tag listed in the [Trademark Edition Index](doc/trademark/README.md). See the [Caliptra Trademark Versioning Scheme](doc/trademark/CaliptraTrademarkVersioningScheme.md) for details.
+
 **Document history**
 
 | Version | Date | Changes |
