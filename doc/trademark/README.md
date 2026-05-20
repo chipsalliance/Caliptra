@@ -11,16 +11,16 @@ This directory hosts the Caliptra Trademark Versioning Scheme and the index of a
 
 | Edition       | Branch                                                                                       | Latest tag        | Status                       | Ratification date | Covered Caliptra `Major.Minor` lines |
 | ------------- | -------------------------------------------------------------------------------------------- | ----------------- | ---------------------------- | ----------------- | ------------------------------------ |
-| `Edition A`   | [`edition/A`](https://github.com/chipsalliance/Caliptra/tree/edition/A) *(to be cut)*        | `edition-A-r1` *(to be applied)* | Planned — not yet ratified | TBD               | TBD by TAC at ratification; expected coverage: Caliptra 1.0, 1.1, 2.0, 2.1 |
+| `Edition A`   | [`edition/A`](https://github.com/chipsalliance/Caliptra/tree/edition/A) *(to be cut)*        | `edition-A-r1` *(to be applied)* | Planned — not yet ratified | TBD               | TBD by TAC at ratification; expected coverage: Caliptra 1.0, 1.1, 1.2, 2.0, 2.1 (each row's minimum patch level pinned in the Edition's `CompatibilityMatrix.md` per [§4.1](CaliptraTrademarkVersioningScheme.md#41-structure)) |
 
 **Next identifier to be allocated:** `B`. See [§3.4 of the Versioning Scheme](CaliptraTrademarkVersioningScheme.md#34-allocation-of-identifiers).
 
 ## Lifecycle status legend
 
-- **Planned** — An Edition row reserved in this index in anticipation of ratification. The branch and initial tag have not yet been created.
-- **Preview** — Ratified but explicitly pre-release. Auditors MAY use a Preview Edition to certify integrations; see [§2.1 of the Versioning Scheme](CaliptraTrademarkVersioningScheme.md#21-edition-lifecycle-status).
-- **Active** — The currently-recommended target for new audits.
-- **Superseded** — A later Edition has replaced this one. Prior grants remain valid; new audits SHOULD target an Active Edition.
+- **Planned** — An Edition row reserved in this index in anticipation of ratification. The branch and initial tag have not yet been created. A Planned Edition does not confer any Trademark authority.
+- **Active** — A ratified Edition that is a valid target for new audits. An Edition enters the Active status on ratification and carries the full authority of the Caliptra Trademark requirements; see [§2.1 of the Versioning Scheme](CaliptraTrademarkVersioningScheme.md#21-edition-lifecycle-status).
+- **Superseded** — A later Edition has replaced this one for the Caliptra `Major.Minor` release lines that the later Edition covers. Prior Trademark licenses remain valid; new audits SHOULD target an Active Edition that covers the integrator's release line.
+- **Withdrawn** — The TAC has formally revoked this Edition as a target for new audits as of the effective withdrawal date recorded on the Edition branch. Trademark licenses previously issued under a Withdrawn Edition remain valid; no new licenses may be issued on the basis of a Withdrawn Edition after the effective date. See [§5.5 of the Versioning Scheme](CaliptraTrademarkVersioningScheme.md#55-withdrawal-of-a-ratified-edition).
 
 ## Related documents
 
