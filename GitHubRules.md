@@ -17,6 +17,21 @@ GitHub configuration.
 * Do not allow bypassing the above settings
 * Restrict who can push to matching branches: only relevant folks in
   [MAINTAINERS](MAINTAINERS.md) for `main` and `release/*` branches
+* For the Caliptra repository (this repository), additional protections apply to
+  the Trademark Edition release artifacts described in [`doc/trademark/CaliptraTrademarkVersioningScheme.md`](doc/trademark/CaliptraTrademarkVersioningScheme.md):
+  * Branches matching `edition/*` are **locked** after their initial ratification
+    commit. Force-pushes and branch deletions are disallowed. New commits to an
+    `edition/*` branch are only permitted through the pull-request process for a
+    new revision per [§5 of the Versioning Scheme](doc/trademark/CaliptraTrademarkVersioningScheme.md#5-revisions-versus-new-editions).
+    Creation of new `edition/*` branches is restricted to TAC Voting Members /
+    repository administrators and only at the conclusion of the new-Edition
+    ratification process.
+  * Tags matching `edition-*-r*` are **immutable**: once published, a tag MUST
+    NOT be moved or deleted. Tag creation in this pattern is restricted to TAC
+    Voting Members / repository administrators and only on a commit that is the
+    tip of the corresponding `edition/*` branch at the time of ratification.
+    Reuse of an Edition identifier is prohibited even if an Edition is later
+    marked `Superseded` or `Withdrawn`.
 * For caliptra-rtl repository
   * "Restrict creation" is used with a pattern match to prevent creation
     of reserved branch names
