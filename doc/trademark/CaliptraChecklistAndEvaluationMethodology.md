@@ -7,8 +7,8 @@
 - [Caliptra Documentation](#caliptra-documentation)
 - [Checklist Summary](#checklist-summary)
 - [Part I: Common Requirements](#part-i-common-requirements)
-- [Part II: Caliptra Core Trademark — Additional Requirements (Passive Mode)](#part-ii-caliptra-core-trademark--additional-requirements-passive-mode)
-- [Part III: Caliptra Subsystem Trademark — Additional Requirements](#part-iii-caliptra-subsystem-trademark--additional-requirements)
+- [Part II: Caliptra Core Trademark - Additional Requirements (Passive Mode)](#part-ii-caliptra-core-trademark--additional-requirements-passive-mode)
+- [Part III: Caliptra Subsystem Trademark - Additional Requirements](#part-iii-caliptra-subsystem-trademark--additional-requirements)
 
 # Introduction
 
@@ -78,11 +78,11 @@ elected trademark: **Part II** for the *Caliptra Core Trademark (Passive Mode)*,
    * Error Handling
    * Log Functionality in SoC
 5. **Secure Processes**
-   * Development Process — Testing and Verification
-   * Production Process — Debugging Controls
-   * Production Process — Flaw Remediation Process
+   * Development Process - Testing and Verification
+   * Production Process - Debugging Controls
+   * Production Process - Flaw Remediation Process
 
-**Part II: Caliptra Core Trademark — Additional Requirements (Passive Mode)**
+**Part II: Caliptra Core Trademark - Additional Requirements (Passive Mode)**
 
 1. **RTL Configuration**
    * Core Mode
@@ -92,9 +92,9 @@ elected trademark: **Part II** for the *Caliptra Core Trademark (Passive Mode)*,
    * SHA Accelerator Access Restriction
    * Subsystem Strap Isolation
 3. **Secure Processes**
-   * Development Process — Integrity of Hardware and ROM
+   * Development Process - Integrity of Hardware and ROM
 
-**Part III: Caliptra Subsystem Trademark — Additional Requirements**
+**Part III: Caliptra Subsystem Trademark - Additional Requirements**
 
 1. **Interface Connectivity**
    * AXI DMA Engine Connectivity
@@ -104,7 +104,7 @@ elected trademark: **Part II** for the *Caliptra Core Trademark (Passive Mode)*,
 3. **Production Debug Unlock**
 4. **Subsystem Fuse Map**
 5. **Secure Processes**
-   * Integrity of Hardware and ROM
+   * Development Process - Integrity of Hardware and ROM
 
 # Part I: Common Requirements
 
@@ -298,7 +298,7 @@ regardless of whether the integrator is pursuing the Caliptra Core Trademark
 
 ---
 
-# Part II: Caliptra Core Trademark — Additional Requirements (Passive Mode)
+# Part II: Caliptra Core Trademark - Additional Requirements (Passive Mode)
 
 The requirements in this section apply **only** to integrations pursuing the
 **Caliptra Core Trademark (Passive Mode)**. All requirements in Part I also
@@ -395,7 +395,7 @@ apply.
 
 ---
 
-# Part III: Caliptra Subsystem Trademark — Additional Requirements
+# Part III: Caliptra Subsystem Trademark - Additional Requirements
 
 The requirements in this section apply **only** to integrations pursuing the
 **Caliptra Subsystem Trademark**. All requirements in Part I also apply.
@@ -470,7 +470,9 @@ The requirements in this section apply **only** to integrations pursuing the
 
 ## Secure Processes
 
-### *Integrity of Hardware and ROM*
+### Development Process
+
+#### *Integrity of Hardware and ROM*
 
 * **Checklist Item:**
   * **Requirement:** The full Caliptra Subsystem RTL MUST be from an official release
@@ -489,3 +491,6 @@ The requirements in this section apply **only** to integrations pursuing the
     RTL files. Manufacturers MUST show that changes to files in the Integrator RTL
     modification list are limited to the scope described in those requirements, and
     MUST show TAC approval for other changes.
+* **Checklist Item:**
+  * **Requirement:** Cryptographic hash of the Caliptra ROM used in final hardware design MUST match reference hash of official Caliptra releases.
+  * **Evaluation Methodology:** Manufacturers MUST demonstrate that the SHA384 hash of ROM matches that of the official release that is integrated.
