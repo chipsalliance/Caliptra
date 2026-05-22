@@ -577,21 +577,49 @@ Caliptra ROM generates the Alias<sub>FMC</sub> certificate and endorses it with 
 | tcg-dice-MultiTcbInfo          | Flags        | NOT_CONFIGURED if lifecycle is unprovisioned
 |                                |              | NOT_SECURE if lifecycle is manufacturing
 |                                |              | DEBUG if not debug locked
-|                                | SVN          | [0] fuse SVN
-|                                |              | [1] firmware SVN
+|                                | SVN          | [2] Image Bundle FW SVN
 |                                | FWIDs        | [0] SHA384 digest of
-|                                |              | lifecycle state
-|                                |              | debug locked state
-|                                |              | anti-rollback disable fuse
-|                                |              | ECDSA vendor public key index fuse
-|                                |              | LMS vendor public key index fuse
-|                                |              | LMS verification enable fuse
-|                                |              | boolean indicating whether owner public key hash is in fuses
-|                                |              | vendor public key hash
-|                                |              | owner public key hash
-|                                |              | [1] SHA384 digest of FMC
+|                                |              | Owner Public Key Hash (sha-384)
+|                                |              | Owner public key Hash in fuses flag (u8) // Flag to indicate whether Owner Pub Key Hash is Fused  
+|                                |              | Anti-rollback disable Fuse (u8)
+|                                |              | ECC Revoke Fuse (u8)
+|                                |              | LMS Revoke Fuse (u32)
+|                                |              | ML-DSA Revoke Fuse (u8)
+|                                |              | Image Bundle FW min SVN Fuse - min SVN value (u8)
+|                                |              | Auth Manifest SoC min SVN Fuse - min SVN value (u8)
+|                                |              | Auth Manifest SoC max SVN Fuse - max SVN value (u8)
+|                                |              | [1] SHA384 digest of 
+|                                |              | Vendor Public Key Hash Fuse (sha-384)
+|                                |              | LMS Verify/PQC Type Fuse (u8)
+|                                |              | Lifecycle State Wire (u8)
+|                                |              | Debug Lock Wire (u8)
+|                                |              | Image Bundle FW SVN from cold boot (u8)
+|                                |              | PK Index ECC (u8)
+|                                |              | PK Index PQC (u8)
+|                                |              | [2] SHA384 digest of FMC
+|                                |Type          | [0] CALIPTRA_2_X_FUSE_OWNER_INFO
+|                                |              | [1] CALIPTRA_2_X_FUSE_VENDOR_INFO
+|                                |              | [2] CALIPTRA_2_X_FMC_FIRMWARE_INFO
 
-Caliptra does not generate an Alias<sub>FMC</sub> CSR. Owners that wish to endorse Alias<sub>FMC</sub> must do so with proprietary flows.
+#### MultiTcbInfo Extension
+
+The MultiTcbInfo extension contains three TCBInfo entries, each corresponding to a unique target environment, attested by Caliptra ROM:
+
+* **TCBInfo[0] - Platform Owner Fuse Configuration**
+  * Type: CALIPTRA_2_X_FUSE_OWNER_INFO
+  * Corresponds to the fuse configuration owned by the platform owner
+  * Scope: Owner-controlled security settings (key hashes, revocation, anti-rollback)
+
+* **TCBInfo[1] - Platform Vendor Fuse Configuration**
+  * Type: CALIPTRA_2_X_FUSE_VENDOR_INFO
+  * Corresponds to the fuse configuration owned by the platform vendor (Caliptra integrator)
+  * Scope: Vendor-controlled security settings (vendor key, lifecycle, debug state)
+
+* **TCBInfo[2] - FMC Firmware Measurement**
+  * Type: CALIPTRA_2_X_FMC_FIRMWARE_INFO
+  * Corresponds to the digest of the FMC
+  * Scope: First Mutable Code firmware digest
+  * SVN: Firmware security version number
 
 ### Alias<sub>RT</sub> certificate
 
@@ -622,9 +650,19 @@ Caliptra FMC generates the Alias<sub>RT</sub> certificate and endorses it with t
 | Authority Key Identifier       | -            | First 20 bytes of SHA256 hash of DER-formatted FMC Alias public key in uncompressed form
 | tcg-dice-Ueid                  | ueid         | UEID specified by IDevID attribute fuses
 | tcg-dice-TcbInfo               | SVN          | Firmware SVN
-|                                | FWIDs        | [0] SHA384 digest of RT
+|                                | FWIDs        | SHA384 digest of RT
+|                                | Type         | CALIPTRA_2_X_RT_FIRMWARE_INFO
 
-Caliptra does not generate an Alias<sub>RT</sub> CSR. Owners that wish to endorse Alias<sub>RT</sub> must do so with proprietary flows.
+#### TcbInfo Extension
+
+The TcbInfo extension corresponds to the Caliptra Runtime Firmware target environment, attested by Caliptra FMC:
+
+* **TCBInfo - RT Firmware Measurement**
+  * Type: CALIPTRA_2_X_RT_FIRMWARE_INFO
+  * Corresponds to the digest of the Caliptra Runtime Firmware
+  * Scope: Caliptra Runtime Firmware
+  * SVN: Firmware security version number
+
 
 ### DPE certificate
 
