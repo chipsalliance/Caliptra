@@ -157,8 +157,8 @@ This section considers some specific questions and suggestions for discussion on
   * **Submission**: When applying for final trademark compliance, the final integrator must submit both evaluation technical reports. The initial IP manufacturer is responsible for providing their evaluation technical report and laboratory details so the final integrator's laboratory can submit the complete audit package.
 * RTL Exemption and Diff Reusability
   * Integrators can submit RTL diffs for exemption using GitHub issues in the applicable repository ([caliptra-rtl](https://github.com/chipsalliance/caliptra-rtl) or [caliptra-ss](https://github.com/chipsalliance/caliptra-ss)) using the "RTL Trademark Exemption Diff" issue template.
-  * **Case-by-Case Reusability**: Whether or not an approved RTL diff can be reused as-is for future audits/products must be determined on a case-by-case basis. Just because one product receives an RTL diff exemption does not guarantee future audits can roll it forward automatically, even for identical diffs.
   * **Scope of Approval Statement**: Any review and approval of an RTL diff by the Caliptra Working Group (WG) must include an explicit *scope of approval statement*. This statement will clarify the boundaries and conditions under which that particular diff can be referred to and reused by future product audits.
+  * **Case-by-Case Reusability**: Whether or not an approved RTL diff can be reused as-is for future audits/products must be determined on a case-by-case basis. Because one product receives an RTL diff exemption does not guarantee future audits can roll it forward automatically, even for identical diffs; any such reuse must be evaluated in accordance with the conditions set in the *scope of approval statement*.
 
 ## Typical Process for Obtaining the Caliptra Trademark
 
@@ -167,8 +167,9 @@ This section considers some specific questions and suggestions for discussion on
 3. The laboratory and manufacturer communicate and jointly, when aligned, provide an application for Caliptra Trademark Usage for a TOE to Caliptra Trademark Owner TAC, signed by both laboratory and manufacturer.  
 4. It is the manufacturer's responsibility to provide evidence of why the checklist requirements are fulfilled to the laboratory. If the manufacturer requires an RTL change exemption(s), they must create an issue in the applicable repository ([caliptra-rtl](https://github.com/chipsalliance/caliptra-rtl) or [caliptra-ss](https://github.com/chipsalliance/caliptra-ss)) using the provided "RTL Trademark Exemption Diff" issue template.
 5. The laboratory evaluates and assesses the TOE using the provided filled-in checklist and the evaluation methodology. Iterations with the manufacturer are expected until all issues are resolved, as judged by the laboratory.  
-6. The laboratory produces an evaluation technical report, using an evaluation technical report template and, with manufacturer's permission, sends it to the Caliptra Trademark Owner at <caliptra-tm@lists.chipsalliance.org>.
-7. The Caliptra Trademark Owner TAC assesses the submitted evaluation technical report, and, if needed, communicates with the laboratory for any questions and comments.  
-8. The Caliptra Trademark Owner determines to grant or deny the usage of the Caliptra Trademark for the TOE.  
-9. Upon approval, the manufacturer will create a pull request to add the TOE to the [Approved Products Registry](ApprovedProductsRegistry.md).
-10. The Caliptra Trademark Owner will then approve and merge the PR.
+6. The laboratory produces an evaluation technical report using the evaluation technical report template.
+7. The manufacturer sends the completed evaluation technical report to the Caliptra Trademark Owner at <caliptra-tm@lists.chipsalliance.org>.
+8. The Caliptra Trademark Owner TAC assesses the submitted evaluation technical report, and, if needed, communicates with the laboratory for any questions and comments.  
+9. The Caliptra Trademark Owner determines to grant or deny the usage of the Caliptra Trademark for the TOE.  
+10. Upon approval, the manufacturer will create a pull request to add the TOE to the [Approved Products Registry](ApprovedProductsRegistry.md).
+11. The Caliptra Trademark Owner will then approve and merge the PR.
