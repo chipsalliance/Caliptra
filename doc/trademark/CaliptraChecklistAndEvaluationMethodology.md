@@ -43,8 +43,7 @@ By adhering to the checklist and employing the specified evaluation methodologie
 
 ### Key Words
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT" in this document are to be interpreted as requirements.
-The key words "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as recommendations.
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119).
 
 **Requirements listed below that are marked with an asterisk (*), may be exempted if there is sufficent, documented, and approved justification otherwise.**
 
@@ -98,13 +97,13 @@ The following is a consolidated list of all requirements and recommendations to 
   * **Requirement:** The confidentiality and integrity of the UDS seed MUST be protected during generation, storage, and provisioning. Access to this asset must be strictly controlled, and any temporary storage MUST be sanitized after use.  
   * **Evaluation Methodology:** Manufacturers MUST detail the security measures employed during the handling of the UDS seed, including access controls, secure storage practices, and sanitization procedures.  
 * **Checklist Item:**  
-  * **Requirement*:** Field Entropy MUST be generated on die, and not be exposed outside the die.  
-  * **Evaluation Methodology**: Manufacturers MUST detail the generation process for, and document exposure of field entropy.
+  * **Recommendation:** Field Entropy SHOULD be generated on die, and not be exposed outside the die.  
+  * **Evaluation Methodology**: Manufacturers SHOULD detail the generation process for, and document exposure of field entropy.
 
 #### *Access to Fuses*
 
 * **Checklist Item:**  
-  * **Requirement*:** Access to the fuses containing the UDS seed and field entropy MUST be restricted exclusively to the mechanisms needed for loading these values into Caliptra's fuse registers. No other components or firmware should have read or write access, except for essential hardware functions like fuse sense and distribution logic.  
+  * **Requirement*:** Access to the fuses containing the UDS seed and field entropy MUST be restricted exclusively to the mechanisms needed for loading these values into Caliptra's fuse registers. No other components or firmware shall have read access, except for essential hardware functions like fuse sense and distribution logic.  
   * **Evaluation Methodology:** Manufacturers MUST provide architectural diagrams and RTL code excerpts demonstrating that only authorized hardware mechanisms can access these fuses.
 
 ### FW Authentication Keys
@@ -148,7 +147,7 @@ The following is a consolidated list of all requirements and recommendations to 
 #### *Access Control*
 
 * **Checklist Item:**  
-  * **Requirement*:** Fuses containing Caliptra secrets MUST NOT be readable or writable by any mutable code in the SoC. Access MUST be restricted to secure hardware mechanisms and essential hardware functions like fuse sense and distribution logic.
+  * **Requirement*:** Fuses containing Caliptra secrets MUST NOT be readable by any mutable code in the SoC. Access MUST be restricted to secure hardware mechanisms and essential hardware functions like fuse sense and distribution logic.
   * **Evaluation Methodology:** Manufacturers MUST provide hardware design documentation showing access controls on fuse read/write mechanisms, ensuring only authorized hardware components can access these fuses.
 
 #### *JTAG and Debug Interfaces*
@@ -166,8 +165,8 @@ The following is a consolidated list of all requirements and recommendations to 
 #### *In-Field Programmable Fuses*
 
 * **Checklist Item:**  
-  * **Requirement*:** Authorization mechanisms MUST be implemented for in-field programmable fuses to prevent unauthorized updates that could lead to denial-of-service or other attacks.  
-  * **Evaluation Methodology:** Manufacturers MUST document the authorization processes required to program fuses in the field, including cryptographic protections or authentication steps.
+  * **Recommendation:** Authorization mechanisms SHOULD be implemented for in-field programmable fuses to prevent unauthorized updates that could lead to denial-of-service or other attacks.  
+  * **Evaluation Methodology:** Manufacturers SHOULD document the authorization processes required to program fuses in the field, including cryptographic protections or authentication steps.
 
 #### *Caliptra SVN (Security Version Number) Management*
 
@@ -201,11 +200,11 @@ The following is a consolidated list of all requirements and recommendations to 
 
 * **Checklist Item:**
   * **Requirement:** SOC firmware that interacts with Caliptra as the privileged PA_USER, including RTM firmware, MUST be measured, and those measurements MUST be submitted to Caliptra.
-  * **Requirement:** Configuration data that modifies the security properties of measured firmware MUST also be measured.   
-  * **Requirement:** Measurements of all firmware and configuration MUST be *collected* before execution of the firmware or usage of the configuration data. 
-  * **Requirement:** Measurements MUST be submitted to Caliptra by the same entity that collected the measurement (e.g. SOC FMC cannot pass measurements to SOC FW for submission to the Caliptra mailbox). 
-  * **Recommendation:** Other SOC firmware SHOULD be measured. 
-  * **Evaluation Methodology:** Manufacturers SHOULD provide a detailed description of how measurements are communicated to Caliptra.  
+  * **Requirement:** Configuration data that modifies the security properties of measured firmware MUST also be measured.
+  * **Requirement:** Measurements of all firmware and configuration MUST be *collected* before execution of the firmware or usage of the configuration data.
+  * **Requirement:** Measurements MUST be submitted to Caliptra by the same entity that collected the measurement (e.g. SOC FMC cannot pass measurements to SOC FW for submission to the Caliptra mailbox).
+  * **Recommendation:** Other SOC firmware SHOULD be measured.
+  * **Evaluation Methodology:** Manufacturers SHOULD provide a detailed description of how measurements are communicated to Caliptra.
 
 ### *Caliptra PA\_USER Management*
 
