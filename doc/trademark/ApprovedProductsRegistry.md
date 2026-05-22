@@ -11,5 +11,5 @@ granted by the Caliptra Trademark Owner (TAC) in accordance with the
 
 ## Approved Products Registry
 
-| Vendor | Model | Type | Trademark Edition |
-| :----- | :---- | :--- | :---------------- |
+| Vendor | Model | Type |
+| :----- | :---- | :--- |
