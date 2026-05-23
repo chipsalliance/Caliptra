@@ -102,8 +102,9 @@ elected trademark: **Part II** for the *Caliptra Core Trademark (Passive Mode)*,
    * Subsystem Straps Configuration
 2. **OCP Streaming Boot**
 3. **Production Debug Unlock**
-4. **Subsystem Fuse Map**
-5. **Secure Processes**
+4. **Subsystem Secret Signal Protection**
+5. **Subsystem Fuse Map**
+6. **Secure Processes**
    * Development Process - Integrity of Hardware and ROM
 
 # Part I: Common Requirements
@@ -159,16 +160,20 @@ regardless of whether the integrator is pursuing the Caliptra Core Trademark
   * **Requirement:** The IDEVID certificates, including CA certificates, MUST adhere to specified formats and cryptographic standards (e.g. key sizes and algorithms as per NIST guidelines). Acceptable algorithms and key strengths MUST meet or exceed the security strength that the Caliptra IP produces. These requirements apply to the entire CA cert chain.
   * **Evaluation Methodology:** Manufacturers MUST demonstrate compliance with the required formats and standards by providing examples of the certificate chain that is created.
 
-### Obfuscation Key
+### Device Keys
 
 #### *Generation and Handling*
 
 * **Checklist Item:**  
-  * **Requirement:** The obfuscation key ([cptra_obf_key](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md#interface)) MUST be generated using a method that ensures 256 bits of entropy, such as an [ESV](https://csrc.nist.rip/Projects/cryptographic-module-validation-program/entropy-validations/esv) certified entropy source or an on-die Physically Unclonable Function (PUF) that is compliant with industry standards. 
-  * **Evaluation Methodology:** Manufacturers MUST provide documentation on the obfuscation key generation method, including entropy measurements and compliance with relevant standards if applicable.  
+  * **Requirement:** The obfuscation key ([cptra_obf_key](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md#interface)) MUST be generated using a method that ensures 256 bits of entropy, such as an [ESV](https://csrc.nist.rip/Projects/cryptographic-module-validation-program/entropy-validations/esv) certified entropy source or an on-die Physically Unclonable Function (PUF) that is compliant with industry standards. The CSR HMAC key ([cptra_csr_hmac_key](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md#interface)) MUST be generated using a method that provides full entropy across its 512-bit width and that meets the same NIST-compliant entropy standards. When either key is driven by an ECO rather than a PUF, the ECO MUST be applied prior to tapeout and the key value MUST be protected as confidential throughout its lifetime.
+  * **Evaluation Methodology:** Manufacturers MUST provide documentation on the generation method for both the obfuscation key and the CSR HMAC key, including entropy measurements, applicable standards compliance, and, where the key is delivered via ECO, the manufacturing controls used to keep the key confidential.
 * **Checklist Item:**  
-  * **Requirement:** The obfuscation key MUST NOT be accessible (readable or modifiable) to firmware or any on-chip non-Caliptra entities, including preventing oracle attacks. The obfuscation key MUST not be on any scannable path. 
-  * **Evaluation Methodology:** Manufacturers MUST demonstrate, through architectural documentation and security analyses, that the obfuscation key is inaccessible to firmware and other unauthorized components.
+  * **Requirement:** The obfuscation key ([cptra_obf_key](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md#interface)) and CSR HMAC key ([cptra_csr_hmac_key](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md#interface)) MUST NOT be accessible (readable or modifiable) to firmware or any on-chip non-Caliptra entities, including preventing oracle attacks. Neither key MUST be on any scannable path, and the key signals themselves MUST NOT be observable outside of Caliptra through debug, trace, scandump, or any other on-die or off-die mechanism.
+  * **Evaluation Methodology:** Manufacturers MUST demonstrate, through architectural documentation, security analyses, and verifiable testing, that the obfuscation key and CSR HMAC key are inaccessible to firmware and other unauthorized components and are not exposed on scan, debug, or trace paths. Acceptable evidence SHOULD cover each of the following categories:
+    * **DFT intent.** Synthesis or DFT-tool constraint files demonstrating that the flops latching each key (for example, `cptra_scan_mode_Latched_d/f`, `field_storage.internal_obf_key`, and `cptra_csr_hmac_key_reg`) are explicitly excluded from scan insertion.
+    * **DFT result.** Scan-insertion reports, scan-chain stitching reports, or gate-level netlist diffs confirming that the named cells are absent from every scan chain in the final taped-out netlist.
+    * **Dynamic verification.** Gate-level simulation with scan enable asserted showing that key state cannot be observed at any scan output, debug interface, or trace port.
+    * **Silicon validation.** Results from production scan-ATPG patterns executed during first-silicon (A0) bring-up or wafer/package test, demonstrating that the key flops are not present on any observable scan chain.
 
 ### Fuses
 
@@ -230,6 +235,9 @@ regardless of whether the integrator is pursuing the Caliptra Core Trademark
   * **Requirement:** SoC firmware that interacts with Caliptra as the privileged PA_USER (for 1.X implementations) or AXI_USER (for 2.X implementations) MUST be measured, and those measurements MUST be submitted to Caliptra. Other SoC firmware SHOULD be measured. Configuration data that modifies the security properties of firmware MUST also be measured. 
   * **Requirement:** Measurements of firmware and configuration MUST be submitted to Caliptra before execution of the firmware, or usage of the configuration data. Measurements MUST be submitted to Caliptra by the same entity that collected the measurement (e.g. SoC FMC cannot pass measurements to SoC FW for submission to the Caliptra mailbox).   
   * **Evaluation Methodology:** Manufacturers MUST provide a detailed description of how measurements are communicated to Caliptra.  
+* **Checklist Item:**
+  * **Requirement:** Caliptra MUST be a non-bypassable element of the SoC Trusted Computing Base. Successful completion of Caliptra's boot MUST be a necessary precondition for the SoC to reach an operational state on every reset and boot path, and the SoC MUST NOT provide any mechanism to bypass, disable, hold in reset, or ignore the results of Caliptra in production silicon. Mechanisms whose sole effect is to enable Caliptra are permitted only if they are irreversibly committed to the enabled state and hardened against side-channel attacks by the manufacturer prior to shipment.
+  * **Evaluation Methodology:** Manufacturers MUST demonstrate non-bypassability through verifiable evidence. Acceptable evidence includes boot-flow documentation showing Caliptra as a hard gate on SoC operation, RTL or netlist analysis of every signal capable of gating or resetting Caliptra, identification and irreversible severance of any pre-production bypass paths, and fuse maps or test reports confirming that any enable mechanisms are committed at manufacturing and cannot be reversed.
 
 ### *Caliptra Privileged USER Management*
 
@@ -456,6 +464,16 @@ The requirements in this section apply **only** to integrations pursuing the
     mechanism implemented and demonstrate that it conforms to the Production
     Debug Unlock Architecture defined in the Caliptra Subsystem Integration
     Specification.
+
+## Subsystem Secret Signal Protection
+
+* **Checklist Item:**
+  * **Requirement:** Subsystem-level signals, registers, and other storage elements that carry or buffer secret material - including, but not limited to, the UDS seed, Field Entropy, and Debug Unlock tokens - MUST NOT be accessible (readable or modifiable) to firmware or to any on-chip non-Caliptra entity outside the Caliptra Subsystem trust boundary. Such signals MUST NOT be placed on any scannable path and MUST NOT be observable through debug, trace, scandump, or any other on-die or off-die mechanism. This requirement extends the Device Keys scan-exclusion requirement (see [Device Keys](#device-keys)) to every Subsystem-level secret-bearing element introduced by the Subsystem integration, including any wires, flops, or temporary storage that hold the cleartext value of such assets at any point during their delivery into the Caliptra Subsystem trust boundary.
+  * **Evaluation Methodology:** Manufacturers MUST enumerate every Subsystem-level signal, register, or storage element that carries or buffers UDS seed, Field Entropy, or Debug Unlock token material, and MUST demonstrate non-observability through the same four evidence categories used for the Device Keys access-restriction checklist item:
+    * **DFT intent.** Synthesis or DFT-tool constraint files demonstrating that the identified flops are explicitly excluded from scan insertion.
+    * **DFT result.** Scan-insertion reports, scan-chain stitching reports, or gate-level netlist diffs confirming that the identified cells are absent from every scan chain in the final taped-out netlist.
+    * **Dynamic verification.** Gate-level simulation with scan enable asserted showing that the identified signals cannot be observed at any scan output, debug interface, or trace port.
+    * **Silicon validation.** Results from production scan-ATPG patterns executed during first-silicon (A0) bring-up or wafer/package test, demonstrating that the identified flops are not present on any observable scan chain.
 
 ## Subsystem Fuse Map (TODO update this verbiage)
 
