@@ -169,7 +169,7 @@ The Caliptra code base and documentation are split across several repositories:
 The GitHub config parameters for all of the branches are documented in a [local
 file](https://github.com/chipsalliance/Caliptra/blob/main/GitHubRules.md).
 
-GitHub branch names for `caliptra-sw` are documented [here](https://github.com/chipsalliance/Caliptra/issues/586).
+GitHub branch names for `caliptra-sw` are documented in its [BRANCHING_STRATEGY.md](https://github.com/chipsalliance/caliptra-sw/blob/main/BRANCHING_STRATEGY.md).
 
 ### Convenience repository URLs
 
