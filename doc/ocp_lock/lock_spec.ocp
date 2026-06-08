@@ -88,6 +88,8 @@ bibliography: bibliography.yaml
 +----------------+---------+-------------------------------------+
 | May 2026       | 1.1_RC3 | Remove KMB firmware notice.         |
 +----------------+---------+-------------------------------------+
+| TODO           | TODO    | Mark LOAD_KAT_MEK as optional.      |
++----------------+---------+-------------------------------------+
 
 \currenttemplateversion
 
@@ -1112,6 +1114,13 @@ Table: CTRL command codes {#tbl:ee-ctrl-cmd-codes}
 |          | `1111 1111 1111 1111 1111 1111 1111 1111`\                |
 |          | `2222 2222 2222 2222 2222 2222 2222 2222`\                |
 |          | `3333 3333 3333 3333 3333 3333 3333 3333`                 |
+|          |                                                           |
+|          | Note: this command is intended to support FIPS validation |
+|          | and is optional. If an encryption engine implementation   |
+|          | does not support this command and wishes to be            |
+|          | FIPS-compliant, the implementation is responsible for     |
+|          | satisfying FIPS KAT requirements via a separate           |
+|          | mechanism.                                                |
 +----------+-----------------------------------------------------------+
 | 5h to Fh | Reserved                                                  |
 +----------+-----------------------------------------------------------+
@@ -1927,6 +1936,8 @@ This value is intentionally selected to avoid potential endianness issues and to
 The command loads the fixed MEK, specified metadata, and aux_metadata into the encryption engine. The formats of metadata and aux_metadata are vendor-defined and will act as an identifier and additional information for the loaded MEK.
 
 The MEK loaded with this command is intended only for Known Answer Test (KAT) purposes of the underlying block cipher in the encryption engine. The loaded MEK should be immediately unloaded by using [UNLOAD_MEK](#sec:unload-mek-cmd) or [CLEAR_KEY_CACHE](#sec:clear-key-cache-cmd) once the KAT is complete. Using this MEK for user data encryption will compromise all data protection mechanism integrated within a storage device.
+
+This command's implementation triggers the **Load KAT MEK** command as defined in @tbl:ee-ctrl-cmd-codes. As noted, encryption engine implementations are not required to support this command. In such cases, the LOAD_KAT_MEK mailbox command will return an error.
 
 Command Code: 0x4C4B_4154 ("LKAT")
 
