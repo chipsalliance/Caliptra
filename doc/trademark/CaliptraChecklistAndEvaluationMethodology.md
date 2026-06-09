@@ -510,5 +510,5 @@ The requirements in this section apply **only** to integrations pursuing the
     modification list are limited to the scope described in those requirements, and
     MUST show TAC approval for other changes.
 * **Checklist Item:**
-  * **Requirement:** Cryptographic hash of the Caliptra ROM used in final hardware design MUST match reference hash of official Caliptra releases.
+  * **Requirement:** Cryptographic hash of the Caliptra Core ROM used in final hardware design MUST match reference hash of official Caliptra Core releases.
   * **Evaluation Methodology:** Manufacturers MUST demonstrate that the SHA384 hash of ROM matches that of the official release that is integrated.
