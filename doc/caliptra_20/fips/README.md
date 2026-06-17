@@ -17,7 +17,7 @@
 | CAVP #4 | v2.0.4          | AES-CTR                | Completed   | 06/03/2026           |[A8470](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21306)|
 | CAVP #4 | v2.0.4          | AES-ECB                | Completed   | 06/03/2026           |[A8470](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21306)|
 | CAVP #4 | v2.0.4          | AES-OFB                | Completed   | 06/03/2026           |[A8470](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21306)|
-| CAVP #4 | v2.0.4          | AES-GCM                | In Progress | NA                   |NA|
+| CAVP #4 | v2.0.4          | AES-GCM                | completed   | 06/08/2026           |[A8470](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21306)|
 | CAVP #5 | v2.0.4          | HMAC DRBG 384          | Completed   | 06/03/2026           |[A8471](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21307)|
 | CAVP #5 | v2.0.4          | ECDSA P-384 KeyGen     | Completed   | 06/03/2026           |[A8471](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21307)|
 | CAVP #5 | v2.0.4          | Det ECDSA P-384 SigGen | Completed   | 06/03/2026           |[A8471](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21307)|
@@ -54,7 +54,7 @@
 | CAVP #4 | v2.1.2          | AES-CTR                | Completed   | 06/03/2026           |[A8477](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21303)|
 | CAVP #4 | v2.1.2          | AES-ECB                | Completed   | 06/03/2026           |[A8477](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21303)|
 | CAVP #4 | v2.1.2          | AES-OFB                | Completed   | 06/03/2026           |[A8477](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21303)|
-| CAVP #4 | v2.1.2          | AES-GCM                | In Progress | NA                   |NA|
+| CAVP #4 | v2.1.2          | AES-GCM                | Completed   | 06/08/2026           |[A8477](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21303)|
 | CAVP #5 | v2.1.2          | HMAC DRBG 384          | Completed   | 06/03/2026           |[A8478](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21304)|
 | CAVP #5 | v2.1.2          | ECDSA P-384 KeyGen     | Completed   | 06/03/2026           |[A8478](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21304)|
 | CAVP #5 | v2.1.2          | Det ECDSA P-384 SigGen | Completed   | 06/03/2026           |[A8478](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21304)|
