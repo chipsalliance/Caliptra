@@ -329,14 +329,9 @@ apply.
 * **Checklist Item:**
   * **Requirement:** The internal TRNG (`CALIPTRA_INTERNAL_TRNG`) is optional in
     Core Trademark integrations. If the internal TRNG is not enabled, the SoC
-    MUST provide a compliant external TRNG via the Caliptra TRNG HW API. If the
-    internal TRNG is used, the TRNG self-test threshold registers
-    (`CPTRA_iTRNG_ENTROPY_CONFIG0` and `CPTRA_iTRNG_ENTROPY_CONFIG1`) MUST NOT
-    be left at 0, as a zero value disables entropy self-testing.
+    MUST provide a compliant external TRNG via the Caliptra TRNG HW API.
   * **Evaluation Methodology:** Manufacturers MUST document the TRNG configuration
-    choice, provide evidence of the TRNG source (internal or external), and, if
-    the internal TRNG is enabled, demonstrate that the self-test threshold
-    registers are set to non-zero values.
+    choice, provide evidence of the TRNG source (internal or external).
 
 ## Interface Connectivity
 
