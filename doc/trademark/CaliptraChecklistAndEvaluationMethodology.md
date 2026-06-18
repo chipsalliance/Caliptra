@@ -369,7 +369,7 @@ apply.
 
 * **Checklist Item:**
   * **Requirement:** All `strap_ss_*` Subsystem-mode strap signals (except for
-    strap_ss_caliptra_dma_axi_user) MUST be tied to logic 0.
+    `strap_ss_caliptra_dma_axi_user`) MUST be tied to logic 0.
     The signals `ss_debug_intent`, `cptra_obf_field_entropy_vld`,
     `cptra_obf_field_entropy`, `cptra_obf_uds_seed_vld`, and
     `cptra_obf_uds_seed` MUST be tied to 0.
