@@ -452,11 +452,12 @@ The requirements in this section apply **only** to integrations pursuing the
 ## OCP Streaming Boot
 
 * **Checklist Item:**
-  * **Requirement:** OCP streaming boot via the I3C interface MUST be implemented
-    in compliance with the OCP Recovery specification.
+  * **Requirement:** OCP streaming boot MUST be implemented through the I3C interface
+    provided with the Caliptra Subsystem official release RTL to ensure compliance with
+    the OCP Recovery specification.
   * **Evaluation Methodology:** Manufacturers MUST provide documentation or test
-    evidence demonstrating compliance with the OCP Recovery specification for
-    the I3C streaming boot path.
+    evidence demonstrating that OCP Streaming Boot is executed through the official I3C
+    component in Caliptra Subsystem release code.
 
 ## Production Debug Unlock
 
