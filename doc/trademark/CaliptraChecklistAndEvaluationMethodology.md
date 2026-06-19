@@ -9,6 +9,7 @@
 - [Part I: Common Requirements](#part-i-common-requirements)
 - [Part II: Caliptra Core Trademark - Additional Requirements (Passive Mode)](#part-ii-caliptra-core-trademark--additional-requirements-passive-mode)
 - [Part III: Caliptra Subsystem Trademark - Additional Requirements](#part-iii-caliptra-subsystem-trademark--additional-requirements)
+- [Part IV: Caliptra Subsystem with OCP L.O.C.K. Trademark - Additional Requirements](#part-iv-caliptra-subsystem-with-ocp-lock-trademark---additional-requirements)
 
 # Introduction
 
@@ -54,8 +55,9 @@ This checklist is built from these specifications with the goal to help ensure t
 
 The following is a consolidated list of all requirements to ensure comprehensive coverage.
 Evaluators MUST apply **Part I** to all integrations, plus the part corresponding to the
-elected trademark: **Part II** for the *Caliptra Core Trademark (Passive Mode)*, or
-**Part III** for the *Caliptra Subsystem Trademark*.
+elected trademark: **Part II** for the *Caliptra Core Trademark (Passive Mode)*,
+**Part III** for the *Caliptra Subsystem Trademark*, or **Part IV** for the *Caliptra
+Subsystem with OCP L.O.C.K. Trademark*.
 
 **Part I: Common Requirements**
 
@@ -107,11 +109,16 @@ elected trademark: **Part II** for the *Caliptra Core Trademark (Passive Mode)*,
 6. **Secure Processes**
    * Development Process - Integrity of Hardware and ROM
 
+**Part IV: Caliptra Subsystem with OCP L.O.C.K. Trademark - Additional Requirements**
+
+1. **OCP L.O.C.K. Specification Compliance**
+
 # Part I: Common Requirements
 
 The requirements in this section apply to **all** Caliptra integrations,
 regardless of whether the integrator is pursuing the Caliptra Core Trademark
-(Passive Mode) or the Caliptra Subsystem Trademark.
+(Passive Mode), the Caliptra Subsystem Trademark, or the Caliptra Subsystem with
+OCP L.O.C.K. Trademark.
 
 ## Assets
 
@@ -313,7 +320,7 @@ regardless of whether the integrator is pursuing the Caliptra Core Trademark
 # Part II: Caliptra Core Trademark - Additional Requirements (Passive Mode)
 
 The requirements in this section apply **only** to integrations pursuing the
-**Caliptra Core Trademark (Passive Mode)**. All requirements in Part I also
+**Caliptra Core Trademark (Passive Mode)**. All requirements in Part I also
 apply.
 
 ## RTL Configuration
@@ -373,10 +380,10 @@ apply.
 
 * **Checklist Item:**
   * **Requirement:** All `strap_ss_*` Subsystem-mode strap signals (except for
-    `strap_ss_caliptra_dma_axi_user`) MUST be tied to logic 0.
+    `strap_ss_caliptra_dma_axi_user`) MUST be tied to logic 0.
     The signals `ss_debug_intent`, `cptra_obf_field_entropy_vld`,
     `cptra_obf_field_entropy`, `cptra_obf_uds_seed_vld`, and
-    `cptra_obf_uds_seed` MUST be tied to 0.
+    `cptra_obf_uds_seed` MUST be tied to 0.
     Integrators may need to drive a non-zero value on the strap
     `strap_ss_caliptra_dma_axi_user` to maintain compliance with
     [SHA Accelerator Access Restriction](#SHA-Accelerator-Access-Restriction).
@@ -405,7 +412,7 @@ apply.
 # Part III: Caliptra Subsystem Trademark - Additional Requirements
 
 The requirements in this section apply **only** to integrations pursuing the
-**Caliptra Subsystem Trademark**. All requirements in Part I also apply.
+**Caliptra Subsystem Trademark**. All requirements in Part I also apply.
 
 ## Interface Connectivity
 
@@ -511,3 +518,17 @@ The requirements in this section apply **only** to integrations pursuing the
 * **Checklist Item:**
   * **Requirement:** Cryptographic hash of the Caliptra Core ROM used in final hardware design MUST match reference hash of official Caliptra Core releases.
   * **Evaluation Methodology:** Manufacturers MUST demonstrate that the SHA384 hash of ROM matches that of the official release that is integrated.
+
+---
+
+# Part IV: Caliptra Subsystem with OCP L.O.C.K. Trademark - Additional Requirements
+
+The requirements in this section apply **only** to integrations pursuing the
+Trademark for Caliptra Subsystem in the OCP L.O.C.K.-enabled configuration.
+All requirements in [Part I](#part-i-common-requirements) and [Part III](#part-iii-caliptra-subsystem-trademark---additional-requirements) also apply.
+
+## OCP L.O.C.K. Specification Compliance
+
+* **Checklist Item:**
+  * **Requirement:** Any product integrating Caliptra Subsystem configured with support for OCP L.O.C.K. MUST comply with all requirements listed in [lock_spec.ocp](../ocp_lock/lock_spec.ocp).
+  * **Evaluation Methodology:** Manufacturers MUST provide evidence to demonstrate that the SoC complies with all OCP LOCK requirements.
