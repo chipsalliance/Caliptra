@@ -106,7 +106,9 @@ Subsystem with OCP L.O.C.K. Trademark*.
 3. **Production Debug Unlock**
 4. **Subsystem Secret Signal Protection**
 5. **Subsystem Fuse Map**
-6. **Secure Processes**
+6. **SoC Root of Trust (RoT)**
+   * Boot and Initialization Process
+7. **Secure Processes**
    * Development Process - Integrity of Hardware and ROM
 
 **Part IV: Caliptra Subsystem with OCP L.O.C.K. Trademark - Additional Requirements**
@@ -246,9 +248,6 @@ OCP L.O.C.K. Trademark.
   * **Requirement:** SoC firmware that interacts with Caliptra as the privileged PA_USER (for 1.X implementations) or AXI_USER (for 2.X implementations) MUST be measured, and those measurements MUST be submitted to Caliptra. Other SoC firmware SHOULD be measured. Configuration data that modifies the security properties of firmware MUST also be measured. 
   * **Requirement:** Measurements of firmware and configuration MUST be submitted to Caliptra before execution of the firmware, or usage of the configuration data. Measurements MUST be submitted to Caliptra by the same entity that collected the measurement (e.g. SoC FMC cannot pass measurements to SoC FW for submission to the Caliptra mailbox).   
   * **Evaluation Methodology:** Manufacturers MUST provide a detailed description of how measurements are communicated to Caliptra.  
-* **Checklist Item:**
-  * **Requirement:** Caliptra MUST be a non-bypassable element of the SoC Trusted Computing Base. Successful completion of Caliptra's boot MUST be a necessary precondition for the SoC to reach an operational state on every reset and boot path, and the SoC MUST NOT provide any mechanism to bypass, disable, hold in reset, or ignore the results of Caliptra in production silicon. Mechanisms whose sole effect is to enable Caliptra are permitted only if they are irreversibly committed to the enabled state and hardened against side-channel attacks by the manufacturer prior to shipment.
-  * **Evaluation Methodology:** Manufacturers MUST demonstrate non-bypassability through verifiable evidence. Acceptable evidence includes boot-flow documentation showing Caliptra as a hard gate on SoC operation, RTL or netlist analysis of every signal capable of gating or resetting Caliptra, identification and irreversible severance of any pre-production bypass paths, and fuse maps or test reports confirming that any enable mechanisms are committed at manufacturing and cannot be reversed.
 
 ### *Caliptra Privileged USER Management*
 
@@ -497,6 +496,14 @@ The requirements in this section apply **only** to integrations pursuing the
     that the Caliptra-Core and Caliptra-Subsystem segments are fully implemented per the
     specifications above, and that any SoC/Vendor-Specific customizations do not affect the
     mandatory segments.
+
+## SoC Root of Trust (RoT)
+
+### *Boot and Initialization Process*
+
+* **Checklist Item:**
+  * **Requirement:** Caliptra MUST be a non-bypassable element of the SoC Trusted Computing Base. Successful completion of Caliptra's boot MUST be a necessary precondition for the SoC to reach an operational state on every reset and boot path, and the SoC MUST NOT provide any mechanism to bypass, disable, hold in reset, or ignore the results of Caliptra in production silicon. Mechanisms whose sole effect is to enable Caliptra are permitted only if they are irreversibly committed to the enabled state and hardened against side-channel attacks by the manufacturer prior to shipment.
+  * **Evaluation Methodology:** Manufacturers MUST demonstrate non-bypassability through verifiable evidence. Acceptable evidence includes boot-flow documentation showing Caliptra as a hard gate on SoC operation, RTL or netlist analysis of every signal capable of gating or resetting Caliptra, identification and irreversible severance of any pre-production bypass paths, and fuse maps or test reports confirming that any enable mechanisms are committed at manufacturing and cannot be reversed.
 
 ## Secure Processes
 
