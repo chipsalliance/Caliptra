@@ -92,8 +92,8 @@ Additional Features
     - [AUTHORIZE_AND_STASH](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#authorize_and_stash)
   - Deferred retrieval of IDEV CSR**
     - [GET_IDEVID_CSR](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#get_idevid_csr)
-  - Self-signed FMC Alias certificate
-    - [GET_FMC_ALIAS_CERT](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#get_fmc_alias_cert)
+  - Self-signed FMC Alias CSR
+    - [GET_FMC_ALIAS_CSR](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#get_fmc_alias_csr)
   - DPE export of CDI
     - [SIGN_WITH_EXPORTED_ECDSA](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#sign_with_exported_ecdsa)
     - [REVOKE_EXPORTED_CDI_HANDLE](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#revoke_exported_cdi_handle)
