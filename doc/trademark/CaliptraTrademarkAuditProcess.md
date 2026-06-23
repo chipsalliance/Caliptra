@@ -18,7 +18,7 @@
   - [Suggestion](#suggestion)
   - [Roles](#roles)
   - [Properties of the Scheme](#properties-of-the-scheme)
-  - [Overview of the Example Scheme](#overview-of-example-scheme)
+  - [Overview of Example Scheme](#overview-of-example-scheme)
   - [Specific Questions for the Scheme Rules](#specific-questions-for-the-scheme-rules)
   - [Typical Process for Obtaining the Caliptra Trademark](#typical-process-for-obtaining-the-caliptra-trademark)
 
@@ -98,7 +98,7 @@ For a formal certification scheme there are rules and documents of the scheme th
   * Application for Caliptra Trademark Usage for a TOE  
     *(Task for Caliptra TAC to develop.)*  
   * Publication of all approved products for Caliptra Trademark usage  
-    *(Task for Caliptra TAC to develop.)*  
+    *([Approved Products Registry](ApprovedProductsRegistry.md))*  
   * Process specification for obtaining Caliptra Trademark  
     *(A brief suggestion is outlined in this document)*  
   * Rules for Caliptra Trademark Usage  
@@ -150,15 +150,26 @@ This section considers some specific questions and suggestions for discussion on
       * New threats have emerged that were not considered in the Caliptra Trademark Process, and that critically effects the security.
   * **Suggestion**: There is validity time granted for each Caliptra Trademark usage.  
   * **Suggestion**: Caliptra 1.X will in time be replaced by Caliptra 2.X with PQC compliance. A date will be set for when the grant of using Caliptra trademark with Caliptra 1.X will no longer be given because it doesn't support PQC algorithms.  After that date, no other Calitpra 1.X trademarks will be given.
+* Multi-Stage Audit Process for Partially Compliant IP
+  * A multi-stage audit process is permitted for cases where an initial manufacturer creates a partially compliant IP intended for integration into a larger system.
+  * **Process**: The initial IP manufacturer engages an accredited laboratory to evaluate all verifiable requirements at the subsystem or IP level. The laboratory produces an initial evaluation technical report covering those specific requirements.
+  * **Final Integration**: When the IP is integrated into a final system or SoC, the final integrator engages an accredited laboratory to evaluate only the remaining integration requirements that could not be verified at the IP stage.
+  * **Submission**: When applying for final trademark compliance, the final integrator must submit both evaluation technical reports. The initial IP manufacturer is responsible for providing their evaluation technical report and laboratory details so the final integrator's laboratory can submit the complete audit package.
+* RTL Exemption and Diff Reusability
+  * Integrators can submit RTL diffs for exemption using GitHub issues in the applicable repository ([caliptra-rtl](https://github.com/chipsalliance/caliptra-rtl) or [caliptra-ss](https://github.com/chipsalliance/caliptra-ss)) using the "RTL Trademark Exemption Diff" issue template.
+  * **Scope of Approval Statement**: Any review and approval of an RTL diff by the Caliptra Working Group (WG) must include an explicit *scope of approval statement*. This statement will clarify the boundaries and conditions under which that particular diff can be referred to and reused by future product audits.
+  * **Case-by-Case Reusability**: Whether or not an approved RTL diff can be reused as-is for future audits/products must be determined on a case-by-case basis. Because one product receives an RTL diff exemption does not guarantee future audits can roll it forward automatically, even for identical diffs; any such reuse must be evaluated in accordance with the conditions set in the *scope of approval statement*.
 
 ## Typical Process for Obtaining the Caliptra Trademark
 
 1. The manufacturer contacts a licensed laboratory.  
-2. The laboratory and manufacturer agree on terms and sign a contract to help respond to the documentation required within the checklist and methodology document.  
-3. The laboratory and manufacturer communicate and jointly, when aligned, provide an application for Caliptra Trademark Usage for a TOE to Caliptra Trademark Owner TAC, signed by both laboratory and manufacturer.  
-4. It is the manufacturer's responsibility to provide a self-assessment of why the checklist requirements are fulfilled, together with other necessary information for the laboratory.  
-5. The laboratory evaluates and assesses the TOE using the provided filled-in checklist and the evaluation methodology. Iterations with the manufacturer are expected until all issues are resolved, as judged by the laboratory.  
-6. The laboratory produces an evaluation technical report, using an evaluation technical report template, and sends this to the Caliptra Trademark Owner.  
-7. The Caliptra Trademark Owner TAC assesses the submitted evaluation technical report, and, if needed, communicates with the laboratory for any questions and comments.  
-8. The Caliptra Trademark Owner determines to grant or deny the usage of the Caliptra Trademark for the TOE.  
-9. Caliptra Trademark Owner publishes the granted Caliptra Trademark Usage for the TOE, together with other previously accepted TOEs.
+2. The laboratory and manufacturer agree on terms and sign a contract to help respond to the documentation required within the checklist and methodology document.
+3. It is the manufacturer's responsibility to provide evidence of why the checklist requirements are fulfilled to the laboratory. If the manufacturer requires an RTL change exemption(s), they must create an issue in the applicable repository ([caliptra-rtl](https://github.com/chipsalliance/caliptra-rtl) or [caliptra-ss](https://github.com/chipsalliance/caliptra-ss)) using the provided "RTL Trademark Exemption Diff" issue template.
+4. The laboratory and manufacturer communicate and jointly, when aligned, provide an [application](Caliptra%20Conformance%20Program%20-%20Participation%20Form.pdf) for Caliptra Trademark Usage for a TOE to Caliptra Trademark Owner TAC, signed by both laboratory and manufacturer. The manufacturer sends the signed application to the Caliptra Trademark Owner at <caliptra-tm@lists.chipsalliance.org>. Note that this application form is also used to sign up for the Caliptra Vulnerability Alerts Mailing List.
+5. The laboratory evaluates and assesses the TOE using the provided filled-in checklist and the evaluation methodology. Iterations with the manufacturer are expected until all issues are resolved, as judged by the laboratory.
+6. The laboratory produces an evaluation technical report using the evaluation technical report template.
+7. The manufacturer sends the completed evaluation technical report to the Caliptra Trademark Owner at <caliptra-tm@lists.chipsalliance.org>.
+8. The Caliptra Trademark Owner TAC assesses the submitted evaluation technical report, and, if needed, communicates with the laboratory for any questions and comments.  
+9. The Caliptra Trademark Owner determines to grant or deny the usage of the Caliptra Trademark for the TOE.  
+10. Upon approval, the manufacturer will create a pull request to add the TOE to the [Approved Products Registry](ApprovedProductsRegistry.md).
+11. The Caliptra Trademark Owner will then approve and merge the PR.
