@@ -543,5 +543,5 @@ All requirements in [Part I](#part-i-common-requirements) and [Part III](#part-i
 ## OCP L.O.C.K. Specification Compliance
 
 * **Checklist Item:**
-  * **Requirement:** Any product integrating Caliptra Subsystem configured with support for OCP L.O.C.K. MUST comply with all requirements listed in [lock_spec.ocp](../ocp_lock/lock_spec.ocp).
+  * **Requirement:** Any product integrating Caliptra Subsystem configured with support for OCP L.O.C.K. MUST comply with the requirements listed in the Compliance section of [lock_spec.ocp](../ocp_lock/lock_spec.ocp).
   * **Evaluation Methodology:** Manufacturers MUST provide evidence to demonstrate that the SoC complies with all OCP LOCK requirements.
