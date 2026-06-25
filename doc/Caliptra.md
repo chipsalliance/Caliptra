@@ -507,6 +507,9 @@ Caliptra does not consume the IDevID certificate. Caliptra needs attributes of t
 * UEID type (byte 24): UEID type as defined in the [IETF EAT specification](https://www.rfc-editor.org/rfc/rfc9711.html#section-4.2.1.1). Used for TCG UEID extension.
 * Reserved (bytes 25 to 27)
 * Manufacturer Serial Number (bytes 28 to 43): the 128-bit unique serial number of the device to be used for the TCG UEID extension in the Caliptra-generated LDevID, Alias<sub>FMC</sub>, and Alias<sub>RT</sub> certificates.
+* Reserved (bytes 44 to 95): Reserved for future use. These 52 bytes correspond to words 11-23 of the 24-word fuse.
+
+**Note**: The complete IDEVID_CERT_ATTR fuse is defined as 96 bytes (768 bits, 24 words of 32 bits each) to align with register file implementation. Only the first 44 bytes (352 bits, words 0-10) contain defined attributes as documented above.
 
 The IDevID certificate is unique for each device and non-renewable. The SoC must be able to retrieve the IDevID certificate at runtime. To save flash space and aid in recoverability, it is recommended that the vendor define an IDevID certificate template such that the SoC at runtime can reconstruct the same certificate that the pCA endorsed. The SoC is recommended to store the IDevID certificate signature in fuses and the IDevID certificate template in the firmware image. Caliptra runtime firmware provides APIs to aid in reconstructing the certificate:
 
@@ -1323,7 +1326,7 @@ The following table describes Caliptra's fuse map:
 | FMC KEY MANIFEST SVN            | 32              | ROM FMC RUNTIME | In-field programmable                           | FMC security version number. (Deprecated in 2.0, will be removed in a future RTL revision.) |
 | RUNTIME SVN                     | 128             | ROM FMC RUNTIME | In-field programmable                           | Firmware security version number. |
 | ANTI-ROLLBACK DISABLE           | 1               | ROM FMC RUNTIME | SoC manufacturing or in-field programmable      | Disables anti-rollback support from Caliptra. (For example, if a Platform RoT is managing FW storage and anti-rollback protection external to the SoC.) |
-| IDEVID CERT IDEVID ATTR         | 768, 352 used   | ROM FMC RUNTIME | SoC manufacturing                               | IDevID Certificate Generation Attributes. See [IDevID certificate section](#idevid-certificate). Caliptra only uses 352 bits. Integrator is not required to back the remaining 416 bits with physical fuses. |
+| IDEVID CERT IDEVID ATTR         | 768, 352 used   | ROM FMC RUNTIME | SoC manufacturing                               | IDevID Certificate Generation Attributes (24 words of 32 bits each). Caliptra uses words 0-10 (352 bits). Integrator is not required to back words 11-23 (remaining 416 bits) with physical fuses. See [IDevID certificate section](#idevid-certificate).
 | IDEVID MANUF HSM IDENTIFIER     | 128, 0 used     | ROM FMC RUNTIME | SoC manufacturing                               | Spare bits for Vendor IDevID provisioner CA identifiers. Caliptra does not use these bits. Integrator is not required to back these with physical fuses. |
 | LIFE CYCLE                      | 2               | ROM FMC RUNTIME | SoC manufacturing                               | **Caliptra Boot Media Integrated mode usage only**. SoCs that build with a Boot Media Dependent profile don’t have to account for these fuses.<br> - '00 - Unprovisioned <br> - '01 - Manufacturing<br> - '10 - Undefined<br> - '11 - Production<br> **Reset:** Can only be reset on powergood. |
 | LMS REVOCATION                  | 32              | ROM             | In-field programmable                           | One-hot encoded list of revoked Vendor LMS Public Keys (up to 32 keys). |
