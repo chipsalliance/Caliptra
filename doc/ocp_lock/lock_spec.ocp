@@ -1,6 +1,6 @@
 ---
 title: "OCP L.O.C.K."
-version: 1.1 (RC3)
+version: 1.1 (RC4)
 type: BASE
 project: NVMe™
 authors: 
@@ -83,10 +83,15 @@ bibliography: bibliography.yaml
 |                |         |                                     |
 |                |         | Update EKP notice.                  |
 +----------------+---------+-------------------------------------+
-| May 2026       | 1.1_RC2 | Add KMB AES-XTS Equality check and  | 
+| May 2026       | 1.1_RC2 | Add KMB AES-XTS Equality check and  |
 |                |         | Encryption Engine self-test.        |
 +----------------+---------+-------------------------------------+
 | May 2026       | 1.1_RC3 | Remove KMB firmware notice.         |
++----------------+---------+-------------------------------------+
+| June 2026      | 1.1_RC4 | Address feedback: grammar and       |
+|                |         | table formatting fixes.             |
+|                |         |                                     |
+|                |         | Mark LOAD_KAT_MEK as optional.      |
 +----------------+---------+-------------------------------------+
 
 \currenttemplateversion
@@ -282,7 +287,7 @@ A product that integrates OCP L.O.C.K. will be expected to undergo an OCP S.A.F.
 To safeguard user data stored on the drive, KMB defines a set of "protection keys", each of which must be available in order for an MEK to be accessible.
 
 - The **data protection key (DPK)**, which is managed by the nominal owner of the data. A given MEK is bound to a single DPK.
-  - In Opal or Enterprise the DPK may be protected by the user's C_PIN, while in Key Per I/O the DPK may be the DEK associated with a given key tag.
+  - In Opal or Enterprise, the DPK may be protected by the user's C_PIN, while in Key Per I/O the DPK may be the DEK associated with a given key tag.
 
 - A configurable number of **Multi-party Protection Keys (MPKs)**, which are each managed by an additional entity that must assent before user data is available. A given MEK may be bound to zero or more MPKs.
   - Each multi-party entity grants access to the data by providing an access key to the drive. Each MPK is protected by a distinct access key, which is never stored persistently within the drive. MPK access keys are protected in transit using HPKE [@{draft-ietf-hpke-hpke}]. This enables use-cases where the access key is served to the drive from a remote key management service, without revealing the access key to the drive's host.
@@ -439,7 +444,7 @@ Table: CSPs visible to KMB firmware {#tbl:fw-visible-csps}
 |                      | held in the Key Vault as well. @sec:hpke-algorithms illustrates that     |
 |                      | these results are used to compute an HMAC message, a SHA3 digest, and an |
 |                      | AES-GCM IV. Caliptra's Key vault hardware does not presently support     |
-|                      | these operations. Therefore the ECDH and ML-KEM Decaps results cannot be |
+|                      | these operations. Therefore, the ECDH and ML-KEM Decaps results cannot be|
 |                      | held in the Key Vault; ergo, the HPKE private keys also cannot be held   |
 |                      | in the Key Vault.                                                        |
 +----------------------+--------------------------------------------------------------------------+
@@ -542,10 +547,12 @@ Table: HPKE algorithm support {#tbl:hpke-algorithm-support}
 |           +---------------------+-----------+-------------------------------+
 |           | P-384               | 0x0011    | Hybrid Public Key Encryption  |
 |           |                     |           | [@{draft-ietf-hpke-hpke}]     |
-+-----------+---------------------+-----------+                               |
-| KDF       | HKDF-SHA384         | 0x0002    |                               |
-+-----------+---------------------+-----------+                               |
-| AEAD      | AES-256-GCM         | 0x0002    |                               |
++-----------+---------------------+-----------+-------------------------------+
+| KDF       | HKDF-SHA384         | 0x0002    | Hybrid Public Key Encryption  |
+|           |                     |           | [@{draft-ietf-hpke-hpke}]     |
++-----------+---------------------+-----------+-------------------------------+
+| AEAD      | AES-256-GCM         | 0x0002    | Hybrid Public Key Encryption  |
+|           |                     |           | [@{draft-ietf-hpke-hpke}]     |
 +-----------+---------------------+-----------+-------------------------------+
 
 The definitions for the post-quantum KEMs are currently distributed across a number of documents. [@{draft-irtf-cfrg-hybrid-kems}] contains generic constructions, [@{draft-irtf-cfrg-concrete-hybrid-kems}] contains concrete parameterizations, and [@{draft-ietf-hpke-pq}] contains HPKE IANA code-point assignments.[^pq-kems]
@@ -706,7 +713,7 @@ Drive firmware is responsible for enforcing the following:
 - The HEK seed shall only be zeroized after it has been randomized or corrupted.
 - Perma-HEK mode shall only be enabled once all HEK seeds have been zeroized.
 
-Drive firmware is responsible for zeroizing the encryption engine's key cache when the SEK transitions from randomized to zeroized. HEK transitions involve power cycles and therefore the key cache is implicitly zeroized across such transitions.
+Drive firmware is responsible for zeroizing the encryption engine's key cache when the SEK transitions from randomized to zeroized. HEK transitions involve power cycles and, as a result, the key cache is implicitly zeroized across such transitions.
 
 ### MEKs {#sec:meks}
 
@@ -742,7 +749,7 @@ By deriving the MDK in ROM based on secrets that are not available to runtime fi
 
 Figures [-@fig:mek-generate] and [-@fig:mek-load] elide the process of deriving the MEK secret, as those details are captured in @fig:mek-secret-derivation. When an MEK is generated or loaded, the inputs given in @fig:mek-secret-derivation are provided by drive firmware so that KMB may derive the MEK secret.
 
-Randomly-generated MEKs are given two layers of at-rest encryption: an inner AES-ECB layer using the MDK, and an outer AES-GCM layer using the MEK secret. The wrapped MEK's integrity tag is associated with the outer layer. The inner AES-ECB layer does not have its own MAC. Therefore the extra layer of encryption does not modify the size of the wrapped MEK. See @sec:wrapped-key for details on the format and layout of the wrapped MEK.
+Randomly-generated MEKs are given two layers of at-rest encryption: an inner AES-ECB layer using the MDK, and an outer AES-GCM layer using the MEK secret. The wrapped MEK's integrity tag is associated with the outer layer. The inner AES-ECB layer does not have its own MAC. Therefore, the extra layer of encryption does not modify the size of the wrapped MEK. See @sec:wrapped-key for details on the format and layout of the wrapped MEK.
 
 ![Generating an MEK](./diagrams/mek_generate.drawio.svg){#fig:mek-generate}
 
@@ -759,9 +766,9 @@ Randomly-generated MEKs are given two layers of at-rest encryption: an inner AES
 The MEK seed is calculated via CMAC instead of HMAC, and then "decrypted" via the MDK, for the following reasons:
 
 - As described in @sec:mdk, the only way to populate the Key Vault slot that holds the MEK is via the AES engine operating in ECB-decrypt mode (where the key is taken from the Key Vault slot that holds the MDK).
-- The AES engine does not allow messages to be read from the Key Vault. Therefore KMB must derive a key from the MEK secret that is readable by firmware, so firmware can pass it as an AES message to compute the MEK.
+- The AES engine does not allow messages to be read from the Key Vault. Therefore, KMB must derive a key from the MEK secret that is readable by firmware, so firmware can pass it as an AES message to compute the MEK.
 - Since the MEK secret is in the Key Vault, the result of any HMAC operations would be required to go back to the Key Vault, and not be available to firmware.
-- The CMAC operation, by contrast, utilizes the AES engine in a manner that allows the results to be readable by firmware. Therefore CMAC is used to compute the MEK seed from the MEK secret.
+- The CMAC operation, by contrast, utilizes the AES engine in a manner that allows the results to be readable by firmware. Therefore, CMAC is used to compute the MEK seed from the MEK secret.
 - The resulting MEK seed is then passed as an AES message to the AES engine, which uses it in a decryption operation to produce the derived MEK.
 
 ##### Derived MEK checksums
@@ -817,7 +824,7 @@ KMB explicitly checks the inequality between *Key~1~* and *Key~2~* at specific s
 - [LOAD_MEK](#sec:load-mek-cmd): before AES-ECB decryption (on `Single-encrypted MEK` in @fig:mek-load),
 - [DERIVE_MEK](#sec:derive-mek-cmd): before AES-ECB decryption (on `MEK seed` in @fig:mek-derive).
 
-Since AES-ECB decryption (`Dec(key, data)`) with a fixed key is a 128-bit-wise permutation, `Dec(K, A) = Dec(K, B)` holds if and only if `A = B` holds for any AES key `K` and any 128-bit data `A` and `B`. Therefore KMB can verify inequality of the resulting `512-bit MEK` by checking with the data before AES-ECB decryption: `Single-encrypted MEK` and `MEK seed`.
+Since AES-ECB decryption (`Dec(key, data)`) with a fixed key is a 128-bit-wise permutation, `Dec(K, A) = Dec(K, B)` holds if and only if `A = B` holds for any AES key `K` and any 128-bit data `A` and `B`. Therefore, KMB can verify inequality of the resulting `512-bit MEK` by checking with the data before AES-ECB decryption: `Single-encrypted MEK` and `MEK seed`.
 
 When [DERIVE_MEK](#sec:derive-mek-cmd) fails the inequality check, KMB regenerates `MEK seed` by applying additional KDFs using the same label, `"ocp_lock_mek_seed"`, until the check passes. Similarly, [GENERATE_MEK](#sec:generate-mek-cmd) repeatedly samples a randomness until the generated key satisfies the inequality. Instead of repeating infinitely, KMB only repeats *26 times* and returns an error if all attempts were failed. Under the (pseudo-)randomness assumption of underlying PRNG and KDF, this will give high enough probability to generate/derive a key passing the inequality check. With 26 repetitions, The probability to get an error is roughly one out of 10^1000^.
 
@@ -825,7 +832,7 @@ In order to support both 256-bit and 512-bit AES-XTS keys, KMB checks both 128-b
 
 ### Random key generation via DRBG
 
-KMB generates multiple kinds of random keys. It does so using randomness obtained from a DRBG, which is seeded from a TRNG and which may be updated with entropy from the host.
+KMB generates multiple kinds of random keys. KMB does this by using randomness obtained from a DRBG, which is seeded from a TRNG and which may be updated with entropy from the host.
 
 Caliptra hardware [@{caliptra-2.0-hw-spec}] supports either an integrated or external DRBG. Caliptra Subsystem requires leveraging the integrated DRBG. This construction is illustrated in @fig:drbg-internal.
 
@@ -1112,6 +1119,13 @@ Table: CTRL command codes {#tbl:ee-ctrl-cmd-codes}
 |          | `1111 1111 1111 1111 1111 1111 1111 1111`\                |
 |          | `2222 2222 2222 2222 2222 2222 2222 2222`\                |
 |          | `3333 3333 3333 3333 3333 3333 3333 3333`                 |
+|          |                                                           |
+|          | Note: this command is intended to support FIPS validation |
+|          | and is optional. If an encryption engine implementation   |
+|          | does not support this command and wishes to be            |
+|          | FIPS-compliant, the implementation is responsible for     |
+|          | satisfying FIPS KAT requirements via a separate           |
+|          | mechanism.                                                |
 +----------+-----------------------------------------------------------+
 | 5h to Fh | Reserved                                                  |
 +----------+-----------------------------------------------------------+
@@ -1928,6 +1942,8 @@ The command loads the fixed MEK, specified metadata, and aux_metadata into the e
 
 The MEK loaded with this command is intended only for Known Answer Test (KAT) purposes of the underlying block cipher in the encryption engine. The loaded MEK should be immediately unloaded by using [UNLOAD_MEK](#sec:unload-mek-cmd) or [CLEAR_KEY_CACHE](#sec:clear-key-cache-cmd) once the KAT is complete. Using this MEK for user data encryption will compromise all data protection mechanism integrated within a storage device.
 
+This command's implementation triggers the **Load KAT MEK** command as defined in @tbl:ee-ctrl-cmd-codes. As noted, encryption engine implementations are not required to support this command. In such cases, the LOAD_KAT_MEK mailbox command will return an error.
+
 Command Code: 0x4C4B_4154 ("LKAT")
 
 Table: LOAD_KAT_MEK input arguments {#tbl:load-kat-mek-input-args}
@@ -2310,13 +2326,13 @@ See <https://github.com/chipsalliance/Caliptra/tree/main/doc/ocp_lock>.
 
 This appendix expands on @sec:preconditioned-aes and provides additional details behind the claim that approximately $2^{80}$ preconditioned AES-Encrypt operations for a given encryption key are needed before an IV collision is expected to occur with probability greater than $2^{-32}$.
 
-To satisfy FIPS, it is sufficient to demonstrate that no single AES-GCM key will be used more than $2^{32}$ times. With a 96-bit salt, a given encryption key can be expanded to up to $2^{96}$ possible subkeys. This can be put in terms of the "Balls into bins" problem [@{balls-into-bins}], where we are looking for the number of balls ($m$) required for the maximum load across $2^{96}$ bins ($n$) to be $2^{32}$. An approximation for the maximum load where $m>n$ is given as $m/n+\sqrt{m·log(n)/n}$. Rearranging to solve for $m$ via the quadratic formula yields $m≈2^{128}$. Therefore a given encryption key may be used in at most $2^{128}$ preconditioned AES-Encrypt operations before any subkey derived from that key is used in more than $2^{32}$ AES-GCM-Encrypt operations.
+To satisfy FIPS, it is sufficient to demonstrate that no single AES-GCM key will be used more than $2^{32}$ times. With a 96-bit salt, a given encryption key can be expanded to up to $2^{96}$ possible subkeys. This can be put in terms of the "Balls into bins" problem [@{balls-into-bins}], where we are looking for the number of balls ($m$) required for the maximum load across $2^{96}$ bins ($n$) to be $2^{32}$. An approximation for the maximum load where $m>n$ is given as $m/n+\sqrt{m·log(n)/n}$. Rearranging to solve for $m$ via the quadratic formula yields $m≈2^{128}$. Therefore, a given encryption key may be used in at most $2^{128}$ preconditioned AES-Encrypt operations before any subkey derived from that key is used in more than $2^{32}$ AES-GCM-Encrypt operations.
 
 However, the $2^{32}$ encryption limit is a means to an end, namely ensuring a low probability of IV collisions. The Birthday paradox [@{birthday-problem}] implies that the probability of a collision between $n$ generated IVs where $d$ is the number of possible IVs is approximately $n^2/(2d)$. The chances of a 96-bit IV collision across $2^{32}$ IVs is therefore approximately $2^{2·32}/2^{96+1}=2^{-33}$ for a given subkey. If each of the $2^{96}$ derived subkeys might be used up to $2^{32}$ times, the expected number of derived subkeys that experience a collision is approximately $2^{96}·2^{-33}=2^{63}$. Clearly a limit of $2^{128}$ encryption operations for a given encryption key, while meeting the letter of the FIPS requirements, is too large for safety.
 
 We can calculate the safe margin by simply considering the 96-bit salt concatenated to the 96-bit IV. What we are really after is the maximum number of preconditioned AES-Encrypt invocations with a given encryption key such that the likelihood of experiencing a collision of the 192-bit (salt || IV) pair is at most $2^{-32}$. Leveraging the Birthday paradox equation where $p(n,d)≈n^2/(2d)$, $n≈\sqrt{2d·p}=\sqrt{2^{192+1}·2^{-32}}=2^{80.5}$.
 
-Therefore a given encryption key may safely be used in at most $2^{80.5}$ preconditioned AES-Encrypt operations before an IV collision is expected to occur with probability greater than $2^{-32}$ across all of the AES-GCM subkeys derived from the encryption key.
+Therefore, a given encryption key may safely be used in at most $2^{80.5}$ preconditioned AES-Encrypt operations before an IV collision is expected to occur with probability greater than $2^{-32}$ across all of the AES-GCM subkeys derived from the encryption key.
 
 # EAT format for attesting to the epoch key state {#sec:eat-format}
 
