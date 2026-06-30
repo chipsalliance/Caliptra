@@ -202,7 +202,7 @@ The following is a consolidated list of all requirements and recommendations to 
   * **Requirement:** SOC firmware that interacts with Caliptra as the privileged PA_USER, including RTM firmware, MUST be measured, and those measurements MUST be submitted to Caliptra.
   * **Recommendation:** Other SOC firmware SHOULD be measured.
   * **Requirement:** Configuration data that modifies the security properties of measured firmware MUST also be measured.
-  * **Requirement:** Collection of measurements MUST occur before execution of the firmware or usage of the configuration data.
+  * **Requirement:** The collecting of each measurement MUST occur before execution of that firmware or usage of that configuration data.
   * **Requirement:** Measurements MUST be submitted to Caliptra by the same entity that collected the measurement (e.g. SOC FMC cannot pass measurements to SOC FW for submission to the Caliptra mailbox).
   * **Evaluation Methodology:** Manufacturers SHOULD provide a detailed description of how measurements are communicated to Caliptra.
 
