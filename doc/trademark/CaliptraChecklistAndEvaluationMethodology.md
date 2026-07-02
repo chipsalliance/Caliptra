@@ -190,7 +190,7 @@ OCP L.O.C.K. Trademark.
   * **Evaluation Methodology:** Manufacturers MUST demonstrate, through architectural documentation, security analyses, and verifiable testing, that the obfuscation key and CSR HMAC key are inaccessible to firmware and other unauthorized components and are not exposed on scan, debug, or trace paths. Acceptable evidence SHOULD cover:
     * **DFT intent.** Synthesis or DFT-tool constraint files demonstrating that the flops latching each key (for example, `cptra_scan_mode_Latched_d/f`, `field_storage.internal_obf_key`, and `cptra_csr_hmac_key_reg`) are explicitly excluded from scan insertion.
     * **DFT result.** Scan-insertion reports, scan-chain stitching reports, or gate-level netlist diffs confirming that the named cells are absent from every scan chain in the final taped-out netlist.
-    * **Dynamic verification.** Gate-level simulation with scan enable asserted showing that key state cannot be observed at any scan output, debug interface, or trace port.
+    * **Verification result.** Gate-level simulation with scan enable asserted showing that key state cannot be observed at any scan output, debug interface, or trace port.
 
 ### *Fuses*
 
