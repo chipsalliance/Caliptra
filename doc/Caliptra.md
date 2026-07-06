@@ -1346,7 +1346,7 @@ This section describes Caliptra error reporting and handling.
 
 | | Fatal errors | Non-fatal errors |
 | :- | - | - |
-| Hardware | - ICCM, DCCM SRAM ECC.<br>-  The second watchdog (WD) timer expiry triggers an NMI, and a FATAL error is signaled to the SoC.<br> - Operating HMAC, ECC, or DOE engines simultaneously. <br> | - Mailbox SRAM ECC (except initial firmware load)<br>- Mailbox incorrect protocol or commands. For example, incorrect access ordering or access without Lock. |
+| Hardware | - ICCM uncorrectable ECC error (maskable; suppressed during FW update reset window)<br>- DCCM uncorrectable ECC error (maskable; suppressed during FW update reset window)<br>- Watchdog timer T2 expiry triggers NMI and FATAL error (maskable)<br>- Crypto engine collision (e.g., simultaneous operation of HMAC, ECC, DOE, AES, ML-DSA or ML-KEM engines)<br>- Key Vault integrity monitor error<br>- Shadow register storage error (glitch detection on double-buffered ICCM region registers)<br>- Sparse FSM encoding error (boot FSM, mailbox FSM, SHA accelerator FSM, or DOE FSM state corruption) | - Mailbox SRAM ECC (except initial firmware load)<br>- Mailbox incorrect protocol or commands. For example, incorrect access ordering or access without Lock. |
 | Firmware | - Control Flow Integrity (CFI) errors. <br> - KAT errors. <br> - FIPS Self Test errors. <br> - Mailbox commands received after FIPS Shutdown request completes. <br>  - Hand-off errors detected upon transfer of control from ROM to FMC or FMC to Runtime. <br> - Mailbox protocol violations leading the mailbox to an inconsistent state if encountered by ROM during cold reset flow. <br> - Firmware image verification or authentication failures if encountered by ROM during Cold Reset flow. <br> - Non-aligned access to ICCM or DCCM <br> - AHB access hangs, triggered through WD timer expiry <br> - AHB access outside of the decoding range <br> | - Firmware image verification or authentication failures if encountered by ROM during Update Reset flow. <br> - Mailbox protocol violations leading the mailbox to an inconsistent state (if encountered by ROM during Update Reset flow). <br> - Cryptography processing errors. |
 
 **Fatal errors**
@@ -1359,6 +1359,26 @@ This section describes Caliptra error reporting and handling.
   * Error mask registers (writable only by Caliptra microcontroller) may be used to prevent error signal assertion per-event. Mask registers only impact interrupts when they are set prior to the error occurrence.
   * cptra\_error\_fatal remains asserted until Caliptra is reset. Note that, although the HW FATAL ERROR register fields may be cleared at any time, a reset is still required to clear the interrupt.
 * When a fatal error occurs, all volatile assets that are stored in key vault are cleared.
+
+**Hardware fatal error register fields**
+
+The `CPTRA_HW_ERROR_FATAL` register contains the following fields, each set by hardware on detection of the corresponding error condition:
+
+| Bit | Field | Source | Maskable | Description |
+| :-- | :---- | :----- | :------- | :---------- |
+| 0 | `crypto_err` | Crypto engine collision detector | No | Set when multiple crypto engines (HMAC, ECC, DOE, SHA, MLDSA) are driven simultaneously in violation of the shared-resource protocol. |
+| 1 | `iccm_ecc_unc` | VeeR ICCM ECC logic | Yes | Set on uncorrectable (double-bit) ECC error in ICCM SRAM. Suppressed during the firmware update reset window to avoid false triggers while ICCM contents are being rewritten. |
+| 2 | `dccm_ecc_unc` | VeeR DCCM ECC logic | Yes | Set on uncorrectable (double-bit) ECC error in DCCM SRAM. Suppressed during the firmware update reset window. |
+| 3 | `nmi_pin` | Watchdog timer (WDT) | Yes | Set when the cascaded watchdog timer T2 expires, generating a non-maskable interrupt (NMI) to the processor and signaling fatal error to the SoC. |
+| 4 | `kv_error` | Key Vault integrity monitor | No | Set when the Key Vault detects an internal integrity or access-policy violation. |
+| 5 | `shadow_storage_err` | ICCM region shadow registers | No | Set when a storage consistency check fails on the double-buffered ICCM region boundary registers (glitch detection). |
+| 6 | `fsm_error` | Sparse FSM monitors | No | Set when any sparse-encoded FSM transitions to an illegal state encoding. Sources include: boot FSM, mailbox FSM, SHA accelerator FSM, and DOE FSM. |
+
+**Masking behavior:**
+
+* Fields marked "maskable" have a corresponding bit in the `internal_hw_error_fatal_mask` register. When a mask bit is set (by Caliptra firmware only), the corresponding error event is still logged in `CPTRA_HW_ERROR_FATAL` but does not assert the `cptra_error_fatal` output signal.
+* Fields marked "No" (not maskable) always assert `cptra_error_fatal` upon detection, regardless of mask register state. These represent security-critical integrity failures where suppression is never appropriate.
+* Mask registers only prevent interrupt assertion when set prior to the error occurrence. Setting a mask after an error has already asserted the fatal signal has no effect; a reset is required.
 
 **Non-fatal errors**
 
