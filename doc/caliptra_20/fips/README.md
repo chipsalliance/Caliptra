@@ -47,8 +47,8 @@
 | CAVP #3 | v2.1.2          | SHA3-512               | Completed   | 06/03/2026           |[A8476](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21302)|
 | CAVP #3 | v2.1.2          | SHAKE-128              | Completed   | 06/03/2026           |[A8476](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21302)|
 | CAVP #3 | v2.1.2          | SHAKE-256              | Completed   | 06/03/2026           |[A8476](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21302)|
-| CAVP #3 | v2.1.2          | cSHAKE-128             | In Progress | NA                   |NA|
-| CAVP #3 | v2.1.2          | cSHAKE-256             | In Progress | NA                   |NA|
+| CAVP #3 | v2.1.2          | cSHAKE-128             | Completed   | 07/07/2026           |[A8476](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21302)|
+| CAVP #3 | v2.1.2          | cSHAKE-256             | Completed   | 07/07/2026           |[A8476](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21302)|
 | CAVP #4 | v2.1.2          | AES-CBC                | Completed   | 06/03/2026           |[A8477](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21303)|
 | CAVP #4 | v2.1.2          | AES-CFB128             | Completed   | 06/03/2026           |[A8477](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21303)|
 | CAVP #4 | v2.1.2          | AES-CTR                | Completed   | 06/03/2026           |[A8477](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21303)|
