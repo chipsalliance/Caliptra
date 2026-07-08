@@ -251,10 +251,10 @@ OCP L.O.C.K. Trademark.
 
 * **Checklist Item:**
   * **Requirement:** SoC firmware that interacts with Caliptra as the privileged PA_USER (for 1.X implementations) or AXI_USER (for 2.X implementations), including RTM firmware, MUST be measured, and those measurements MUST be submitted to Caliptra.
+  * **Recommendation:** Other SoC firmware SHOULD be measured.
   * **Requirement:** Configuration data that modifies the security properties of measured firmware MUST also be measured.
   * **Requirement:** The collecting of each measurement MUST occur before execution of that firmware or usage of that configuration data.
   * **Requirement:** Measurements MUST be submitted to Caliptra by the same entity that collected the measurement (e.g. SoC FMC cannot pass measurements to SoC FW for submission to the Caliptra mailbox).
-  * **Recommendation:** Other SoC firmware SHOULD be measured.
   * **Evaluation Methodology:** Manufacturers SHOULD provide a detailed description of how measurements are communicated to Caliptra.
 
 ### *Caliptra Privileged USER Management*
