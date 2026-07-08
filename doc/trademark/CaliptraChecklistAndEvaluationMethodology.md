@@ -490,7 +490,7 @@ The requirements in this section apply **only** to integrations pursuing the
 ## Subsystem Fuse Map
 
 * **Checklist Item:**
-  * **Requirement:** The integrator MUST implement the full Caliptra Subsystem fuse map per
+  * **Requirement:** The integrator MUST implement the Caliptra Subsystem fuse map per
     the [Fuse Macro Memory Map and Fuse Controller CSR Address Map](https://github.com/chipsalliance/caliptra-ss/releases)
     section of the Caliptra Subsystem Integration Specification from the consumed official release.
     The fuse map has three segments: **Caliptra-Core** (`CALIPTRA_CORE` prefix) fuses, which are
