@@ -183,6 +183,7 @@ OCP L.O.C.K. Trademark.
 * **Checklist Item:**  
   * **Requirement:** The CSR HMAC key ([cptra_csr_hmac_key](https://github.com/chipsalliance/caliptra-rtl/blob/main/docs/CaliptraIntegrationSpecification.md#interface)) MUST be generated using a method that provides full entropy across its 512-bit width, such as an [ESV](https://csrc.nist.rip/Projects/cryptographic-module-validation-program/entropy-validations/esv) certified entropy source.
   * **Requirement:** Access to the key value MUST be restricted to only authorized entities, and MUST be stored in a manner that prevents disclosure.
+  * **Requirement:** Design, test, manufacturing, and other processes that require the unencrypted key value MUST NOT store or retain it past completion except as required for certificate issuance.
   * **Evaluation Methodology:** Manufacturers MUST provide documentation on the generation method for the CSR HMAC key, including entropy measurements, applicable standards compliance, and the manufacturing controls used to keep the key confidential.
     * **Example:** Establish the CSR HMAC Key in an HSM. After the ECO is completed plaintext copies should be destroyed.
 * **Checklist Item:**  
