@@ -2,7 +2,7 @@
 
 * Authors: Hilary Richardson, Dan Scales
 * Reviewed by: Caliptra TAC founding members
-* Last major revision: March 30th 2023
+* Last major revision: July 9, 2026
 
 The Caliptra project trademarks and logos (“Caliptra Marks”) are licensed
 separately from any copyright and patent license grants contained in the
@@ -78,7 +78,7 @@ Project itself.
 
 ## Caliptra Trademark Tracks
 
-The Caliptra project defines two distinct integration architectures, each with
+The Caliptra project defines three distinct integration architectures, each with
 its own trademark. Integrators MUST elect which trademark type they are pursuing
 when following the certification process, as this determines the audit scope and
 applicable sections from [Checklist and Evaluation Methodology](CaliptraChecklistAndEvaluationMethodology.md). Only one
@@ -103,6 +103,18 @@ incorporates Caliptra Core together with a Life Cycle Controller (LCC),
 Fuse Controller, OCP streaming boot interface, Manufacturer Control
 Unit (MCU), and Manufacturer Control Interface (MCI). In this configuration
 Caliptra operates with an active profile.
+
+### Caliptra Subsystem with OCP L.O.C.K. Trademark
+
+The **Caliptra Subsystem with OCP L.O.C.K. Trademark** applies to integrations
+that adopt the full Caliptra Subsystem architecture with support for OCP L.O.C.K.
+introduced in Caliptra 2.1. This configuration incorporates
+Caliptra Core together with a Life Cycle Controller (LCC),
+Fuse Controller, OCP streaming boot interface, Manufacturer Control
+Unit (MCU), and Manufacturer Control Interface (MCI), with the addition of native
+hardware features to support OCP L.O.C.K.. In this configuration
+Caliptra operates with an active profile and is responsible for performing
+key release to integrated encryption blocks.
 
 ## Technical Specifications & Caliptra Certification
 
