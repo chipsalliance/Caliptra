@@ -14,7 +14,6 @@
 
 # Table of Contents
 - [Introduction](#introduction)
-- [Trademark Type Selection](#trademark-type-selection)
 - [Caliptra Trademark Auditing Process](#caliptra-trademark-auditing-process)
   - [Suggestion](#suggestion)
   - [Roles](#roles)
