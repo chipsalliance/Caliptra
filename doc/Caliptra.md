@@ -785,7 +785,9 @@ Caliptra contains 32 384-bit PCR banks that are extendable by the SHA engine, an
 |PCR1|Cumulative|ROM|Holds journey of Caliptra’s FMC measurement and ROM policy configuration.|
 |PCR2|Current|FMC|Holds Caliptra's runtime firmware and firmware manifest measurements.|
 |PCR3|Cumulative|FMC|Holds journey of Caliptra's runtime firmware and firmware manifest measurements.|
-|PCR4 to PCR30|-|RT|Holds measurements extended by EXTEND_PCR commands (serviced by RT).|
+|PCR4|Current|HW|Holds a measurement of Caliptra's ICCM content. Hardware hashes the most recent writes to ICCM from reset until ICCM lock.|
+|PCR5|Cumulative|HW|Holds journey of Caliptra's ICCM content. Hardware extends this hash using the same hash measured for PCR4.|
+|PCR6 to PCR30|-|RT|Holds measurements extended by EXTEND_PCR commands (serviced by RT).|
 |PCR31|Cumulative|ROM|Holds measurements extended by STASH_MEASUREMENTS commands (serviced by both ROM and RT).|
 
 For PCR0 and PCR1, ROM issues the following extend operations in order:
