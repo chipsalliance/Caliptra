@@ -1,6 +1,6 @@
 ---
 title: "OCP L.O.C.K."
-version: 1.1 (RC4)
+version: TBD
 type: BASE
 project: NVMe™
 authors: 
@@ -92,6 +92,8 @@ bibliography: bibliography.yaml
 |                |         | table formatting fixes.             |
 |                |         |                                     |
 |                |         | Mark LOAD_KAT_MEK as optional.      |
++----------------+---------+-------------------------------------+
+| TBD            | TBD     | Address compliance feedback.        |
 +----------------+---------+-------------------------------------+
 
 \currenttemplateversion
@@ -2259,11 +2261,13 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 +------+----------------------------------------------------------+-----------+
 | Item | Requirement                                              | Mandatory |
 +======+==========================================================+===========+
-| 1    | The device shall integrate Caliptra.                     | Yes       |
+| 1    | The device shall integrate Caliptra Subsystem. The       | Yes       |
+|      | integration shall comply with the Caliptra Subsystem     |           |
+|      | trademark requirements.                                  |           |
 +------+----------------------------------------------------------+-----------+
 | 2    | OCP L.O.C.K. shall be enabled by setting the input       | Yes       |
-|      | strap `ss_ocp_lock_en` in Caliptra Core or               |           |
-|      | `cptra_ss_strap_ocp_lock_en_i` in Caliptra Subsystem.    |           |
+|      | strap `cptra_ss_strap_ocp_lock_en_i` in Caliptra         |           |
+|      | Subsystem.                                               |           |
 +------+----------------------------------------------------------+-----------+
 | 3    | When a storage device is in a production lifecycle       |           |
 |      | state, MEKs shall only be programmable to the encryption | Yes       |
@@ -2274,46 +2278,48 @@ Table: Compliance requirements {#tbl:compliance-requirements}
 |      | zeroization of the storage device. See                   |           |
 |      | @sec:architecture.                                       |           |
 +------+----------------------------------------------------------+-----------+
-| 5    | When the device is shipped it must be in the             | Yes       |
-|      | production lifecycle state and have a randomized         |           |
-|      | HEK. See @sec:hek-sek-lifecycle.                         |           |
-+------+----------------------------------------------------------+-----------+
-| 6    | MCU ROM shall populate the HEK seed fuse register and    | Yes       |
-|      | invoke REPORT_HEK_METADATA upon cold reset. See Sections |           |
-|      | [-@sec:hek-lifecycle] and                                |           |
+| 5    | Only read-only firmware or hardware shall populate the   | Yes       |
+|      | HEK seed fuse register and invoke REPORT_HEK_METADATA    |           |
+|      | upon cold reset. See Sections [-@sec:hek-lifecycle] and  |           |
 |      | [-@sec:report-hek-metadata-cmd].                         |           |
 +------+----------------------------------------------------------+-----------+
-| 7    | The drive shall only provide HEK seeds or SEKs that are  | Yes       |
-|      | cryptographically-strong random values. See              |           |
-|      | @sec:heks-seks.                                          |           |
+| 6    | The drive shall only provide HEK seeds and SEKs that     | Yes       |
+|      | were obtained from a cryptographically-strong entropy    |           |
+|      | source. See @sec:heks-seks.                              |           |
 +------+----------------------------------------------------------+-----------+
-| 8    | Drive firmware shall implement authorization             | Yes       |
+| 7    | Drive firmware shall implement authorization             | Yes       |
 |      | controls to gate lifecycle events that have the          |           |
 |      | potential to trigger data loss. See                      |           |
 |      | @sec:authorization.                                      |           |
 +------+----------------------------------------------------------+-----------+
-| 9    | KMB shall have access to the SFRs defined in             | Yes       |
+| 8    | KMB shall have access to the SFRs defined in             | Yes       |
 |      | @tbl:kmb-ee-sfrs through the address defined by          |           |
 |      | OCP_LOCK_MEK_ADDRESS. See @sec:sfrs.                     |           |
 +------+----------------------------------------------------------+-----------+
-| 10   | MCU ROM shall configure registers                        | Yes       |
+| 9    | MCU ROM shall configure registers                        | Yes       |
 |      | SS_KEY_RELEASE_BASE_ADDR_L, SS_KEY_RELEASE_BASE_ADDR_H   |           |
-|      | and SS_KEY_RELEASE_SIZE, then setting CPTRA_FUSE_WR_DONE |           |
-|      | to prevent further modifications. Additionally,          |           |
-|      | OCP_LOCK_MEK_LENGTH must be set to 40h. See @sec:sfrs.   |           |
+|      | and SS_KEY_RELEASE_SIZE, before setting                  |           |
+|      | CPTRA_FUSE_WR_DONE to prevent further modifications.     |           |
+|      | Additionally, SS_KEY_RELEASE_SIZE shall be set to 40h.   |           |
+|      | See @sec:sfrs.                                           |           |
 +------+----------------------------------------------------------+-----------+
-| 11   | Upon KMB cold reset or firmware update reset, drive      | Yes       |
-|      | firmware shall enumerate HPKE keypairs supported by KMB  |           |
-|      | and advertise them to the host, if drive firmware        |           |
-|      | supports a host-facing API for doing so. See             |           |
-|      | @sec:hpke-transport-encryption.                          |           |
+| 10   | Upon any KMB reset, or when the HPKE key pair is         | Yes       |
+|      | rotated, drive firmware shall enumerate HPKE keypairs    |           |
+|      | supported by KMB and advertise them to the host, if      |           |
+|      | drive firmware supports a host-facing API for doing      |           |
+|      | so. See @sec:hpke-transport-encryption.                  |           |
 +------+----------------------------------------------------------+-----------+
-| 12   | Integrations shall invoke Caliptra resets according to   | Yes       |
+| 11   | Integrations shall invoke Caliptra resets according to   | Yes       |
 |      | the directives given in @sec:reset-behavior.             |           |
 +------+----------------------------------------------------------+-----------+
-| 13   | The encryption engine shall not allow user data to be    | Yes       |
+| 12   | The encryption engine shall not allow user data to be    | Yes       |
 |      | encrypted with the MEK loaded by                         |           |
 |      | [LOAD_KAT_MEK](#sec:load-kat-mek-cmd) command.           |           |
++------+----------------------------------------------------------+-----------+
+| 13   | Mutable firmware shall never have access to the MEK.     | Yes       |
++------+----------------------------------------------------------+-----------+
+| 14   | When the debug intent strap is enabled, the encryption   | Yes       |
+|      | engine shall zeroize the MEK.                            |           |
 +------+----------------------------------------------------------+-----------+
 
 ## Repository location
