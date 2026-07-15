@@ -154,7 +154,7 @@ This section considers some specific questions and suggestions for discussion on
 ## Typical Process for Obtaining the Caliptra Trademark
 
 1. The manufacturer contacts a licensed laboratory.  
-2. The laboratory and manufacturer agree on terms and sign a contract to help respond to the documentation required within the checklist and methodology document.  
+2. The laboratory and manufacturer agree on terms and sign a contract to help respond to the documentation required within the checklist and methodology document. 
 3. The laboratory and manufacturer communicate and jointly, when aligned, provide an application for Caliptra Trademark Usage for a TOE to Caliptra Trademark Owner TAC, signed by both laboratory and manufacturer.  
 4. It is the manufacturer's responsibility to provide a self-assessment of why the checklist requirements are fulfilled, together with other necessary information for the laboratory.  
 5. The laboratory evaluates and assesses the TOE using the provided filled-in checklist and the evaluation methodology. Iterations with the manufacturer are expected until all issues are resolved, as judged by the laboratory.  
