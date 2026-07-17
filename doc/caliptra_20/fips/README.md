@@ -27,6 +27,7 @@
 | CAVP #7 | v2.0.4          | ML-DSA KeyGen          | Completed   | 06/03/2026           |[A8473](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21293)|
 | CAVP #7 | v2.0.4          | ML-DSA SigGen          | Completed   | 06/03/2026           |[A8473](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21293)|
 | CAVP #7 | v2.0.4          | ML-DSA SigVer          | Completed   | 06/03/2026           |[A8473](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21293)|
+| CAVP #8 | v2.0.4          | CTR-DRBG               | Completed   | 07/17/2026           |[A8778](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21629)|
 
 # Caliptra v2.1.x FIPS Certificates
 
@@ -66,4 +67,5 @@
 | CAVP #7 | v2.1.2          | ML-DSA SigVer          | Completed   | 06/03/2026           |[A8489](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21288)|
 | CAVP #8 | v2.1.2          | ML-KEM KeyGen          | Completed   | 06/03/2026           |[A8481](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21289)|
 | CAVP #8 | v2.1.2          | ML-KEM EncapDecap      | Completed   | 06/03/2026           |[A8481](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21289)|
+| CAVP #9 | v2.1.2          | CTR-DRBG               | Completed   | 07/17/2026           |[A8779](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?product=21630)|
 
