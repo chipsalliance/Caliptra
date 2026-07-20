@@ -169,7 +169,7 @@ This section considers some specific questions and suggestions for discussion on
 4. The laboratory and manufacturer communicate and jointly, when aligned, provide an [application](Caliptra%20Conformance%20Program%20-%20Participation%20Form.pdf) for Caliptra Trademark Usage for a TOE to Caliptra Trademark Owner TAC, signed by both laboratory and manufacturer. The manufacturer sends the signed application to the Caliptra Trademark Owner at <caliptra-tm@lists.chipsalliance.org>. Note that this application form is also used to sign up for the Caliptra Vulnerability Alerts Mailing List.
 5. The laboratory evaluates and assesses the TOE using the provided filled-in checklist and the evaluation methodology. Iterations with the manufacturer are expected until all issues are resolved, as judged by the laboratory.
 6. The laboratory produces an evaluation technical report using the evaluation technical report template.
-7. The manufacturer sends the completed evaluation technical report to the Caliptra Trademark Owner at <caliptra-tm@lists.chipsalliance.org>.
+7. The manufacturer sends the completed evaluation technical report to the Caliptra Trademark Owner TAC at <caliptra-tm@lists.chipsalliance.org>, including contact information for a point of contact at the laboratory.
 8. The Caliptra Trademark Owner TAC assesses the submitted evaluation technical report, and, if needed, communicates with the laboratory for any questions and comments.  
 9. The Caliptra Trademark Owner determines to grant or deny the usage of the Caliptra Trademark for the TOE.  
 10. Upon approval, the manufacturer will create a pull request to add the TOE to the [Approved Products Registry](ApprovedProductsRegistry.md).
