@@ -105,12 +105,13 @@ Subsystem with OCP L.O.C.K. Trademark*.
    * SHA Accelerator Access Restriction (Subsystem)
    * Subsystem Straps Configuration
 2. **OCP Streaming Boot**
-3. **Production Debug Unlock**
-4. **Subsystem Secret Signal Protection**
-5. **Subsystem Fuse Map**
-6. **SoC Root of Trust (RoT)**
+3. **Manufacturing Debug Unlock**
+4. **Production Debug Unlock**
+5. **Subsystem Secret Signal Protection**
+6. **Subsystem Fuse Map**
+7. **SoC Root of Trust (RoT)**
    * Boot and Initialization Process
-7. **Secure Processes**
+8. **Secure Processes**
    * Development Process - Integrity of Hardware and ROM
 
 **Part IV: Caliptra Subsystem with OCP L.O.C.K. Trademark - Additional Requirements**
@@ -465,6 +466,20 @@ The requirements in this section apply **only** to integrations pursuing the
     evidence demonstrating that OCP Streaming Boot is executed through the official I3C
     component in Caliptra Subsystem release code.
 
+## Manufacturing Debug Unlock
+
+* **Checklist Item:**
+  * **Requirement:** The Manufacturing Debug Unlock Architecture MUST be used.
+    The simple JTAG security-state mechanism used in Passive Mode (Core
+    Trademark) is not applicable to Subsystem integrations. Any SoC DFT
+    or TAP access during manufacturing must be initiated through the
+    Caliptra Subsystem Manufacturing Debug Unlock procedure defined in
+    the Caliptra Subsystem Hardware Specification.
+  * **Evaluation Methodology:** Manufacturers MUST document the manufacturing
+    debug unlock mechanism implemented and demonstrate that it conforms to the
+    Manufacturing Debug Unlock Architecture defined in the Caliptra Subsystem
+    Hardware Specification.
+
 ## Production Debug Unlock
 
 * **Checklist Item:**
@@ -473,10 +488,10 @@ The requirements in this section apply **only** to integrations pursuing the
     Trademark) is not applicable to Subsystem integrations. Any SoC DFT
     or TAP access must be initiated through the Caliptra Subsystem Debug
     Unlock procedure.
-  * **Evaluation Methodology:** Manufacturers MUST document the debug unlock
-    mechanism implemented and demonstrate that it conforms to the Production
-    Debug Unlock Architecture defined in the Caliptra Subsystem Integration
-    Specification.
+  * **Evaluation Methodology:** Manufacturers MUST document the production
+    debug unlock mechanism implemented and demonstrate that it conforms to the
+    Production Debug Unlock Architecture defined in the Caliptra Subsystem
+    Hardware Specification.
 
 ## Subsystem Secret Signal Protection
 
