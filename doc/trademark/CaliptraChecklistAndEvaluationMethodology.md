@@ -320,7 +320,7 @@ OCP L.O.C.K. Trademark.
 
 * **Checklist Item:**  
   * **Requirement:** There MUST be a defined process for handling reported vulnerabilities, including assessment, communication, and deployment of security updates or mitigations.
-  * **Requirement:** Vendors MUST report issues or vulnerabilities that impact compliance with these Trademark requirements using the Caliptra [Security Incident](https://github.com/chipsalliance/Caliptra/blob/main/SECURITY.md) process.
+  * **Requirement:** Vendors MUST report issues or vulnerabilities that impact compliance with these Trademark requirements to the Caliptra Trademark Owner TAC at <caliptra-tm@lists.chipsalliance.org>.
   * **Evaluation Methodology:** Manufacturers MUST provide their flaw remediation policy. This policy must describe how vulnerabilities are received (e.g., bug bounty programs), evaluated, and prioritized, and how updates are securely delivered to devices in the field. Procedures for notifying stakeholders and compliance with relevant regulations MUST also be described.
 
 ---
