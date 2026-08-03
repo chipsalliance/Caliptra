@@ -13,7 +13,7 @@ granted by the Caliptra Trademark Owner (TAC) in accordance with the
 
 * **Vendor**: Vendor identifier specified in concise evidence and [IETF CoRIM (Concise Reference Integrity Manifest)](https://datatracker.ietf.org/doc/draft-ietf-rats-corim/) manifests.
 * **Model**: Model designation specified in concise evidence and [IETF CoRIM](https://datatracker.ietf.org/doc/draft-ietf-rats-corim/) manifests.
-* **Type**: Component/device type specified in concise evidence and [IETF CoRIM](https://datatracker.ietf.org/doc/draft-ietf-rats-corim/) manifests.
+* **Type**: (OPTIONAL) Component/device type specified in concise evidence and [IETF CoRIM](https://datatracker.ietf.org/doc/draft-ietf-rats-corim/) manifests, if needed to distinguish between models.
 * **HW Revision**: Caliptra hardware revision of the evaluated product (e.g. 1.1, 2.1.2).
 * **Trademark Track**: One of the 3 evaluation options defined in the [Caliptra Checklist and Evaluation Methodology](CaliptraChecklistAndEvaluationMethodology.md):
   * Caliptra Core Trademark (Passive Mode)
