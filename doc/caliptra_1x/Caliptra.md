@@ -1233,7 +1233,7 @@ Caliptra 1.3 introduces a **firmware-only retrofit** of post-quantum cryptograph
 
 ## Motivation and the PQC identity chain
 
-As the industry converges on post-2028 requirements for post-quantum cryptographic support, a large installed base of Caliptra 1.x silicon would otherwise face deprecation for purely cryptographic reasons, since Caliptra 1.x's DICE identity chain is ECDSA-only. Caliptra 1.3 addresses this by retrofitting a **parallel ML-DSA-87 identity chain**, referred to as `PQ.DevID`, alongside the existing ECDSA DICE chain described in [Identity](#identity). The two chains are independent: the classical ECDSA chain (IDevID → LDevID → Alias<sub>FMC</sub> → Alias<sub>RT</sub>) continues to be generated and endorsed exactly as before, and is unaffected by the PQC retrofit.
+As the industry converges on requirements for post-quantum cryptographic support, a large installed base of Caliptra 1.x silicon would otherwise face deprecation for purely cryptographic reasons, since Caliptra 1.x's DICE identity chain is ECDSA-only. Caliptra 1.3 addresses this by retrofitting a **parallel ML-DSA-87 identity chain**, referred to as `PQ.DevID`, alongside the existing ECDSA DICE chain described in [Identity](#identity). The two chains are independent: the classical ECDSA chain (IDevID → LDevID → Alias<sub>FMC</sub> → Alias<sub>RT</sub>) continues to be generated and endorsed exactly as before, and is unaffected by the PQC retrofit.
 
 The `PQ.DevID` chain is seeded, rather than derived purely internally as UDS-based ECDSA identity is:
 
