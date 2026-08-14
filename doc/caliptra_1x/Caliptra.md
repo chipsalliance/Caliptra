@@ -1244,7 +1244,7 @@ The `PQ.DevID` chain is seeded, rather than derived purely internally as UDS-bas
 * DPE leaf certificates and signing operations can be produced using ML-DSA-87 in addition to ECDSA, through [`INVOKE_DPE_MLDSA87`](#invoke_dpe_mldsa87), [`CERTIFY_KEY_EXTENDED_MLDSA87`](#certify_key_extended_mldsa87), and [`SIGN_WITH_EXPORTED_MLDSA`](#sign_with_exported_mldsa).
 * A general-purpose [`MLDSA87_SIGNATURE_VERIFY`](#mldsa87_signature_verify) command is also provided, parallel to `ECDSA384_SIGNATURE_VERIFY` and `LMS_SIGNATURE_VERIFY`, so an SoC RoT can use Caliptra as a PQC-safe verification oracle for its own firmware signatures independent of DICE/DPE identity.
 
-Support for this feature is advertised to the SoC via the `RT_MLDSA_ATTESTATION` bit in the `CAPABILITIES` command output, and the command loop only accepts the commands above when runtime firmware is built with the `mldsa_attestation` feature.
+Support for this feature is advertised to the SoC via the `RT_MLDSA_ATTESTATION` bit in the `CAPABILITIES` command output.
 
 ### Security guarantees
 
