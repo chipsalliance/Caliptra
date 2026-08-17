@@ -1264,7 +1264,7 @@ Support for this feature is advertised to the SoC via the `RT_MLDSA_ATTESTATION`
 
 ## New mailbox commands
 
-The following mailbox commands are added in Caliptra 1.3 and are gated behind the `mldsa_attestation` runtime firmware build feature and the `RT_MLDSA_ATTESTATION` capability bit. Full request/response layouts are documented in [`runtime/README.md`](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md).
+The following mailbox commands are added in Caliptra 1.3. Full request/response layouts are documented in [`runtime/README.md`](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md).
 
 | Command | Code | Purpose |
 | ------- | ---- | ------- |
