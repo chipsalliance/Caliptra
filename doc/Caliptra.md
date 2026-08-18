@@ -265,6 +265,7 @@ From Caliptra 2.x onwards, Caliptra introduces three integration variants: **Pas
 *   **Passive Mode**: Caliptra coordinates the start of the firmware chain-of-trust with the SoC, but the SoC manages its own update and recovery.
 *   **Subsystem Mode**: Caliptra is the RoT for the SoC and provides streaming boot, secure boot, attestation, and various cryptographic API services (such as encryption/decryption of SoC FWs, key releases, key wraps, and hashing).
 *   **Caliptra Subsystem w/ OCP L.O.C.K**: This variant extends the Caliptra Subsystem to include OCP L.O.C.K features. In this variant, Caliptra acts as a Key Management Block (KMB), providing secure key management, media encryption key (MEK) protection, and programming into the storage device's encryption engine via a dedicated hardware interface, ensuring that the MEK is never visible to mutable firmware.
+    * **NOTE:** This variant is only available with Caliptra 2.1 and onwards.
 
 **Passive Mode High Level Flow**
 
