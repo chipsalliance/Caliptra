@@ -510,7 +510,7 @@ The requirements in this section apply **only** to integrations pursuing the
 ### *Boot and Initialization Process*
 
 * **Checklist Item:**
-  * **Requirement:** Products (defined by Vendor, Model, and Type) receiving a trademark MUST NOT be capable of bypassing, disabling, holding in reset, or ignoring the results of Caliptra in production silicon. Mechanisms whose effect is to enable Caliptra are permitted only if they are irreversibly committed to the enabled state and hardened against side-channel attacks by the manufacturer prior to shipment.
+  * **Requirement:** Products (defined by Vendor, Model, and Type) receiving a trademark MUST NOT be capable of bypassing, disabling, holding in reset, or ignoring the results of Caliptra in production silicon. Mechanisms whose effect is to enable Caliptra are permitted only if they are irreversibly committed to the enabled state by the manufacturer prior to shipment.
   * **Evaluation Methodology:** Manufacturers MUST demonstrate non-bypassability through verifiable evidence. Acceptable evidence includes boot-flow documentation showing Caliptra as a hard gate on SoC operation, RTL or netlist analysis of every signal capable of gating or resetting Caliptra, identification and irreversible severance of any pre-production bypass paths, and fuse maps or test reports confirming that any enable mechanisms are committed at manufacturing and cannot be reversed.
 
 ## Secure Processes
