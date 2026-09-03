@@ -1229,7 +1229,7 @@ Please refer to [the Caliptra code base](https://github.com/chipsalliance/calipt
 
 # Software-based PQC features (Caliptra 1.3)
 
-Caliptra 1.3 introduces a **firmware-only retrofit** of post-quantum cryptographic (PQC) device identity for Caliptra 1.x silicon. This work is delivered entirely through mutable code (FMC and runtime firmware) updates — no ROM or hardware changes are required or possible, since Caliptra 1.x hardware does not include a PQC accelerator (unlike Caliptra 2.x, which pairs with the Adams Bridge ML-DSA/ML-KEM hardware IP). All ML-DSA-87 (FIPS 204) operations described in this section are performed by a software implementation running in runtime firmware.
+Caliptra 1.3 introduces a **firmware-only retrofit** of post-quantum cryptographic (PQC) device identity for Caliptra 1.x silicon. This work is delivered entirely through runtime firmware updates, since Caliptra 1.x hardware does not include a PQC accelerator (unlike Caliptra 2.x, which pairs with the Adams Bridge ML-DSA/ML-KEM hardware IP). All ML-DSA-87 (FIPS 204) operations described in this section are performed by a software implementation running in runtime firmware.
 
 ## Motivation and the PQC identity chain
 
