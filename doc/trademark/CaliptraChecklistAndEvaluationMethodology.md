@@ -248,7 +248,7 @@ OCP L.O.C.K. Trademark.
 ### *Firmware Implementation*
 * **Checklist Item:**  
     * **Requirement:** Cryptographic hashes of the Caliptra ROM and firmware (FMC and RT) MUST match reference hashes of official Caliptra releases.
-    * **Evaluation Methodology:** Vendors MUST show that Caliptra reports the FMC and RT measurements that match official measurements of at least one boot on a production part. Vendors MUST attest to the Auditor that they intend to only release official Caliptra releases.
+    * **Evaluation Methodology:** Vendors MUST show that Caliptra reports the FMC and RT measurements that match official measurements on at least one boot on a production part. Vendors MUST attest to the Auditor that they intend to only release official Caliptra releases.
 
 ## SoC Root of Trust (RoT)
 
