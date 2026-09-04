@@ -246,9 +246,11 @@ OCP L.O.C.K. Trademark.
   * **Evaluation Methodology:** Manufacturers MUST show the hardware implementation complies to the integration requirements in the caliptra-rtl repo and, if pursuing the Caliptra Subsystem Trademark, also complies to the integration requirements in the caliptra-ss repo. Note: the scope of the RTL integration requirements are limited to the hardware and ROM instantiation and do not cover firmware capabilities.
 
 ### *Firmware Implementation*
+
 * **Checklist Item:**  
-    * **Requirement:** Cryptographic hashes of the Caliptra ROM and firmware (FMC and RT) MUST match reference hashes of official Caliptra releases.
-    * **Evaluation Methodology:** Vendors MUST show that Caliptra reports the FMC and RT measurements that match official measurements on at least one boot on a production part. Vendors MUST attest to the Auditor that they intend to only release official Caliptra releases.
+    * **Requirement:** Vendors MUST attest that they intend to only sign for production official Caliptra releases as found at [FW Releases](https://github.com/chipsalliance/caliptra-sw#release-history).
+    * **Requirement:** Caliptra firmware (FMC and RT) MUST match official Caliptra releases as found at [FW Releases](https://github.com/chipsalliance/caliptra-sw#release-history).
+    * **Evaluation Methodology:** Vendors MUST show that Caliptra reports the FMC and RT measurements that match official measurements on at least one boot in their integrated environment (possible ways of getting this include pre-silicon environments, physical part attestation, image inspection compare). 
 
 ## SoC Root of Trust (RoT)
 
