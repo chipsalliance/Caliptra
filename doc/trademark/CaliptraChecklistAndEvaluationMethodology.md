@@ -245,6 +245,13 @@ OCP L.O.C.K. Trademark.
   * **Requirement:** Hardware implementation of Caliptra MUST adhere to the SoC Integration Requirements of the RTL release that was used. Refer to docs/CaliptraIntegrationSpecification.md (section "SoC integration requirements") from the official release that was consumed for integration, as listed in [Releases](https://github.com/chipsalliance/caliptra-rtl/releases). Integrators pursuing the **Caliptra Subsystem Trademark** must additionally consult the Caliptra Subsystem Integration Specification for Subsystem-specific integration requirements, from official [Releases](https://github.com/chipsalliance/caliptra-ss/releases).
   * **Evaluation Methodology:** Manufacturers MUST show the hardware implementation complies to the integration requirements in the caliptra-rtl repo and, if pursuing the Caliptra Subsystem Trademark, also complies to the integration requirements in the caliptra-ss repo. Note: the scope of the RTL integration requirements are limited to the hardware and ROM instantiation and do not cover firmware capabilities.
 
+### *Firmware Implementation*
+
+* **Checklist Item:**  
+    * **Requirement:** Vendors MUST attest that they intend to only sign for production official Caliptra releases as found at [FW Releases](https://github.com/chipsalliance/caliptra-sw#release-history).
+    * **Requirement:** Caliptra firmware (FMC and RT) MUST match official Caliptra releases as found at [FW Releases](https://github.com/chipsalliance/caliptra-sw#release-history).
+    * **Evaluation Methodology:** Vendors MUST show that Caliptra reports the FMC and RT measurements that match official measurements on at least one boot in their integrated environment (possible ways of getting this include pre-silicon environments, physical part attestation, image inspection compare). 
+
 ## SoC Root of Trust (RoT)
 
 ### *Boot and Initialization Process*
