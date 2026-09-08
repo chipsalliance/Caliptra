@@ -249,7 +249,7 @@ OCP L.O.C.K. Trademark.
 
 * **Checklist Item:**  
     * **Requirement:** Vendors MUST attest that they intend to only sign for production official Caliptra releases as found at [FW Releases](https://github.com/chipsalliance/caliptra-sw#release-history).
-    * **Requirement:** Caliptra firmware (FMC and RT) MUST match official Caliptra releases as found at [FW Releases](https://github.com/chipsalliance/caliptra-sw#release-history).
+    * **Requirement:** Caliptra firmware (FMC and RT) running in the vendor's integrated implementation MUST match official Caliptra releases as found at [FW Releases](https://github.com/chipsalliance/caliptra-sw#release-history).
     * **Evaluation Methodology:** Vendors MUST show that Caliptra reports the FMC and RT measurements that match official measurements on at least one boot in their integrated environment (possible ways of getting this include pre-silicon environments, physical part attestation, image inspection compare). 
 
 ## SoC Root of Trust (RoT)
