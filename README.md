@@ -109,6 +109,31 @@ Compatible Configurations:
 | 1.1.x | 1.1.x | 1.2.x (0/0) |
 | 1.0.x | 1.0.x | 1.2.x (0/0) |
 
+### Caliptra 1.3
+
+Additional Features
+  - [Software-based PQC features](doc/caliptra_1x/Caliptra.md#software-based-pqc-features-caliptra-13): firmware-only retrofit of an ML-DSA-87 (FIPS 204) `PQ.DevID` identity chain, parallel to the existing ECDSA DICE chain, implemented entirely in Runtime Firmware for Caliptra 1.x silicon (no hardware/ROM changes)
+    - New Runtime commands
+      - [SET_PQ_SEED](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#set_pq_seed)
+      - [GET_PQ_CSR](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#get_pq_csr)
+      - [GET_PQ_INFO](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#get_pq_info)
+      - [POPULATE_PQ_CERT](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#populate_pq_cert)
+      - [GET_PQ_CERT](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#get_pq_cert)
+      - [MLDSA87_SIGNATURE_VERIFY](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#mldsa87_signature_verify)
+      - [INVOKE_DPE_MLDSA87](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#invoke_dpe_mldsa87)
+      - [CERTIFY_KEY_EXTENDED_MLDSA87](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#certify_key_extended_mldsa87)
+      - [SIGN_WITH_EXPORTED_MLDSA](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#sign_with_exported_mldsa)
+    - Gated behind the `mldsa_attestation` Runtime Firmware feature and advertised via the `RT_MLDSA_ATTESTATION` [`CAPABILITIES`](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#capabilities) bit
+    - Software-only ML-DSA-87 implementation: no PQC hardware acceleration on Caliptra 1.x silicon, so some commands (notably `CERTIFY_KEY_EXTENDED_MLDSA87`) carry significant tail latency; see [Performance considerations](doc/caliptra_1x/Caliptra.md#performance-considerations)
+
+Compatible Configurations:
+
+| RTL | ROM | Runtime FMC/FW |
+| --- | --- | --- |
+| 1.1.x | 1.2.x | 1.3.x (0/0) |
+| 1.1.x | 1.1.x | 1.3.x (0/0) |
+| 1.0.x | 1.0.x | 1.3.x (0/0) |
+
 ### Caliptra 2.0
 
 Additional Features

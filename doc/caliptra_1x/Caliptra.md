@@ -1227,6 +1227,92 @@ This section describes Caliptra error reporting and handling.
 
 Please refer to [the Caliptra code base](https://github.com/chipsalliance/caliptra-sw/blob/main/error/src/lib.rs) for a list of the error codes.
 
+# Software-based PQC features (Caliptra 1.3)
+
+Caliptra 1.3 introduces a **firmware-only retrofit** of post-quantum cryptographic (PQC) device identity for Caliptra 1.x silicon. This work is delivered entirely through runtime firmware updates, since Caliptra 1.x hardware does not include a PQC accelerator (unlike Caliptra 2.x, which pairs with the Adams Bridge ML-DSA/ML-KEM hardware IP). All ML-DSA-87 (FIPS 204) operations described in this section are performed by a software implementation running in runtime firmware.
+
+## Motivation and the PQC identity chain
+
+As the industry converges on requirements for post-quantum cryptographic support, a large installed base of Caliptra 1.x silicon would otherwise face deprecation for purely cryptographic reasons, since Caliptra 1.x's DICE identity chain is ECDSA-only. Caliptra 1.3 addresses this by retrofitting a **parallel ML-DSA-87 identity chain**, referred to as `PQ.DevID`, alongside the existing ECDSA DICE chain described in [Identity](#identity). The two chains are independent: the classical ECDSA chain (IDevID → LDevID → Alias<sub>FMC</sub> → Alias<sub>RT</sub>) continues to be generated and endorsed exactly as before, and is unaffected by the PQC retrofit.
+
+The `PQ.DevID` chain is seeded, rather than derived purely internally as UDS-based ECDSA identity is:
+
+* The SoC (via the SOC Manager mutable code, outside the scope of Caliptra) provisions a per-device seed, `PQ.DevID.Seed` (at least 384 bits, with the same protection expectations as other per-device secrets), to Caliptra runtime firmware using the [`SET_PQ_SEED`](#set_pq_seed) mailbox command.
+* Runtime firmware mixes `PQ.DevID.Seed` through an HMAC-based KDF to derive `PQ.DevID.CDI`, which is stored in persistent data until a cold reset. The CDI lives through warm resets and hitless updates.
+* `PQ.DevID.CDI` is used to deterministically derive an ML-DSA-87 keypair (the same seed always produces the same keypair).
+* Runtime firmware can produce a CSR for the `PQ.DevID` public key ([`GET_PQ_CSR`](#get_pq_csr)) for use during manufacturing/provisioning, retrieve the raw public key ([`GET_PQ_INFO`](#get_pq_info)), and reconstruct/return a `PQ.DevID` certificate from a caller-supplied TBS and ML-DSA-87 signature ([`GET_PQ_CERT`](#get_pq_cert)) — the same on-demand DER-assembly pattern `GET_IDEV_CERT` uses for the ECDSA IDevID. Separately, [`POPULATE_PQ_CERT`](#populate_pq_cert) loads the vendor/owner-issued `PQ.DevID` certificate chain into a runtime buffer that runtime firmware embeds as the issuer chain when DPE returns ML-DSA-87 leaf certificates; it does not feed `GET_PQ_CERT`, and — unlike `POPULATE_IDEV_CERT`, which prepends onto the existing ECDSA chain — it replaces the buffer outright and must be re-issued after every Caliptra reset before `INVOKE_DPE_MLDSA87`, `CERTIFY_KEY_EXTENDED_MLDSA87`, or an ML-DSA CDI export is attempted.
+* DPE leaf certificates and signing operations can be produced using ML-DSA-87 in addition to ECDSA, through [`INVOKE_DPE_MLDSA87`](#invoke_dpe_mldsa87), [`CERTIFY_KEY_EXTENDED_MLDSA87`](#certify_key_extended_mldsa87), and [`SIGN_WITH_EXPORTED_MLDSA`](#sign_with_exported_mldsa).
+* A general-purpose [`MLDSA87_SIGNATURE_VERIFY`](#mldsa87_signature_verify) command is also provided, parallel to `ECDSA384_SIGNATURE_VERIFY` and `LMS_SIGNATURE_VERIFY`, so an SoC RoT can use Caliptra as a PQC-safe verification oracle for its own firmware signatures independent of DICE/DPE identity.
+
+Support for the ML-DSA feature is advertised to the SoC via the `RT_MLDSA_ATTESTATION` bit in the `CAPABILITIES` command output.
+
+### Security guarantees
+
+* `PQ.DevID` provides a post-quantum-safe (ML-DSA-87 / FIPS 204) device identity and signing capability, usable for SPDM 1.4 PQC algorithm negotiation and attestation, and for DPE-mediated leaf identities, alongside — not instead of — the existing ECDSA DICE identity. **This attestation is strictly scoped to components that fall outside Caliptra Core itself** — for example, application processors and other SoC components for which Caliptra acts as PQC-capable root of trust. Unlike the classical ECDSA DICE chain, which is rooted in Caliptra ROM and extends to attest Caliptra Core's own ROM and Runtime/FMC state via Alias<sub>FMC</sub>/Alias<sub>RT</sub>, **the ML-DSA-87 identity chain provides no equivalent attestation of Caliptra's own ROM or FMC** — a `PQ.DevID`-signed certificate or signature says nothing about the integrity of the ROM or FMC that booted the device. See [Limitations](#limitations) below for what this means for PQC-signed attestation of Caliptra's own firmware.
+* `PQ.DevID.Seed` delivery is restricted to PL0 callers only, and the derived `PQ.DevID.CDI` and cached key material live only in Caliptra's persistent data (DCCM) for the runtime session; the ML-DSA-87 private key itself is never exposed across the mailbox.
+* **The production `PQ.DevID.Seed` must never be delivered while Caliptra is `DebugUnlocked`.** Runtime firmware does not enforce this itself.
+  Integrators may still call `SET_PQ_SEED` with a throwaway, non-production seed while `DebugUnlocked` for local bring-up and debug — the rule only concerns the real production seed value.
+  This matters because `PQ.DevID.Seed` carries the same protection requirements as [UDS](#uds) or field entropy (see [Caliptra security states](#caliptra-security-states)). Unlike those hardware-backed secrets, however, `PQ.DevID.Seed` is software-based and so cannot be cleared on a `DebugUnlocked` transition — which is why it is important not to populate `PQ.DevID.Seed` during debug operations.
+
+### Limitations
+
+* **This is a software-only PQC implementation.** Caliptra 1.x hardware provides no ML-DSA acceleration, so all lattice arithmetic executes on the VeeR core. This has direct performance, code size, and stack usage implications; see [Performance considerations](#performance-considerations) below.
+* **`PQ.DevID` deliberately does not bind to Caliptra's own measurements.** Neither the FMC hash nor the RT hash is mixed into `PQ.DevID.Seed`/`PQ.DevID.CDI`, unlike the ECDSA chain where Alias<sub>FMC</sub> and Alias<sub>RT</sub> are cryptographically bound to firmware measurements. This means **Caliptra's own firmware integrity is not attested by the PQC identity** — a `PQ.DevID`-signed certificate or signature says nothing about which FMC/RT is running. This tradeoff was made deliberately: binding to firmware measurements would require re-provisioning the `PQ.DevID` certificate (a costly manufacturing-flow operation) on every FMC/RT firmware update.
+  This does **not** mean PQC-signed attestation of Caliptra's firmware is entirely unavailable, but the guarantee it offers and the assumptions behind it are worth spelling out.
+  In the classic ECDSA chain, each stage's measurements are vouched for by an *earlier*, independently-derived key: LDevID endorses Alias<sub>FMC</sub> before FMC ever executes, and Alias<sub>FMC</sub> endorses Alias<sub>RT</sub> before RT firmware ever executes.
+  A later compromised stage therefore cannot impersonate an earlier one or lie about its own measurements to a verifier.
+  `PQ.DevID` cannot offer that same property, because `PQ.DevID.Seed` is delivered directly to RT firmware itself (via `SET_PQ_SEED`), rather than to an earlier boot stage that could attest to RT before it runs.
+  This means there is no independent, earlier-derived key vouching for RT firmware's own measurements in the PQC chain: a compromised RT firmware that controls `PQ.DevID.CDI` could, in principle, alter the very measurements it reports
+  and use `PQ.DevID`-derived keys to sign a self-consistent but false story about what firmware is running.
+  This could only have been avoided by delivering `PQ.DevID.Seed` to FMC and deriving an alias ID there so that RT's own measurement is attested by an earlier, independent stage the way the ECDSA chain does.
+  That approach was considered and rejected for this retrofit: FMC does not have the code or storage budget and delivering the seed early in boot would itself have been a significant integration challenge.
+  `INVOKE_DPE_MLDSA87` and `CERTIFY_KEY_EXTENDED_MLDSA87` operate on the same DPE context/TCI tree as their ECDSA counterparts (see [New mailbox commands](#new-mailbox-commands) below),
+  whose root TCI is seeded from `RT_FW_CURRENT_PCR`/`RT_FW_JOURNEY_PCR` — PCRs extended with the **RT firmware hash** alone.
+  As a result, DPE does still produce ML-DSA-87-signed attestations of RT firmware measurements, and integrators who need PQC-signed attestation of the RT measurement should request it through DPE-mediated ML-DSA-87 leaf certificates rather than treating the bare `PQ.DevID` certificate as an
+attestation — but the trustworthiness of that attestation is weaker than the classical chain's, since it ultimately depends on the integrity of the same RT firmware it is attesting to.
+* `PQ.DevID.Seed` provisioning, `PQ.DevID` certificate issuance/management, and SPDM 1.4 PQC negotiation are performed by the SOC Manager and manufacturing flow, which are outside the scope of the Caliptra codebase and this specification.
+
+## New mailbox commands
+
+The following mailbox commands are added in Caliptra 1.3. Full request/response layouts are documented in [`runtime/README.md`](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md).
+
+| Command | Code | Purpose |
+| ------- | ---- | ------- |
+| `SET_PQ_SEED`<a id="set_pq_seed"></a> | `0x5051_5344` ("PQSD") | PL0-only. Delivers `PQ.DevID.Seed` (a `[u8; 48]` value, sized to `MLDSA87_PRIVATE_SEED_BYTES`) from the SoC to runtime firmware. runtime firmware derives `PQ.DevID.CDI` via HMAC-KDF, derives the ML-DSA-87 keypair, and caches the public-key digest in persistent data. No command-specific response payload beyond the standard mailbox response header. |
+| `GET_PQ_CSR`<a id="get_pq_csr"></a> | `0x5051_4353` ("PQCS") | No input arguments. Returns a variable-length (`data_size`, up to 12,800 bytes) DER-encoded ML-DSA-87 CSR for the `PQ.DevID` public key, for collection during manufacturing/provisioning. |
+| `GET_PQ_INFO`<a id="get_pq_info"></a> | `0x5051_494E` ("PQIN") | No input arguments. Returns the raw ML-DSA-87 `PQ.DevID` public key (2,592 bytes). |
+| `POPULATE_PQ_CERT`<a id="populate_pq_cert"></a> | `0x5050_5143` ("PPQC") | PL0-only. Loads a DER-encoded `PQ.DevID` certificate chain (up to 8,192 bytes, issued by the vendor/owner after CSR collection) into runtime firmware's ML-DSA DPE certificate-chain buffer, **replacing** any chain loaded by a previous call — it does not prepend like `POPULATE_IDEV_CERT` does. This buffer is not persisted across resets and is empty at boot, so `POPULATE_PQ_CERT` must be called once per boot before it is used as the issuer chain embedded in ML-DSA-87 DPE leaf certificates returned by `INVOKE_DPE_MLDSA87` / `CERTIFY_KEY_EXTENDED_MLDSA87`, and before exporting an ML-DSA CDI. It is unrelated to `GET_PQ_CERT`, which assembles its response from caller-supplied request fields rather than reading this buffer. |
+| `GET_PQ_CERT`<a id="get_pq_cert"></a> | `0x4750_5143` ("GPQC") | Given a caller-supplied TBS and ML-DSA-87 signature, DER-assembles and returns the resulting `PQ.DevID` certificate, mirroring `GET_IDEV_CERT`. Stateless: it does not read the buffer populated by `POPULATE_PQ_CERT`. |
+| `MLDSA87_SIGNATURE_VERIFY`<a id="mldsa87_signature_verify"></a> | `0x4D44_5356` ("MDSV") | Verifies a standalone ML-DSA-87 signature over the digest currently staged in Caliptra's SHA384 accelerator, analogous to `ECDSA384_SIGNATURE_VERIFY`/`LMS_SIGNATURE_VERIFY`. Input arguments are the 2,592-byte public key and 4,627-byte signature; as with the other verify commands, the message must be streamed through the SHA accelerator first — the raw message cannot be carried in-band, to keep hashing inside the FIPS module boundary. |
+| `INVOKE_DPE_MLDSA87`<a id="invoke_dpe_mldsa87"></a> | `0x4D4C_4450` ("MLDP") | Invokes a DPE command using the ML-DSA-87 crypto backend (up to 512 bytes of encoded DPE command input, up to 25,168 bytes of response), used to obtain DPE leaf certificates/signatures rooted in the ML-DSA-87 profile. |
+| `CERTIFY_KEY_EXTENDED_MLDSA87`<a id="certify_key_extended_mldsa87"></a> | `0x434B_454D` ("CKEM") | The ML-DSA-87 counterpart to [`CERTIFY_KEY_EXTENDED`](#certify_key_extended): produces a DPE leaf certificate or CSR containing SoC-supplied custom extensions (such as `DMTF_OTHER_NAME`), signed with ML-DSA-87. Request carries a fixed 72-byte `certify_key_req` plus flags; response carries a fixed 25,152-byte `certify_key_resp` buffer. |
+| `SIGN_WITH_EXPORTED_MLDSA`<a id="sign_with_exported_mldsa"></a> | `0x5357_4D4C` ("SWML") | The ML-DSA-87 counterpart to `SIGN_WITH_EXPORTED_ECDSA`: signs with an ML-DSA-87 keypair derived from a previously-exported DPE CDI handle. Supports two modes selected by `sign_mode` — `SIGN_MODE_DATA` (Caliptra computes the internal `mu` from a raw message up to 1,024 bytes) and `SIGN_MODE_EXTERNAL_MU` (caller supplies a precomputed external `mu`, for callers that hash the message themselves). |
+
+### Example workflow: SPDM attestation in a DICE-enabled environment
+
+A typical end-to-end flow for standing up and using `PQ.DevID` in a DICE-enabled SPDM 1.4 deployment looks like the following:
+
+**Manufacturing / provisioning time**
+
+1. Caliptra boots to runtime firmware as usual, establishing the classical ECDSA DICE chain (IDevID → LDevID → Alias<sub>FMC</sub> → Alias<sub>RT</sub>).
+2. The SOC Manager delivers the device's `PQ.DevID.Seed` to Caliptra via `SET_PQ_SEED`. Caliptra derives `PQ.DevID.CDI` and the ML-DSA-87 keypair.
+3. The manufacturing flow retrieves the CSR by issuing the `GET_PQ_CSR` runtime firmware mailbox command over the normal mailbox interface, and submits it to the vendor/owner PQC provisioning CA. This differs from ECDSA IDevID CSR collection (see [Provisioning IDevID during manufacturing](#provisioning-idevid-during-manufacturing)), which is a ROM-time, cold-boot-only sequence gated by `CPTRA_DBG_MANUF_SERVICE_REG`/`CPTRA_BOOTFSM_GO` and read out via JTAG or the SoC interface before runtime firmware is even loaded: `GET_PQ_CSR` requires no such register sequence and can be issued at any point after runtime firmware boots (once `SET_PQ_SEED` has provisioned the seed), regenerating the CSR deterministically from the persisted `PQ.DevID.CDI` on each call rather than being fetched once and cached.
+4. Once the signed `PQ.DevID` certificate chain is returned from the CA, it is provisioned back onto the device: the SOC Manager retains the leaf certificate's TBS and ML-DSA-87 signature for later reconstruction via `GET_PQ_CERT`, and loads the full chain into runtime firmware with `POPULATE_PQ_CERT` so it is available as the issuer chain for ML-DSA-87 DPE leaf certificates. Because `POPULATE_PQ_CERT`'s buffer does not survive a reset, this call must be repeated on every boot before step 6 below, not just once at manufacturing time.
+
+**Field / attestation time**
+
+5. An SPDM 1.4 requester negotiates PQC algorithms with the SoC's SPDM responder (SOC Manager). The responder asks Caliptra to reassemble the `PQ.DevID` leaf certificate via `GET_PQ_CERT` (supplying the TBS and signature captured in step 4), combines it with the rest of the chain it already holds, and presents the result to the requester as part of the SPDM `GET_CERTIFICATE` exchange.
+6. For SPDM challenge/measurement signing, the responder uses Caliptra as a signing oracle: it either invokes DPE via `INVOKE_DPE_MLDSA87`/`CERTIFY_KEY_EXTENDED_MLDSA87` to obtain an ML-DSA-87 leaf identity for the requested DPE context, or uses `SIGN_WITH_EXPORTED_MLDSA` against a previously-exported CDI handle, to produce the ML-DSA-87 signature over the SPDM transcript.
+7. The requester verifies the signature against the `PQ.DevID` chain using standard ML-DSA-87 verification, completing PQC-safe attestation — independent of, and in parallel with, the ECDSA-based DICE attestation the SoC may also present.
+
+`MLDSA87_SIGNATURE_VERIFY` is not part of this identity-chain flow; it exists as a standalone verification oracle (mirroring `ECDSA384_SIGNATURE_VERIFY`/`LMS_SIGNATURE_VERIFY`) for SoC RoT designs that want to verify their own PQC-signed firmware images using Caliptra's FIPS-validated crypto module.
+
+## Performance considerations
+
+Because ML-DSA-87 in Caliptra 1.3 is implemented entirely in software on the VeeR core, several of the new commands are measurably more expensive than their ECDSA/LMS counterparts, and this cost cannot be fully eliminated without hardware acceleration. `CERTIFY_KEY_EXTENDED_MLDSA87` in particular is the most expensive command in the mailbox surface with a tail cost that, measured by the runtime's cycle-count regression tests over 1000 samples, reaches roughly 0.6 seconds at p99 and up to 0.7 seconds in the worst observed case, at the reference 400 MHz core clock used by those tests.
+
+Part of this cost is a mandatory FIPS pairwise consistency test (PCT) performed the first time a freshly derived ML-DSA-87 key is used, which adds an extra sign-and-verify pass on top of key derivation and signing; the runtime avoids repeating it for subsequent operations against the same derived key within a session, but the added first-use cost still lengthens the worst-case tail. The actual latency on a given integration will vary with the SoC's core clock frequency and system load, and should not be assumed to be lower.
+
 # Future effort: Caliptra security subsystem
 
 A future effort is a full security subsystem solution. This solution is a combination of fully open source digital logic and licensable analog components that are technology dependent, such as TRNG analog sources or technology dependent fuse controllers.
