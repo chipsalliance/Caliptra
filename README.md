@@ -123,7 +123,7 @@ Additional Features
       - [INVOKE_DPE_MLDSA87](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#invoke_dpe_mldsa87)
       - [CERTIFY_KEY_EXTENDED_MLDSA87](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#certify_key_extended_mldsa87)
       - [SIGN_WITH_EXPORTED_MLDSA](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#sign_with_exported_mldsa)
-    - Gated behind the `mldsa_attestation` Runtime Firmware feature and advertised via the `RT_MLDSA_ATTESTATION` [`CAPABILITIES`](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#capabilities) bit
+    - Availability is advertised to the SoC via the `RT_MLDSA_ATTESTATION` [`CAPABILITIES`](https://github.com/chipsalliance/caliptra-sw/blob/caliptra-1.x/runtime/README.md#capabilities) bit
     - Software-only ML-DSA-87 implementation: no PQC hardware acceleration on Caliptra 1.x silicon, so some commands (notably `CERTIFY_KEY_EXTENDED_MLDSA87`) carry significant tail latency; see [Performance considerations](doc/caliptra_1x/Caliptra.md#performance-considerations)
 
 Compatible Configurations:
