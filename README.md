@@ -27,6 +27,8 @@ sets out the charter governing the Caliptra project.
 * [Caliptra Trademark Policy](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkPolicy.md)
 * [Caliptra Trademark Process definition](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraTrademarkAuditProcess.md)
 * [Caliptra Trademark Checklist and Evaluation Methodology](https://github.com/chipsalliance/Caliptra/blob/main/CaliptraChecklistAndEvaluationMethodology.md)
+* [Caliptra Trademark Versioning Scheme](https://github.com/chipsalliance/Caliptra/blob/main/doc/trademark/CaliptraTrademarkVersioningScheme.md) — how Trademark Editions are named and released as Git branches and tags.
+* [Caliptra Trademark Edition Index](https://github.com/chipsalliance/Caliptra/blob/main/doc/trademark/README.md) — the canonical list of ratified Trademark Editions.
 
 ## Specifications
 
@@ -56,6 +58,8 @@ sets out the charter governing the Caliptra project.
 Caliptra is released in independently versioned components: RTL, ROM, FMC and Runtime FW. They are all represented by 3 values: major.minor.patch (such as 1.0.2). The first 2 values, major.minor, correspond to a set of features caliptra supports. The patch value is incremented as new releases are made with bug fixes. Lastly, mutable firmware (FMC/FW) have security version numbers (SVNs) that are incremented as required by when addressing security-critical issues. These are specified with the label (svn/svn) for (FMC/FW) versions respectively.
 
 Not all components necessarily need to be of the same major.minor version to be compatible. Details are below:
+
+> **Note on Trademark versioning.** The Caliptra Trademark requirements are versioned independently of Caliptra component releases, as **Trademark Editions** delivered on dedicated Git branches and tags in this repository. Trademark Edition identifiers (e.g., `Edition A`) are intentionally distinct from Caliptra component `major.minor.patch` versions and never embed a component version. See the [Caliptra Trademark Versioning Scheme](https://github.com/chipsalliance/Caliptra/blob/main/doc/trademark/CaliptraTrademarkVersioningScheme.md) and the [Edition Index](https://github.com/chipsalliance/Caliptra/blob/main/doc/trademark/README.md).
 
 ### Caliptra 1.0
 Compatible Configurations:
