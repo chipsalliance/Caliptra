@@ -220,12 +220,6 @@ OCP L.O.C.K. Trademark.
   * **Recommendation:** Authorization mechanisms SHOULD be implemented for in-field programmable fuses to prevent unauthorized updates that could lead to denial-of-service or other attacks.  
   * **Evaluation Methodology:** Manufacturers SHOULD document the authorization processes required to program fuses in the field, including cryptographic protections or authentication steps.
 
-#### *Caliptra SVN (Security Version Number) Management*
-
-* **Checklist Item:**  
-  * **Requirement*:** Before updating any Caliptra SVN fuses, the SoC MUST verify that the firmware integrity and authenticity have been validated, and that the new SVN is greater than the current one.  
-  * **Evaluation Methodology:** Manufacturers MUST describe the SVN update process, including checks performed to prevent unauthorized or erroneous updates.
-
 ## Interfaces
 
 ### *Mailbox Interface Compliance*
