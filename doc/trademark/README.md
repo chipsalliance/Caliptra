@@ -1,30 +1,50 @@
 # Caliptra Trademark Edition Index
 
-This directory hosts the Caliptra Trademark Versioning Scheme and the index of all ratified Trademark Editions.
+This directory hosts the [Caliptra Trademark Versioning Scheme](CaliptraTrademarkVersioningScheme.md) and the index of all allocated Trademark Edition identifiers.
 
-* [Caliptra Trademark Versioning Scheme](CaliptraTrademarkVersioningScheme.md) — defines how Trademark Editions are named, released (as Git branches and tags), and how they relate to Caliptra code releases.
-* The three working-draft Trademark documents — [`CaliptraTrademarkPolicy.md`](../../CaliptraTrademarkPolicy.md), [`CaliptraTrademarkAuditProcess.md`](../../CaliptraTrademarkAuditProcess.md), and [`CaliptraChecklistAndEvaluationMethodology.md`](../../CaliptraChecklistAndEvaluationMethodology.md) — live at the repository root on the `main` branch. Frozen copies are published on a dedicated `edition/<identifier>` branch at each Edition ratification.
+All working and ratified Trademark content is maintained on `main`. The mutable `doc/trademark/next_wip/` working directory contains the unratified proposal for the next Edition and cannot be used for an audit or license. Each ratified Edition is preserved permanently in `doc/trademark/edition_<identifier>/`.
 
-> **How to cite an Edition for compliance.** Integrators cite a specific revision tag of the form `edition-<identifier>-r<N>` (for example, `edition-A-r1`), not just the Edition identifier or the branch name. The revision tag is a deterministic, immutable Git reference to the exact frozen text the integrator was audited against.
+> **How to cite an Edition for compliance.** Integrators cite the immutable Edition and Revision tag `edition-<identifier>-r<N>` (for example, `edition-A-r1`). A directory name, Edition identifier, or the `main` branch is not a compliance citation.
 
 ## Edition Index
 
-| Edition       | Branch                                                                                       | Latest tag        | Status                       | Ratification date | In-scope Caliptra `Major.Minor` lines |
-| ------------- | -------------------------------------------------------------------------------------------- | ----------------- | ---------------------------- | ----------------- | ------------------------------------- |
-| `Edition A`   | [`edition/A`](https://github.com/chipsalliance/Caliptra/tree/edition/A) *(to be cut)*        | `edition-A-r1` *(to be applied)* | Planned — not yet ratified | TBD               | TBD by TAC at ratification; expected applicability: Caliptra 1.0, 1.1, 1.2, 2.0, 2.1 (each row's minimum patch level pinned in the Edition's `CompatibilityMatrix.md` per [§4.1](CaliptraTrademarkVersioningScheme.md#41-structure)) |
+| Edition | Directory on `main` | Current tag | Lifecycle status | Ratification date | Compatibility Matrix |
+| --- | --- | --- | --- | --- | --- |
+| `Edition A` | Not yet created | Not yet created | Not ratified; no lifecycle status | Not available | Not available |
 
-**Next identifier to be allocated:** `B`. See [§3.4 of the Versioning Scheme](CaliptraTrademarkVersioningScheme.md#34-allocation-of-identifiers).
+`Edition A` is allocated, but the directory, tag, status record, and Compatibility Matrix required for ratification do not yet exist. It therefore has no ratified Trademark authority. When an Edition is ratified, this index links both its permanent directory on `main` and its current immutable tag.
+
+**Next identifier to be allocated:** `B`. See [Section 2 of the Versioning Scheme](CaliptraTrademarkVersioningScheme.md#2-identifier-scheme).
+
+## Controlled document set
+
+The complete controlled document set expected in `next_wip` and each Edition directory is:
+
+- `CaliptraTrademarkPolicy.md`
+- `CaliptraTrademarkAuditProcess.md`
+- `CaliptraChecklistAndEvaluationMethodology.md`
+- `CompatibilityMatrix.md`
+- `Caliptra Conformance Program - Participation Form.pdf`
+- `Caliptra Conformance Program - Terms and Conditions.pdf`
+- `EditionStatus.md`
+
+Additional controlled documents may be added when required by the Trademark program. See [Section 3.1 of the Versioning Scheme](CaliptraTrademarkVersioningScheme.md#31-working-documentation).
 
 ## Lifecycle status legend
 
-- **Planned** — An Edition row reserved in this index in anticipation of ratification. The branch and initial tag have not yet been created. A Planned Edition does not confer any Trademark authority.
-- **Active** — A ratified Edition that is a valid target for new audits. An Edition enters the Active status on ratification and carries the full authority of the Caliptra Trademark requirements; see [§2.1 of the Versioning Scheme](CaliptraTrademarkVersioningScheme.md#21-edition-lifecycle-status).
-- **Superseded** — A later Edition has replaced this one for the Caliptra `Major.Minor` release lines that the later Edition is applicable to. Prior Trademark licenses remain valid; new audits SHOULD target an Active Edition that is applicable to the integrator's release line.
-- **Withdrawn** — The TAC has formally revoked this Edition as a target for new audits as of the effective withdrawal date recorded on the Edition branch. Trademark licenses previously issued under a Withdrawn Edition remain valid; no new licenses may be issued on the basis of a Withdrawn Edition after the effective date. See [§5.5 of the Versioning Scheme](CaliptraTrademarkVersioningScheme.md#55-withdrawal-of-a-ratified-edition).
+- **Active** - Ratified and available for new Trademark engagements.
+- **Superseded** - A later Edition is available or preferred, but this Edition remains usable where its Compatibility Matrix and this index permit.
+- **Deprecated** - Not available to an integrator that did not initiate contact with a Security Review Provider (SRP) before the effective deprecation date.
+
+See [Section 8 of the Versioning Scheme](CaliptraTrademarkVersioningScheme.md#8-lifecycle-and-applicability-of-tags) for requirements around Edition deprecation and SRP contact.
+
+## Transition status
+
+The directory model is not operational until `next_wip`, ratified Edition directories, this index and related links, the integrity workflow, and repository and protected-tag rules have all been migrated to the model on `main`. No Edition or Revision may be ratified under the scheme before those prerequisites are complete. See [Section 10 of the Versioning Scheme](CaliptraTrademarkVersioningScheme.md#10-transition-to-the-directory-model).
 
 ## Related documents
 
-- [Caliptra Trademark Policy](../../CaliptraTrademarkPolicy.md)
-- [Caliptra Trademark Audit Process](../../CaliptraTrademarkAuditProcess.md)
-- [Caliptra Checklist and Evaluation Methodology](../../CaliptraChecklistAndEvaluationMethodology.md)
-- [Caliptra Contributing Process](../CaliptraContributingProcess.md) — including the RFC procedure invoked when ratifying a new Edition.
+- [Caliptra Trademark Policy](CaliptraTrademarkPolicy.md)
+- [Caliptra Trademark Audit Process](CaliptraTrademarkAuditProcess.md)
+- [Caliptra Checklist and Evaluation Methodology](CaliptraChecklistAndEvaluationMethodology.md)
+- [Caliptra Contributing Process](../CaliptraContributingProcess.md)
