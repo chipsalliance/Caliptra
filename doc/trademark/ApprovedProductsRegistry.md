@@ -19,8 +19,9 @@ granted by the Caliptra Trademark Owner (TAC) in accordance with the
   * Caliptra Core Only Trademark
   * Caliptra Subsystem Trademark
   * Caliptra Subsystem with OCP L.O.C.K. Trademark
+* **Trademark Edition**: The identifier for the officially ratified [Trademark Edition](CaliptraTrademarkVersioningScheme.md) that was used to complete the audit.
 
 ## Approved Products Registry
 
-| Vendor | Model | Type | HW Revision | Trademark Track |
-| :----- | :---- | :--- | :---------- | :-------------- |
+| Vendor | Model | Type | HW Revision | Trademark Track | Trademark Edition |
+| :----- | :---- | :--- | :---------- | :-------------- | :---------------- |
