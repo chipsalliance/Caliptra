@@ -1,0 +1,3 @@
+Placeholder for a future workflow that defines repository tagging on push to main according to the Trademark Versioning Scheme
+ - Applies to pull requests that create or modify doc/trademark/edition_<identifier>
+
