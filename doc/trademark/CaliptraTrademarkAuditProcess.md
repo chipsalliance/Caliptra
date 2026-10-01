@@ -144,13 +144,7 @@ This section considers some specific questions and suggestions for discussion on
   * Updates of the hardware of the device that integrates Caliptra that are expected to **affect the security** of the Caliptra integration.
     * **Suggestion**: A new Caliptra Trademark Audit Process is required. If the manufacturer is using the same laboratory as for a similar previous version, it is expected that the audit process is more efficient.
 * Validity of granted Caliptra Trademark
-  * Revocation of Caliptra Trademark Usage
-    * **Suggestion**: Caliptra TAC can revoke the usage of the Caliptra Trademark under certain conditions.
-      * The validity time of the Caliptra Trademark Usage has expired.
-      * Critical vulnerabilities have been discovered in either the integration of Caliptra, or Caliptra, that would fail a new Caliptra Trademark audit, and the vulnerabilities have not, or cannot, be mitigated.
-      * New threats have emerged that were not considered in the Caliptra Trademark Process, and that critically effects the security.
-  * **Suggestion**: There is validity time granted for each Caliptra Trademark usage.
-  * **Suggestion**: Caliptra 1.X will in time be replaced by Caliptra 2.X with PQC compliance. A date will be set for when the grant of using Caliptra trademark with Caliptra 1.X will no longer be given because it doesn't support PQC algorithms.  After that date, no other Calitpra 1.X trademarks will be given.
+  * Caliptra 1.X will in time be replaced by Caliptra 2.X with PQC compliance. A date will be set for when the grant of using Caliptra trademark with Caliptra 1.X will no longer be given because it doesn't support PQC algorithms.  After that date, no other Calitpra 1.X trademarks will be given.
 * Multi-Stage Audit Process for Partially Compliant IP
   * A multi-stage audit process is permitted for cases where an initial manufacturer creates a partially compliant IP intended for integration into a larger system.
   * **Process**: The initial IP manufacturer engages an accredited laboratory to evaluate all verifiable requirements at the subsystem or IP level. The laboratory produces an initial evaluation technical report covering those specific requirements.
