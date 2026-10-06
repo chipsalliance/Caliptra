@@ -24,3 +24,5 @@ granted by the Caliptra Trademark Owner (TAC) in accordance with the
 
 | Vendor | Model | Type | HW Revision | Trademark Track |
 | :----- | :---- | :--- | :---------- | :-------------- |
+| NVIDIA | Vera |  | 1.1 | Caliptra Core Only Trademark |
+| NVIDIA | Spectrum-6 |  | 1.1 | Caliptra Core Only Trademark |
