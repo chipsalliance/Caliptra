@@ -94,6 +94,9 @@ bibliography: bibliography.yaml
 |                |         | Mark LOAD_KAT_MEK as optional.      |
 +----------------+---------+-------------------------------------+
 | TBD            | TBD     | Address compliance feedback.        |
+|                |         |                                     |
+|                |         | Clarify that KMB may rotate HPKE    |
+|                |         | KEM keys.                           |
 +----------------+---------+-------------------------------------+
 
 \currenttemplateversion
@@ -375,8 +378,8 @@ Table: Critical Security Parameters {#tbl:critical-security-parameters}
 |                   | [-@fig:mek-secret-derivation].       |                                                             |                |
 +-------------------+--------------------------------------+-------------------------------------------------------------+----------------+
 | HPKE private keys | Provides transport encryption for    | Randomly generated on startup. Held in volatile memory,     | N/A            |
-|                   | injected access keys. See            | rotated on demand, and lost on cold reset.                  |                |
-|                   | @sec:hpke-transport-encryption.      |                                                             |                |
+|                   | injected access keys. See            | rotated on demand, on reset or if on a malformed KEM        |                |
+|                   | @sec:hpke-transport-encryption.      | encapsulated secret.                                        |                |
 +-------------------+--------------------------------------+-------------------------------------------------------------+----------------+
 | Access keys       | Contributes to the derivation of a   | Managed outside of Caliptra. Asymmetrically encrypted       | N/A            |
 |                   | Locked MPK encryption key. See       | using the HPKE public key. When held by Caliptra, each      |                |
@@ -531,7 +534,7 @@ When a user wishes to generate or enable an MPK (which is required prior to load
 
 Upon receipt, KMB will unwrap the access key and proceed to generate or enable the MPK.
 
-Upon Caliptra cold reset or firmware-update reset, the HPKE keypairs are autonomously regenerated. See @sec:reset-behavior.
+Upon any Caliptra reset, the HPKE keypairs are regenerated. See @sec:reset-behavior. Additionally, KMB may rotate HPKE KEM keypairs when the KEM encapsulated secret is malformed. Integrations should be resilient to the HPKE KEM keypairs and their associated handles changing upon malformed input.
 
 ##### HPKE algorithm support {#sec:hpke-algorithms}
 
